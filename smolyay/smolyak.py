@@ -24,9 +24,10 @@ class IndexGrid:
                 type(index_per_level) == np.ndarray):
             index_per_level = list(index_per_level)
 
-        if len(index_per_level) != exactness + 1:
+        if len(index_per_level) < exactness + 1:
             raise IndexError(
-                "index_per_level must be an array with a length of {}"
+                "index_per_level must be an array with a"
+                "length of at least {}"
                 .format(exactness + 1))
 
     def level_indexes(self):
@@ -41,7 +42,7 @@ class IndexGrid:
         # creating an array to store unique indexes in each level
         level_indexes = np.zeros((self.exactness+1), dtype=list)
 
-        max_index = sum(self.index_per_level)
+        max_index = sum(self.index_per_level[0:self.exactness + 2])
         indexes = np.linspace(0, max_index, max_index+1, dtype=np.int32)
 
         # intial level
@@ -60,7 +61,7 @@ class IndexGrid:
     def grid_point_index(self):
         """Generate index of grid points.
 
-        First, it generates allowed composoitons of levels
+        First, it generates allowed compositons of levels
         via NEXCOM algorithm. Then, it replaces the levels
         with their corresponding indexes, and
         makes the index for the grid points.
@@ -155,4 +156,5 @@ class IndexGrid:
                 num_grid_point += 1
 
         return grid_points_index
+
 
