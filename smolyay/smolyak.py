@@ -12,17 +12,13 @@ class IndexGrid:
     exactness : int
         Level of exactness of the approximation.
     index_per_level : list
-        Number of indexes at each level
+        Number of indexes at each level.
     """
 
     def __init__(self, dimension, exactness, index_per_level):
         self.dimension = dimension
         self.exactness = exactness
         self.index_per_level = index_per_level
-
-        if (type(index_per_level) == tuple or
-                type(index_per_level) == np.ndarray):
-            index_per_level = list(index_per_level)
 
         if len(index_per_level) < exactness + 1:
             raise IndexError(
@@ -35,13 +31,12 @@ class IndexGrid:
 
         Returns
         -------
-        level_indexes : numpy array
+        level_indexes : list
             Unique indexes at each level.
 
         """
         # creating an array to store unique indexes in each level
-        level_indexes = np.zeros((self.exactness+1), dtype=list)
-
+        level_indexes = [[0]]*(self.exactness + 1)
         max_index = sum(self.index_per_level[0:self.exactness + 2])
         indexes = np.linspace(0, max_index, max_index+1, dtype=np.int32)
 
@@ -74,27 +69,15 @@ class IndexGrid:
         """
         num_grid_points = 0
         level_indexes = self.level_indexes()
-
-        # precompute the number of level compositions
-        summs = np.linspace(self.dimension,
-                            self.exactness+self.dimension,
-                            self.exactness+1, dtype=np.int32)
-        max_level_indexes = summs - self.dimension
-        num_comps = 0
-        for max_level_index in max_level_indexes:
-            num_comps += scipy.special.comb(max_level_index+self.dimension-1,
-                                            self.dimension-1, exact=True)
-        level_compositions = np.zeros((num_comps, self.dimension), dtype=list)
+        level_compositions = []
 
         # compute the allowed level compositions
-        num_comp = 0
         for summ in range(self.dimension, self.exactness+self.dimension+1):
 
             # NEXCOM
             max_level_index = summ - self.dimension
             num_output = scipy.special.comb(max_level_index+self.dimension-1,
                                             self.dimension-1, exact=True)
-
             compositions = np.zeros((num_output, self.dimension),
                                     dtype=np.int32)
 
@@ -129,13 +112,13 @@ class IndexGrid:
             # and replace the levels with indexes
             for composition in compositions:
                 num_grid_point = 1
+                level_compositions.append([])
                 for index_i in range(self.dimension):
                     num_grid_point *= (
                         self.index_per_level[composition[index_i]])
-                    level_compositions[num_comp][index_i] = (
+                    level_compositions[-1].append(
                         level_indexes[composition[index_i]])
                 num_grid_points += num_grid_point
-                num_comp += 1
 
         # create a numpy array with the size of grid points
         grid_points_index = np.zeros((
@@ -156,5 +139,3 @@ class IndexGrid:
                 num_grid_point += 1
 
         return grid_points_index
-
-
