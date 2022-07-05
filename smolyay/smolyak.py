@@ -1,11 +1,19 @@
-import numpy as np
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul  5 08:00:15 2022
+
+@author: mzf0069
+"""
+
+import numpy
 import scipy.special
 
 
 class IndexGrid:
-    """Generate index of grid points.
+    """Indexes of grid points for constructing a surrogate function.
 
-    Attributes
+    Parameters
     ----------
     dimension : int
         Number of independent variables.
@@ -19,13 +27,47 @@ class IndexGrid:
         self.dimension = dimension
         self.exactness = exactness
         self.index_per_level = index_per_level
+        self._needs_update = True
 
-        if len(index_per_level) < exactness + 1:
+    def _update(self):
+        """Update the indexes of grid points.
+
+        It generates the indexes for each level
+        depending on the index_per_level, and makes the
+        indexes of grid points.
+
+        """
+        # requirement for generating the grid points
+        if len(self.index_per_level) < self.exactness + 1:
             raise IndexError(
                 "index_per_level must be an array with a"
-                "length of at least {}"
-                .format(exactness + 1))
+                " length of at least {}"
+                .format(self.exactness + 1))
 
+        # cumulative sum to get end index of each level, up to exactness+1
+        end_levels = numpy.cumsum(self.index_per_level[:self.exactness+1])
+        # create ranges of indexes at each level
+        level_indexes = [list(range(end-n, end))
+                         for end, n in zip(end_levels, self.index_per_level)]
+        self._level_indexes = level_indexes
+
+        points = None
+        # get all combinations of points at each level
+        for summ in range(self.dimension, self.exactness+self.dimension+1):
+            compositions = generate_compositions(summ, self.dimension)
+            for composition in compositions:
+                point_ids = [level_indexes[i] for i in composition]
+                points_ = numpy.array(
+                    numpy.meshgrid(*point_ids)).T.reshape(-1,
+                                                          self.dimension)
+                if points is None:
+                    points = points_
+                else:
+                    points = numpy.concatenate((points, points_), axis=0)
+        self._grid_point_index = points
+        self._needs_update = False
+
+    @property
     def level_indexes(self):
         """Generate indexes of levels.
 
@@ -35,31 +77,18 @@ class IndexGrid:
             Unique indexes at each level.
 
         """
-        # creating an array to store unique indexes in each level
-        level_indexes = [[0]]*(self.exactness + 1)
-        max_index = sum(self.index_per_level[0:self.exactness + 2])
-        indexes = np.linspace(0, max_index, max_index+1, dtype=np.int32)
+        if self._needs_update:
+            self._update()
 
-        # intial level
-        level_indexes[0] = indexes[0:self.index_per_level[0]]
+        return self._level_indexes
 
-        # storing unique indexes for each level
-        summ_index = self.index_per_level[0]
-        for idx_index_per_level in range(1, self.exactness + 1):
-            summ_index += self.index_per_level[idx_index_per_level]
-            level_indexes[idx_index_per_level] = (
-                indexes[summ_index-self.index_per_level[idx_index_per_level]:
-                        summ_index])
-
-        return level_indexes
-
+    @property
     def grid_point_index(self):
         """Generate index of grid points.
 
-        First, it generates allowed compositons of levels
-        via NEXCOM algorithm. Then, it replaces the levels
-        with their corresponding indexes, and
-        makes the index for the grid points.
+        It generates allowed compositons of levels,
+        and depending on the indexes for each level,
+        it makes the indexes of the grid points.
 
         Returns
         -------
@@ -67,75 +96,59 @@ class IndexGrid:
             Index of grid points
 
         """
-        num_grid_points = 0
-        level_indexes = self.level_indexes()
-        level_compositions = []
+        if self._needs_update:
+            self._update()
 
-        # compute the allowed level compositions
-        for summ in range(self.dimension, self.exactness+self.dimension+1):
+        return self._grid_point_index
 
-            # NEXCOM
-            max_level_index = summ - self.dimension
-            num_output = scipy.special.comb(max_level_index+self.dimension-1,
-                                            self.dimension-1, exact=True)
-            compositions = np.zeros((num_output, self.dimension),
-                                    dtype=np.int32)
 
-            # (A) first entry
-            r = np.zeros(self.dimension, dtype=np.int32)
-            r[0] = max_level_index
-            t = max_level_index
+def generate_compositions(summ, dimension):
+    """Genearte allowed compositions of levels using NEXCOM algorithm.
+
+    Parameters
+    ----------
+    summ: int
+        Summation of levels.
+    dimension: int
+        Number of independent variables.
+
+    Returns
+    -------
+    compositions: list
+        Allowed composition of levels.
+    """
+    max_level_index = summ - dimension
+    num_output = scipy.special.comb(max_level_index+dimension-1,
+                                    dimension-1, exact=True)
+    compositions = numpy.zeros((num_output, dimension),
+                               dtype=numpy.int32)
+
+    # (A) first entry
+    r = numpy.zeros(dimension, dtype=numpy.int32)
+    r[0] = max_level_index
+    t = max_level_index
+    h = 0
+    compositions[0] = r
+    index = 1
+
+    # (D): these termination conditions should be redundant
+    while (r[dimension-1] != max_level_index
+           and index < num_output + 1):
+
+        # (B)
+        if t != 1:
             h = 0
-            compositions[0] = r
-            index = 1
 
-            # (D): these termination conditions should be redundant
-            while (r[self.dimension-1] != max_level_index
-                   and index < num_output + 1):
+        # (C)
+        h += 1
+        t = r[h-1]
+        r[h-1] = 0
+        r[0] = t-1
+        r[h] += 1
 
-                # (B)
-                if t != 1:
-                    h = 0
+        # (D)
+        compositions[index] = r
+        index += 1
 
-                # (C)
-                h += 1
-                t = r[h-1]
-                r[h-1] = 0
-                r[0] = t-1
-                r[h] += 1
+    return compositions
 
-                # (D)
-                compositions[index] = r
-                index += 1
-
-            # precompute the number of grid points
-            # and replace the levels with indexes
-            for composition in compositions:
-                num_grid_point = 1
-                level_compositions.append([])
-                for index_i in range(self.dimension):
-                    num_grid_point *= (
-                        self.index_per_level[composition[index_i]])
-                    level_compositions[-1].append(
-                        level_indexes[composition[index_i]])
-                num_grid_points += num_grid_point
-
-        # create a numpy array with the size of grid points
-        grid_points_index = np.zeros((
-            num_grid_points, self.dimension), dtype=np.int32)
-        num_grid_point = 0
-        for level_index_composition in level_compositions:
-            len_level = []
-            # generate a list containing the number of indexes
-            # corresponding to each level
-            for level_index in level_index_composition:
-                len_level.append(len(level_index))
-            # generate grid point indexes
-            for index_grid_i in np.ndindex(tuple(len_level)):
-                for dimension_i in range(self.dimension):
-                    index = index_grid_i[dimension_i]
-                    grid_points_index[num_grid_point][dimension_i] = (
-                        level_index_composition[dimension_i][index])
-                num_grid_point += 1
-
-        return grid_points_index
