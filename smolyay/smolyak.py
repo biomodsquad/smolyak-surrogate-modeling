@@ -54,6 +54,7 @@ class IndexGrid:
         points = None
         # get all combinations of points at each level
         for summ in range(self.dimension, self.exactness+self.dimension+1):
+            # use generate_compositions function which implements NEXCOM
             compositions = generate_compositions(summ, self.dimension)
             for composition in compositions:
                 point_ids = [level_indexes[i] for i in composition]
@@ -151,4 +152,6 @@ def generate_compositions(summ, dimension):
         index += 1
 
     return compositions
-
+u = IndexGrid(2, 2, [1,2,2])
+i = u.level_indexes
+j = u.grid_point_index
