@@ -1,13 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul  5 08:00:15 2022
-
-@author: mzf0069
-"""
-
 import numpy
-import scipy.special
 
 
 class IndexGrid:
@@ -27,15 +18,46 @@ class IndexGrid:
         self.dimension = dimension
         self.exactness = exactness
         self.index_per_level = index_per_level
+
+    @property
+    def dimension(self):
+        """Get dimension."""
+        return self._dimension
+
+    @dimension.setter
+    def dimension(self, value):
+        print('Set dimension')
+        self._dimension = value
+        self._needs_update = True
+
+    @property
+    def exactness(self):
+        """Get exactness."""
+        return self._exactness
+
+    @exactness.setter
+    def exactness(self, value):
+        print('Set exactness')
+        self._exactness = value
+        self._needs_update = True
+
+    @property
+    def index_per_level(self):
+        """Get index_per_level."""
+        return self._index_per_level
+
+    @index_per_level.setter
+    def index_per_level(self, value):
+        print('Set index_per_level')
+        self._index_per_level = value
         self._needs_update = True
 
     def _update(self):
         """Update the indexes of grid points.
 
-        It generates the indexes for each level
+        Generates the indexes for each level
         depending on the index_per_level, and makes the
         indexes of grid points.
-
         """
         # requirement for generating the grid points
         if len(self.index_per_level) < self.exactness + 1:
@@ -51,33 +73,31 @@ class IndexGrid:
                          for end, n in zip(end_levels, self.index_per_level)]
         self._level_indexes = level_indexes
 
-        points = None
         # get all combinations of points at each level
-        for summ in range(self.dimension, self.exactness+self.dimension+1):
-            # use generate_compositions function which implements NEXCOM
-            compositions = generate_compositions(summ, self.dimension)
-            for composition in compositions:
-                point_ids = [level_indexes[i] for i in composition]
-                points_ = numpy.array(
-                    numpy.meshgrid(*point_ids)).T.reshape(-1,
-                                                          self.dimension)
-                if points is None:
-                    points = points_
+        grid_points_idx = None
+        for sum_levels in range(self.dimension,
+                                self.exactness+self.dimension+1):
+            for composition in generate_compositions(
+                    sum_levels, self.dimension, include_zero=False):
+                # indexes start from zero
+                index_composition = composition - 1
+                # generate all combinations of the arrays along each dimension
+                level_cmp_idx = [level_indexes[idx]
+                                 for idx in index_composition]
+                grid_points_idx_ = numpy.array(
+                    numpy.meshgrid(*level_cmp_idx)).T.reshape(-1,
+                                                              self.dimension)
+                if grid_points_idx is None:
+                    grid_points_idx = grid_points_idx_
                 else:
-                    points = numpy.concatenate((points, points_), axis=0)
-        self._grid_point_index = points
+                    grid_points_idx = numpy.concatenate(
+                        (grid_points_idx, grid_points_idx_), axis=0)
+        self._grid_point_index = grid_points_idx
         self._needs_update = False
 
     @property
     def level_indexes(self):
-        """Generate indexes of levels.
-
-        Returns
-        -------
-        level_indexes : list
-            Unique indexes at each level.
-
-        """
+        """Generate indexes of levels."""
         if self._needs_update:
             self._update()
 
@@ -85,56 +105,42 @@ class IndexGrid:
 
     @property
     def grid_point_index(self):
-        """Generate index of grid points.
-
-        It generates allowed compositons of levels,
-        and depending on the indexes for each level,
-        it makes the indexes of the grid points.
-
-        Returns
-        -------
-        grid_points_index : numpy array
-            Index of grid points
-
-        """
+        """Generate index of grid points."""
         if self._needs_update:
             self._update()
 
         return self._grid_point_index
 
 
-def generate_compositions(summ, dimension):
-    """Genearte allowed compositions of levels using NEXCOM algorithm.
+def generate_compositions(value, num_parts, include_zero):
+    """Genearte compostions of a value into num_parts parts.
 
     Parameters
     ----------
-    summ: int
-        Summation of levels.
-    dimension: int
-        Number of independent variables.
+    value: int
+        Value.
+    num_parts: int
+        Number of parts.
+    include_zero : bool
+        True if compositions contain zero, False otherwise.
 
-    Returns
-    -------
-    compositions: list
-        Allowed composition of levels.
+    Yields
+    ------
+    numpy array
+        All possible compositions of the value into num_parts.
     """
-    max_level_index = summ - dimension
-    num_output = scipy.special.comb(max_level_index+dimension-1,
-                                    dimension-1, exact=True)
-    compositions = numpy.zeros((num_output, dimension),
-                               dtype=numpy.int32)
+    value = value if include_zero else value - num_parts
 
     # (A) first entry
-    r = numpy.zeros(dimension, dtype=numpy.int32)
-    r[0] = max_level_index
-    t = max_level_index
+    r = numpy.zeros(num_parts, dtype=numpy.int32)
+    r[0] = value
+    t = value
     h = 0
-    compositions[0] = r
     index = 1
+    yield r if include_zero else r+1
 
-    # (D): these termination conditions should be redundant
-    while (r[dimension-1] != max_level_index
-           and index < num_output + 1):
+    # (D)
+    while r[num_parts-1] != value:
 
         # (B)
         if t != 1:
@@ -146,12 +152,5 @@ def generate_compositions(summ, dimension):
         r[h-1] = 0
         r[0] = t-1
         r[h] += 1
-
-        # (D)
-        compositions[index] = r
+        yield r if include_zero else r+1
         index += 1
-
-    return compositions
-u = IndexGrid(2, 2, [1,2,2])
-i = u.level_indexes
-j = u.grid_point_index
