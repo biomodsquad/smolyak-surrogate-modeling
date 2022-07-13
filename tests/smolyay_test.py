@@ -2,9 +2,16 @@ import pytest
 import numpy
 from smolyay.smolyak import IndexGrid
 
+@pytest.fixture
+def expected_points():
+    """grid_point_indexes for dimension=2,exactness=2,index_per_level=[1,2,2]"""
+    return numpy.array([[0,0],[0,1],[0,2],[0,3],[0,4],[1,0],
+        [1,1],[1,2],[2,0],[2,1],[2,2],[3,0],[4,0]], dtype=numpy.int32)
 
-grid_points_expect = numpy.array([[0,0],[0,1],[0,2],[0,3],[0,4],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2],[3,0],[4,0]], dtype=numpy.int32)
-
+@pytest.fixture
+def expected_indexes():
+    """level_indexes for dimension=2,exactness=2,index_per_level=[1,2,2]"""
+    return [[0],[1,2],[3,4]]
 
 def test_initial_dimension():
     """test initialized class returns correct dimension"""
@@ -19,182 +26,111 @@ def test_initial_exactness():
 def test_initial_index_by_level():
     """test initialized class returns correct index by level"""
     test_class = IndexGrid(1,2,[1,2,3])
-    assert test_class.index_per_level == [1,2,3]
+    assert numpy.array_equiv(test_class.index_per_level,[1,2,3])
 
-def test_level_indexes():
+def test_level_indexes(expected_indexes):
     """test level indexes"""
     test_class = IndexGrid(2,2,[1,2,2])
-    level_indexes_expect = [[0],[1,2],[3,4]]
     level_indexes_recieved = test_class.level_indexes
-    error_message = []
-    is_equal = True
-    # check length, then values
-    if len(level_indexes_recieved) == 3:
-        counter = 0
-        while is_equal and counter < 3:
-            is_equal = is_equal and numpy.array_equal(
-                    level_indexes_expect[counter],
-                    level_indexes_recieved[counter])
-            if not is_equal:
-                error_message.append(
-                        "level indexes incorrect at level" + str(counter))
-            counter += 1
-    else:
-        error_message.append("level_indexes length incorrect")
+    
+    assert level_indexes_recieved == expected_indexes
 
-    assert not error_message, error_message
-
-def test_grid_point_index():
+def test_grid_point_index(expected_points):
     """test grid point index"""
     test_class = IndexGrid(2,2,[1,2,2])
-    grid_points = test_class.grid_point_index
-    # sort grid_points as order of points is unimportant
-    for i in range(len(grid_points[0,:])-1,-1,-1):
-        grid_points = grid_points[grid_points[:,i].argsort(kind='mergesort')]
+    grid_points = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
 
-    assert numpy.array_equal(grid_points,grid_points_expect)
+    assert numpy.array_equal(grid_points,expected_points)
 
-def test_level_indexes_extra_level_per_index():
+def test_level_indexes_extra_level_per_index(expected_indexes):
     """test level indexes when level_per_index has more information"""
     test_class = IndexGrid(2,2,[1,2,2,4,8])
-    level_indexes_expect = [[0],[1,2],[3,4]]
     level_indexes_recieved = test_class.level_indexes
-    error_message = []
-    is_equal = True
-    # check length, then values
-    if len(level_indexes_recieved) == 3:
-        counter = 0
-        while is_equal and counter < 3:
-            is_equal = is_equal and numpy.array_equal(
-                    level_indexes_expect[counter],
-                    level_indexes_recieved[counter])
-            if not is_equal:
-                error_message.append(
-                        "level indexes incorrect at level" + str(counter))
-            counter += 1
-    else:
-        error_message.append("level_indexes length incorrect")
 
-    assert not error_message, error_message
+    assert level_indexes_recieved == expected_indexes
 
-def test_grid_point_index_extra_level_per_index():
+def test_grid_point_index_extra_level_per_index(expected_points):
     """test grid point index when level_per_index has more information"""
     test_class = IndexGrid(2,2,[1,2,2,4,8])
-    grid_points = test_class.grid_point_index
-    # sort grid_points as order of points is unimportant
-    for i in range(len(grid_points[0,:])-1,-1,-1):
-        grid_points = grid_points[grid_points[:,i].argsort(kind='mergesort')]
+    grid_points = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
 
-    assert numpy.array_equal(grid_points,grid_points_expect)
-
+    assert numpy.array_equal(grid_points,expected_points)
 
 def test_index_per_level_expand():
     """test if properties change if more is added to level_per_index"""
     test_class = IndexGrid(1,2,[1,2,3])
-    level_indexes_1 = test_class.level_indexes
-    grid_point_1 = test_class.grid_point_index
+    grid_point_1 = test_class.grid_point_indexes
 
     test_class.index_per_level = [1,2,3,4,5]
-    level_indexes_2 = test_class.level_indexes
-    grid_point_2 = test_class.grid_point_index
+    grid_point_2 = test_class.grid_point_indexes
     
     assert numpy.array_equal(grid_point_1,grid_point_2)
 
-def test_update_exactness():
-    """test if grid points are correct if exactness is updated"""
+def test_increase_exactness(expected_points):
+    """test if grid points are correct if exactness is increased"""
     test_class = IndexGrid(2,1,[1,2,2])
-    grid_points_1 = test_class.grid_point_index
+    grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.exactness = 2
-    grid_points_2 = test_class.grid_point_index
-    test_class.exactness = 1
-    grid_points_3 = test_class.grid_point_index
-    #sort grid_points as order is unimportant
-    for i in range(len(grid_points_2[0,:])-1,-1,-1):
-        grid_points_1 = grid_points_1[
-                grid_points_1[:,i].argsort(kind='mergesort')]
-        grid_points_2 = grid_points_2[
-                grid_points_2[:,i].argsort(kind='mergesort')]
-        grid_points_3 = grid_points_3[
-                grid_points_3[:,i].argsort(kind='mergesort')]
-    #see if test failed
-    exactness_2e = numpy.array_equal(grid_points_2, grid_points_expect)
-    exactness_13 = numpy.array_equal(grid_points_1, grid_points_3)
-    exactness_12 = numpy.array_equal(grid_points_1, grid_points_2)
-    exactness_23 = numpy.array_equal(grid_points_3, grid_points_2)
-    #include ways test failed if it did
-    error_message = []
-    if exactness_12:
-        error_message.append("Increasing exactness failed to update value. ")
-    elif not exactness_2e:
-        error_message.append("Increased exactness has incorrect value. ")
-    if exactness_23 and not exactness_12:
-        error_message.append("Decreasing exactness failed to update value. ")
-    elif not exactness_13:
-        error_message.append("Decreased exactness has incorrect value. ")
+    grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
+    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
+            and numpy.array_equiv(grid_points_2, expected_points))
 
+def test_decrease_exactness(expected_points):
+    """test if grid points are correct if exactness is decreased"""
+    test_class = IndexGrid(2,4,[1,2,2,4,8])
+    grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
+    test_class.exactness = 2
+    grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
+    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
+            and numpy.array_equiv(grid_points_2, expected_points))
 
-    assert not error_message,''.join(error_message)
-
-def test_update_dimension():
-    """test if grid points are correct if dimension is updated"""
-    test_class = IndexGrid(3,2,[1,2,2])
-    grid_points_1 = test_class.grid_point_index
+def test_increase_dimension(expected_points):
+    """test if grid points are correct if dimension is increased"""
+    test_class = IndexGrid(1,2,[1,2,2])
+    grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.dimension = 2
-    grid_points_2 = test_class.grid_point_index
-    test_class.dimension = 3
-    grid_points_3 = test_class.grid_point_index
-    #sort grid_points as order is unimportant
-    for i in range(len(grid_points_2[0,:])-1,-1,-1):
-        grid_points_1 = grid_points_1[
-                grid_points_1[:,i].argsort(kind='mergesort')]
-        grid_points_2 = grid_points_2[
-                grid_points_2[:,i].argsort(kind='mergesort')]
-        grid_points_3 = grid_points_3[
-                grid_points_3[:,i].argsort(kind='mergesort')]
-    #see if test failed
-    dimension_2e = numpy.array_equal(grid_points_2, grid_points_expect)
-    dimension_13 = numpy.array_equal(grid_points_1, grid_points_3)
-    dimension_12 = numpy.array_equal(grid_points_1, grid_points_2)
-    dimension_23 = numpy.array_equal(grid_points_3, grid_points_2)
-    #include ways test failed if it did
-    error_message = []
-    if dimension_12:
-        error_message.append("Decreasing dimension failed to update value. ")
-    elif not dimension_2e:
-        error_message.append("Decreased dimension has incorrect value. ")
-    if dimension_23 and not dimension_12:
-        error_message.append("Increasing dimension failed to update value. ")
-    elif not dimension_13:
-        error_message.append("Increased dimension has incorrect value. ")
+    grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
+    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
+            and numpy.array_equiv(grid_points_2, expected_points))
 
-    assert not error_message,''.join(error_message)
+def test_decrease_dimension(expected_points):
+    """test if grid points are correct if dimension is decreased"""
+    test_class = IndexGrid(3,2,[1,2,2])
+    grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
+    test_class.dimension = 2
+    grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
+    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
+            and numpy.array_equiv(grid_points_2, expected_points))
 
-def test_update_index_per_level():
-    """test if grid points are correct if index_per_level is updated"""
+def test_update_index_per_level(expected_points):
+    """test if grid points are correct if index_per_level is changed"""
     test_class = IndexGrid(2,2,[1,2,3])
-    grid_points_1 = test_class.grid_point_index
+    grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.index_per_level = [1,2,2]
-    grid_points_2 = test_class.grid_point_index
-    #sort grid_points as order is unimportant
-    for i in range(len(grid_points_2[0,:])-1,-1,-1):
-        grid_points_1 = grid_points_1[
-                grid_points_1[:,i].argsort(kind='mergesort')]
-        grid_points_2 = grid_points_2[
-                grid_points_2[:,i].argsort(kind='mergesort')]
-    #see if test failed
-    lpi_2e = numpy.array_equal(grid_points_2, grid_points_expect)
-    lpi_12 = numpy.array_equal(grid_points_1, grid_points_2)
-    #include ways test failed if it did
-    error_message = []
-    if lpi_12:
-        error_message = "New index per level failed to update value. "
-    elif not lpi_2e:
-        error_message = "New index per level has incorrect value. "
+    grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
+    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
+            and numpy.array_equiv(grid_points_2, expected_points))
 
-    assert not error_message,error_message
-
-def test_error():
-    """test if error is returned for invalid index_per_level"""
+def test_invalid_index_per_level():
+    """test if error is returned if invalid index_per_level is initialized"""
     test_class = IndexGrid(2,2,[1,2])
     with pytest.raises(IndexError):
         level_indexes = test_class.level_indexes
+
+def test_update_invalid_index_per_level():
+    """test if error is returned if updated index_per_level is invalid"""
+    test_class = IndexGrid(2,2,[1,2,2])
+    test_class.index_per_level = [2,2]
+    with pytest.raises(IndexError):
+        level_indexes = test_class.level_indexes
+
+def test_exactness_zero_level_indexes():
+    """test the level indexes if exactness is zero"""
+    test_class = IndexGrid(2,0,[1,2,2])
+    assert test_class.level_indexes == [[0]]
+
+def test_exactness_zero_grid_point_indexes():
+    """test the level indexes if exactness is zero"""
+    test_class = IndexGrid(2,0,[1,2,2])
+    assert numpy.array_equiv(test_class.level_indexes,[0,0])
+
