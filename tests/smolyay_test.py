@@ -138,7 +138,9 @@ def test_generate_compositions_include_zero_true():
     """test the generate compositions function if include_zero is true"""
     composition_expected = numpy.array([[6,0],[5,1],[4,2],[3,3],
         [2,4],[1,5],[0,6]],dtype=numpy.int32)
-    composition_obtained = list(generate_compositions(6,2,include_zero=True))
+    composition_obtained = []
+    for i in generate_compositions(6,2,include_zero=True):
+        composition_obtained.append(i.copy())
     assert numpy.array_equiv(composition_obtained,composition_expected)
 
 def test_generate_compositions_include_zero_false():
