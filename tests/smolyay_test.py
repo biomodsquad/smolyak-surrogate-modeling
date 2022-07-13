@@ -1,6 +1,6 @@
 import pytest
 import numpy
-from smolyay.smolyak import IndexGrid
+from smolyay.smolyak import IndexGrid,generate_compositions
 
 @pytest.fixture
 def expected_points():
@@ -134,3 +134,24 @@ def test_exactness_zero_grid_point_indexes():
     test_class = IndexGrid(2,0,[1,2,2])
     assert numpy.array_equiv(test_class.level_indexes,[0,0])
 
+def test_generate_compositions_include_zero_true():
+    """test the generate compositions function if include_zero is true"""
+    composition_expected = numpy.array([[6,0],[5,1],[4,2],[3,3],
+        [2,4],[1,5],[0,6]],dtype=numpy.int32)
+    composition_obtained = list(generate_compositions(6,2,include_zero=True))
+    assert numpy.array_equiv(composition_obtained,composition_expected)
+
+def test_generate_compositions_include_zero_false():
+    """test the generate compositions function if include_zero is false"""
+    test_class = IndexGrid(2,1,[1,2,3])
+    composition_expected = numpy.array([[5,1],[4,2],[3,3],
+        [2,4],[1,5]],dtype=numpy.int32)
+    composition_obtained = list(generate_compositions(6,2,include_zero=False))
+    assert numpy.array_equiv(composition_obtained,composition_expected) 
+
+def test_generate_compositions_zero_false_error():
+    """test that generate compositions raises an error for invalid input"""
+    with pytest.raises(ValueError):
+        composition_obtained = generate_compositions(6,7,include_zero=False)
+        for obj in composition_obtained:
+            pass
