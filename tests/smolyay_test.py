@@ -72,8 +72,8 @@ def test_increase_exactness(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.exactness = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
-            and numpy.array_equiv(grid_points_2, expected_points))
+    assert not numpy.array_equiv(grid_points_1, grid_points_2)
+    assert numpy.array_equiv(grid_points_2, expected_points)
 
 def test_decrease_exactness(expected_points):
     """test if grid points are correct if exactness is decreased"""
@@ -81,8 +81,8 @@ def test_decrease_exactness(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.exactness = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
-            and numpy.array_equiv(grid_points_2, expected_points))
+    assert not numpy.array_equiv(grid_points_1, grid_points_2)
+    assert numpy.array_equiv(grid_points_2, expected_points)
 
 def test_increase_dimension(expected_points):
     """test if grid points are correct if dimension is increased"""
@@ -90,8 +90,8 @@ def test_increase_dimension(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.dimension = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
-            and numpy.array_equiv(grid_points_2, expected_points))
+    assert not numpy.array_equiv(grid_points_1, grid_points_2)
+    assert numpy.array_equiv(grid_points_2, expected_points)
 
 def test_decrease_dimension(expected_points):
     """test if grid points are correct if dimension is decreased"""
@@ -99,8 +99,8 @@ def test_decrease_dimension(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.dimension = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
-            and numpy.array_equiv(grid_points_2, expected_points))
+    assert not numpy.array_equal(grid_points_1, grid_points_2)
+    assert numpy.array_equal(grid_points_2, expected_points)
 
 def test_update_index_per_level(expected_points):
     """test if grid points are correct if index_per_level is changed"""
@@ -108,8 +108,8 @@ def test_update_index_per_level(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.index_per_level = [1,2,2]
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert ((not numpy.array_equiv(grid_points_1,grid_points_2))
-            and numpy.array_equiv(grid_points_2, expected_points))
+    assert not numpy.array_equal(grid_points_1, grid_points_2)
+    assert numpy.array_equal(grid_points_2, expected_points)
 
 def test_invalid_index_per_level():
     """test if error is returned if invalid index_per_level is initialized"""
@@ -132,7 +132,7 @@ def test_exactness_zero_level_indexes():
 def test_exactness_zero_grid_point_indexes():
     """test the level indexes if exactness is zero"""
     test_class = IndexGrid(2,0,[1,2,2])
-    assert numpy.array_equiv(test_class.level_indexes,[0,0])
+    assert numpy.array_equal(test_class.grid_point_indexes,[[0,0]])
 
 def test_generate_compositions_include_zero_true():
     """test the generate compositions function if include_zero is true"""
@@ -141,7 +141,7 @@ def test_generate_compositions_include_zero_true():
     composition_obtained = []
     for i in generate_compositions(6,2,include_zero=True):
         composition_obtained.append(i.copy())
-    assert numpy.array_equiv(composition_obtained,composition_expected)
+    assert numpy.array_equal(composition_obtained, composition_expected)
 
 def test_generate_compositions_include_zero_false():
     """test the generate compositions function if include_zero is false"""
@@ -149,11 +149,9 @@ def test_generate_compositions_include_zero_false():
     composition_expected = numpy.array([[5,1],[4,2],[3,3],
         [2,4],[1,5]],dtype=numpy.int32)
     composition_obtained = list(generate_compositions(6,2,include_zero=False))
-    assert numpy.array_equiv(composition_obtained,composition_expected) 
+    assert numpy.array_equal(composition_obtained, composition_expected) 
 
 def test_generate_compositions_zero_false_error():
     """test that generate compositions raises an error for invalid input"""
     with pytest.raises(ValueError):
-        composition_obtained = generate_compositions(6,7,include_zero=False)
-        for obj in composition_obtained:
-            pass
+        list(generate_compositions(6,7,include_zero=False))
