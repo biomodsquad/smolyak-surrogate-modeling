@@ -2,7 +2,20 @@ import numpy
 from BasisFunction import BasisFunction
 
 class ChebyshevFirstKind(BasisFunction):
-    """Basis Function of Chebyshev polynomials of the first kind"""
+    """Basis Function of Chebyshev polynomials of the first kind
+    Chebyshev polynomials are a set of polynomials described by the
+    following recurrence relation:
+    .. math::
+    T_0(x) = 1
+    T_1(x) = x
+    T_{n+1}(x) = 2xT_n(x) - T_{n-1}(x)
+
+    The extrema of the polynomials are calculated via the following
+    equation:
+    .. math::
+    extrema = -\cos\left((\frac{j-1}{n-1}\pi\right), j = 1,...,n
+
+    """
 
     def update_extrema_index_per_level(self, next_exactness = 1):
         """Compute extrema and extrema per level num
