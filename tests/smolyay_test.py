@@ -26,7 +26,7 @@ def test_initial_exactness():
 def test_initial_index_by_level():
     """test initialized class returns correct index by level"""
     test_class = IndexGrid(1,2,[1,2,3])
-    assert numpy.array_equiv(test_class.index_per_level,[1,2,3])
+    assert numpy.array_equal(test_class.index_per_level,[1,2,3])
 
 def test_level_indexes(expected_indexes):
     """test level indexes"""
@@ -72,8 +72,8 @@ def test_increase_exactness(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.exactness = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not numpy.array_equiv(grid_points_1, grid_points_2)
-    assert numpy.array_equiv(grid_points_2, expected_points)
+    assert not numpy.array_equal(grid_points_1, grid_points_2)
+    assert numpy.array_equal(grid_points_2, expected_points)
 
 def test_decrease_exactness(expected_points):
     """test if grid points are correct if exactness is decreased"""
@@ -81,8 +81,8 @@ def test_decrease_exactness(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.exactness = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not numpy.array_equiv(grid_points_1, grid_points_2)
-    assert numpy.array_equiv(grid_points_2, expected_points)
+    assert not numpy.array_equal(grid_points_1, grid_points_2)
+    assert numpy.array_equal(grid_points_2, expected_points)
 
 def test_increase_dimension(expected_points):
     """test if grid points are correct if dimension is increased"""
@@ -90,8 +90,8 @@ def test_increase_dimension(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.dimension = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not numpy.array_equiv(grid_points_1, grid_points_2)
-    assert numpy.array_equiv(grid_points_2, expected_points)
+    assert not numpy.array_equal(grid_points_1, grid_points_2)
+    assert numpy.array_equal(grid_points_2, expected_points)
 
 def test_decrease_dimension(expected_points):
     """test if grid points are correct if dimension is decreased"""
