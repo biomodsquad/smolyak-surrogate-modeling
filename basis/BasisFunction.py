@@ -1,6 +1,12 @@
 from abc import ABC, abstractmethod
 
 class BasisFunction(ABC):
+    """Abstract class for basis functions.
+
+    Creates a framework for basis functions that are the building blocks
+    for the terms in the surrogate model.
+
+    """
 
     def __init__(self,max_exactness):
         """Initializer"""
@@ -22,7 +28,7 @@ class BasisFunction(ABC):
     @property
     def extrema_per_level_num(self):
         """Number of extrema per grid level"""
-        return self._index_per_level
+        return self._extrema_per_level_num
 
     @max_exactness.setter
     def max_exactness(self, max_exactness):
@@ -47,9 +53,9 @@ class BasisFunction(ABC):
             self._max_exactness = max_exactness
             # update other properties
             extrema_keep = sum(
-                    self._index_per_level[0:self._max_exactness+1])
-            self._extrema_dict = self._extrema_dict[0:extrema_keep-1]
-            self._index_per_level = self._index_per_level[
+                    self._extrema_per_level_num[0:self._max_exactness+1])
+            self._extrema_list = self._extrema_list[0:extrema_keep]
+            self._extrema_per_level_num = self._extrema_per_level_num[
                     0:self._max_exactness+1]
 
     @abstractmethod

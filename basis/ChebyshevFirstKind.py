@@ -17,11 +17,11 @@ class ChebyshevFirstKind(BasisFunction):
             m = 2**(ex)+1
             counter_index = 0
             for i in range(1,m+1):
-                temp = round(-np.cos(np.pi*(i-1)/(m-1)),15) + 0
+                temp = round(-numpy.cos(numpy.pi*(i-1)/(m-1)),15) + 0
                 if temp not in self._extrema_list:
                     self._extrema_list.append(temp)
                     counter_index += 1
-            self._index_per_level.append(counter_index)
+            self._extrema_per_level_num.append(counter_index)
 
     def basis_fun(x,n):
         """Terms of basis function
