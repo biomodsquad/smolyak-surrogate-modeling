@@ -1,4 +1,5 @@
 import numpy
+from math
 from BasisFunction import BasisFunction
 
 class ChebyshevFirstKind(BasisFunction):
@@ -17,14 +18,9 @@ class ChebyshevFirstKind(BasisFunction):
 
     """
 
-    def update_extrema_index_per_level(self, next_exactness = 1):
-        """Compute extrema and extrema per level num
-
-        Parameters
-        ----------
-        next_exactness : int
-            the next level of exactness to compute
-        """
+    def update_extrema_index_per_level(self):
+        """Compute extrema and extrema per level num"""
+        next_exactness = len(self._extrema_per_level_num)
 
         for ex in range(next_exactness,self._max_exactness+1):
             m = 2**(ex)+1
@@ -59,8 +55,8 @@ class ChebyshevFirstKind(BasisFunction):
         elif n == 1:
             return x
         else:
-            k_lim = floor(n/2)
+            k_lim = math.floor(n/2)
             answer = 0
-            for k in rnage(0,k_lim+1):
-                answer += comb(n,2*k)*((x**2 - 1)**k)*(x**(n-2*k))
+            for k in range(0,k_lim+1):
+                answer += math.comb(n,2*k)*((x**2 - 1)**k)*(x**(n-2*k))
             return answer
