@@ -63,10 +63,9 @@ class BasisFunction(ABC):
         """
         if self._max_exactness < max_exactness:
             # extend
-            min_exactness = self._max_exactness
             self._max_exactness = max_exactness
             # update other properties
-            self.update_extrema_index_per_level(min_exactness+1)
+            self.update_extrema_index_per_level()
         elif self._max_exactness > max_exactness:
             # truncate
             self._max_exactness = max_exactness
@@ -78,17 +77,11 @@ class BasisFunction(ABC):
                     0:self._max_exactness+1]
 
     @abstractmethod
-    def update_extrema_index_per_level(self, next_exactness = 1):
+    def update_extrema_index_per_level(self):
         """Updates properties described by level of exactness
         Compute extrema of basis function and the number of extrema
         associated with each level of exactness required to describe 
         the level of exactness in property self.max_exactness
-
-        Parameters
-        ----------
-        next_exactness : int
-            level of exactness one higher than what the class describes
-            before updating
         """
         pass
 
