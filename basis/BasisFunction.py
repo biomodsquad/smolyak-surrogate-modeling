@@ -17,6 +17,8 @@ class BasisFunction(abc.ABC):
     with a Smolyak index described by the class IndexGrid, and the 
     Smolyak index of a given extrema is equal to the extrema's position
     in the array extrema.
+    ``extrema_per_level`` property gives the Smolyak indexes for each
+    grid level based on the num_extrema_per_level
 
     Parameters
     ----------
@@ -74,7 +76,7 @@ class BasisFunction(abc.ABC):
             self._max_exactness = max_exactness
             # update other properties
             extrema_keep = sum(
-                    self._extrema_per_level_num[:self._max_exactness+1])
+                    self._num_extrema_per_level[:self._max_exactness+1])
             self._extrema = self._extrema[:extrema_keep]
             self._num_extrema_per_level = self._num_extrema_per_level[
                     :self._max_exactness+1]
