@@ -1,6 +1,6 @@
 import numpy
 import math
-from BasisFunction import BasisFunction
+from .BasisFunction import BasisFunction
 
 class ChebyshevFirstKind(BasisFunction):
     """Basis Function of Chebyshev polynomials of the first kind
