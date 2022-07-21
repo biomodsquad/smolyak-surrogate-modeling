@@ -209,7 +209,7 @@ def generate_compositions(value, num_parts, include_zero):
         Number of parts cannot be greater than value if the desired output
         does not include compositions containing zeroes.
     """
-    if value < num_parts:
+    if value < num_parts and include_zero is False:
         raise ValueError(
             "When include_zero is {}, num_parts cannot be greater"
             " than the value"
@@ -221,7 +221,7 @@ def generate_compositions(value, num_parts, include_zero):
     r[0] = value
     t = value
     h = 0
-    yield r if include_zero else (numpy.array(r)+1).tolist()
+    yield list(r) if include_zero else (numpy.array(r)+1).tolist()
 
     # (D)
     while r[num_parts-1] != value:
@@ -235,4 +235,4 @@ def generate_compositions(value, num_parts, include_zero):
         r[h-1] = 0
         r[0] = t-1
         r[h] += 1
-        yield r if include_zero else (numpy.array(r)+1).tolist()
+        yield list(r) if include_zero else (numpy.array(r)+1).tolist()
