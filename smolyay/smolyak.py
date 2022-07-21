@@ -200,7 +200,7 @@ def generate_compositions(value, num_parts, include_zero):
 
     Yields
     ------
-    numpy.ndarray
+    list
         All possible compositions of the value into num_parts.
 
     Raises
