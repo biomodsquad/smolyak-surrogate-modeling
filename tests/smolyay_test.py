@@ -31,38 +31,32 @@ def test_level_indexes(expected_indexes):
     """test level indexes"""
     test_class = IndexGrid(2,2,[1,2,2])
     level_indexes_recieved = test_class.level_indexes
-    
     assert level_indexes_recieved == expected_indexes
 
 def test_grid_point_index(expected_points):
     """test grid point index"""
     test_class = IndexGrid(2,2,[1,2,2])
     grid_points = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-
     assert grid_points == expected_points
 
 def test_level_indexes_extra_level_per_index(expected_indexes):
     """test level indexes when level_per_index has more information"""
     test_class = IndexGrid(2,2,[1,2,2,4,8])
     level_indexes_recieved = test_class.level_indexes
-
     assert level_indexes_recieved == expected_indexes
 
 def test_grid_point_index_extra_level_per_index(expected_points):
     """test grid point index when level_per_index has more information"""
     test_class = IndexGrid(2,2,[1,2,2,4,8])
     grid_points = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-
     assert grid_points == expected_points
 
 def test_index_per_level_expand():
     """test if properties change if more is added to level_per_index"""
     test_class = IndexGrid(1,2,[1,2,3])
     grid_point_1 = test_class.grid_point_indexes
-
     test_class.index_per_level = [1,2,3,4,5]
     grid_point_2 = test_class.grid_point_indexes
-    
     assert grid_point_1 == grid_point_2
 
 def test_increase_exactness(expected_points):
@@ -71,7 +65,7 @@ def test_increase_exactness(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.exactness = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not grid_points_1 == grid_points_2
+    assert grid_points_1 != grid_points_2
     assert grid_points_2 == expected_points
 
 def test_decrease_exactness(expected_points):
@@ -80,7 +74,7 @@ def test_decrease_exactness(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.exactness = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not grid_points_1 == grid_points_2
+    assert grid_points_1 != grid_points_2
     assert grid_points_2 == expected_points
 
 
@@ -90,7 +84,7 @@ def test_increase_dimension(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.dimension = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not grid_points_1 == grid_points_2
+    assert grid_points_1 != grid_points_2
     assert grid_points_2 == expected_points
 
     
@@ -100,7 +94,7 @@ def test_decrease_dimension(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.dimension = 2
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not grid_points_1 == grid_points_2
+    assert grid_points_1 != grid_points_2
     assert grid_points_2 == expected_points
 
 def test_update_index_per_level(expected_points):
@@ -109,7 +103,7 @@ def test_update_index_per_level(expected_points):
     grid_points_1 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
     test_class.index_per_level = [1,2,2]
     grid_points_2 = sorted(test_class.grid_point_indexes,key = lambda x:x[0])
-    assert not grid_points_1 == grid_points_2
+    assert grid_points_1 != grid_points_2
     assert grid_points_2 == expected_points
 
 def test_invalid_index_per_level():
