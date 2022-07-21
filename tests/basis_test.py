@@ -1,5 +1,6 @@
 import pytest
 from basis.ChebyshevFirstKind import ChebyshevFirstKind
+from basis.BasisFunction import BasisFunction
 
 @pytest.fixture
 def expected_extrema_2():
@@ -64,4 +65,29 @@ def test_decrease_exactness(expected_extrema_3):
     assert test_class.extrema == expected_extrema_3
     assert test_class.extrema_per_level == [[0],[1,2],[3,4],[5,6,7,8]]
     assert test_class.num_extrema_per_level == [1,2,2,4]
+
+def test_basis_degree_0():
+    """Chebyshev polynomial degree 0 is 1"""
+    for i in range(0,16):
+        assert ChebyshevFirstKind.basis(i,0) == 1
+
+def test_basis_degree_1():
+    """Chebyshev polynomial degree 1 should return input"""
+    for i in range(0,16):
+        assert ChebyshevFirstKind.basis(i,1) == i
+
+def test_basis_input_1():
+    """Chebyshev polynomial input 1 returns 1 for any degree n"""
+    for i in range(0,16):
+        assert ChebyshevFirstKind.basis(1,i) == 1
+
+def test_basis_input_2_degree_6():
+    """Test chebyshev polynomial at some degree at some input"""
+    assert ChebyshevFirstKind.basis(2,6) == 1351
+
+def test_is_abstract():
+    """Check BasisFunction is an abstract class"""
+    with pytest.raises(TypeError):
+        test_class = BasisFunction(1)
+
 
