@@ -81,9 +81,13 @@ def test_basis_input_1():
     for i in range(0,16):
         assert ChebyshevFirstKind.basis(1,i) == 1
 
-def test_basis_input_2_degree_6():
+@pytest.mark.parametrize("x, n, expected",[(2,6,1351),(-3,9,-3880899),
+    (13,4,227137),(8,3,2024),(4,9,58106404),(14,5,8550374),(0,12,1),
+    (7,5,262087),(-2,4,97),(3,9,3880899),(9,4,51841),(2,11,978122),
+    (4,7,937444),(-3,2,17),(6,4,10081),(2,8,18817)])
+def test_basis_random_points(x,n,expected):
     """Test chebyshev polynomial at some degree at some input"""
-    assert ChebyshevFirstKind.basis(2,6) == 1351
+    assert ChebyshevFirstKind.basis(x,n) == expected
 
 def test_is_abstract():
     """Check BasisFunction is an abstract class"""
