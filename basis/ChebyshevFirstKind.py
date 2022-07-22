@@ -45,7 +45,7 @@ class ChebyshevFirstKind(BasisFunction):
             self._extrema_per_level.append(new_level)
             self._num_extrema_per_level.append(counter_index)
 
-    def basis(x,n):
+    def basis(self,x,n):
         """Terms of basis function
         Returns the output of an nth degree Chebyshev polynomial of the
         first kind with input x

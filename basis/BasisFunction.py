@@ -94,7 +94,7 @@ class BasisFunction(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def basis(x,n):
+    def basis(self,x,n):
         """Compute term of basis function
         Returns the output of an nth degree basis function with input x
 
