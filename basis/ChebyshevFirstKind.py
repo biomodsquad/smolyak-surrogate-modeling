@@ -3,7 +3,7 @@ import math
 from .BasisFunction import BasisFunction
 
 class ChebyshevFirstKind(BasisFunction):
-    """Basis Function of Chebyshev polynomials of the first kind
+    r"""Basis Function of Chebyshev polynomials of the first kind
     Chebyshev polynomials are a set of polynomials described by the
     following recurrence relation:
     
