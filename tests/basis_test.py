@@ -1,6 +1,5 @@
 import pytest
-from basis.ChebyshevFirstKind import ChebyshevFirstKind
-from basis.BasisFunction import BasisFunction
+from basis.basis import BasisFunction, ChebyshevFirstKind
 
 @pytest.fixture
 def expected_extrema_2():
