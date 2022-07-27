@@ -12,15 +12,12 @@ class BasisFunction(abc.ABC):
     information for. This class can provide enough information for 
     constructing a surrogate function of any accuracy at or below 
     max_exactness.
-    ``num_extrema_per_level`` property represents the number of unique 
-    extrema that correspond to increasing levels of exactness.
-    ``extrema`` property represents all the unique extrema of the 
-    basis function in order of computation. Each extrema is associated 
-    with a Smolyak index described by the class IndexGrid, and the 
-    Smolyak index of a given extrema is equal to the extrema's position
-    in the array extrema.
-    ``extrema_per_level`` property gives the Smolyak indexes for each
-    grid level based on the num_extrema_per_level
+    ``points`` property represents all the unique 1D points of the 
+    basis function associated with a Smolyak index described by the 
+    class IndexGrid. The Smolyak index of a given point is equal to 
+    its position in the list points.
+    ``levels`` property gives the Smolyak indexes for each
+    grid level.
 
     Parameters
     ----------
@@ -31,9 +28,8 @@ class BasisFunction(abc.ABC):
 
     def __init__(self,max_exactness):
         self._max_exactness = max_exactness
-        self._extrema = []
-        self._num_extrema_per_level = []
-        self._extrema_per_level = []
+        self._points = []
+        self._levels = []
         self._update()
 
     @property
@@ -42,26 +38,20 @@ class BasisFunction(abc.ABC):
         return self._max_exactness
 
     @property
-    def extrema(self):
+    def points(self):
         """Extrema assigned to Smolyak indices"""
-        return self._extrema
+        return self._points
 
     @property
-    def num_extrema_per_level(self):
-        """Number of extrema per grid level"""
-        return self._num_extrema_per_level
-
-    @property
-    def extrema_per_level(self):
-        """extrema in each grid level by index in property extrema"""
-        return self._extrema_per_level
+    def levels(self):
+        """index of each point that belongs to each grid level"""
+        return self._levels
 
     @max_exactness.setter
     def max_exactness(self, max_exactness):
         """Set maximum level of exactness
         Sets maximmum level of exactness class instance will describe, will
-        extend or truncate extrema_list and extrema_per_level_num to match
-        new value
+        extend or truncate properties points and levels to match new value
 
         Parameters
         ----------
@@ -77,21 +67,17 @@ class BasisFunction(abc.ABC):
             # truncate
             self._max_exactness = max_exactness
             # update other properties
-            extrema_keep = sum(
-                    self._num_extrema_per_level[:self._max_exactness+1])
-            self._extrema = self._extrema[:extrema_keep]
-            self._num_extrema_per_level = self._num_extrema_per_level[
-                    :self._max_exactness+1]
-            self._extrema_per_level = self._extrema_per_level[
-                    :self._max_exactness+1]
+            points_keep = sum(
+                    [len(x) for x in self._levels[:self._max_exactness+1]])
+            self._points = self._points[:points_keep]
+            self._levels = self._levels[:self._max_exactness+1]
 
 
     @abc.abstractmethod
     def _update(self):
         """Update properties described by level of exactness
-        Compute extrema of basis function and the number of extrema
-        associated with each level of exactness required to describe 
-        the level of exactness in property self.max_exactness
+        Compute points of basis function and the Smolyak index of
+        each grid level between 0 and max_exactness + 1 
         """
         pass
 
@@ -135,12 +121,11 @@ class ChebyshevFirstKind(BasisFunction):
 
     def _update(self):
         """Update properties dependent on max_exactness"""
-        next_exactness = len(self._num_extrema_per_level)
+        next_exactness = len(self._levels)
 
         if next_exactness == 0:
-            self._extrema = [0]
-            self._num_extrema_per_level = [1]
-            self._extrema_per_level = [[0]]
+            self._points = [0]
+            self._levels = [[0]]
             next_exactness = 1
 
         for ex in range(next_exactness,self._max_exactness+1):
@@ -149,12 +134,11 @@ class ChebyshevFirstKind(BasisFunction):
             new_level = []
             for i in range(1,m+1):
                 temp = round(-numpy.cos(numpy.pi*(i-1)/(m-1)),15) + 0
-                if temp not in self._extrema:
-                    new_level.append(len(self._extrema))
-                    self._extrema.append(temp)
+                if temp not in self._points:
+                    new_level.append(len(self._points))
+                    self._points.append(temp)
                     counter_index += 1
-            self._extrema_per_level.append(new_level)
-            self._num_extrema_per_level.append(counter_index)
+            self._levels.append(new_level)
 
     def basis(self,x,n):
         """Terms of basis function
