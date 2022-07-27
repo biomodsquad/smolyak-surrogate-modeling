@@ -1,6 +1,4 @@
 import numpy
-from smolyak import IndexGrid
-from basis import ChebyshevFirstKind
 
 
 class SurrogateFunction:
@@ -8,30 +6,33 @@ class SurrogateFunction:
 
     Depending on dimensionality (number of independent variables),
     level of exactness (approximation's accuracy) and the basis function,
-    a set of grid points by the Smolyak method are generated and a
-    surrogate function is trained which acts as a black box of a
-    complex function.
+    a set of grid points can be generated.
+    For instance, :class:`SmolyakGrid` generates grid points using
+    Smolyak's method depending on the mentioned parameters.
+    A surrogate function is then trained which acts as a black box of a
+    complex function (``real_function``).
 
-    :class:`IndexGrid` generates the required number of extremums
-    of basis function and make the grid points based on the
-    extremums' indexes (degrees).
+    The grid generator (``basis_grid``) calls the required number of points
+    of a basis function based on the type of the basis function
+    and exactness, and makes grid points based on the points' indexes
+    (order of the points) via :meth:`~GridGenerator.generate_grid_index`.
+    Then, :meth:`~GridGenerator.generate_grid_basis` generates the grid points
+    of the basis function (bound between (-1, 1)).
+    In case of using :class:`SmolyakGrid` the methods would be
+    :meth:`~SmolyakGrid.generate_grid_index` and
+    :meth:`~Smolyak.generate_grid_basis`
 
-    :class:`BasisFunction` generates the extremums depending on
-    the type of basis function and level of exactness.
+    With ``domain_real_function`` (domain of the ``real_function``
+    to be approximated) being specified, the actual grid points
+    of the real function are generated (property ``grids``).
+    Coefficent of the surrogate(property `coeffcients_of_surrogate``)
+    is obtained via solving linear equations (= number of grid points).
 
-    This class uses the outputs of the mentioned classes to first
-    generate the ``grid_points_basis_function`` which is grid points
-    in the basis function domain.
-    With ``domain_real_function`` (domain of the real function)
-    being specified, the actual ``grid_points`` of the real function
-    are generated. ``coeffcients_of_surrogate`` is obtained via solving
-    linear equations (= number of grid points) using LU decomposition.
-
-    For instance, consider function :math:F(y) with one independent variable.
+    For instance, consider a function :math:F(y) with one independent variable.
     Basis function B(x, order) is chosen for the approximation and
-    generates three grid points:
+    we have three grid points:
     (:math:x_0, :math:x_1, :math:x_2).
-    The extremums' orders are: [:math:x_0: 0, :math:x_1: 1, :math:x_2: 2];
+    The point' orders are: [:math:x_0: 0, :math:x_1: 1, :math:x_2: 2];
     then:
     ..math:
         Basis function matrix = \begin{bmatrix}
@@ -55,8 +56,8 @@ class SurrogateFunction:
     ..math:
         (Basis function matrix) Coefficients = (Real function)
 
-    Coefficients can be obtained by solving linear equations, since
-    we have a full rank systems of matrixes.
+    Coefficients (``coefficients_of_surrogate``) can be obtained
+    by solving linear equations, since we have a full rank systems of matrixes.
 
     The generated surrogate is then:
     ..math:
@@ -67,84 +68,56 @@ class SurrogateFunction:
 
     Parameters
     ----------
-    exactness: int
-        Level of exactness of the approximation.
-    domain_real_function : iterable
-        Domain of the real function to be approximated.
-    basis_function: :class:`BasisFunction`
-        Basis function used for training.
     real_function: Callable
         Function that is being approximated.
+    domain_real_function : iterable
+        Domain of the real function to be approximated.
+    basis_grids: :class:`PointsGrid(basis: :class:`BasisFunction`, exactness)`
+        Grid generator.
+        basis function and level of exactness.
+    solve_method: Callabe
+        Method that is being used for solving linear equations.
     """
 
-    def __init__(self, exactness, domain_real_function,
-                 basis_function, real_function):
-        self.exactness = exactness
-        self.domain_real_function = domain_real_function
-        self.basis_function = basis_function
+    def __init__(self, real_function, domain_real_function,
+                 basis_grids, solve_method):
+
         self.real_function = real_function
+        self.domain_real_function = domain_real_function
+        self.basis_grids = basis_grids
+        self.solve_method = solve_method
+        self._grids = []
+        self._dimension = len(domain_real_function)
 
     @property
-    def exactness(self):
-        """int: Level of exactness."""
-        return self._exactness
+    def real_function(self):
+        """Callable: Any callable function."""
+        return self._real_function
 
-    @exactness.setter
-    def exactness(self, value):
-        self._exactness = value
-
-    @property
-    def basis_function(self):
-        """:class:`BasisFunction`: Basis function chosen for the model."""
-        return self._basis_function
-
-    @basis_function.setter
-    def basis_function(self, basis_function_instance):
-        self._basis_function = basis_function_instance
+    @real_function.setter
+    def real_function(self, callable_function):
+        self._real_function = callable_function
 
     @property
     def domain_real_function(self):
-        """numpy.ndarray: Domain of the real function."""
-        return self._domain_real_function
+        """list: domain of the called function."""
+        return list(self._domain_real_function)
 
     @domain_real_function.setter
     def domain_real_function(self, domain):
-        self._domain_real_function = numpy.array(domain, dtype=float)
+        self._domain_real_function = domain
 
     @property
-    def dimension(self):
-        """int: Number of independent variables."""
+    def grids(self):
+        """list: Grid points of real function."""
         self._update()
-
-        return self._dimension
+        return self._grids.tolist()
 
     @property
-    def grid_point_indexes(self):
-        """numpy.ndarray: Indexes of grid points."""
+    def coeffcients_of_surrogate(self):
+        """list: Coefficient of the surrogate function."""
         self._update()
-
-        return self._grid_point_indexes
-
-    @property
-    def grid_points_basis_function(self):
-        """numpy.ndarray: Grid points of the basis function."""
-        self._update()
-
-        return self._grid_points_basis_function
-
-    @property
-    def grid_points(self):
-        """numpy.ndarray: Grid points of the real function."""
-        self._update()
-
-        return self._grid_points
-
-    @property
-    def coefficients(self):
-        """numpy.ndarray: Coeffcients of the surrogate function."""
-        self._update()
-
-        return self._coefficients
+        return self._coefficients.tolist()
 
     def output_value(self, *surrogate_inputs):
         """Generate the surrogate's output at a given input.
@@ -170,19 +143,23 @@ class SurrogateFunction:
 
         """
         self._update()
+        basis = self.basis_grids.basis
+        exactness = self.basis_grids.exactness
 
         if len(*surrogate_inputs) != self._dimension:
             raise IndexError("Inputs must be of length of {}".format(
                 self._dimension))
 
         surrogate_output = 0
-        for index_point in range(len(self._grid_points)):
+        for index_point in range(len(self._grids)):
             coefficient = self._coefficients[index_point]
             output_grid = 1
             for dimension_ in range(self._dimension):
                 # compute basis function at input and indexes of grid points
-                output_grid *= self._basis_function.basis(
-                    surrogate_inputs[0][dimension_], self._grid_point_indexes[
+                output_grid *= basis(exactness).basis(
+                    surrogate_inputs[0][dimension_],
+                    self.basis_grids.generate_grid_index(
+                            self._dimension)[
                         index_point][dimension_])
             output_grid *= coefficient
             surrogate_output += output_grid
@@ -190,71 +167,54 @@ class SurrogateFunction:
         return surrogate_output
 
     def _update(self):
-        """Compute the following properties.
+        """Update properties of the surrogate.
 
-        Updates indexes of grid points (``grid_point_indexes``),
-        grid points of the basis function (``grid_points_basis_function``),
-        grid points of the real function (``grid_points``). Then, it
-        computes the basis function matrix and real function
-        at grid points, and then update the coefficients ``coefficients``.
+        Update grid points of the real function ``grids``
+        based on ``real_function`` and its domain ``domain_real_function``.
+        Then, it updates the ``basis_matrix``, real function value at
+        grid points (``real_function_at_grids``), and generate the
+        coefficinets accordingly (``coefficients``).
         """
-        self._dimension = len(self._domain_real_function)//2
+        domain_basis = (-1, 1)
+        basis = self.basis_grids.basis
+        exactness = self.basis_grids.exactness
 
-        # get number of indexes per level to generate the grid points
-        max_level = self._exactness + 1
-        num_of_index_per_level = (
-            self._basis_function(max_level)._num_extrema_per_level)
+        # create grid points of the real function
+        self._grids = numpy.array(
+            self.basis_grids.generate_grid_basis(self._dimension))
+        for dimension_ in range(self._dimension):
+            self._grids[:, dimension_] = (
+                numpy.polynomial.polyutils.mapdomain(
+                    self._grids[:, dimension_],
+                    domain_basis, self.domain_real_function[dimension_]))
 
-        # generate grid points indexes
-        self._grid_point_indexes = (IndexGrid(self._dimension,
-                                    self._exactness,
-                                    num_of_index_per_level)
-                                    .grid_point_indexes)
-
-        # generate grid points of the basis function
-        self._grid_points_basis_function = numpy.array(
-            self._grid_point_indexes)
-        extremums = numpy.array(
-            self._basis_function(self._exactness)._extrema)
-        self._grid_points_basis_function = extremums[self._grid_point_indexes]
-
-        # transform linearly to real function domain
-        self._grid_points = numpy.array(self._grid_points_basis_function)
-        domain_real_function_ = numpy.array(
-            self._domain_real_function).reshape((self._dimension, 2))
-        for index in range(self._dimension):
-            minimum = domain_real_function_[index][0]
-            maximum = domain_real_function_[index][1]
-            slope = (maximum-minimum) / (
-                numpy.max(extremums)-numpy.min(extremums))
-            intercept = minimum - slope*numpy.min(extremums)
-            self._grid_points[:, index] = (
-                slope*self._grid_points[:, index] + intercept)
-
-        # compute basis matrix
-        basis_matrix = numpy.ones((len(self._grid_points),
-                                   len(self._grid_points)))
-        for grid_num in range(len(self._grid_points)):
-            for extrema_num in range(self._dimension):
-                index_dimension = 0
+        # create basis matrix
+        basis_matrix = numpy.ones((len(self._grids),
+                                   len(self._grids)))
+        for grid_num in range(len(self._grids)):
+            for point_num in range(self._dimension):
+                dimension_ = 0
                 for index in numpy.transpose(
-                        self._grid_point_indexes)[extrema_num]:
-                    basis_matrix[grid_num][index_dimension] *= (
-                        self._basis_function.basis(
-                            self._grid_points[grid_num][extrema_num], index))
-                    index_dimension += 1
+                        self.basis_grids.generate_grid_index(
+                                self._dimension))[point_num]:
+                    basis_matrix[grid_num][dimension_] *= (
+                        basis(
+                            exactness).basis(
+                            self._grids[grid_num][point_num], index))
+                    dimension_ += 1
 
         # evaluate the real function at grid points
-        real_function_at_grids = numpy.zeros((len(self._grid_points)))
-        for grid_num in range(len(self._grid_points)):
+        real_function_at_grids = numpy.zeros((len(self._grids)))
+        for grid_num in range(len(self._grids)):
             real_function_at_grids[grid_num] = (
-                self.real_function(*self._grid_points[grid_num]))
+                self.real_function(*self._grids[grid_num]))
 
         # evaluate coefficients
-        coefficients = numpy.linalg.solve(basis_matrix, real_function_at_grids)
-        self._coefficients = coefficients
+        self._coefficients = self.solve_method(
+                basis_matrix, real_function_at_grids)
 
 
+# real function
 def branin(x1, x2):
     """Evaluate Branin function.
 
@@ -275,3 +235,74 @@ def branin(x1, x2):
               + 10*(1 - 1/(8*numpy.pi))*numpy.cos(x1) + 10)
 
     return branin
+
+
+# numerical methods for solving linear equations
+def lower_upper_decomposition(a, b):
+    """Solve systems of linear equations (Ax=B) via LU decompostion method.
+
+    Parameters
+    ----------
+    a: numpy.ndarray
+        A matrix (square matrix).
+    b: numpy.ndarray
+        B matrix.
+
+    Returns
+    -------
+    x: numpy.ndarray
+        Unknown variables.
+    """
+    x = numpy.linalg.solve(a, b)
+
+    return x
+
+
+def inverse_matrix(a, b):
+    """Solve( Ax=B) by inversing the A matrix (x = :math:A^(-1) B).
+
+    Parameters
+    ----------
+    a: numpy.ndarray
+        A matrix(square matrix).
+    b: numpy.ndarray
+        B matrix.
+
+    Returns
+    -------
+    x: numpy.ndarray
+        Unknown variables.
+    """
+    x = numpy.dot(numpy.linalg.inv(a), b)
+
+    return x
+
+
+def gauss_eliminination(a, b):
+    """Solve systems of linear equations (Ax=B) via Gauss-Elimination method.
+
+    Parameters
+    ----------
+    a: numpy.ndarray
+        A matrix (square matrix).
+    b: numpy.ndarray
+        B matrix.
+
+    Returns
+    -------
+    x: numpy.ndarray
+        Unknown variables.
+    """
+    (rows, cols) = a.shape
+    # elimination phase
+    for row in range(0, rows-1):  # pivot equation/row
+        for i in range(row+1, rows):
+            if a[i, row] != 0.0:
+                factor = a[i, row]/a[row, row]
+                a[i, row+1:rows] = a[i, row+1:rows] - factor*a[row, row+1:rows]
+                b[i] = b[i] - factor*b[row]
+    # back substitution
+    for k in range(rows-1, -1, -1):
+        b[k] = (b[k] - numpy.dot(a[k, k+1:rows], b[k+1:rows]))/a[k, k]
+
+    return b
