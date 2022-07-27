@@ -1,6 +1,238 @@
 import numpy
 
 
+class SmolyakGrid:
+    r"""Generate grid points based on a basis function and exactness.
+
+    Depending on the exactness and the basis function,
+    :class:`SmolyakGrid` extracts
+    the ``points`` (numbers between [-1, 1]) and ``levels`` (points' indexes
+    at each level of approximation) from
+    :class:`BasisFunction(exactness)`.
+    For instance, for ``basis`` = :class:`ChebyshevFirstKind(exactness)`
+    and ``exactness`` = 2 (criterion that determines the number of points
+    at each level):
+    ..math:
+        ``points`` = [0, -1.0, 1.0, -0.707106781186548, 0.707106781186548]
+        ``levels`` = [[0], [1, 2], [3, 4]]
+    In this case, ``points`` represents extremums of the basis function
+    (``basis``).
+
+    Using Smolyak's approach,
+    :meth:`~SmolyakGrid.generate_grid_index`
+    creates indexes of grid points (depending pn dimensionality ``dimension``)
+    which then can be used to interpolate a surrogate function.
+    ``dimension`` represents the number of independent variables,
+    and ``exactness`` specifies how many grid points do we need to
+    build the surrogate. Larger amount of ``exactness`` means
+    more grid points (in the case of surrogate modeling, a more
+    accurate black-box).
+    In Smolyak's method, each dimension is assigned a level which is
+    from 1 to ``exactness`` + 1 (maximum level).
+    ..math:
+        n = ``dimension``
+        \mu = ``exactness``
+        [k_1, k_2, ..., k_n] = level_indexes
+    where :math:k_(1,2,...,n) = [1, 2, ..., ``exactness`` + 1]
+
+    ..math:
+        n <= k_1 + k_2 + ... + k_n <= n + \mu
+
+    For instance, if n = 2 and :math:\mu = 1, then:
+    :math:\sum :math:k_i = 2 and :math:\sum :math:k_i = 3.
+    if :math:\sum :math:k_i = 2, then:
+    ..math:
+        (k_1 = 1, k_2 = 1)
+    and if :math:\sum :math:k_i = 3:
+    ..math:
+        (k_1 = 1, k_2 = 2)
+        (k_1 = 2, k_2 = 1)
+    Using ``levels`` all :math:k_i are replaced with corresponding point(s)
+    (unique point(s)).
+    For :class:`ChebyshevFirstKind(1)`, ``levels`` is as follow:
+    ..math:
+        ``levels`` = [[0], [1,2]]
+    Then:
+    ..math:
+        ``level_composition_indexes`` =
+        [([0],[0]), ([0],[1,2]), ([1,2],[0])]
+    ``grid_indexes`` then is obtained via generating all possible
+    combination of points' indexes.
+    ..math:
+        ``grids_indexes`` = [(0,0), (0,1), (0,2), (1,0), (2,0)]
+
+    :meth:`~SmolyakGrid.generate_grid_basis` generates grid points
+    of the basis function (in the basis function domain, (-1, 1)) by replacing
+    indexes with points.
+    ..math:
+        ``grids_basis`` =
+        [(0,0), (0,-1.0), (0,1.0), (-1.0,0), (1.0,0)]
+    """
+
+    def __init__(self, basis, exactness):
+        self.basis = basis
+        self.exactness = exactness
+
+    @property
+    def basis(self):
+        """Callable: Basis function used for interpolation."""
+        return self._basis
+
+    @basis.setter
+    def basis(self, basis_function):
+        self._basis = basis_function
+
+    @property
+    def exactness(self):
+        """int: Level of exactness."""
+        return self._exactness
+
+    @exactness.setter
+    def exactness(self, value):
+        self._exactness = value
+
+    def generate_grid_index(self, dimension):
+        """Generate the indexes (orders) of grid points.
+
+        Parameters
+        ----------
+        dimension: int
+            Number of independent variables.
+
+        Returns
+        -------
+        grids_indexes: list
+            Indexes (orders) of grid points.
+        """
+        self.dimension = dimension
+        self._update()
+        return self._grids_indexes
+
+    def generate_grid_basis(self, dimension):
+        """Generate the grid points of the basis function.
+
+        Parameters
+        ----------
+        dimension: int
+            Number of independent variables.
+
+        Returns
+        -------
+        grids_basis: list
+            Grid points of the basis function.
+        """
+        self.dimension = dimension
+        self._update()
+        return self._grids_basis
+
+    def _update(self):
+        """Update the properties and grid points.
+
+        Update the basis function (``basis``), level of exactness
+        (``exactness``), and grid points (``grids_indexes``, and
+        `` grids_basis``).
+        """
+        points = self.basis(self.exactness)._extrema
+        levels = self.basis(self.exactness)._extrema_per_level
+
+        # get all combinations of points at each level
+        grid_points_indexes = None
+        for sum_of_levels in range(self.dimension,
+                                   self.dimension+self.exactness+1):
+            for composition in generate_compositions(
+                    sum_of_levels, self.dimension, include_zero=False):
+                # indexes start from zero
+                integer_composition = numpy.array(composition) - 1
+                # generate all combinations of the arrays along each dimension
+                level_composition_indexes = [levels[index]
+                                             for index in integer_composition]
+                grid_points_indexes_ = (numpy.array(
+                    numpy.meshgrid(*level_composition_indexes))
+                    .T.reshape(-1, self.dimension))
+                if grid_points_indexes is None:
+                    grid_points_indexes = grid_points_indexes_
+                else:
+                    grid_points_indexes = numpy.concatenate(
+                        (grid_points_indexes, grid_points_indexes_), axis=0)
+        self._grids_indexes = grid_points_indexes.tolist()
+        self._grids_basis = (
+            numpy.array(points)[grid_points_indexes].tolist())
+
+
+def generate_compositions(value, num_parts, include_zero):
+    """Generate compositions of a value into num_parts parts.
+
+    The algorithm that is being used is NEXCOM and can be found in
+    "Combinatorial Algorithms For Computers and Calculators",
+    Second Edition, 1978.
+    Authors: ALBERT NIJENHUIS and HERBERT S. WILF.
+    https://doi.org/10.1016/C2013-0-11243-3
+
+    ``include_zero`` parameter determines whether the compositions
+    that contain zeros are parts of the output or not.
+
+    The first composition will be (``value``, 0, ..., 0)
+    (or (``value-num_parts``, 0, ..., 0) if ``include_zero`` is ``False``).
+    Next, the first component (index = 0) is dropped by 1, and next component
+    (index = 1) is incremented by 1. This goes on until index 0 reaches ``0``.
+    Once, generated all compositions, the  next component is incremented
+    by 1 and is fixed until all compositions are generated with the same
+    method. This goes on until the last component reaches the ``value``
+    (or ``value - num_parts`` if ``include_zero`` is ``False``).
+    It is important to note that if ``include_zero`` is ``False``,
+    all components will be incremented by 1.
+
+    Parameters
+    ----------
+    value: int
+        Value.
+    num_parts: int
+        Number of parts.
+    include_zero : bool
+        True if compositions contain zero, False otherwise.
+
+    Yields
+    ------
+    list
+        All possible compositions of the value into num_parts.
+
+    Raises
+    ------
+    ValueError
+        Number of parts cannot be greater than value if the desired output
+        does not include compositions containing zeroes.
+    """
+    if value < num_parts and include_zero is False:
+        raise ValueError(
+            "When include_zero is {}, num_parts cannot be greater"
+            " than the value"
+            .format(False))
+    value = value if include_zero else value - num_parts
+
+    # (A) first entry
+    r = [0]*num_parts
+    r[0] = value
+    t = value
+    h = 0
+    yield list(r) if include_zero else (numpy.array(r)+1).tolist()
+
+    # (D)
+    while r[num_parts-1] != value:
+        # (B)
+        if t != 1:
+            h = 0
+
+        # (C)
+        h += 1
+        t = r[h-1]
+        r[h-1] = 0
+        r[0] = t-1
+        r[h] += 1
+        yield list(r) if include_zero else (numpy.array(r)+1).tolist()
+
+########################################################################
+
+
 class SurrogateFunction:
     r"""Generate a surrogate function that approximates a complex function.
 
