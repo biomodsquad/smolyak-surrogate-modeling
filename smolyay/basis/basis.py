@@ -1,6 +1,7 @@
 import abc
-import numpy
 import math
+
+import numpy
 
 class BasisFunction(abc.ABC):
     """Abstract class for basis functions.
