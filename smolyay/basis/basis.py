@@ -32,14 +32,6 @@ class BasisFunction(abc.ABC):
         return self._levels
 
     @abc.abstractmethod
-    def _update(self):
-        """Update properties described by level of exactness
-        Compute points of basis function and the Smolyak index of
-        each grid level between 0 and max_exactness + 1 
-        """
-        pass
-
-    @abc.abstractmethod
     def __call__(self,n,x):
         """Compute term of basis function
         Returns the output of an nth degree basis function with input x
