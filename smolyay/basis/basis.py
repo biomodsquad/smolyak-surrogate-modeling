@@ -8,11 +8,6 @@ class BasisFunction(abc.ABC):
 
     Creates a framework for basis functions that are the building blocks
     for the terms in the surrogate model. 
-    ``max_exactness`` represents the maximum level of exactness, or 
-    accuracy, of a surrogate function this class can provide enough 
-    information for. This class can provide enough information for 
-    constructing a surrogate function of any accuracy at or below 
-    max_exactness.
     ``points`` property represents all the unique 1D points of the 
     basis function associated with a Smolyak index described by the 
     class IndexGrid. The Smolyak index of a given point is equal to 
@@ -20,23 +15,11 @@ class BasisFunction(abc.ABC):
     ``levels`` property gives the Smolyak indexes for each
     grid level.
 
-    Parameters
-    ----------
-    max_exactness : int
-        level of exactness class will describe
-
     """
 
-    def __init__(self,max_exactness):
-        self._max_exactness = max_exactness
+    def __init__(self):
         self._points = []
         self._levels = []
-        self._update()
-
-    @property
-    def max_exactness(self):
-        """Maximum level of exactness described"""
-        return self._max_exactness
 
     @property
     def points(self):
@@ -47,32 +30,6 @@ class BasisFunction(abc.ABC):
     def levels(self):
         """index of each point that belongs to each grid level"""
         return self._levels
-
-    @max_exactness.setter
-    def max_exactness(self, max_exactness):
-        """Set maximum level of exactness
-        Sets maximmum level of exactness class instance will describe, will
-        extend or truncate properties points and levels to match new value
-
-        Parameters
-        ----------
-        max_exactness : int
-            new level of exactness class should describe
-        """
-        if max_exactness > self._max_exactness:
-            # extend
-            self._max_exactness = max_exactness
-            # update other properties
-            self._update()
-        elif max_exactness < self._max_exactness:
-            # truncate
-            self._max_exactness = max_exactness
-            # update other properties
-            points_keep = sum(
-                    [len(x) for x in self._levels[:self._max_exactness+1]])
-            self._points = self._points[:points_keep]
-            self._levels = self._levels[:self._max_exactness+1]
-
 
     @abc.abstractmethod
     def _update(self):
@@ -113,12 +70,58 @@ class ChebyshevFirstKind(BasisFunction):
         T_1(x) = x
         T_{n+1}(x) = 2xT_n(x) - T_{n-1}(x)
 
+    ``max_exactness`` represents the maximum level of exactness, or
+    accuracy, of a surrogate function this class can provide enough
+    information for. It determines the number of points and levels
+    the class will calculate and store.
+
     The extrema of the polynomials are calculated via the following
     equation:
 
     ..math:
         x_{n,j}^* = -\cos\left((\frac{j-1}{n-1}\pi\right), j = 1,...,n
+        n = 2^{exactness-1}+1
+
+     Parameters
+    ----------
+    max_exactness : int
+        level of exactness class will describe
     """
+
+    def __init__(self,max_exactness):
+        super().__init__()
+        self._max_exactness = max_exactness
+        self._update()
+
+    @property
+    def max_exactness(self):
+        """Maximum level of exactness described"""
+        return self._max_exactness
+
+    @max_exactness.setter
+    def max_exactness(self, max_exactness):
+        """Set maximum level of exactness
+        Sets maximmum level of exactness class instance will describe, will
+        extend or truncate properties points and levels to match new value
+
+        Parameters
+        ----------
+        max_exactness : int
+            new level of exactness class should describe
+        """
+        if max_exactness > self._max_exactness:
+            # extend
+            self._max_exactness = max_exactness
+            # update other properties
+            self._update()
+        elif max_exactness < self._max_exactness:
+            # truncate
+            self._max_exactness = max_exactness
+            # update other properties
+            points_keep = sum(
+                    [len(x) for x in self._levels[:self._max_exactness+1]])
+            self._points = self._points[:points_keep]
+            self._levels = self._levels[:self._max_exactness+1]
 
     def _update(self):
         """Update properties dependent on max_exactness"""
@@ -130,11 +133,11 @@ class ChebyshevFirstKind(BasisFunction):
             next_exactness = 1
 
         for ex in range(next_exactness,self._max_exactness+1):
-            m = 2**(ex)+1
+            n = 2**(ex)+1
             counter_index = 0
             new_level = []
-            for i in range(1,m+1):
-                temp = round(-numpy.cos(numpy.pi*(i-1)/(m-1)),15) + 0
+            for i in range(1,n+1):
+                temp = round(-numpy.cos(numpy.pi*(i-1)/(n-1)),15) + 0
                 if temp not in self._points:
                     new_level.append(len(self._points))
                     self._points.append(temp)
