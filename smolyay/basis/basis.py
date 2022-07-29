@@ -40,17 +40,17 @@ class BasisFunction(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def basis(self,x,n):
+    def __call__(self,n,x):
         """Compute term of basis function
         Returns the output of an nth degree basis function with input x
 
         Parameters
         ----------
-        x : float
-            input
-
         n : int
             degree
+
+        x : float
+            input
 
         Returns
         -------
@@ -61,8 +61,8 @@ class BasisFunction(abc.ABC):
 
 
 class ChebyshevFirstKind(BasisFunction):
-    r"""Basis Function of Chebyshev polynomials of the first kind
-    Chebyshev polynomials are a set of polynomials described by the
+    r"""Basis function of Chebyshev polynomials of the first kind
+    Chebyshev polynomials are a sequence of polynomials described by the
     following recurrence relation:
 
     ..math:
@@ -82,7 +82,7 @@ class ChebyshevFirstKind(BasisFunction):
         x_{n,j}^* = -\cos\left((\frac{j-1}{n-1}\pi\right), j = 1,...,n
         n = 2^{exactness-1}+1
 
-     Parameters
+    Parameters
     ----------
     max_exactness : int
         level of exactness class will describe
@@ -144,18 +144,18 @@ class ChebyshevFirstKind(BasisFunction):
                     counter_index += 1
             self._levels.append(new_level)
 
-    def basis(self,x,n):
+    def __call__(self,n,x):
         """Terms of basis function
         Returns the output of an nth degree Chebyshev polynomial of the
         first kind with input x
 
         Parameters
         ----------
-        x : float
-            input
-
         n : int
             degree of Chebyshev polynomial of the first kind
+
+        x : float
+            input
 
         Returns
         -------
