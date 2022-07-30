@@ -1,8 +1,6 @@
 import abc
 import math
 
-import numpy
-
 class BasisFunction(abc.ABC):
     """Abstract class for basis functions.
 
@@ -53,7 +51,7 @@ class BasisFunction(abc.ABC):
 
 
 class ChebyshevFirstKind(BasisFunction):
-    r"""Basis function of Chebyshev polynomials of the first kind
+    r"""Basis function family Chebyshev polynomials of the first kind
     Chebyshev polynomials are a sequence of polynomials described by the
     following recurrence relation:
 
@@ -129,7 +127,7 @@ class ChebyshevFirstKind(BasisFunction):
             counter_index = 0
             new_level = []
             for i in range(1,n+1):
-                temp = round(-numpy.cos(numpy.pi*(i-1)/(n-1)),15) + 0
+                temp = round(-math.cos(math.pi*(i-1)/(n-1)),15) + 0
                 if temp not in self._points:
                     new_level.append(len(self._points))
                     self._points.append(temp)
