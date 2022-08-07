@@ -8,26 +8,17 @@ class BasisFunction(abc.ABC):
     for the terms in the surrogate model. 
     ``points`` property represents all the unique 1D points of the 
     basis function associated with a Smolyak index described by the 
-    class IndexGrid. The Smolyak index of a given point is equal to 
-    its position in the list points.
-    ``levels`` property gives the Smolyak indexes for each
-    grid level.
+    class IndexGrid.
 
     """
 
     def __init__(self):
         self._points = []
-        self._levels = []
 
     @property
     def points(self):
         """Extrema assigned to Smolyak indices"""
         return self._points
-
-    @property
-    def levels(self):
-        """index of each point that belongs to each grid level"""
-        return self._levels
 
     @abc.abstractmethod
     def __call__(self,n,x):
@@ -51,7 +42,7 @@ class BasisFunction(abc.ABC):
 
 
 class ChebyshevFirstKind(BasisFunction):
-    r"""Basis function family Chebyshev polynomials of the first kind
+    r"""Basis function Chebyshev polynomials of the first kind
     Chebyshev polynomials are a sequence of polynomials described by the
     following recurrence relation:
 
@@ -60,12 +51,11 @@ class ChebyshevFirstKind(BasisFunction):
         T_1(x) = x
         T_{n+1}(x) = 2xT_n(x) - T_{n-1}(x)
 
-    ``max_exactness`` represents the maximum level of exactness, or
-    accuracy, of a surrogate function this class can provide enough
-    information for. It determines the number of points and levels
-    the class will calculate and store.
+    ``n`` is the degree of the polynomial this object describes
+    ``points`` represents the extrema of the polynomial of this degree on
+    the domain [-1,1]
 
-    The extrema of the polynomials are calculated via the following
+    The extrema of the polynomial are calculated via the following
     equation:
 
     ..math:
@@ -74,76 +64,49 @@ class ChebyshevFirstKind(BasisFunction):
 
     Parameters
     ----------
-    max_exactness : int
-        level of exactness class will describe
+    n : int
+        degree of the Chebyshev polynomial
     """
 
-    def __init__(self,max_exactness):
+    def __init__(self,n):
         super().__init__()
-        self._max_exactness = max_exactness
-        self._update()
+        self._n = n
 
     @property
-    def max_exactness(self):
-        """Maximum level of exactness described"""
-        return self._max_exactness
-
-    @max_exactness.setter
-    def max_exactness(self, max_exactness):
-        """Set maximum level of exactness
-        Sets maximmum level of exactness class instance will describe, will
-        extend or truncate properties points and levels to match new value
-
-        Parameters
-        ----------
-        max_exactness : int
-            new level of exactness class should describe
-        """
-        if max_exactness > self._max_exactness:
-            # extend
-            self._max_exactness = max_exactness
-            # update other properties
+    def points(self):
+        """extrema of polynomial"""
+        if len(self._points) == 0:
             self._update()
-        elif max_exactness < self._max_exactness:
-            # truncate
-            self._max_exactness = max_exactness
-            # update other properties
-            points_keep = sum(
-                    [len(x) for x in self._levels[:self._max_exactness+1]])
-            self._points = self._points[:points_keep]
-            self._levels = self._levels[:self._max_exactness+1]
+        return self._points
+
+    @property
+    def n(self):
+        """degree of polynomial"""
+        return self._n
+
+    @n.setter
+    def n(self,n):
+        if self._n != n:
+            self._n = n
+            self._points = []
 
     def _update(self):
         """Update properties dependent on max_exactness"""
-        next_exactness = len(self._levels)
 
-        if next_exactness == 0:
+        if self._n == 0:
             self._points = [0]
-            self._levels = [[0]]
-            next_exactness = 1
+        else:
+            for i in range(0,self._n+1):
+                temp = round(-math.cos(math.pi*(i)/(self._n)),15) + 0
+                self._points.append(temp)
 
-        for ex in range(next_exactness,self._max_exactness+1):
-            n = 2**(ex)+1
-            counter_index = 0
-            new_level = []
-            for i in range(1,n+1):
-                temp = round(-math.cos(math.pi*(i-1)/(n-1)),15) + 0
-                if temp not in self._points:
-                    new_level.append(len(self._points))
-                    self._points.append(temp)
-                    counter_index += 1
-            self._levels.append(new_level)
-
-    def __call__(self,n,x):
+    def __call__(self,x):
         """Terms of basis function
         Returns the output of an nth degree Chebyshev polynomial of the
         first kind with input x
 
         Parameters
         ----------
-        n : int
-            degree of Chebyshev polynomial of the first kind
-
         x : float
             input
 
@@ -152,15 +115,15 @@ class ChebyshevFirstKind(BasisFunction):
         y : float
             output
         """
-        if n == 0:
+        if self._n == 0:
             return 1
-        elif n == 1:
+        elif self._n == 1:
             return x
         else:
-            k_lim = n//2
+            k_lim = self._n//2
             answer = 0
             for k in range(0,k_lim+1):
-                answer += math.comb(n,2*k)*((x**2 - 1)**k)*(x**(n-2*k))
+                answer += math.comb(self._n,2*k)*((x**2 - 1)**k)*(x**(self._n-2*k))
             return answer
 
 
