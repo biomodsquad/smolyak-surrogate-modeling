@@ -21,15 +21,12 @@ class BasisFunction(abc.ABC):
         return self._points
 
     @abc.abstractmethod
-    def __call__(self,n,x):
+    def __call__(self,x):
         """Compute term of basis function
-        Returns the output of an nth degree basis function with input x
+        Returns the output of the basis function with input x
 
         Parameters
         ----------
-        n : int
-            degree
-
         x : float
             input
 
@@ -39,6 +36,47 @@ class BasisFunction(abc.ABC):
             output
         """
         pass
+
+class BasisFunctionSet():
+    """Set of basis functions
+
+    Creates a framework for a set of basis functions to be used as the
+    building blocks for a surrogate model.
+    ``basis_set'' is a list of BasisFunction objects
+    ``sample_flag`` is a list of boolean equal in length to basis_set and
+    an index in the list is true if the object in basis_set at the same
+    index is one that points should be sampled from
+    ''all_points'' 1D points taken from the BasisFunction objects specified
+    by sample_flag
+    """
+
+    def __init__(self,sample_flag):
+        self._sample_flag = sample_flag
+        self._basis_set = []
+        self._all_points = []
+        self._need_update = True
+
+    @property
+    def all_points(self):
+        """All points for basis function set at some level of precision"""
+        if self._need_update:
+            self._update()
+        return self._all_points
+
+    @property
+    def basis_set(self):
+        """list of BasisFunction objects"""
+        return self._basis_set
+
+    @property
+    def sample_flag(self):
+        """list of what objects in basis_set to sample points from"""
+        return self._sample_flag
+
+    @sample_flag.setter(self,sample_flag):
+        self._sample_flag = sample_flag
+        self.need_update = True
+
 
 
 class ChebyshevFirstKind(BasisFunction):
