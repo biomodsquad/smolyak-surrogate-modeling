@@ -17,7 +17,7 @@ class BasisFunction(abc.ABC):
 
     @property
     def points(self):
-        """Extrema assigned to Smolyak indices"""
+    """The points of the basis function assigned to Smolyak indices"""
         return self._points
 
     @abc.abstractmethod
@@ -36,47 +36,6 @@ class BasisFunction(abc.ABC):
             output
         """
         pass
-
-class BasisFunctionSet():
-    """Set of basis functions
-
-    Creates a framework for a set of basis functions to be used as the
-    building blocks for a surrogate model.
-    ``basis_set'' is a list of BasisFunction objects
-    ``sample_flag`` is a list of boolean equal in length to basis_set and
-    an index in the list is true if the object in basis_set at the same
-    index is one that points should be sampled from
-    ''all_points'' 1D points taken from the BasisFunction objects specified
-    by sample_flag
-    """
-
-    def __init__(self,sample_flag):
-        self._sample_flag = sample_flag
-        self._basis_set = []
-        self._all_points = []
-        self._need_update = True
-
-    @property
-    def all_points(self):
-        """All points for basis function set at some level of precision"""
-        if self._need_update:
-            self._update()
-        return self._all_points
-
-    @property
-    def basis_set(self):
-        """list of BasisFunction objects"""
-        return self._basis_set
-
-    @property
-    def sample_flag(self):
-        """list of what objects in basis_set to sample points from"""
-        return self._sample_flag
-
-    @sample_flag.setter(self,sample_flag):
-        self._sample_flag = sample_flag
-        self.need_update = True
-
 
 
 class ChebyshevFirstKind(BasisFunction):
@@ -165,3 +124,80 @@ class ChebyshevFirstKind(BasisFunction):
             return answer
 
 
+class BasisFunctionSet(abc.ABC):
+    """Set of basis functions
+
+    Creates a framework for a set of basis functions to be used as the
+    building blocks for a surrogate model.
+    ``basis_set`` is a list of BasisFunction objects
+    ``sample_flag`` is a list of boolean equal in length to basis_set and
+    an index in the list is true if the object in basis_set at the same
+    index is one that points should be sampled from
+    ''all_points'' 1D points taken from the BasisFunction objects specified
+    by sample_flag
+    """
+
+    def __init__(self,sample_flag):
+        self._sample_flag = sample_flag
+        self._basis_set = []
+        self._all_points = []
+        self._need_update = True
+
+    @property
+    def all_points(self):
+        """All points for basis function set at some level of precision"""
+        if self._need_update:
+            self._update()
+        return self._all_points
+
+    @property
+    def basis_set(self):
+        """list of BasisFunction objects"""
+        return self._basis_set
+
+    @property
+    def sample_flag(self):
+        """list of what objects in basis_set to sample points from"""
+        return self._sample_flag
+
+    @sample_flag.setter
+    def sample_flag(self,sample_flag):
+        self._sample_flag = sample_flag
+        self._need_update = True
+
+    @abc.abstractmethod
+    def _update(self):
+        """Updates all_points based on parameters"""
+        pass
+    
+
+
+class ChebyshevSet(BasisFunctionSet):
+    """Set of the family of Chebyshev polynomials of the first kind
+
+    ``level_indexes`` is a list of the Smolyak indexes associated with 
+    each grid level
+
+
+    """
+
+    def __init__(self,sample_flag,level_indexes,ChebyshevFunction):
+        """Initialization of parameters
+        Parameters
+        ----------
+        ChebyshevFunction : class Object
+            the class object that describes the basis function
+        """
+        super().__init__(sample_flag)
+        self._level_indexes = level_indexes
+        for i in range(0,len(self._sample_flag)):
+            self._basis_set.append(ChebyshevFunction(i))
+
+        def _update(self):
+            self._all_points = []
+            for i in range(0,len(self._sample_flag)):
+                if self._sample_flag[i]:
+                    new_points = self._basis_set[i].points
+                    for j in range(0,len(new_points)):
+                        if new_points[j] not in self._all_points:
+                            self._all_points.append(new_points[j]
