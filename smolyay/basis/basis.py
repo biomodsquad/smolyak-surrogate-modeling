@@ -17,7 +17,7 @@ class BasisFunction(abc.ABC):
 
     @property
     def points(self):
-    """The points of the basis function assigned to Smolyak indices"""
+        """The points of the basis function assigned to Smolyak indices"""
         return self._points
 
     @abc.abstractmethod
@@ -126,7 +126,6 @@ class ChebyshevFirstKind(BasisFunction):
 
 class BasisFunctionSet(abc.ABC):
     """Set of basis functions
-
     Creates a framework for a set of basis functions to be used as the
     building blocks for a surrogate model.
     ``basis_set`` is a list of BasisFunction objects
@@ -174,14 +173,10 @@ class BasisFunctionSet(abc.ABC):
 
 class ChebyshevSet(BasisFunctionSet):
     """Set of the family of Chebyshev polynomials of the first kind
-
-    ``level_indexes`` is a list of the Smolyak indexes associated with 
-    each grid level
-
-
+    Set of Chebyshev polynomials to form the surrogate function
     """
 
-    def __init__(self,sample_flag,level_indexes,ChebyshevFunction):
+    def __init__(self,sample_flag,ChebyshevFunction):
         """Initialization of parameters
         Parameters
         ----------
@@ -189,15 +184,15 @@ class ChebyshevSet(BasisFunctionSet):
             the class object that describes the basis function
         """
         super().__init__(sample_flag)
-        self._level_indexes = level_indexes
         for i in range(0,len(self._sample_flag)):
             self._basis_set.append(ChebyshevFunction(i))
 
-        def _update(self):
-            self._all_points = []
-            for i in range(0,len(self._sample_flag)):
-                if self._sample_flag[i]:
-                    new_points = self._basis_set[i].points
-                    for j in range(0,len(new_points)):
-                        if new_points[j] not in self._all_points:
-                            self._all_points.append(new_points[j]
+    def _update(self):
+        self._all_points = []
+        for i in range(0,len(self._sample_flag)):
+            if self._sample_flag[i]:
+                new_points = self._basis_set[i].points
+                for j in range(0,len(new_points)):
+                    if new_points[j] not in self._all_points:
+                        self._all_points.append(new_points[j])
+        self._need_update = False

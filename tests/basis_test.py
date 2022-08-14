@@ -1,65 +1,76 @@
 import pytest
 
-
 import numpy
 
-from smolyay.basis.basis import BasisFunction, ChebyshevFirstKind
+from smolyay.basis.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, ChebyshevSet
 
 @pytest.fixture
-def expected_extrema_2():
+def expected_points_2():
     """extrema for exactness = 4"""
     return sorted([0, -1.0, 1.0, -1/(2**0.5), 1/(2**0.5)])
 
 @pytest.fixture
-def expected_extrema_3():
+def expected_points_3():
     """extrema for n = 8"""
     return sorted([0, -1.0, 1.0, -1/(2**0.5), 1/(2**0.5), 
             -(((2**0.5)+1)**0.5)/(2**0.75),-(((2**0.5)-1)**0.5)/(2**0.75),
             (((2**0.5)-1)**0.5)/(2**0.75),(((2**0.5)+1)**0.5)/(2**0.75)])
 
-def test_exactness_zero():
-    """test exactness of zero"""
+@pytest.fixture
+def expected_points_2_set():
+    """extrema for exactness = 4"""
+    return [0, -1.0, 1.0, -1/(2**0.5), 1/(2**0.5)]
+
+@pytest.fixture
+def expected_points_3_set():
+    """extrema for n = 8"""
+    return [0, -1.0, 1.0, -1/(2**0.5), 1/(2**0.5),
+            -(((2**0.5)+1)**0.5)/(2**0.75),-(((2**0.5)-1)**0.5)/(2**0.75),
+            (((2**0.5)-1)**0.5)/(2**0.75),(((2**0.5)+1)**0.5)/(2**0.75)]
+
+def test_degree_zero():
+    """test degree of zero"""
     test_class = ChebyshevFirstKind(0)
     assert test_class.n == 0
     assert test_class.points == [0]
 
-def test_initial_exactness_1():
-    """test initial when exactness is 1"""
+def test_initial_degree_1():
+    """test initial when degree is 1"""
     test_class = ChebyshevFirstKind(1)
     assert test_class.n == 1
     assert test_class.points == [-1,1]
 
-def test_initial_exactness_2(expected_extrema_2):
-    """test initial when exactness is 2"""
+def test_initial_degree_2(expected_points_2):
+    """test initial when degree is 2"""
     test_class = ChebyshevFirstKind(4)
     assert test_class.n == 4
-    assert numpy.allclose(test_class.points,expected_extrema_2,atol=1e-10)
+    assert numpy.allclose(test_class.points,expected_points_2,atol=1e-10)
 
-def test_increase_exactness(expected_extrema_3):
-    """test when max exactness is increased"""
+def test_increase_degree(expected_points_3):
+    """test when max degree is increased"""
     test_class = ChebyshevFirstKind(1)
     a = test_class.points
     test_class.n = 8
     assert test_class.n == 8
-    assert numpy.allclose(test_class.points, expected_extrema_3,atol=1e-10)
+    assert numpy.allclose(test_class.points, expected_points_3,atol=1e-10)
 
-def test_decrease_exactness(expected_extrema_3):
-    """test when max exactness is decreased"""
+def test_decrease_degree(expected_points_3):
+    """test when max degree is decreased"""
     test_class = ChebyshevFirstKind(16)
     a = test_class.points
     test_class.n = 8
     assert test_class.n == 8
-    assert numpy.allclose(test_class.points,expected_extrema_3,atol=1e-10)
+    assert numpy.allclose(test_class.points,expected_points_3,atol=1e-10)
 
-def test_decrease_increase_exactness(expected_extrema_2):
-    """test when max exactness is decreased"""
+def test_decrease_increase_degree(expected_points_2):
+    """test when max degree is decreased"""
     test_class = ChebyshevFirstKind(1)
     a = test_class.points
     test_class.n = 6
     a = test_class.points
     test_class.n = 4
     assert test_class.n == 4
-    assert numpy.allclose(test_class.points,expected_extrema_2,atol=1e-10)
+    assert numpy.allclose(test_class.points,expected_points_2,atol=1e-10)
 
 def test_basis_degree_0():
     """Chebyshev polynomial degree 0 is 1"""
@@ -88,9 +99,45 @@ def test_basis_random_points(x,n,expected):
     test_class = ChebyshevFirstKind(n)
     assert test_class(x) == expected
 
-def test_is_abstract():
+def test_is_basis_abstract():
     """Check BasisFunction is an abstract class"""
     with pytest.raises(TypeError):
         test_class = BasisFunction()
 
+def test_is_set_abstract():
+    """Check BasisFunctionSet is an abstract class"""
+    with pytest.raises(TypeError):
+        test_class = BasisFunctionSet([True])
+
+def test_set_initialize_0():
+    """Check ChebyshevSet correctly initializes"""
+    sample_flag = [True]
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    assert test_class.all_points == [0]
+
+def test_set_initialize_1():
+    """Check ChebyshevSet correctly initializes"""
+    sample_flag = [True,True]
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    assert test_class.all_points == [0,-1,1]
+
+def test_set_initialize_2():
+    """Check ChebyshevSet correctly initializes"""
+    sample_flag = [True,True,True]
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    assert test_class.all_points == [0,-1,1]
+
+def test_set_initialize_3(expected_points_2_set):
+    """Check ChebyshevSet correctly initializes"""
+    sample_flag = [True,True,True,False,True]
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    assert numpy.allclose(
+            test_class.all_points,expected_points_2_set,atol=1e-10)
+
+def test_set_initialize_4(expected_points_3_set):
+    """Check ChebyshevSet correctly initializes"""
+    sample_flag = [True,True,True,False,True,False,False,False,True]
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    assert numpy.allclose(
+            test_class.all_points,expected_points_3_set,atol=1e-10)
 
