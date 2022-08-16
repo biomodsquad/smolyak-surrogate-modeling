@@ -18,7 +18,19 @@ class BasisFunction(abc.ABC):
     @property
     def points(self):
         """The points of the basis function assigned to Smolyak indices"""
+        if len(self._points) == 0:
+            self._compute_points()
         return self._points
+
+    @abc.abstractmethod
+    def _compute_points(self):
+        """Compute the value of the points for the basis function
+        Computes the 1D points associated with the basis function, The
+        method of computation depends on the basis function and what
+        the points are meant to represent
+        """
+        pass
+
 
     @abc.abstractmethod
     def __call__(self,x):
@@ -73,7 +85,7 @@ class ChebyshevFirstKind(BasisFunction):
     def points(self):
         """extrema of polynomial"""
         if len(self._points) == 0:
-            self._update()
+            self._compute_points()
         return self._points
 
     @property
@@ -87,9 +99,8 @@ class ChebyshevFirstKind(BasisFunction):
             self._n = n
             self._points = []
 
-    def _update(self):
-        """Update properties dependent on max_exactness"""
-
+    def _compute_points(self):
+        """Compute extrema of Chebyshev polynomial of the first kind"""
         if self._n == 0:
             self._points = [0]
         else:
@@ -132,12 +143,18 @@ class BasisFunctionSet(abc.ABC):
     ``sample_flag`` is a list of boolean equal in length to basis_set and
     an index in the list is true if the object in basis_set at the same
     index is one that points should be sampled from
+    ``basis_function`` is the BasisFunction child class that populates
+    basis_set
     ''all_points'' 1D points taken from the BasisFunction objects specified
     by sample_flag
+    ``need_update`` is a boolean parameter that specifies when properties
+    of the class need to be recomputed
+
     """
 
-    def __init__(self,sample_flag):
+    def __init__(self,sample_flag,basis_function):
         self._sample_flag = sample_flag
+        self._basis_function = basis_function
         self._basis_set = []
         self._all_points = []
         self._need_update = True
@@ -152,6 +169,8 @@ class BasisFunctionSet(abc.ABC):
     @property
     def basis_set(self):
         """list of BasisFunction objects"""
+        if self._need_update:
+            self._update()
         return self._basis_set
 
     @property
@@ -164,31 +183,44 @@ class BasisFunctionSet(abc.ABC):
         self._sample_flag = sample_flag
         self._need_update = True
 
+    @property
+    def basis_function(self):
+        """BasisFunction class used in basis_set"""
+        return basis_function
+
+    @basis_function.setter
+    def basis_function(self,basis_function):
+        self._basis_function = basis_function
+        self._need_update = True
+
     @abc.abstractmethod
     def _update(self):
         """Updates all_points based on parameters"""
         pass
-    
 
 
 class ChebyshevSet(BasisFunctionSet):
-    """Set of the family of Chebyshev polynomials of the first kind
+    """Set of the family of Chebyshev polynomials
     Set of Chebyshev polynomials to form the surrogate function
+
+    The set of basis functions this class uses are assumed to be part
+    of a sequential series of functions, where the index of a function
+    in basis_set is the only required input of the basis_function
     """
 
-    def __init__(self,sample_flag,ChebyshevFunction):
-        """Initialization of parameters
-        Parameters
-        ----------
-        ChebyshevFunction : class Object
-            the class object that describes the basis function
-        """
-        super().__init__(sample_flag)
-        for i in range(0,len(self._sample_flag)):
-            self._basis_set.append(ChebyshevFunction(i))
+    def __init__(self,sample_flag,basis_function):
+        """Initialization of parameters"""
+        super().__init__(sample_flag,basis_function)
+        self._update()
 
     def _update(self):
+        """Update basis_set and get points"""
+        self._basis_set = []
         self._all_points = []
+
+        for i in range(0,len(self._sample_flag)):
+            self._basis_set.append(self._basis_function(i))
+
         for i in range(0,len(self._sample_flag)):
             if self._sample_flag[i]:
                 new_points = self._basis_set[i].points
@@ -196,3 +228,21 @@ class ChebyshevSet(BasisFunctionSet):
                     if new_points[j] not in self._all_points:
                         self._all_points.append(new_points[j])
         self._need_update = False
+
+    def __call__(self,n,x):
+        """Compute value of function in set
+        Computes the answer of the nth function of the set given input x
+
+        Parameters
+        ----------
+        x : float
+            input
+        n : int
+            index of function in set
+        
+        Returns
+        -------
+        answer : float
+            output
+        """
+        return self._basis_set[n](x) 

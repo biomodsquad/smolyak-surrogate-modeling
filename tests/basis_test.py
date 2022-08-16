@@ -109,11 +109,17 @@ def test_is_set_abstract():
     with pytest.raises(TypeError):
         test_class = BasisFunctionSet([True])
 
+def test_set_initialize_empty():
+    """Check ChebyshevSet correctly initializes with empty set"""
+    sample_flag = []
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    assert test_class.all_points == []
+
 def test_set_initialize_0():
     """Check ChebyshevSet correctly initializes"""
-    sample_flag = [True]
+    sample_flag = []
     test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
-    assert test_class.all_points == [0]
+    assert test_class.all_points == []
 
 def test_set_initialize_1():
     """Check ChebyshevSet correctly initializes"""
@@ -140,4 +146,23 @@ def test_set_initialize_4(expected_points_3_set):
     test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
     assert numpy.allclose(
             test_class.all_points,expected_points_3_set,atol=1e-10)
+
+def test_set_change(expected_points_2_set):
+    """Check ChebyshevSet correctly initializes"""
+    sample_flag = [False,False,False,True]
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class.sample_flag = [True,True,False,False,True]
+    assert numpy.allclose(
+            test_class.all_points,expected_points_2_set,atol=1e-10)
+
+@pytest.mark.parametrize("x, n, expected",[(2,6,1351),(-3,9,-3880899),
+    (13,4,227137),(8,3,2024),(4,9,58106404),(14,5,8550374),(0,12,1),
+    (7,5,262087),(-2,4,97),(3,9,3880899),(9,4,51841),(2,11,978122),
+    (4,7,937444),(-3,2,17),(6,4,10081),(2,8,18817)])
+def test_basis_set_random_points(x,n,expected):
+    """Test chebyshev polynomial at some degree at some input"""
+    sample_flag = [True,True,False,False,True,False,False,False,True,
+            False,False,False,False,False,False,False,True]
+    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    assert test_class(n,x) == expected
 
