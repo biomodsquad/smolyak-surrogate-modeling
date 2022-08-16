@@ -199,13 +199,13 @@ class BasisFunctionSet(abc.ABC):
         pass
 
 
-class RecurranceSet(BasisFunctionSet):
-    """Set of basis functions related via a recurrance relation
+class RecurrenceSet(BasisFunctionSet):
+    """Set of basis functions related via a recurrence relation
 
     The set of basis functions this class uses are assumed to be part
     of a sequential series of functions, where the index of a function
     in basis_set is the only required input of the basis_function. Such
-    functions can be described as a recurrance relation where the nth
+    functions can be described as a recurrence relation where the nth
     function of the sequence is a combination of previous terms.
     """
 
