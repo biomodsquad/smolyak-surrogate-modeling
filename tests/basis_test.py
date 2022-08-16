@@ -2,7 +2,7 @@ import pytest
 
 import numpy
 
-from smolyay.basis.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, ChebyshevSet
+from smolyay.basis.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, RecurranceSet
 
 @pytest.fixture
 def expected_points_2():
@@ -110,47 +110,47 @@ def test_is_set_abstract():
         test_class = BasisFunctionSet([True])
 
 def test_set_initialize_empty():
-    """Check ChebyshevSet correctly initializes with empty set"""
+    """Check RecurranceSet correctly initializes with empty set"""
     sample_flag = []
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     assert test_class.all_points == []
 
 def test_set_initialize_0():
-    """Check ChebyshevSet correctly initializes"""
+    """Check RecurranceSet correctly initializes"""
     sample_flag = []
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     assert test_class.all_points == []
 
 def test_set_initialize_1():
-    """Check ChebyshevSet correctly initializes"""
+    """Check RecurranceSet correctly initializes"""
     sample_flag = [True,True]
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     assert test_class.all_points == [0,-1,1]
 
 def test_set_initialize_2():
-    """Check ChebyshevSet correctly initializes"""
+    """Check RecurranceSet correctly initializes"""
     sample_flag = [True,True,True]
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     assert test_class.all_points == [0,-1,1]
 
 def test_set_initialize_3(expected_points_2_set):
-    """Check ChebyshevSet correctly initializes"""
+    """Check RecurranceSet correctly initializes"""
     sample_flag = [True,True,True,False,True]
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     assert numpy.allclose(
             test_class.all_points,expected_points_2_set,atol=1e-10)
 
 def test_set_initialize_4(expected_points_3_set):
-    """Check ChebyshevSet correctly initializes"""
+    """Check RecurranceSet correctly initializes"""
     sample_flag = [True,True,True,False,True,False,False,False,True]
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     assert numpy.allclose(
             test_class.all_points,expected_points_3_set,atol=1e-10)
 
 def test_set_change(expected_points_2_set):
-    """Check ChebyshevSet correctly initializes"""
+    """Check RecurranceSet updates points when sample_flag changes"""
     sample_flag = [False,False,False,True]
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     test_class.sample_flag = [True,True,False,False,True]
     assert numpy.allclose(
             test_class.all_points,expected_points_2_set,atol=1e-10)
@@ -163,6 +163,6 @@ def test_basis_set_random_points(x,n,expected):
     """Test chebyshev polynomial at some degree at some input"""
     sample_flag = [True,True,False,False,True,False,False,False,True,
             False,False,False,False,False,False,False,True]
-    test_class = ChebyshevSet(sample_flag,ChebyshevFirstKind)
+    test_class = RecurranceSet(sample_flag,ChebyshevFirstKind)
     assert test_class(n,x) == expected
 

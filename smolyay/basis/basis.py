@@ -199,13 +199,14 @@ class BasisFunctionSet(abc.ABC):
         pass
 
 
-class ChebyshevSet(BasisFunctionSet):
-    """Set of the family of Chebyshev polynomials
-    Set of Chebyshev polynomials to form the surrogate function
+class RecurranceSet(BasisFunctionSet):
+    """Set of basis functions related via a recurrance relation
 
     The set of basis functions this class uses are assumed to be part
     of a sequential series of functions, where the index of a function
-    in basis_set is the only required input of the basis_function
+    in basis_set is the only required input of the basis_function. Such
+    functions can be described as a recurrance relation where the nth
+    function of the sequence is a combination of previous terms.
     """
 
     def __init__(self,sample_flag,basis_function):
