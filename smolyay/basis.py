@@ -1,6 +1,8 @@
 import abc
 import math
 
+import numpy
+
 class BasisFunction(abc.ABC):
     """Abstract class for basis functions.
 
@@ -15,20 +17,9 @@ class BasisFunction(abc.ABC):
     def __init__(self):
         self._points = []
 
-    @property
+    @abc.abstractproperty
     def points(self):
         """The points of the basis function assigned to Smolyak indices"""
-        if len(self._points) == 0:
-            self._compute_points()
-        return self._points
-
-    @abc.abstractmethod
-    def _compute_points(self):
-        """Compute the value of the points for the basis function
-        Computes the 1D points associated with the basis function, The
-        method of computation depends on the basis function and what
-        the points are meant to represent
-        """
         pass
 
 
@@ -104,9 +95,8 @@ class ChebyshevFirstKind(BasisFunction):
         if self._n == 0:
             self._points = [0]
         else:
-            for i in range(0,self._n+1):
-                temp = round(-math.cos(math.pi*(i)/(self._n)),15) + 0
-                self._points.append(temp)
+            i = numpy.arange(self._n+1)
+            self._points = list(-numpy.cos(numpy.pi*i/self._n))
 
     def __call__(self,x):
         """Terms of basis function
@@ -143,8 +133,6 @@ class BasisFunctionSet(abc.ABC):
     ``sample_flag`` is a list of boolean equal in length to basis_set and
     an index in the list is true if the object in basis_set at the same
     index is one that points should be sampled from
-    ``basis_function`` is the BasisFunction child class that populates
-    basis_set
     ''all_points'' 1D points taken from the BasisFunction objects specified
     by sample_flag
     ``need_update`` is a boolean parameter that specifies when properties
@@ -152,26 +140,26 @@ class BasisFunctionSet(abc.ABC):
 
     """
 
-    def __init__(self,sample_flag,basis_function):
+    def __init__(self,sample_flag,basis_set):
         self._sample_flag = sample_flag
-        self._basis_function = basis_function
-        self._basis_set = []
+        self._basis_set = basis_set
         self._all_points = []
         self._need_update = True
 
-    @property
+    @abc.abstractproperty
     def all_points(self):
         """All points for basis function set at some level of precision"""
-        if self._need_update:
-            self._update()
-        return self._all_points
+        pass
 
     @property
     def basis_set(self):
         """list of BasisFunction objects"""
-        if self._need_update:
-            self._update()
         return self._basis_set
+
+    @basis_set.setter
+    def basis_set(self,basis_set):
+        self._basis_set = basis_set
+        self._need_update = True
 
     @property
     def sample_flag(self):
@@ -181,16 +169,6 @@ class BasisFunctionSet(abc.ABC):
     @sample_flag.setter
     def sample_flag(self,sample_flag):
         self._sample_flag = sample_flag
-        self._need_update = True
-
-    @property
-    def basis_function(self):
-        """BasisFunction class used in basis_set"""
-        return basis_function
-
-    @basis_function.setter
-    def basis_function(self,basis_function):
-        self._basis_function = basis_function
         self._need_update = True
 
     @abc.abstractmethod
@@ -209,24 +187,27 @@ class RecurrenceSet(BasisFunctionSet):
     function of the sequence is a combination of previous terms.
     """
 
-    def __init__(self,sample_flag,basis_function):
+    def __init__(self,sample_flag,basis_set):
         """Initialization of parameters"""
-        super().__init__(sample_flag,basis_function)
+        super().__init__(sample_flag,basis_set)
         self._update()
+
+    @property
+    def all_points(self):
+        """All points for basis function set at some level of precision"""
+        if self._need_update:
+            self._update()
+        return self._all_points
 
     def _update(self):
         """Update basis_set and get points"""
-        self._basis_set = []
         self._all_points = []
-
-        for i in range(0,len(self._sample_flag)):
-            self._basis_set.append(self._basis_function(i))
 
         for i in range(0,len(self._sample_flag)):
             if self._sample_flag[i]:
                 new_points = self._basis_set[i].points
                 for j in range(0,len(new_points)):
-                    if new_points[j] not in self._all_points:
+                    if not numpy.isclose(self._all_points,new_points[j]).any():
                         self._all_points.append(new_points[j])
         self._need_update = False
 
