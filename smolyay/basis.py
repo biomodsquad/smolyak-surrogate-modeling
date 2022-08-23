@@ -125,31 +125,27 @@ class ChebyshevFirstKind(BasisFunction):
             return answer
 
 
-class BasisFunctionSet(abc.ABC):
+class BasisFunctionSet():
     """Set of basis functions
     Creates a framework for a set of basis functions to be used as the
     building blocks for a surrogate model.
     ``basis_set`` is a list of BasisFunction objects
-    ``sample_flag`` is a list of boolean equal in length to basis_set and
-    an index in the list is true if the object in basis_set at the same
-    index is one that points should be sampled from
-    ''all_points'' 1D points taken from the BasisFunction objects specified
-    by sample_flag
-    ``need_update`` is a boolean parameter that specifies when properties
-    of the class need to be recomputed
+    ''all_points'' 1D points taken from the BasisFunction objects
 
     """
 
-    def __init__(self,sample_flag,basis_set):
-        self._sample_flag = sample_flag
+    def __init__(self,all_points,basis_set):
         self._basis_set = basis_set
-        self._all_points = []
-        self._need_update = True
+        self._all_points = all_points
 
-    @abc.abstractproperty
+    @property
     def all_points(self):
         """All points for basis function set at some level of precision"""
-        pass
+        return self._all_points
+
+    @all_points.setter
+    def all_points(self,all_points):
+        self._all_points = all_points
 
     @property
     def basis_set(self):
@@ -159,72 +155,49 @@ class BasisFunctionSet(abc.ABC):
     @basis_set.setter
     def basis_set(self,basis_set):
         self._basis_set = basis_set
-        self._need_update = True
-
-    @property
-    def sample_flag(self):
-        """list of what objects in basis_set to sample points from"""
-        return self._sample_flag
-
-    @sample_flag.setter
-    def sample_flag(self,sample_flag):
-        self._sample_flag = sample_flag
-        self._need_update = True
-
-    @abc.abstractmethod
-    def _update(self):
-        """Updates all_points based on parameters"""
-        pass
 
 
-class RecurrenceSet(BasisFunctionSet):
-    """Set of basis functions related via a recurrence relation
+class NestedBasisFunctionSet(BasisFunctionSet):
+    """Set of basis functions that are nested
 
     The set of basis functions this class uses are assumed to be part
-    of a sequential series of functions, where the index of a function
-    in basis_set is the only required input of the basis_function. Such
-    functions can be described as a recurrence relation where the nth
-    function of the sequence is a combination of previous terms.
+    of a sequential series of functions, where the functions that
+    determine the points are nested
+    ``levels`` is a list of lists that determines which grid level each
+    point is added on
     """
 
-    def __init__(self,sample_flag,basis_set):
+    def __init__(self,all_points,basis_set,levels):
         """Initialization of parameters"""
-        super().__init__(sample_flag,basis_set)
-        self._update()
+        super().__init__(all_points,basis_set)
+        self._levels = levels
 
     @property
-    def all_points(self):
-        """All points for basis function set at some level of precision"""
-        if self._need_update:
-            self._update()
-        return self._all_points
+    def levels(self):
+        """list of list that show the points for each grid level"""
+        return self._levels
 
-    def _update(self):
-        """Update basis_set and get points"""
-        self._all_points = []
+    @levels.setter
+    def levels(self,levels):
+        self._levels = levels
 
-        for i in range(0,len(self._sample_flag)):
-            if self._sample_flag[i]:
-                new_points = self._basis_set[i].points
-                for j in range(0,len(new_points)):
-                    if not numpy.isclose(self._all_points,new_points[j]).any():
-                        self._all_points.append(new_points[j])
-        self._need_update = False
 
-    def __call__(self,n,x):
-        """Compute value of function in set
-        Computes the answer of the nth function of the set given input x
+def make_nested_chebyshev_points(exactness,basis_function):
+    """calculate nested points for Chebyshev polynomial basis function
+    Created the NestedBasisFunctionSet object that holds the nested
+    points for a CHebyshev basis function
 
-        Parameters
-        ----------
-        x : float
-            input
-        n : int
-            index of function in set
-        
-        Returns
-        -------
-        answer : float
-            output
-        """
-        return self._basis_set[n](x) 
+    Parameters
+    ----------
+    exactness : int
+        level of exactness to calculate points to
+    basis_function : BasisFunction object
+        type of chebyshev polynomial
+
+    Returns
+    -------
+    nested_set : NestedBasisFunctionSet object
+        data structure for points
+    """
+    pass
+

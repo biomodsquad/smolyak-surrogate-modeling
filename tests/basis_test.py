@@ -2,7 +2,7 @@ import pytest
 
 import numpy
 
-from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, RecurrenceSet
+from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, NestedBasisFunctionSet
 
 @pytest.fixture
 def expected_points_2():
@@ -104,84 +104,37 @@ def test_is_basis_abstract():
     with pytest.raises(TypeError):
         test_class = BasisFunction()
 
-def test_is_set_abstract():
-    """Check BasisFunctionSet is an abstract class"""
-    with pytest.raises(TypeError):
-        test_class = BasisFunctionSet([True],[ChebyshevFirstKind(0)])
-
 def test_set_initialize_empty():
-    """Check RecurrenceSet correctly initializes with empty set"""
-    sample_flag = []
+    """Check NestedBasisFunctionSet initializes with empty set"""
+    levels = []
     basis_set = []
-    test_class = RecurrenceSet(sample_flag,basis_set)
+    points = []
+    test_class = NestedBasisFunctionSet(points,basis_set,levels)
     assert test_class.all_points == []
+    assert test_class.levels == []
+    assert test_class.basis_set == []
 
 def test_set_initialize_0():
-    """Check RecurrenceSet correctly initializes"""
-    sample_flag = [True]
-    test_class = RecurrenceSet(sample_flag,[ChebyshevFirstKind(0)])
+    """Check NestedBasisFunctionSet correctly initializes"""
+    levels = [[0]]
+    points = [0]
+    test_class = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
     assert test_class.all_points == [0]
-
-def test_set_initialize_1():
-    """Check RecurrenceSet correctly initializes"""
-    sample_flag = [True,True]
-    basis_set = []
-    for i in range(0,len(sample_flag)):
-        basis_set.append(ChebyshevFirstKind(i))
-    test_class = RecurrenceSet(sample_flag,basis_set)
-    assert test_class.all_points == [0,-1,1]
-
-def test_set_initialize_2():
-    """Check RecurrenceSet correctly initializes"""
-    sample_flag = [True,False,True]
-    basis_set = []
-    for i in range(0,len(sample_flag)):
-        basis_set.append(ChebyshevFirstKind(i))
-    test_class = RecurrenceSet(sample_flag,basis_set)
-    assert test_class.all_points == [0,-1,1]
-
-def test_set_initialize_3(expected_points_2_set):
-    """Check RecurrenceSet correctly initializes"""
-    sample_flag = [True,False,True,False,True]
-    basis_set = []
-    for i in range(0,len(sample_flag)):
-        basis_set.append(ChebyshevFirstKind(i))
-    test_class = RecurrenceSet(sample_flag,basis_set)
-    assert numpy.allclose(
-            test_class.all_points,expected_points_2_set,atol=1e-10)
-
-def test_set_initialize_4(expected_points_3_set):
-    """Check RecurrenceSet correctly initializes"""
-    sample_flag = [True,False,True,False,True,False,False,False,True]
-    basis_set = []
-    for i in range(0,len(sample_flag)):
-        basis_set.append(ChebyshevFirstKind(i))
-    test_class = RecurrenceSet(sample_flag,basis_set)
-    assert numpy.allclose(
-            test_class.all_points,expected_points_3_set,atol=1e-10)
+    assert test_class.levels == [[0]]
 
 def test_set_change(expected_points_2_set):
-    """Check RecurrenceSet updates points when sample_flag changes"""
-    sample_flag = [False,False,False,True]
+    """Check NestedBasisFunctionSet updates points when sample_flag changes"""
+    levels = [[0]]
+    points = [0]
+    test_class = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
     basis_set = []
-    for i in range(0,len(sample_flag)+1):
+    for i in range(0,9):
         basis_set.append(ChebyshevFirstKind(i))
-    test_class = RecurrenceSet(sample_flag,basis_set)
-    test_class.sample_flag = [True,False,True,False,True]
-    assert numpy.allclose(
-            test_class.all_points,expected_points_2_set,atol=1e-10)
+    test_class.basis_set = basis_set
+    test_class.levels = [[0],[1,2],[3,4]]
+    test_class.all_points = expected_points_2_set
+    assert test_class.all_points == expected_points_2_set
+    assert test_class.levels == [[0],[1,2],[3,4]]
+    assert test_class.basis_set == basis_set
 
-@pytest.mark.parametrize("x, n, expected",[(2,6,1351),(-3,9,-3880899),
-    (13,4,227137),(8,3,2024),(4,9,58106404),(14,5,8550374),(0,12,1),
-    (7,5,262087),(-2,4,97),(3,9,3880899),(9,4,51841),(2,11,978122),
-    (4,7,937444),(-3,2,17),(6,4,10081),(2,8,18817)])
-def test_basis_set_random_points(x,n,expected):
-    """Test chebyshev polynomial at some degree at some input"""
-    sample_flag = [True,False,True,False,True,False,False,False,True,
-            False,False,False,False,False,False,False,True]
-    basis_set = []
-    for i in range(0,len(sample_flag)):
-        basis_set.append(ChebyshevFirstKind(i))
-    test_class = RecurrenceSet(sample_flag,basis_set)
-    assert test_class(n,x) == expected
 
