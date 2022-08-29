@@ -199,5 +199,28 @@ def make_nested_chebyshev_points(exactness,basis_function):
     nested_set : NestedBasisFunctionSet object
         data structure for points
     """
-    pass
+
+    levels = [[0]]
+    basis_set = []
+    all_points = [0]
+    max_degree = 2**exactness
+    if exactness == 0:
+        max_degree = 0
+    start_level_index = 1
+    for i in range(0,max_degree+1):
+        basis_set.append(basis_function(i))
+
+    for j in range(1,exactness+1):
+        degree_sample = 2**j
+        new_points = basis_set[degree_sample].points
+        end_level_index = start_level_index
+        for k in range(0,len(new_points)):
+            if not numpy.isclose(all_points,new_points[k]).any():
+                all_points.append(new_points[k])
+                end_level_index = end_level_index + 1
+        levels.append(list(range(start_level_index,end_level_index)))
+        start_level_index = end_level_index
+
+    nested_set = NestedBasisFunctionSet(all_points,basis_set,levels)
+    return nested_set
 
