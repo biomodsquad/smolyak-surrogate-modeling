@@ -83,12 +83,6 @@ class ChebyshevFirstKind(BasisFunction):
         """degree of polynomial"""
         return self._n
 
-    @n.setter
-    def n(self,n):
-        if self._n != n:
-            self._n = n
-            self._points = []
-
     def _compute_points(self):
         """Compute extrema of Chebyshev polynomial of the first kind"""
         if self._n == 0:
@@ -129,31 +123,23 @@ class BasisFunctionSet():
     Creates a framework for a set of basis functions to be used as the
     building blocks for a surrogate model.
     ``basis_set`` is a list of BasisFunction objects
-    ''all_points'' 1D points taken from the BasisFunction objects
+    ``points`` 1D points taken from the BasisFunction objects
 
     """
 
-    def __init__(self,all_points,basis_set):
+    def __init__(self,points,basis_set):
         self._basis_set = basis_set
-        self._all_points = all_points
+        self._points = points
 
     @property
-    def all_points(self):
+    def points(self):
         """All points for basis function set at some level of precision"""
-        return self._all_points
-
-    @all_points.setter
-    def all_points(self,all_points):
-        self._all_points = all_points
+        return self._points
 
     @property
     def basis_set(self):
         """list of BasisFunction objects"""
         return self._basis_set
-
-    @basis_set.setter
-    def basis_set(self,basis_set):
-        self._basis_set = basis_set
 
 
 class NestedBasisFunctionSet(BasisFunctionSet):
@@ -166,9 +152,9 @@ class NestedBasisFunctionSet(BasisFunctionSet):
     point is added on
     """
 
-    def __init__(self,all_points,basis_set,levels):
+    def __init__(self,points,basis_set,levels):
         """Initialization of parameters"""
-        super().__init__(all_points,basis_set)
+        super().__init__(points,basis_set)
         self._levels = levels
 
     @property
@@ -201,7 +187,7 @@ def make_nested_chebyshev_points(exactness,basis_function):
 
     levels = [[0]]
     basis_set = []
-    all_points = [0]
+    points = [0]
     max_degree = 2**exactness
     if exactness == 0:
         max_degree = 0
@@ -214,11 +200,11 @@ def make_nested_chebyshev_points(exactness,basis_function):
         new_points = basis_set[degree_sample].points
         end_level_index = start_level_index
         for k in range(0,len(new_points)):
-            if not numpy.isclose(all_points,new_points[k]).any():
-                all_points.append(new_points[k])
+            if not numpy.isclose(points,new_points[k]).any():
+                points.append(new_points[k])
                 end_level_index = end_level_index + 1
         levels.append(list(range(start_level_index,end_level_index)))
         start_level_index = end_level_index
 
-    return NestedBasisFunctionSet(all_points,basis_set,levels)
+    return NestedBasisFunctionSet(points,basis_set,levels)
 

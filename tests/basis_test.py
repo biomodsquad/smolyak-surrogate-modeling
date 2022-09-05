@@ -46,32 +46,6 @@ def test_initial_degree_2(expected_points_2):
     assert test_class.n == 4
     assert numpy.allclose(test_class.points,expected_points_2,atol=1e-10)
 
-def test_increase_degree(expected_points_3):
-    """test when max degree is increased"""
-    test_class = ChebyshevFirstKind(1)
-    a = test_class.points
-    test_class.n = 8
-    assert test_class.n == 8
-    assert numpy.allclose(test_class.points, expected_points_3,atol=1e-10)
-
-def test_decrease_degree(expected_points_3):
-    """test when max degree is decreased"""
-    test_class = ChebyshevFirstKind(16)
-    a = test_class.points
-    test_class.n = 8
-    assert test_class.n == 8
-    assert numpy.allclose(test_class.points,expected_points_3,atol=1e-10)
-
-def test_decrease_increase_degree(expected_points_2):
-    """test when max degree is decreased"""
-    test_class = ChebyshevFirstKind(1)
-    a = test_class.points
-    test_class.n = 6
-    a = test_class.points
-    test_class.n = 4
-    assert test_class.n == 4
-    assert numpy.allclose(test_class.points,expected_points_2,atol=1e-10)
-
 def test_basis_degree_0():
     """Chebyshev polynomial degree 0 is 1"""
     test_class = ChebyshevFirstKind(0)
@@ -110,7 +84,7 @@ def test_set_initialize_empty():
     basis_set = []
     points = []
     test_class = NestedBasisFunctionSet(points,basis_set,levels)
-    assert test_class.all_points == []
+    assert test_class.points == []
     assert test_class.levels == []
     assert test_class.basis_set == []
 
@@ -119,29 +93,22 @@ def test_set_initialize_0():
     levels = [[0]]
     points = [0]
     test_class = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
-    assert test_class.all_points == [0]
+    assert test_class.points == [0]
     assert test_class.levels == [[0]]
 
-def test_set_change(expected_points_2_set):
-    """Check NestedBasisFunctionSet updates points when sample_flag changes"""
+def test_set_change_levels():
+    """Check NestedBasisFunctionSet updates points when level changes"""
     levels = [[0]]
     points = [0]
     test_class = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
-    basis_set = []
-    for i in range(0,9):
-        basis_set.append(ChebyshevFirstKind(i))
-    test_class.basis_set = basis_set
     test_class.levels = [[0],[1,2],[3,4]]
-    test_class.all_points = expected_points_2_set
-    assert test_class.all_points == expected_points_2_set
     assert test_class.levels == [[0],[1,2],[3,4]]
-    assert test_class.basis_set == basis_set
 
 def test_set_compute_function(expected_points_3_set):
     """Check make_nested_chebyshev_points creates NestedBasisFunctionSet"""
     test_class = make_nested_chebyshev_points(3,ChebyshevFirstKind)
     assert numpy.allclose(
-            test_class.all_points,expected_points_3_set,atol=1e-10)
+            test_class.points,expected_points_3_set,atol=1e-10)
     assert test_class.levels == [[0],[1,2],[3,4],[5,6,7,8]]
     basis_set = test_class.basis_set
     assert len(basis_set) == 9
@@ -151,7 +118,7 @@ def test_set_compute_function(expected_points_3_set):
 def test_set_compute_empty():
     """Check make_nested_chebyshev_points makes empty NestedBasisFunctionSet"""
     test_class = make_nested_chebyshev_points(0,ChebyshevFirstKind)
-    assert test_class.all_points == [0]
+    assert test_class.points == [0]
     assert test_class.levels == [[0]]
     basis_set = test_class.basis_set
     assert len(basis_set) == 1
