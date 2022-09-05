@@ -5,12 +5,11 @@ import numpy
 
 class BasisFunction(abc.ABC):
     """Abstract class for basis functions.
-
-    Creates a framework for basis functions that are the building blocks
-    for the terms in the surrogate model. 
-    ``points`` property represents all the unique 1D points of the 
-    basis function associated with a Smolyak index described by the 
-    class IndexGrid.
+    Data structure for basis functions that can be called as a function
+    and holds the points 
+    ``points`` property represents all the unique 1D points within the 
+    range [-1,1] of the basis function associated with a Smolyak index 
+    described by the class IndexGrid.
 
     """
 
@@ -31,12 +30,12 @@ class BasisFunction(abc.ABC):
         Parameters
         ----------
         x : float
-            input
+            Input arguement.
 
         Returns
         -------
-        y : float
-            output
+        float
+            Value of basis function.
         """
         pass
 
@@ -47,11 +46,12 @@ class ChebyshevFirstKind(BasisFunction):
     following recurrence relation:
 
     ..math:
-        T_0(x) = 1
+    T_0(x) = 1
         T_1(x) = x
         T_{n+1}(x) = 2xT_n(x) - T_{n-1}(x)
 
-    ``n`` is the degree of the polynomial this object describes
+    Object describes the nth term in the set of polynomials as designated
+    by the property ``n``
     ``points`` represents the extrema of the polynomial of this degree on
     the domain [-1,1]
 
@@ -59,13 +59,12 @@ class ChebyshevFirstKind(BasisFunction):
     equation:
 
     ..math:
-        x_{n,j}^* = -\cos\left((\frac{j-1}{n-1}\pi\right), j = 1,...,n
-        n = 2^{exactness-1}+1
+        x_{i}^* = -\cos\left((\frac{i-1}{n-1}\pi\right), i = 1,...,n
 
     Parameters
     ----------
     n : int
-        degree of the Chebyshev polynomial
+        Degree of the Chebyshev polynomial.
     """
 
     def __init__(self,n):
@@ -106,12 +105,12 @@ class ChebyshevFirstKind(BasisFunction):
         Parameters
         ----------
         x : float
-            input
+            Input arguement.
 
         Returns
         -------
-        y : float
-            output
+        float
+            Value of Chebyshev polynomial of the first kind.
         """
         if self._n == 0:
             return 1
@@ -190,14 +189,14 @@ def make_nested_chebyshev_points(exactness,basis_function):
     Parameters
     ----------
     exactness : int
-        level of exactness to calculate points to
+        Level of exactness to calculate points to.
     basis_function : BasisFunction object
-        type of chebyshev polynomial
+        Type of chebyshev polynomial.
 
     Returns
     -------
-    nested_set : NestedBasisFunctionSet object
-        data structure for points
+    NestedBasisFunctionSet object
+        Data structure for points.
     """
 
     levels = [[0]]
@@ -221,6 +220,5 @@ def make_nested_chebyshev_points(exactness,basis_function):
         levels.append(list(range(start_level_index,end_level_index)))
         start_level_index = end_level_index
 
-    nested_set = NestedBasisFunctionSet(all_points,basis_set,levels)
-    return nested_set
+    return NestedBasisFunctionSet(all_points,basis_set,levels)
 
