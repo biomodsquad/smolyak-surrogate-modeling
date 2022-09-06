@@ -192,9 +192,9 @@ def make_nested_chebyshev_points(exactness,basis_function):
     if exactness == 0:
         max_degree = 0
     start_level_index = 1
-    for i in range(0,max_degree+1):
-        basis_functions.append(basis_function(i))
 
+    basis_functions = [basis_function(n) for n in range(max_degree+1)]
+    
     for j in range(1,exactness+1):
         degree_sample = 2**j
         new_points = basis_functions[degree_sample].points
