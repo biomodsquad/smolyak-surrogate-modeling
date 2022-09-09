@@ -130,6 +130,9 @@ class BasisFunctionSet():
     def __init__(self,points,basis_functions):
         self._basis_functions = basis_functions
         self._points = points
+        if len(basis_functions) != len(points):
+            raise IndexError("basis_functions and points must have the "
+                    "same number of elements.")
 
     @property
     def points(self):
@@ -167,7 +170,7 @@ class NestedBasisFunctionSet(BasisFunctionSet):
         self._levels = levels
 
 
-def make_nested_chebyshev_points(exactness,basis_function):
+def make_nested_set(exactness):
     """calculate nested points for Chebyshev polynomial basis function
     Created the NestedBasisFunctionSet object that holds the nested
     points for a CHebyshev basis function
@@ -176,8 +179,6 @@ def make_nested_chebyshev_points(exactness,basis_function):
     ----------
     exactness : int
         Level of exactness to calculate points to.
-    basis_function : BasisFunction object
-        Type of chebyshev polynomial.
 
     Returns
     -------
@@ -193,7 +194,7 @@ def make_nested_chebyshev_points(exactness,basis_function):
         max_degree = 0
     start_level_index = 1
 
-    basis_functions = [basis_function(n) for n in range(max_degree+1)]
+    basis_functions = [ChebyshevFirstKind(n) for n in range(max_degree+1)]
     
     for j in range(1,exactness+1):
         degree_sample = 2**j

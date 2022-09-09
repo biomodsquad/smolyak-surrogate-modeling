@@ -2,7 +2,7 @@ import pytest
 
 import numpy
 
-from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, NestedBasisFunctionSet, make_nested_chebyshev_points
+from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, NestedBasisFunctionSet, make_nested_set
 
 @pytest.fixture
 def expected_points_2():
@@ -79,6 +79,29 @@ def test_is_basis_abstract():
         test_class = BasisFunction()
 
 def test_set_initialize_empty():
+    """Check BasisFunctionSet initializes with empty set"""
+    basis_functions = []
+    points = []
+    test_class = BasisFunctionSet(points,basis_functions)
+    assert test_class.points == []
+    assert test_class.basis_functions == []
+
+def test_set_initialize_0():
+    """Check NestedBasisFunctionSet correctly initializes"""
+    basis_functions = [ChebyshevFirstKind(0)]
+    points = [0]
+    test_class = BasisFunctionSet(points,basis_functions)
+    assert test_class.points == [0]
+    assert test_class.basis_functions[0].n == 0
+
+def test_set_invalid_input():
+    """Check BasisFunctionSet gives error for invalid inputs"""
+    basis_functions = [ChebyshevFirstKind(0)]
+    points = [0,1,2]
+    with pytest.raises(IndexError):
+        test_class = BasisFunctionSet(points,basis_functions)
+
+def test_set_nested_initialize_empty():
     """Check NestedBasisFunctionSet initializes with empty set"""
     levels = []
     basis_functions = []
@@ -88,7 +111,7 @@ def test_set_initialize_empty():
     assert test_class.levels == []
     assert test_class.basis_functions == []
 
-def test_set_initialize_0():
+def test_set_nested_initialize_0():
     """Check NestedBasisFunctionSet correctly initializes"""
     levels = [[0]]
     points = [0]
@@ -96,7 +119,7 @@ def test_set_initialize_0():
     assert test_class.points == [0]
     assert test_class.levels == [[0]]
 
-def test_set_change_levels():
+def test_set_nested_change_levels():
     """Check NestedBasisFunctionSet updates points when level changes"""
     levels = [[0]]
     points = [0]
@@ -105,8 +128,8 @@ def test_set_change_levels():
     assert test_class.levels == [[0],[1,2],[3,4]]
 
 def test_set_compute_function(expected_points_3_set):
-    """Check make_nested_chebyshev_points creates NestedBasisFunctionSet"""
-    test_class = make_nested_chebyshev_points(3,ChebyshevFirstKind)
+    """Check make_nested_set creates NestedBasisFunctionSet"""
+    test_class = make_nested_set(3)
     assert numpy.allclose(
             test_class.points,expected_points_3_set,atol=1e-10)
     assert test_class.levels == [[0],[1,2],[3,4],[5,6,7,8]]
@@ -116,11 +139,13 @@ def test_set_compute_function(expected_points_3_set):
         assert basis_functions[i].n == i
 
 def test_set_compute_empty():
-    """Check make_nested_chebyshev_points makes empty NestedBasisFunctionSet"""
-    test_class = make_nested_chebyshev_points(0,ChebyshevFirstKind)
+    """Check make_nested_set makes empty NestedBasisFunctionSet"""
+    test_class = make_nested_set(0)
     assert test_class.points == [0]
     assert test_class.levels == [[0]]
     basis_functions = test_class.basis_functions
     assert len(basis_functions) == 1
     assert basis_functions[0].n == 0
+
+
 
