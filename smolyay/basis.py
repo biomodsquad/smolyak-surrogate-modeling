@@ -117,6 +117,45 @@ class ChebyshevFirstKind(BasisFunction):
                 answer += math.comb(self._n,2*k)*((x**2 - 1)**k)*(x**(self._n-2*k))
             return answer
 
+    @classmethod
+    def make_nested_set(cls, exactness):
+        """calculate nested points for Chebyshev polynomial basis function
+        Created the NestedBasisFunctionSet object that holds the nested
+        points for a CHebyshev basis function
+
+        Parameters
+        ----------
+        exactness : int
+            Level of exactness to calculate points to.
+
+        Returns
+        -------
+        NestedBasisFunctionSet object
+            Data structure for points.
+        """
+        levels = [[0]]
+        basis_functions = []
+        points = [0]
+        max_degree = 2**exactness
+        if exactness == 0:
+            max_degree = 0
+        start_level_index = 1
+
+        basis_functions = [ChebyshevFirstKind(n) for n in range(max_degree+1)]
+
+        for j in range(1,exactness+1):
+            degree_sample = 2**j
+            new_points = basis_functions[degree_sample].points
+            end_level_index = start_level_index
+            for k in range(0,len(new_points)):
+                if not numpy.isclose(points,new_points[k]).any():
+                    points.append(new_points[k])
+                    end_level_index = end_level_index + 1
+            levels.append(list(range(start_level_index,end_level_index)))
+            start_level_index = end_level_index
+
+        return NestedBasisFunctionSet(points,basis_functions,levels)
+
 
 class BasisFunctionSet():
     """Set of basis functions
@@ -168,44 +207,4 @@ class NestedBasisFunctionSet(BasisFunctionSet):
     @levels.setter
     def levels(self,levels):
         self._levels = levels
-
-
-def make_nested_set(exactness):
-    """calculate nested points for Chebyshev polynomial basis function
-    Created the NestedBasisFunctionSet object that holds the nested
-    points for a CHebyshev basis function
-
-    Parameters
-    ----------
-    exactness : int
-        Level of exactness to calculate points to.
-
-    Returns
-    -------
-    NestedBasisFunctionSet object
-        Data structure for points.
-    """
-
-    levels = [[0]]
-    basis_functions = []
-    points = [0]
-    max_degree = 2**exactness
-    if exactness == 0:
-        max_degree = 0
-    start_level_index = 1
-
-    basis_functions = [ChebyshevFirstKind(n) for n in range(max_degree+1)]
-    
-    for j in range(1,exactness+1):
-        degree_sample = 2**j
-        new_points = basis_functions[degree_sample].points
-        end_level_index = start_level_index
-        for k in range(0,len(new_points)):
-            if not numpy.isclose(points,new_points[k]).any():
-                points.append(new_points[k])
-                end_level_index = end_level_index + 1
-        levels.append(list(range(start_level_index,end_level_index)))
-        start_level_index = end_level_index
-
-    return NestedBasisFunctionSet(points,basis_functions,levels)
 
