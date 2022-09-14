@@ -73,7 +73,7 @@ class ChebyshevFirstKind(BasisFunction):
 
     @property
     def points(self):
-        """point associated with corresponding Smolyak index"""
+        """extrema of polynomial"""
         if len(self._points) == 0:
             self._compute_points()
         return self._points
@@ -84,18 +84,12 @@ class ChebyshevFirstKind(BasisFunction):
         return self._n
 
     def _compute_points(self):
-        """Compute an extrema of a Chebyshev polynomial of the first kind"""
-        if self._n <= 2:
-            exceptions = [0,-1,1]
-            self._points = exceptions[self._n]
+        """Compute extrema of Chebyshev polynomial of the first kind"""
+        if self._n == 0:
+            self._points = [0]
         else:
-            # find the exactness this Chebyshev polynomial is added at
-            exactness_added = math.ceil(math.log2(self._n))
-            m = 2**(exactness_added-1)
-            points_for_grid_level = numpy.polynomial.chebyshev.chebpts1(m)
-            offset = self._n - m - 1
-            self._points = points_for_grid_level[offset]
-
+            i = numpy.arange(self._n+1)
+            self._points = list(-numpy.cos(numpy.pi*i/self._n))
 
     def __call__(self,x):
         """Terms of basis function
@@ -139,19 +133,26 @@ class ChebyshevFirstKind(BasisFunction):
         NestedBasisFunctionSet object
             Data structure for points.
         """
-        start_level_index = [0]
-        end_level_index = [2**n for n in range(exactness+1)]
-        end_level_index[0] = 0
-        start_level_index = [0]
-        start_level_index.extend([n+1 for n in end_level_index])
-        levels = []
-        for i in range(0,exactness+1):
-            levels.append(
-                    list(range(start_level_index[i],end_level_index[i]+1)))
+        levels = [[0]]
+        basis_functions = []
+        points = [0]
+        max_degree = 2**exactness
+        if exactness == 0:
+            max_degree = 0
+        start_level_index = 1
 
-        max_degree = end_level_index[-1]
         basis_functions = [ChebyshevFirstKind(n) for n in range(max_degree+1)]
-        points = [basis_functions[n].points for n in range(max_degree+1)]
+
+        for j in range(1,exactness+1):
+            degree_sample = 2**j
+            new_points = basis_functions[degree_sample].points
+            end_level_index = start_level_index
+            for k in range(0,len(new_points)):
+                if not numpy.isclose(points,new_points[k]).any():
+                    points.append(new_points[k])
+                    end_level_index = end_level_index + 1
+            levels.append(list(range(start_level_index,end_level_index)))
+            start_level_index = end_level_index
 
         return NestedBasisFunctionSet(points,basis_functions,levels)
 
