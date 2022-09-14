@@ -5,16 +5,15 @@ import numpy
 from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, NestedBasisFunctionSet
 
 @pytest.fixture
-def expected_points_2():
-    """extrema for exactness = 4"""
-    return sorted([0, -1.0, 1.0, -1/(2**0.5), 1/(2**0.5)])
+def expected_points_4():
+    """extrema for n = 4"""
+    return [-1/(2**0.5), 1/(2**0.5)]
 
 @pytest.fixture
-def expected_points_3():
+def expected_points_8():
     """extrema for n = 8"""
-    return sorted([0, -1.0, 1.0, -1/(2**0.5), 1/(2**0.5), 
-            -(((2**0.5)+1)**0.5)/(2**0.75),-(((2**0.5)-1)**0.5)/(2**0.75),
-            (((2**0.5)-1)**0.5)/(2**0.75),(((2**0.5)+1)**0.5)/(2**0.75)])
+    return [-(((2**0.5)+1)**0.5)/(2**0.75),-(((2**0.5)-1)**0.5)/(2**0.75),
+            (((2**0.5)-1)**0.5)/(2**0.75),(((2**0.5)+1)**0.5)/(2**0.75)]
 
 @pytest.fixture
 def expected_points_2_set():
@@ -23,31 +22,42 @@ def expected_points_2_set():
 
 @pytest.fixture
 def expected_points_3_set():
-    """extrema for n = 8"""
+    """extrema for exactness = 8"""
     return [0, -1.0, 1.0, -1/(2**0.5), 1/(2**0.5),
             -(((2**0.5)+1)**0.5)/(2**0.75),-(((2**0.5)-1)**0.5)/(2**0.75),
             (((2**0.5)-1)**0.5)/(2**0.75),(((2**0.5)+1)**0.5)/(2**0.75)]
 
-def test_degree_zero():
+def test_cheb_initial_zero():
     """test degree of zero"""
     test_class = ChebyshevFirstKind(0)
     assert test_class.n == 0
-    assert test_class.points == [0]
 
-def test_initial_degree_1():
+def test_cheb_initial_1():
     """test initial when degree is 1"""
     test_class = ChebyshevFirstKind(1)
     assert test_class.n == 1
+    assert test_class.points == [0]
+
+def test_cheb_initial_2():
+    """test initial when degree is 2"""
+    test_class = ChebyshevFirstKind(2)
+    assert test_class.n == 2
     assert test_class.points == [-1,1]
 
-def test_initial_degree_2(expected_points_2):
-    """test initial when degree is 2"""
+def test_cheb_initial_4(expected_points_4):
+    """test initial when degree is 4"""
     test_class = ChebyshevFirstKind(4)
     assert test_class.n == 4
-    assert numpy.allclose(test_class.points,expected_points_2,atol=1e-10)
+    assert numpy.allclose(test_class.points,expected_points_4,atol=1e-10)
+
+def test_cheb_initial_8(expected_points_8):
+    """test initial when degree is 8"""
+    test_class = ChebyshevFirstKind(8)
+    assert test_class.n == 8
+    assert numpy.allclose(test_class.points,expected_points_8,atol=1e-10)
 
 def test_basis_degree_0():
-    """Chebyshev polynomial degree 0 is 1"""
+    """Chebyshev polynomial degree 0 is 1 for all inputs"""
     test_class = ChebyshevFirstKind(0)
     for i in range(0,16):
         assert test_class(i) == 1

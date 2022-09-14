@@ -85,11 +85,13 @@ class ChebyshevFirstKind(BasisFunction):
 
     def _compute_points(self):
         """Compute extrema of Chebyshev polynomial of the first kind"""
-        if self._n == 0:
+        if self._n == 2:
+            self._points = [-1,1]
+        elif self._n <= 0:
             self._points = [0]
         else:
-            i = numpy.arange(self._n+1)
-            self._points = list(-numpy.cos(numpy.pi*i/self._n))
+            num_points = math.ceil(self._n/2)
+            self._points = list(numpy.polynomial.chebyshev.chebpts1(num_points))
 
     def __call__(self,x):
         """Terms of basis function
@@ -133,26 +135,21 @@ class ChebyshevFirstKind(BasisFunction):
         NestedBasisFunctionSet object
             Data structure for points.
         """
-        levels = [[0]]
-        basis_functions = []
-        points = [0]
-        max_degree = 2**exactness
-        if exactness == 0:
-            max_degree = 0
-        start_level_index = 1
+        levels = []
+        points = []
 
+        end_level_index = [2**n for n in range(exactness+1)]
+        end_level_index[0] = 0
+        start_level_index = [0]
+        start_level_index.extend([n+1 for n in end_level_index])
+
+        max_degree = end_level_index[-1]
         basis_functions = [ChebyshevFirstKind(n) for n in range(max_degree+1)]
 
-        for j in range(1,exactness+1):
-            degree_sample = 2**j
-            new_points = basis_functions[degree_sample].points
-            end_level_index = start_level_index
-            for k in range(0,len(new_points)):
-                if not numpy.isclose(points,new_points[k]).any():
-                    points.append(new_points[k])
-                    end_level_index = end_level_index + 1
-            levels.append(list(range(start_level_index,end_level_index)))
-            start_level_index = end_level_index
+        for i in range(0,exactness+1):
+            levels.append(
+                    list(range(start_level_index[i],end_level_index[i]+1)))
+            points.extend(basis_functions[end_level_index[i]].points)
 
         return NestedBasisFunctionSet(points,basis_functions,levels)
 
