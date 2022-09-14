@@ -28,37 +28,38 @@ def expected_points_3_set():
             -(((2**0.5)+1)**0.5)/(2**0.75),-(((2**0.5)-1)**0.5)/(2**0.75),
             (((2**0.5)-1)**0.5)/(2**0.75),(((2**0.5)+1)**0.5)/(2**0.75)]
 
-def test_degree_zero():
+def test_cheb_initial_zero():
     """test degree of zero"""
     test_class = ChebyshevFirstKind(0)
     assert test_class.n == 0
-    assert test_class.points == [0]
+    assert test_class.points == 0
 
-def test_initial_degree_1():
+def test_initial_1():
     """test initial when degree is 1"""
     test_class = ChebyshevFirstKind(1)
     assert test_class.n == 1
-    assert test_class.points == [-1,1]
+    assert test_class.points == -1
 
-def test_initial_degree_2(expected_points_2):
-    """test initial when degree is 2"""
-    test_class = ChebyshevFirstKind(4)
-    assert test_class.n == 4
-    assert numpy.allclose(test_class.points,expected_points_2,atol=1e-10)
+def test_cheb_initials(expected_points_3_set):
+    """test points for higher Chebyshev degrees"""
+    for i in range(len(expected_points_3_set)):
+        test_class = ChebyshevFirstKind(i)
+        assert test_class.n == i
+        assert numpy.isclose(test_class.points,expected_points_3_set[i])
 
-def test_basis_degree_0():
-    """Chebyshev polynomial degree 0 is 1"""
+def test_cheb_call_degree_0():
+    """Chebyshev polynomial degree 0 is 1 for all inputs"""
     test_class = ChebyshevFirstKind(0)
     for i in range(0,16):
         assert test_class(i) == 1
 
-def test_basis_degree_1():
+def test_cheb_call_degree_1():
     """Chebyshev polynomial degree 1 should return input"""
     test_class = ChebyshevFirstKind(1)
     for i in range(0,16):
         assert test_class(i) == i
 
-def test_basis_input_1():
+def test_cheb_call_input_1():
     """Chebyshev polynomial input 1 returns 1 for any degree n"""
     for i in range(0,16):
         test_class = ChebyshevFirstKind(i)
