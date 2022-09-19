@@ -85,13 +85,10 @@ class ChebyshevFirstKind(BasisFunction):
 
     def _compute_points(self):
         """Compute extrema of Chebyshev polynomial of the first kind"""
-        if self._n == 2:
-            self._points = [-1,1]
-        elif self._n <= 0:
+        if self._n == 0:
             self._points = [0]
         else:
-            num_points = math.ceil(self._n/2)
-            self._points = list(numpy.polynomial.chebyshev.chebpts1(num_points))
+            self._points = list(numpy.polynomial.chebyshev.chebpts2(self._n+1))
 
     def __call__(self,x):
         """Terms of basis function
@@ -142,15 +139,16 @@ class ChebyshevFirstKind(BasisFunction):
         end_level_index[0] = 0
         start_level_index = [0]
         start_level_index.extend([n+1 for n in end_level_index])
-
         max_degree = end_level_index[-1]
         basis_functions = [ChebyshevFirstKind(n) for n in range(max_degree+1)]
 
         for i in range(0,exactness+1):
             levels.append(
                     list(range(start_level_index[i],end_level_index[i]+1)))
-            points.extend(basis_functions[end_level_index[i]].points)
-
+            new_points = basis_functions[end_level_index[i]].points
+            for p in new_points:
+                if not numpy.isclose(points,p).any():
+                    points.append(p)
         return NestedBasisFunctionSet(points,basis_functions,levels)
 
 

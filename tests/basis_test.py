@@ -7,13 +7,14 @@ from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, N
 @pytest.fixture
 def expected_points_4():
     """extrema for n = 4"""
-    return [-1/(2**0.5), 1/(2**0.5)]
+    return [-1, -1/(2**0.5), 0, 1/(2**0.5), 1]
 
 @pytest.fixture
 def expected_points_8():
     """extrema for n = 8"""
-    return [-(((2**0.5)+1)**0.5)/(2**0.75),-(((2**0.5)-1)**0.5)/(2**0.75),
-            (((2**0.5)-1)**0.5)/(2**0.75),(((2**0.5)+1)**0.5)/(2**0.75)]
+    return [-1, -(((2**0.5)+1)**0.5)/(2**0.75), -1/(2**0.5),
+            -(((2**0.5)-1)**0.5)/(2**0.75), 0, (((2**0.5)-1)**0.5)/(2**0.75),
+            1/(2**0.5),(((2**0.5)+1)**0.5)/(2**0.75), 1]
 
 @pytest.fixture
 def expected_points_2_set():
@@ -36,13 +37,13 @@ def test_cheb_initial_1():
     """test initial when degree is 1"""
     test_class = ChebyshevFirstKind(1)
     assert test_class.n == 1
-    assert test_class.points == [0]
+    assert test_class.points == [-1, 1]
 
 def test_cheb_initial_2():
     """test initial when degree is 2"""
     test_class = ChebyshevFirstKind(2)
     assert test_class.n == 2
-    assert test_class.points == [-1,1]
+    assert numpy.allclose(test_class.points,[-1, 0, 1],atol=1e-10)
 
 def test_cheb_initial_4(expected_points_4):
     """test initial when degree is 4"""
