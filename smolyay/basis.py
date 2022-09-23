@@ -200,7 +200,7 @@ class BasisFunctionSet():
 
 
 class NestedBasisFunctionSet(BasisFunctionSet):
-    """Set of basis functions that are nested
+    """Nested set of basis functions and points.
 
     The set of basis functions this class uses are assumed to be part
     of a sequential series of functions, where the functions that
