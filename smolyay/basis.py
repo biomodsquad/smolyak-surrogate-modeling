@@ -125,19 +125,33 @@ class ChebyshevFirstKind(BasisFunction):
 
     @classmethod
     def make_nested_set(cls, exactness):
-        """calculate nested points for Chebyshev polynomial basis function
-        Created the NestedBasisFunctionSet object that holds the nested
-        points for a CHebyshev basis function
+        """Create a nested set of Chebyshev polynomials.
+
+        A nested set is created up to a given level of ``exactness``,
+        which corresponds to a highest-order Chebyshev polynomial of
+        degree ``n = 2**exactness``.
+
+        Each nesting level corresponds to the increasing powers of 2 going up to
+        ``2**exactness``, with the first level being a special case. The generating
+        Chebyshev polynomials are hence of degree (0, 2, 4, 8, ...). Each new point
+        added in a level is paired with a basis function of increasing order.
+
+        For example, for an ``exactness`` of 3, the generating polynomials are
+        of degree 0, 2, 4, and 8, at each of 4 levels. There are 1, 2, 2, and 4
+        new points added at each level. The polynomial at level 0 is of degree 0,
+        the polynomials at level 1 are of degrees 1 and 2, those at level 2 are of
+        degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and 8.
 
         Parameters
         ----------
         exactness : int
-            Level of exactness to calculate points to.
+            Level of exactness.
 
         Returns
         -------
-        NestedBasisFunctionSet object
-            Data structure for points.
+        NestedBasisFunctionSet
+            Nested Chebyshev polynomials of the first kind.
+
         """
         levels = []
         points = []
