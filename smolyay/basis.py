@@ -202,11 +202,9 @@ class BasisFunctionSet():
 class NestedBasisFunctionSet(BasisFunctionSet):
     """Nested set of basis functions and points.
 
-    The set of basis functions this class uses are assumed to be part
-    of a sequential series of functions, where the functions that
-    determine the points are nested
-    ``levels`` is a list of lists that determines which grid level each
-    point is added on
+    Nested points/basis function grow in levels, such that an approximation
+    of a given level uses not only its sampling points but also all the points at
+    lower levels. Nested sets (similarly to ogres) are like onions.
     """
 
     def __init__(self,points,basis_functions,levels):
