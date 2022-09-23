@@ -91,19 +91,26 @@ class ChebyshevFirstKind(BasisFunction):
             self._points = list(numpy.polynomial.chebyshev.chebpts2(self._n+1))
 
     def __call__(self,x):
-        """Terms of basis function
-        Returns the output of an nth degree Chebyshev polynomial of the
-        first kind with input x
+        r"""Evaluate the basis function.
+
+        The Chebyshev polynomial is evaluated using the combinatorial formula:
+        
+        .. math::
+        
+            T_n(x) = \sum_{k=0}^{\lfloor n/2 \rfloor} {n \ choose 2k} (x^2-1)^k x^{n-2k}
+
+        for :math:`n \ge 2`.
 
         Parameters
         ----------
         x : float
-            Input arguement.
+            One-dimensional point on :math:`[-1,1]`.
 
         Returns
         -------
         float
             Value of Chebyshev polynomial of the first kind.
+
         """
         if self._n == 0:
             return 1
