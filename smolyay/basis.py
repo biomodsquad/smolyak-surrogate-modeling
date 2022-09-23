@@ -213,7 +213,7 @@ class NestedBasisFunctionSet(BasisFunctionSet):
 
     @property
     def levels(self):
-        """list of list that show the points for each grid level"""
+        """list: List of lists of indexes for points/functions at each level."""
         return self._levels
 
     @levels.setter
