@@ -18,7 +18,8 @@ class BasisFunction(abc.ABC):
     def __init__(self):
         self._points = []
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def points(self):
         """list: Sampling points for interpolation."""
         pass
