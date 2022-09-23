@@ -192,7 +192,6 @@ class NestedBasisFunctionSet(BasisFunctionSet):
     """
 
     def __init__(self,points,basis_functions,levels):
-        """Initialization of parameters"""
         super().__init__(points,basis_functions)
         self._levels = levels
 
