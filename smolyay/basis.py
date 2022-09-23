@@ -153,22 +153,25 @@ class ChebyshevFirstKind(BasisFunction):
             Nested Chebyshev polynomials of the first kind.
 
         """
+        basis_functions = []
         levels = []
         points = []
+        for i in range(0, exactness+1):
+            if i > 1:
+                start_level = 2**(i-1)+1
+                end_level = 2**i
+            elif i == 1:
+                start_level = 1
+                end_level = 2
+            else:
+                start_level = 0
+                end_level = 0
+            level_range = range(start_level, end_level+1)
 
-        end_level_index = [2**n for n in range(exactness+1)]
-        end_level_index[0] = 0
-        start_level_index = [0]
-        start_level_index.extend([n+1 for n in end_level_index])
-        max_degree = end_level_index[-1]
-        basis_functions = [ChebyshevFirstKind(n) for n in range(max_degree+1)]
-
-        for i in range(0,exactness+1):
-            levels.append(
-                    list(range(start_level_index[i],end_level_index[i]+1)))
-            new_points = basis_functions[end_level_index[i]].points
-            for p in new_points:
-                if not numpy.isclose(points,p).any():
+            basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
+            levels.append(list(level_range))
+            for p in basis_functions[end_level].points:
+                if not numpy.isclose(points, p).any():
                     points.append(p)
         return NestedBasisFunctionSet(points,basis_functions,levels)
 
