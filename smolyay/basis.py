@@ -27,8 +27,7 @@ class BasisFunction(abc.ABC):
 
     @abc.abstractmethod
     def __call__(self,x):
-        """Compute term of basis function
-        Returns the output of the basis function with input x
+        """Evaluate the basis function.
 
         Parameters
         ----------
