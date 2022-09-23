@@ -195,7 +195,7 @@ class BasisFunctionSet():
 
     @property
     def basis_functions(self):
-        """list of BasisFunction objects"""
+        """list: Basis functions."""
         return self._basis_functions
 
 
