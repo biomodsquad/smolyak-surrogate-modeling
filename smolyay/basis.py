@@ -32,7 +32,7 @@ class BasisFunction(abc.ABC):
         Parameters
         ----------
         x : float
-            Input arguement.
+            One-dimensional point.
 
         Returns
         -------
