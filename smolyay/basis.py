@@ -190,7 +190,7 @@ class BasisFunctionSet():
 
     @property
     def points(self):
-        """All points for basis function set at some level of precision"""
+        """list: Sampling points."""
         return self._points
 
     @property
