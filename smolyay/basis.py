@@ -4,12 +4,14 @@ import math
 import numpy
 
 class BasisFunction(abc.ABC):
-    """Abstract class for basis functions.
-    Data structure for basis functions that can be called as a function
-    and holds the points 
-    ``points`` property represents all the unique 1D points within the 
-    range [-1,1] of the basis function associated with a Smolyak index 
-    described by the class IndexGrid.
+    """Basis function for interpolating data.
+
+     A one-dimensional basis function is defined on the domain
+     :math:`[-1,1]`. The function defines the :attr:`points` at
+     which it should be sampled within this interval for interpolation.
+     The function also has an associated :meth:`__call__` method
+     for evaluating it at a point within its domain.
+
 
     """
 
