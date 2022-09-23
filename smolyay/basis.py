@@ -43,25 +43,23 @@ class BasisFunction(abc.ABC):
 
 
 class ChebyshevFirstKind(BasisFunction):
-    r"""Basis function Chebyshev polynomials of the first kind
-    Chebyshev polynomials are a sequence of polynomials described by the
-    following recurrence relation:
+    r"""Chebyshev polynomial of the first kind.
 
-    ..math:
-    T_0(x) = 1
+    The Chebyshev polynomial of degree *n* is defined by the
+    recursive relationship:
+
+    ..math::
+
+        T_0(x) = 1
         T_1(x) = x
-        T_{n+1}(x) = 2xT_n(x) - T_{n-1}(x)
+        T_{n+1}(x) = 2x T_n(x) - T_{n-1}(x)
 
-    Object describes the nth term in the set of polynomials as designated
-    by the property ``n``
-    ``points`` represents the extrema of the polynomial of this degree on
-    the domain [-1,1]
+    The :attr:`points` for this polynomial are the extrema on the domain
+    :math:`[-1,1]`:
+   
+    ..math::
 
-    The extrema of the polynomial are calculated via the following
-    equation:
-
-    ..math:
-        x_{i}^* = -\cos\left((\frac{i-1}{n-1}\pi\right), i = 1,...,n
+        x_i^* = -\cos(\pi i/n), i = 0,...,n
 
     Parameters
     ----------
