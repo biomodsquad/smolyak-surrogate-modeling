@@ -70,10 +70,12 @@ class ChebyshevFirstKind(BasisFunction):
     def __init__(self,n):
         super().__init__()
         self._n = n
+        self._points = list(
+                numpy.polynomial.chebyshev.chebpts2(n+1)) if n > 0 else [0]
 
     @property
     def points(self):
-        """extrema of polynomial"""
+        """list: Sampling points at extrema of polynomial."""
         if len(self._points) == 0:
             self._compute_points()
         return self._points
@@ -82,13 +84,6 @@ class ChebyshevFirstKind(BasisFunction):
     def n(self):
         """degree of polynomial"""
         return self._n
-
-    def _compute_points(self):
-        """Compute extrema of Chebyshev polynomial of the first kind"""
-        if self._n == 0:
-            self._points = [0]
-        else:
-            self._points = list(numpy.polynomial.chebyshev.chebpts2(self._n+1))
 
     def __call__(self,x):
         r"""Evaluate the basis function.
@@ -132,15 +127,17 @@ class ChebyshevFirstKind(BasisFunction):
         degree ``n = 2**exactness``.
 
         Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**exactness``, with the first level being a special case. The generating
-        Chebyshev polynomials are hence of degree (0, 2, 4, 8, ...). Each new point
-        added in a level is paired with a basis function of increasing order.
+        ``2**exactness``, with the first level being a special case. The 
+        generating Chebyshev polynomials are hence of degree (0, 2, 4, 8, ...).
+        Each new point added in a level is paired with a basis function of 
+        increasing order.
 
         For example, for an ``exactness`` of 3, the generating polynomials are
         of degree 0, 2, 4, and 8, at each of 4 levels. There are 1, 2, 2, and 4
-        new points added at each level. The polynomial at level 0 is of degree 0,
-        the polynomials at level 1 are of degrees 1 and 2, those at level 2 are of
-        degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and 8.
+        new points added at each level. The polynomial at level 0 is of degree 
+        0, the polynomials at level 1 are of degrees 1 and 2, those at level 2 
+        are of degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and
+        8.
 
         Parameters
         ----------
@@ -179,6 +176,14 @@ class ChebyshevFirstKind(BasisFunction):
 class BasisFunctionSet():
     """Set of basis functions and sample points.
 
+    Parameters
+    ----------
+    basis_functions : list of BasisFunction objects
+        series of basis functions
+
+    points : list
+        1D points taken from the BasisFunction objects
+        
     """
 
     def __init__(self,points,basis_functions):
@@ -203,8 +208,13 @@ class NestedBasisFunctionSet(BasisFunctionSet):
     """Nested set of basis functions and points.
 
     Nested points/basis function grow in levels, such that an approximation
-    of a given level uses not only its sampling points but also all the points at
-    lower levels. Nested sets (similarly to ogres) are like onions.
+    of a given level uses not only its sampling points but also all the points 
+    at lower levels. Nested sets (similarly to ogres) are like onions.
+
+    Parameters
+    ---------
+    levels : list of lists
+        determines which level each point is added on
     """
 
     def __init__(self,points,basis_functions,levels):
