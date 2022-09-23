@@ -177,11 +177,7 @@ class ChebyshevFirstKind(BasisFunction):
 
 
 class BasisFunctionSet():
-    """Set of basis functions
-    Creates a framework for a set of basis functions to be used as the
-    building blocks for a surrogate model.
-    ``basis_functions`` is a list of BasisFunction objects
-    ``points`` 1D points taken from the BasisFunction objects
+    """Set of basis functions and sample points.
 
     """
 
