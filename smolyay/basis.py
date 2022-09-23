@@ -18,7 +18,7 @@ class BasisFunction(abc.ABC):
 
     @abc.abstractproperty
     def points(self):
-        """The points of the basis function assigned to Smolyak indices"""
+        """list: Sampling points for interpolation."""
         pass
 
 
