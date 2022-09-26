@@ -57,7 +57,7 @@ class ChebyshevFirstKind(BasisFunction):
     The :attr:`points` for this polynomial are the extrema on the domain
     :math:`[-1,1]`:
    
-    ..math::
+    .. math::
 
         x_i^* = -\cos(\pi i/n), i = 0,...,n
 
