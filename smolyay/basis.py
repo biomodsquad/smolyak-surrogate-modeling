@@ -48,7 +48,7 @@ class ChebyshevFirstKind(BasisFunction):
     The Chebyshev polynomial :math:`T_n` of degree *n* is defined by the
     recursive relationship:
 
-    ..math::
+    .. math::
 
         T_0(x) = 1
         T_1(x) = x
