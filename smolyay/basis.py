@@ -45,7 +45,7 @@ class BasisFunction(abc.ABC):
 class ChebyshevFirstKind(BasisFunction):
     r"""Chebyshev polynomial of the first kind.
 
-    The Chebyshev polynomial of degree *n* is defined by the
+    The Chebyshev polynomial :math:`T_n` of degree *n* is defined by the
     recursive relationship:
 
     ..math::
