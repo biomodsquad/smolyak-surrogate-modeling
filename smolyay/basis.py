@@ -76,8 +76,6 @@ class ChebyshevFirstKind(BasisFunction):
     @property
     def points(self):
         """list: Sampling points at extrema of polynomial."""
-        if len(self._points) == 0:
-            self._compute_points()
         return self._points
 
     @property
