@@ -176,11 +176,11 @@ class BasisFunctionSet():
 
     Parameters
     ----------
-    basis_functions : list of BasisFunction objects
-        series of basis functions
+    basis_functions : list
+        Basis functions in set.
 
     points : list
-        1D points taken from the BasisFunction objects
+        Sample point corresponding to each basis function.
         
     """
 
