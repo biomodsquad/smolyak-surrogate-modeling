@@ -7,7 +7,7 @@ from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, N
 @pytest.fixture
 def expected_points_4():
     """extrema for n = 4"""
-    return [-1, -1/(2**0.5), 0, 1/(2**0.5), 1]
+    return [-1, -1/numpy.sqrt(2), 0, 1/numpy.sqrt(2), 1]
 
 @pytest.fixture
 def expected_points_8():
