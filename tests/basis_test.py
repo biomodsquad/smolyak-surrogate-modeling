@@ -6,24 +6,6 @@ from scipy import special
 from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, NestedBasisFunctionSet
 
 @pytest.fixture
-def expected_points_4():
-    """extrema for n = 4"""
-    return [-1, -1/numpy.sqrt(2), 0, 1/numpy.sqrt(2), 1]
-
-@pytest.fixture
-def expected_points_8():
-    """extrema for n = 8"""
-    return [-1, -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75), -1/numpy.sqrt(2),
-            -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 0, 
-            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 1/numpy.sqrt(2),
-            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75), 1]
-
-@pytest.fixture
-def expected_points_2_set():
-    """extrema for exactness = 4"""
-    return [0, -1.0, 1.0, -1/numpy.sqrt(2), 1/numpy.sqrt(2)]
-
-@pytest.fixture
 def expected_points_3_set():
     """extrema for exactness = 8"""
     return [0, -1.0, 1.0, -1/numpy.sqrt(2), 1/numpy.sqrt(2),
@@ -49,17 +31,22 @@ def test_cheb_initial_2():
     assert f.n == 2
     assert numpy.allclose(f.points,[-1, 0, 1],atol=1e-10)
 
-def test_cheb_initial_4(expected_points_4):
+def test_cheb_initial_4():
     """test initial when degree is 4"""
+    expected_points = [-1, -1/numpy.sqrt(2), 0, 1/numpy.sqrt(2), 1]
     f = ChebyshevFirstKind(4)
     assert f.n == 4
-    assert numpy.allclose(f.points,expected_points_4,atol=1e-10)
+    assert numpy.allclose(f.points,expected_points,atol=1e-10)
 
-def test_cheb_initial_8(expected_points_8):
+def test_cheb_initial_8():
     """test initial when degree is 8"""
+    expected_points = [-1, -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75), 
+            -1/numpy.sqrt(2), -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 0,
+            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 1/numpy.sqrt(2),
+            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75), 1]
     f = ChebyshevFirstKind(8)
     assert f.n == 8
-    assert numpy.allclose(f.points,expected_points_8,atol=1e-10)
+    assert numpy.allclose(f.points,expected_points,atol=1e-10)
 
 def test_cheb_call_degree_0():
     """Chebyshev polynomial degree 0 is 1 for all inputs"""
