@@ -64,13 +64,13 @@ def test_cheb_initial_8(expected_points_8):
 def test_cheb_call_degree_0():
     """Chebyshev polynomial degree 0 is 1 for all inputs"""
     f = ChebyshevFirstKind(0)
-    for i in range(0,16):
+    for i in [-1, -0.5, 0, 0.5, 1]:
         assert f(i) == 1
 
 def test_cheb_call_degree_1():
     """Chebyshev polynomial degree 1 should return input"""
     f = ChebyshevFirstKind(1)
-    for i in range(0,16):
+    for i in [-1, -0.5, 0, 0.5, 1]:
         assert f(i) == i
 
 def test_cheb_call_random_points():
