@@ -118,11 +118,19 @@ def test_set_nested_initialize_0():
     assert f.points == [0]
     assert f.levels == [[0]]
 
-def test_set_nested_change_levels():
-    """Check NestedBasisFunctionSet updates points when level changes"""
+def test_set_nested_change_levels_invalid():
+    """Check NestedBasisFunctionSet does not allow more levels than points"""
     levels = [[0]]
     points = [0]
     f = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
+    with pytest.raises(IndexError):
+        f.levels = [[0],[1,2],[3,4]]
+    
+def test_set_nested_change_levels(expected_points_3_set):
+    """Check NestedBasisFunctionSet updates levels correctly"""
+    levels = [[0],[1,2],[3,4],[5,6,7,8]]
+    basis_functions = [ChebyshevFirstKind(i) for i in range(9)]
+    f = NestedBasisFunctionSet(expected_points_3_set,basis_functions,levels)
     f.levels = [[0],[1,2],[3,4]]
     assert f.levels == [[0],[1,2],[3,4]]
 

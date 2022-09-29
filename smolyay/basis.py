@@ -71,7 +71,7 @@ class ChebyshevFirstKind(BasisFunction):
         super().__init__()
         self._n = n
         self._points = (
-                list(numpy.polynomial.chebyshev.chebpts2(n+1)) if n > 0 else [0])
+                list(numpy.polynomial.chebyshev.chebpts2(n+1)) if n>0 else [0])
 
     @property
     def points(self):
@@ -234,5 +234,15 @@ class NestedBasisFunctionSet(BasisFunctionSet):
 
     @levels.setter
     def levels(self,levels):
-        self._levels = levels
+        """
+        Raises
+        ------
+        IndexError
+            max index must be less than total number of points.
+        """
+        if any([any(numpy.greater(y,len(self._points))) for y in levels]):
+            raise IndexError("max level index must be less than total "
+                    "number of points.")
+        else:
+            self._levels = levels
 
