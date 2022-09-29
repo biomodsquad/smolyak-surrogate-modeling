@@ -104,7 +104,15 @@ class ChebyshevFirstKind(BasisFunction):
         float
             Value of Chebyshev polynomial of the first kind.
 
+        Raises
+        ------
+        ValueError
+            if input is outside the domain [-1,1]
+
         """
+        if x > 1 or x < -1:
+            raise ValueError("Input is outside the domain [-1,1]")
+
         if self._n == 0:
             return 1
         elif self._n == 1:

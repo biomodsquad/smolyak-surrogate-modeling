@@ -82,6 +82,14 @@ def test_cheb_call_random_points():
         f = ChebyshevFirstKind(n[i])
         assert numpy.isclose(f(x[i]),special.eval_chebyt(n[i],x[i]))
 
+def test_cheb_call_invalid_input():
+    """Test call raises error if input is outside domain [-1,1]"""
+    f = ChebyshevFirstKind(4)
+    with pytest.raises(ValueError):
+        f(2)
+    with pytest.raises(ValueError):
+        f(-2)
+
 def test_set_initialize_empty():
     """Check BasisFunctionSet initializes with empty set"""
     basis_functions = []
