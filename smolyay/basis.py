@@ -82,7 +82,7 @@ For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
 
     @property
     def n(self):
-        """degree of polynomial"""
+        """int: Degree of polynomial"""
         return self._n
 
     def __call__(self,x):
