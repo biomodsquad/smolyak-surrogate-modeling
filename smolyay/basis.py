@@ -242,7 +242,7 @@ class NestedBasisFunctionSet(BasisFunctionSet):
         IndexError
             max index must be less than total number of points.
         """
-        if any([any(numpy.greater(y,len(self._points))) for y in levels]):
+        if numpy.any(numpy.concatenate(levels) > len(self.points)):
             raise IndexError("max level index must be less than total "
                     "number of points.")
         else:
