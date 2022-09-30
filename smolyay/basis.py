@@ -231,17 +231,16 @@ class NestedBasisFunctionSet(BasisFunctionSet):
 
     @property
     def levels(self):
-        """list: List of lists of indexes for points/functions at each level."""
-        return self._levels
-
-    @levels.setter
-    def levels(self,levels):
-        """
+        """list: List of lists of indexes for points/functions at each level.
         Raises
         ------
         IndexError
             max index must be less than total number of points.
         """
+        return self._levels
+
+    @levels.setter
+    def levels(self,levels):
         if numpy.any(numpy.concatenate(levels) > len(self.points)):
             raise IndexError("max level index must be less than total "
                     "number of points.")
