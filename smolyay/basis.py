@@ -92,7 +92,7 @@ For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
         
         .. math::
         
-            T_n(x) = \sum_{k=0}^{\lfloor n/2 \rfloor} {n \ choose 2k} (x^2-1)^k x^{n-2k}
+            T_n(x) = \sum_{k=0}^{\lfloor n/2 \rfloor} {n \choose 2k} (x^2-1)^k x^{n-2k}
 
         for :math:`n \ge 2`.
 
