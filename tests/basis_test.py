@@ -18,6 +18,7 @@ def test_cheb_initial_zero():
     """test degree of zero"""
     f = ChebyshevFirstKind(0)
     assert f.n == 0
+    assert f.points == [0]
 
 def test_cheb_initial_1():
     """test initial when degree is 1"""
@@ -48,17 +49,13 @@ def test_cheb_initial_8():
     assert f.n == 8
     assert numpy.allclose(f.points,expected_points,atol=1e-10)
 
-def test_cheb_call_degree_0():
-    """Chebyshev polynomial degree 0 is 1 for all inputs"""
-    f = ChebyshevFirstKind(0)
+def test_cheb_call_degree_0_1():
+    """Chebyshev polynomial degree 0 is always 1 and degree 1 returns input"""
+    f0 = ChebyshevFirstKind(0)
+    f1 = ChebyshevFirstKind(1)
     for i in [-1, -0.5, 0, 0.5, 1]:
-        assert f(i) == 1
-
-def test_cheb_call_degree_1():
-    """Chebyshev polynomial degree 1 should return input"""
-    f = ChebyshevFirstKind(1)
-    for i in [-1, -0.5, 0, 0.5, 1]:
-        assert f(i) == i
+        assert f0(i) == 1
+        assert f1(i) == i
 
 def test_cheb_call_random_points():
     """Test chebyshev polynomial at some degree at some input"""
