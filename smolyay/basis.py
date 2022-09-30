@@ -94,7 +94,7 @@ For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
         
             T_n(x) = \sum_{k=0}^{\lfloor n/2 \rfloor} {n \choose 2k} (x^2-1)^k x^{n-2k}
 
-        for :math:`n \ge 2`.
+        for :math:`n \ge 2`, and by the direct formula for the other values of *n*.
 
         Parameters
         ----------
