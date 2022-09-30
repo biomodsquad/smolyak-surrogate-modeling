@@ -63,11 +63,11 @@ def test_cheb_call_degree_1():
 def test_cheb_call_random_points():
     """Test chebyshev polynomial at some degree at some input"""
     numpy.random.seed(567)
-    n = numpy.random.randint(20,size = 20)
-    x = numpy.random.rand(20) * 2 - 1
-    for i in range(20):
-        f = ChebyshevFirstKind(n[i])
-        assert numpy.isclose(f(x[i]),special.eval_chebyt(n[i],x[i]))
+    ns = numpy.random.randint(20,size = 20)
+    xs = numpy.random.rand(20) * 2 - 1
+    for n,x in zip(ns,xs):
+        f = ChebyshevFirstKind(n)
+        assert numpy.isclose(f(x),special.eval_chebyt(n,x))
 
 def test_cheb_call_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
