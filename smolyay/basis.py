@@ -222,7 +222,7 @@ class NestedBasisFunctionSet(BasisFunctionSet):
     Parameters
     ---------
     levels : list of lists
-        determines which level each point is added on
+       Assignment of points/basis functions to each level.
     """
 
     def __init__(self,points,basis_functions,levels):
