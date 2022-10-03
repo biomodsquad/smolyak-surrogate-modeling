@@ -61,7 +61,7 @@ class ChebyshevFirstKind(BasisFunction):
 
         x_i^* = -\cos(\pi i/n), i = 0,...,n
 
-For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
 
     Parameters
     ----------
