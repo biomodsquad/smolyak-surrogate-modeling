@@ -1,6 +1,5 @@
 import numpy
 
-
 class IndexGrid:
     r"""Indexes of grid points for constructing a surrogate function.
 
@@ -8,36 +7,38 @@ class IndexGrid:
     approximate a real function. ``dimension`` represents the number
     of independent variables of the real function, and ``exactness``
     specifies the surrogate's accuracy. Each dimension is assigned
-    a level which is integers from 1 to exactness + 1 (maximum level). Levels
-    represent indices that correspond to each dimension and
+    a level which is integers from 1 to ``exactness`` + 1 (maximum level).
+    Levels represent indices that correspond to each dimension and
     are chosen as follows:
-    ..math::
-        ``n`` = ``dimension``
-        ``\mu`` = ``exactness``
-        ``[k_1, k_2, ..., k_n]`` = ``levels``
-        where k_1,2,...,n = [1, 2, ..., ``exactness`` +1]
+    ..math:
+        n = ``dimension``
+        \mu = ``exactness``
+        [k_1, k_2, ..., k_n] = levels
+    where :math:k_(1,2,...,n) = [1, 2, ..., ``exactness`` +1]
 
-        ``n`` <= ``k_1 + k_2 + ... + k_n`` <= ``n + \mu``
+    ..math:
+        n <= k_1 + k_2 + ... + k_n <= n + \mu
 
-    For instance:
-    ..math::
-        if n = 2 and \mu = 1, then:
-            if \sum k_i = 2:
-                (k_1 = 1, k_2 = 1)
-            if \sum k_i = 3:
-                (k_1 = 1, k_2 = 2)
-                (k_1 = 2, k_2 = 1)
+    For instance, if n = 2 and :math:\mu = 1, then:
+    :math:\sum k_i = 2 and :math:\sum k_i = 3.
+    if :math:\sum k_i = 2, then:
+    ..math:
+        (k_1 = 1, k_2 = 1)
+    and if :math:\sum k_i = 3:
+    ..math:
+        (k_1 = 1, k_2 = 2)
+        (k_1 = 2, k_2 = 1)
 
-    ``index_per_level`` shows unique roots (corresponding to a
-    basis function) needed for each level to construct a surrogate function,
+    ``index_per_level`` shows unique roots 
+    needed for each level to construct a surrogate function,
     and one can improve the accuracy by adding new roots at each level.
 
-    For instance: Chebyshev's polynomial of first kind
-    ..math::
+    For instance, for Chebyshev's polynomial of first kind we have:
+    ..math:
         ``index_per_level`` = [1, 2, 2, 4, 8, ...]
 
     The property ``level_indexes`` computes the unique indexes (or number of
-    roots)of each level (which then can be replaced by the actual extremums
+    roots) of each level (which then can be replaced by the actual extremums
     depending on a basis function). The property ``grid_point_indexes``
     generates the required number of grid points for constructing
     a surrogate. First, as above, all possible combinations of
@@ -90,17 +91,17 @@ class IndexGrid:
 
     @property
     def index_per_level(self):
-        """numpy.ndarray: Index per level."""
+        """list: Index per level."""
         return self._index_per_level
 
     @index_per_level.setter
     def index_per_level(self, value):
-        self._index_per_level = numpy.array(value, dtype=int)
+        self._index_per_level = list(value)
         self._needs_update = True
 
     @property
     def level_indexes(self):
-        """Generate indexes of levels."""
+        """list: Unique indexes at each grid level."""
         if self._needs_update:
             self._update()
 
@@ -108,7 +109,7 @@ class IndexGrid:
 
     @property
     def grid_point_indexes(self):
-        """Generate index of grid points."""
+        """list: Indexes correspond to each grid point."""
         if self._needs_update:
             self._update()
 
@@ -147,7 +148,7 @@ class IndexGrid:
             for composition in generate_compositions(
                     sum_of_levels, self.dimension, include_zero=False):
                 # indexes start from zero
-                index_composition = composition - 1
+                index_composition = numpy.array(composition) - 1
                 # generate all combinations of the arrays along each dimension
                 level_composition_index = [level_indexes[index]
                                            for index in index_composition]
@@ -159,7 +160,7 @@ class IndexGrid:
                 else:
                     grid_points_indexes = numpy.concatenate(
                         (grid_points_indexes, grid_points_indexes_), axis=0)
-        self._grid_point_indexes = grid_points_indexes
+        self._grid_point_indexes = grid_points_indexes.tolist()
         self._needs_update = False
 
 
@@ -197,7 +198,7 @@ def generate_compositions(value, num_parts, include_zero):
 
     Yields
     ------
-    numpy.ndarray
+    list
         All possible compositions of the value into num_parts.
 
     Raises
@@ -206,7 +207,7 @@ def generate_compositions(value, num_parts, include_zero):
         Number of parts cannot be greater than value if the desired output
         does not include compositions containing zeroes.
     """
-    if value < num_parts:
+    if value < num_parts and include_zero is False:
         raise ValueError(
             "When include_zero is {}, num_parts cannot be greater"
             " than the value"
@@ -214,11 +215,11 @@ def generate_compositions(value, num_parts, include_zero):
     value = value if include_zero else value - num_parts
 
     # (A) first entry
-    r = numpy.zeros(num_parts, dtype=int)
+    r = [0]*num_parts
     r[0] = value
     t = value
     h = 0
-    yield r if include_zero else r+1
+    yield list(r) if include_zero else (numpy.array(r)+1).tolist()
 
     # (D)
     while r[num_parts-1] != value:
@@ -232,4 +233,4 @@ def generate_compositions(value, num_parts, include_zero):
         r[h-1] = 0
         r[0] = t-1
         r[h] += 1
-        yield r if include_zero else r+1
+        yield list(r) if include_zero else (numpy.array(r)+1).tolist()
