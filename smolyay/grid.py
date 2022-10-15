@@ -1,5 +1,8 @@
+import sys
+sys.path.insert(1, '/home/che_h2/mzf0069/Documents/code/smolyak-surrogate-modeling')
 import abc
 import numpy
+import itertools
 from smolyay.basis import (BasisFunction, ChebyshevFirstKind,
                    BasisFunctionSet, NestedBasisFunctionSet)
 
@@ -14,8 +17,8 @@ class IndexGridGenerator(abc.ABC):
     of complex systems.
     """
 
-    def __init__(self, basis_set):
-        self._basis_set = basis_set
+    def __init__(self):
+        pass
 
     def __call__(self, dimension):
         """Make grid points and their corresponding basis functions.
@@ -28,7 +31,7 @@ class IndexGridGenerator(abc.ABC):
         Returns
         -------
         :class:`IndexGrid`
-            Grid points and their corresponding functions.
+            Grid points (and their indexes) and their corresponding functions.
         """
         pass
 
@@ -62,15 +65,15 @@ class SmolyakGridGenerator(IndexGridGenerator):
     For instance:
     ..math::
         if n = 2 and \mu = 1, then:
-            if \sum{1}^{n} k_i = 2:
+            if \sum_{1}^{n} k_i = 2:
                 (k_1 = 1, k_2 = 1)
-            if \sum k_i{i=1}^{n} = 3:
+            if \sum_{i=1}^{n} k_i = 3:
                 (k_1 = 1, k_2 = 2)
                 (k_1 = 2, k_2 = 1)
 
-    The  :meth:`smolyak_indices` generates the mentioned compositions,
+    The  :meth:`indices` generates the mentioned compositions,
     and can expand or drop indices if necessary.
-    The :meth:`make_integer_grid_points` generates the indexes of
+    :meth:`__call__`  generates the indexes of
     grid points (integer grids) depending on dimensionality and
     exactness. First, as above, all possible combinations of
     indices are computed, which then can be replaced with indexes based on the
@@ -92,7 +95,7 @@ class SmolyakGridGenerator(IndexGridGenerator):
 
     Example
     -------
-    For instance: Consider dimension (or n) = 2, and
+    For instance, consider dimension (or n) = 2, and
     exactness (or \mu) = 1 and Chebyshev's polynomial
     of first kind, and its extremums as the basis function and points, then:
     ..math::
@@ -101,7 +104,7 @@ class SmolyakGridGenerator(IndexGridGenerator):
         then:
         grid points indexes = [(0,0), (0,1), (0,2), (1,0), (2,0)]
         points = [0, -1, 1]
-        basis = [:class:`ChebyshevFunction`, ::class:`ChebyshevFunction`,
+        basis = [:class:`ChebyshevFunction`, :class:`ChebyshevFunction`,
                  :class:`ChebyshevFunction`]
 
     Then:
@@ -131,23 +134,7 @@ class SmolyakGridGenerator(IndexGridGenerator):
     def nested_basis_set(self, nested_basis_set):
         self._nested_basis_set = nested_basis_set
 
-    def make_integer_grid_points(self, dimension):
-        """Generate grid points based on their indexes via Smolyak method.
-
-        Parameters
-        ----------
-        dimension: int
-            Number of independent variables.
-
-        Returns
-        -------
-        list
-            Integer grid points.
-        """
-        self._update(dimension)
-        return self._grid_points_indexes
-
-    def smolyak_indices(self, dimension, expand_indicy=[], drop_indicy=[]):
+    def indices(self, dimension, expand_indicy=[], drop_indicy=[]):
         """Generate Smolyak indices depending on the dimensionality.
 
         Parameters
@@ -180,43 +167,45 @@ class SmolyakGridGenerator(IndexGridGenerator):
             raise IndexError("Indicy must be in length of the dimension.")
 
         if (self._drop_indicy != [] and
-           self._drop_indicy not in self._smolyak_indices):
+           self._drop_indicy not in self._indices):
             raise ValueError("Indicy doesn't exist.")
 
         if self._expand_indicy == [] and self._drop_indicy == []:
-            return self._smolyak_indices
+            return self._indices
         else:
             if self._expand_indicy == []:
-                self._smolyak_indices.remove(drop_indicy)
+                self._indices.remove(drop_indicy)
             elif self._drop_indicy == []:
-                self._smolyak_indices.append(expand_indicy)
+                self._indices.append(expand_indicy)
             else:
-                self._smolyak_indices.append(expand_indicy)
-                self._smolyak_indices.remove(drop_indicy)
-            return self._smolyak_indices
+                self._indices.append(expand_indicy)
+                self._indices.remove(drop_indicy)
+            return self._indices
 
     def __call__(self, dimension):
         """Make grid points and their corresponding basis functions.
 
         Depending on the dimensionality, a set of grid points are generated
-        based on their polynomial degree (integer grid points). Grid points of
-        the basis function (bounded between -1 and 1), and their corresponding
-        basis function are generated.
+        (integer grid points). Grid points of the basis function, and
+        their corresponding basis function are then generated by replacing
+        the indexes with their points and functions.
 
         Parameters
         ----------
         dimension: int
-            Number of independent variables
+            Number of independent variables.
 
         Returns
         -------
-        :class:`IndexGrid`
-            Grid points and their corresponding functions.
+        :class:`SmolyakGrid`
+            Grid points (and their indexes),their corresponding functions and
+            indices.
         """
         self._dimension = dimension
         self._update(self._dimension)
 
-        return IndexGrid(self._grid_points, self._grid_points_basis)
+        return SmolyakGrid(self._grid_points_indexes, self._grid_points,
+                           self._grid_points_basis, self._indices)
 
     def _update(self, dimension):
         """Update the properties associated with Smolyak sampling method.
@@ -227,16 +216,16 @@ class SmolyakGridGenerator(IndexGridGenerator):
         Parameters
         ----------
         dimension: int
-            Number of independent variables
+            Number of independent variables.
         """
         self._dimension = dimension
         grid_points_indexes = None
-        self._smolyak_indices = []
+        self._indices = []
         for sum_of_levels in range(self._dimension,
                                    self._dimension+len(self._levels)):
             for composition in generate_compositions(
                     sum_of_levels, self._dimension, include_zero=False):
-                self._smolyak_indices.append(composition)
+                self._indices.append(composition)
                 # indexes start from zero
                 index_composition = numpy.array(composition) - 1
                 # generate all combinations of
@@ -260,27 +249,143 @@ class SmolyakGridGenerator(IndexGridGenerator):
                                                 grid_points_indexes].tolist()
 
 
+class TensorGridGenerator(IndexGridGenerator):
+    """Create grid points and functions for constructing a surrogate.
+
+    Depending on the dimensionality, points and basis functions provided
+    by :class:`BasisFunctionSet`, the :meth:`__call__` makes full tensor
+    grids.
+    :meth:`__call__`  generates the indexes of
+    grid points (integer grids) depending on dimensionality (full tensor grid).
+    Grid points and their functions are made by replacing the indexes with
+    corresponding point.
+    
+    Parameters
+    ----------
+    basis_set: :class:`BasisFunctionSet`
+        points, basis functions and levels.
+    """
+
+    def __init__(self, basis_set):
+        self._basis_set = basis_set
+        self._points = self._basis_set.points
+        self._basis = self._basis_set.basis_functions
+
+    def __call__(self, dimension):
+        """Make grid points and their corresponding basis functions.
+
+        Depending on the dimensionality, a set of grid points are generated
+        (integer grid points). Grid points of the basis function, and
+        their corresponding basis functions are then generated by replacing
+        the indexes with their points and functions.
+
+        Parameters
+        ----------
+        dimension: int
+            Number of independent variables.
+
+        Returns
+        -------
+        :class:`IndexGrid`
+            Grid points (and their indexes),their corresponding functions and
+            indices.
+        """
+        self._dimension = dimension
+        points_indexes = numpy.arange(len(self._points))
+        self._grid_points_indexes = list(itertools.product(
+            *[points_indexes for point in range(self._dimension)]))
+        self._grid_points_indexes = list(map(list, self._grid_points_indexes))
+        self._grid_points = numpy.array(self._points
+                                        )[numpy.array(self._grid_points_indexes
+                                                      )].tolist()
+        self._grid_points_basis = (numpy.array(self._basis)[
+            numpy.array(self._grid_points_indexes)].tolist())
+        return IndexGrid(self._grid_points_indexes, self._grid_points,
+                         self._grid_points_basis)
+
+
 class IndexGrid():
     """Set of grid points and their corresponding functions (a data structure).
 
-    Generate a data structure that contains grid points
+    Generate a data structure that contains grid points (and their indexes)
     and their corresponding basis functions. This data structure
     can then be used to generate a surrogate for complex systems.
+
+    Property ``grid_points_indexes``, ``grid_points``, and
+    ``grid_points_basis`` represent the integer grid points,
+    actual grid points, and their basis functions.
+
+    Parameters
+    ----------
+    grid_points_indexes: list
+        Integer grid points.
+
+    grid_points: list
+        Grid points.
+
+    grid_points_basis: list
+        Basis functions of grid points.
     """
 
-    def __init__(self, grid_points, grid_points_basis):
+    def __init__(self, grid_points_indexes, grid_points, grid_points_basis):
+        self._grid_points_indexes = grid_points_indexes
         self._grid_points = grid_points
         self._grid_points_basis = grid_points_basis
 
     @property
+    def grid_points_indexes(self):
+        """list: Integer grid points."""
+        return self._grid_points_indexes
+
+    @property
     def grid_points(self):
-        """list: Grid points bounded between (-1, 1)."""
+        """list: Grid points."""
         return self._grid_points
 
     @property
     def grid_points_basis(self):
         """list: Basis functions of grid points."""
         return self._grid_points_basis
+
+
+class SmolyakGrid(IndexGrid):
+    """Set of grid points and their corresponding functions (a data structure).
+
+    Generate a data structure that contains grid points (and their indexes)
+    and their corresponding basis functions. This data structure
+    can then be used to generate a surrogate for complex systems.
+
+    Property ``grid_points_indexes``, ``grid_points``, and
+    ``grid_points_basis`` represent the integer grid points,
+    actual grid points, and their basis functions. Property ``indices``
+    shows Smolyak indices which are used to generate the points (based on
+    the inequaltiy equation suggested by Smolyak , see
+    :class:`SmolyakGridGenerator` documentation).
+
+    Parameters
+    ----------
+    grid_points_indexes: list
+        Integer grid points.
+
+    grid_points: list
+        Grid points.
+
+    grid_points_basis: list
+        Basis functions of grid points.
+
+    indices: list
+        Smolyak indices.
+    """
+
+    def __init__(self, grid_points_indexes, grid_points, grid_points_basis,
+                 indices):
+        super().__init__(grid_points_indexes, grid_points, grid_points_basis)
+        self._indices = indices
+
+    @property
+    def indices(self):
+        """list: Smolyak indices."""
+        return self._indices
 
 
 def generate_compositions(value, num_parts, include_zero):
