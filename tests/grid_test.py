@@ -1,41 +1,10 @@
-import sys
-sys.path.insert(1, '/home/che_h2/mzf0069/Documents/code/smolyak-surrogate-modeling')
+
 import pytest
-import numpy
 from smolyay.basis import ChebyshevFirstKind
 from smolyay.grid import (IndexGridGenerator, SmolyakGridGenerator,
-                          TensorGridGenerator, IndexGrid,
-                          generate_compositions)
-
-
-def test_smolyak_initial_nested_basis_set_points():
-    """Test initialized class returns correct points."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    assert numpy.allclose(test_class._points,
-                          [0, -1, 1, -0.70710, 0.70710], atol=1e-10)
-
-
-def test_smolyak_initial_nested_basis_set_functions():
-    """Test initialized class return correct basis functions."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_point = 0.3
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    test_class_basis_eval = []
-    [test_class_basis_eval.append(basis.__call__(test_point))
-     for basis in test_class._basis]
-
-    assert numpy.allclose(test_class_basis_eval,
-                          [1, 0.3, 2*(0.3**2)-1, 4*0.3**3-3*0.3,
-                           8*0.3**4-8*0.3**2+1], atol=1e-10)
-
-
-def test_ismolyak_nitial_nested_basis_set_levels():
-    """Test initialized class returns correct levels."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(3)
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    expected_levels = [[0], [1, 2], [3, 4], [5, 6, 7, 8]]
-    assert test_class._levels == expected_levels
+                          TensorGridGenerator,
+                          IndexGrid, NestedIndexGrid, generate_compositions)
+import numpy
 
 
 def test_smolyak_grid_points_indexes_one_dimension():
@@ -43,7 +12,7 @@ def test_smolyak_grid_points_indexes_one_dimension():
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_class = SmolyakGridGenerator(test_nested_basis_set)
     expected_integer_grid_points = [[0], [1], [2], [3], [4]]
-    assert (test_class(1).grid_points_indexes
+    assert (test_class(1).indexes
             == expected_integer_grid_points)
 
 
@@ -56,7 +25,7 @@ def test_smolyak_grid_points_indexes():
                                     [1, 1], [1, 2], [2, 1],
                                     [2, 2], [0, 3], [0, 4]]
 
-    assert (test_class(2).grid_points_indexes
+    assert (test_class(2).indexes
             == expected_integer_grid_points)
 
 
@@ -64,7 +33,7 @@ def test_smolyak_grid_points_one_dimension():
     """Test grid points for one dimension."""
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_class = SmolyakGridGenerator(test_nested_basis_set)
-    assert numpy.allclose(test_class(1).grid_points, [[0], [-1], [1],
+    assert numpy.allclose(test_class(1).points, [[0], [-1], [1],
            [-0.70710], [0.70710]], atol=1e-10)
 
 
@@ -76,7 +45,7 @@ def test_smolyak_grid_points():
                             [-0.70710, 0], [0.70710, 0], [-1, -1],
                             [-1, 1], [1, -1], [1, 1], [0, -0.70710],
                             [0, 0.70710]]
-    assert numpy.allclose(test_class(2).grid_points,
+    assert numpy.allclose(test_class(2).points,
                           expected_grid_points, atol=1e-10)
 
 
@@ -85,7 +54,7 @@ def test_smolyak_grid_points_basis_one_dimension():
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_point = 0.3
     test_class = SmolyakGridGenerator(test_nested_basis_set)
-    test_grid_points_basis = test_class(1)._grid_points_basis
+    test_grid_points_basis = test_class(1).basis
     test_grid_points_basis_eval = []
     for grid in test_grid_points_basis:
         for grid_point_basis in grid:
@@ -102,7 +71,7 @@ def test_smolyak_grid_points_basis():
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(1)
     test_point = 0.3
     test_class = SmolyakGridGenerator(test_nested_basis_set)
-    test_grid_points_basis = test_class(2)._grid_points_basis
+    test_grid_points_basis = test_class(2).basis
     test_grid_points_basis_eval = []
     for grid_index in range(len(test_grid_points_basis)):
         test_grid_points_basis_eval.append([])
@@ -116,95 +85,23 @@ def test_smolyak_grid_points_basis():
                           expected_grid_points_basis, atol=1e-10)
 
 
-def test_smolyak_indicies_one_dimension():
-    """Test Smolyak indices in one dimension."""
+def test_smolyak_levels_one_dimension():
+    """Test Smolyak levels in one dimension."""
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_class = SmolyakGridGenerator(test_nested_basis_set)
-    expected_smolyak_indices = [[1], [2], [3]]
+    expected_levels = [[1], [2], [3]]
 
-    assert test_class.indices(1) == expected_smolyak_indices
+    assert test_class(1).levels == expected_levels
 
 
-def test_smolyak_indices():
-    """Test Smolyak indices."""
+def test_smolyak_levels():
+    """Test Smolyak levels."""
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_class = SmolyakGridGenerator(test_nested_basis_set)
-    expected_smolyak_indices = [[1, 1], [2, 1], [1, 2],
-                                [3, 1], [2, 2], [1, 3]]
+    expected_levels = [[1, 1], [2, 1], [1, 2],
+                       [3, 1], [2, 2], [1, 3]]
 
-    assert test_class.indices(2) == expected_smolyak_indices
-
-
-def test_smolyak_indices_expand():
-    """Test the expand feature of smolyak_indices."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    expected_smolyak_indices = [[1, 1], [2, 1], [1, 2],
-                                [3, 1], [2, 2], [1, 3], [1, 4]]
-
-    assert (test_class.indices(2, expand_indicy=[1, 4],
-            drop_indicy=[]) == expected_smolyak_indices)
-
-
-def test_smolyak_indices_drop():
-    """Test the drop feature of smolyak_indices."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    expected_smolyak_indices = [[1, 1], [2, 1], [1, 2],
-                                [3, 1], [1, 3]]
-
-    assert (test_class.indices(2, expand_indicy=[],
-            drop_indicy=[2, 2]) == expected_smolyak_indices)
-
-
-def test_smolyak_indicy_expand_drop():
-    """Test the expand and the drop feature of smolyak_indices."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    expected_smolyak_indices = [[2, 1], [1, 2],
-                                [3, 1], [2, 2], [1, 3], [1, 4]]
-
-    assert (test_class.indices(2, expand_indicy=[1, 4],
-            drop_indicy=[1, 1]) == expected_smolyak_indices)
-
-
-def test_smolyak_indices_dimension_error():
-    """Test if smolyak_indices raises an error when invalid indicy is given."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    with pytest.raises(IndexError):
-        test_class.indices(2, expand_indicy=[1, 1, 1],
-                           drop_indicy=[1, 2, 3])
-
-
-def test_smolyak_indices_drop_error():
-    """Test if drop_indicy raises an error when invalid indicy is given."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_class = SmolyakGridGenerator(test_nested_basis_set)
-    with pytest.raises(ValueError):
-        test_class.indices(2, drop_indicy=[1, 5])
-
-
-def test_tensor_initial_basis_set_points():
-    """Test initialized class returns correct points."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_class = TensorGridGenerator(test_nested_basis_set)
-    assert numpy.allclose(test_class._points,
-                          [0, -1, 1, -0.70710, 0.70710], atol=1e-10)
-
-
-def test_tensor_initial_nested_basis_set_functions():
-    """Test initialized class return correct basis functions."""
-    test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
-    test_point = 0.3
-    test_class = TensorGridGenerator(test_nested_basis_set)
-    test_class_basis_eval = []
-    [test_class_basis_eval.append(basis.__call__(test_point))
-     for basis in test_class._basis]
-
-    assert numpy.allclose(test_class_basis_eval,
-                          [1, 0.3, 2*(0.3**2)-1, 4*0.3**3-3*0.3,
-                           8*0.3**4-8*0.3**2+1], atol=1e-10)
+    assert test_class(2).levels == expected_levels
 
 
 def test_tensor_grid_points_indexes_one_dimension():
@@ -212,7 +109,7 @@ def test_tensor_grid_points_indexes_one_dimension():
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_class = TensorGridGenerator(test_nested_basis_set)
     expected_integer_grid_points = [[0], [1], [2], [3], [4]]
-    assert (test_class(1).grid_points_indexes
+    assert (test_class(1).indexes
             == expected_integer_grid_points)
 
 
@@ -222,7 +119,7 @@ def test_tensor_grid_points_indexes():
     test_class = TensorGridGenerator(test_nested_basis_set)
     expected_integer_grid_points = [[0, 0], [0, 1], [0, 2], [1, 0],
                                     [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
-    assert (test_class(2).grid_points_indexes
+    assert (test_class(2).indexes
             == expected_integer_grid_points)
 
 
@@ -230,7 +127,7 @@ def test_tensor_grid_points_one_dimension():
     """Test grid points for one dimension."""
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_class = TensorGridGenerator(test_nested_basis_set)
-    assert numpy.allclose(test_class(1).grid_points, [[0], [-1], [1],
+    assert numpy.allclose(test_class(1).points, [[0], [-1], [1],
            [-0.70710], [0.70710]], atol=1e-10)
 
 
@@ -240,7 +137,7 @@ def test_tensor_grid_points():
     test_class = TensorGridGenerator(test_nested_basis_set)
     expected_grid_points = [[0, 0], [0, -1], [0, 1], [-1, 0],
                             [-1, -1], [-1, 1], [1, 0], [1, -1], [1, 1]]
-    assert numpy.allclose(test_class(2).grid_points,
+    assert numpy.allclose(test_class(2).points,
                           expected_grid_points, atol=1e-10)
 
 
@@ -249,7 +146,7 @@ def test_tensor_grid_points_basis_one_dimesnion():
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(2)
     test_point = 0.3
     test_class = TensorGridGenerator(test_nested_basis_set)
-    test_grid_points_basis = test_class(1)._grid_points_basis
+    test_grid_points_basis = test_class(1).basis
     test_grid_points_basis_eval = []
     for grid in test_grid_points_basis:
         for grid_point_basis in grid:
@@ -266,7 +163,7 @@ def test_tensor_grid_points_basis():
     test_nested_basis_set = ChebyshevFirstKind.make_nested_set(1)
     test_point = 0.3
     test_class = TensorGridGenerator(test_nested_basis_set)
-    test_grid_points_basis = test_class(2)._grid_points_basis
+    test_grid_points_basis = test_class(2).basis
     test_grid_points_basis_eval = []
     for grid_index in range(len(test_grid_points_basis)):
         test_grid_points_basis_eval.append([])
