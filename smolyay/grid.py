@@ -3,8 +3,7 @@ import itertools
 
 import numpy
 
-from smolyay.basis import (BasisFunction, ChebyshevFirstKind,
-                           BasisFunctionSet, NestedBasisFunctionSet)
+from smolyay.basis import (BasisFunctionSet, NestedBasisFunctionSet)
 
 
 class IndexGridGenerator(abc.ABC):
@@ -41,6 +40,7 @@ class IndexGridGenerator(abc.ABC):
     def basis_set(self, basis_set):
         self._basis_set = basis_set
 
+    @abc.abstractmethod
     def __call__(self, dimension):
         """Make grid points and their corresponding basis functions.
 
@@ -208,14 +208,13 @@ class SmolyakGridGenerator(IndexGridGenerator):
         grid_points_indexes = grid_points_indexes.tolist()
         level_lookup = {point: level for level, points in
                         enumerate(self._basis_set.levels) for point in points}
-        levels = numpy.array([level_lookup[index] for index in
-                              numpy.concatenate(grid_points_indexes)]
-                             ).reshape((len(grid_points_indexes),
-                                        dimension)).tolist()
-        grid_points = numpy.array(self._basis_set.points
-                                  )[numpy.array(grid_points_indexes)].tolist()
-        grid_points_basis = numpy.array(self._basis_set.basis_functions)[
-            numpy.array(grid_points_indexes)].tolist()
+        levels = [[level_lookup[index] for index in indexes] for indexes in
+                  grid_points_indexes]
+        grid_points = [[self._basis_set.points[index] for index in indexes] for
+                       indexes in grid_points_indexes]
+
+        grid_points_basis = [[self._basis_set.basis_functions[index] for index
+                              in indexes] for indexes in grid_points_indexes]
 
         return NestedIndexGrid(grid_points_indexes, grid_points,
                                grid_points_basis, levels)
@@ -297,7 +296,7 @@ class IndexGrid:
         return self._points
 
     @property
-    def basis(self):
+    def basis_functions(self):
         """list: Basis functions of the grid points."""
         return self._basis
 
