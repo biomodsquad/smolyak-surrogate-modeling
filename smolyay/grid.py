@@ -1,7 +1,6 @@
 import abc
 import itertools
-import sys
-sys.path.insert(1, '/home/che_h2/mzf0069/Documents/code/smolyak-surrogate-modeling')
+
 
 import numpy
 
