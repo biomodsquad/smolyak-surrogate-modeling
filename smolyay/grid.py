@@ -261,13 +261,8 @@ class TensorGridGenerator(IndexGridGenerator):
         grid_points_indexes = list(map(list, grid_points_indexes))
         grid_points = [[self._basis_set.points[index] for index in indexes] for
                        indexes in grid_points_indexes]
-        #grid_points = numpy.array(self._basis_set.points
-         #                         )[numpy.array(grid_points_indexes
-          #                                      )].tolist()
         grid_points_basis = [[self._basis_set.basis_functions[index] for index
                               in indexes] for indexes in grid_points_indexes]
-        #grid_points_basis = (numpy.array(self._basis_set.basis_functions)[
-         #   numpy.array(grid_points_indexes)].tolist())
 
         return IndexGrid(grid_points_indexes, grid_points,
                          grid_points_basis)
