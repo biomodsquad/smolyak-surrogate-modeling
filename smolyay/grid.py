@@ -1,9 +1,11 @@
 import abc
 import itertools
+import sys
+sys.path.insert(1, '/home/che_h2/mzf0069/Documents/code/smolyak-surrogate-modeling')
 
 import numpy
 
-from smolyay.basis import (BasisFunctionSet, NestedBasisFunctionSet)
+from smolyay.basis import (BasisFunctionSet, NestedBasisFunctionSet, ChebyshevFirstKind)
 
 
 class IndexGridGenerator(abc.ABC):
@@ -258,11 +260,15 @@ class TensorGridGenerator(IndexGridGenerator):
         grid_points_indexes = list(itertools.product(
             *[points_indexes for point in range(dimension)]))
         grid_points_indexes = list(map(list, grid_points_indexes))
-        grid_points = numpy.array(self._basis_set.points
-                                  )[numpy.array(grid_points_indexes
-                                                )].tolist()
-        grid_points_basis = (numpy.array(self._basis_set.basis_functions)[
-            numpy.array(grid_points_indexes)].tolist())
+        grid_points = [[self._basis_set.points[index] for index in indexes] for
+                       indexes in grid_points_indexes]
+        #grid_points = numpy.array(self._basis_set.points
+         #                         )[numpy.array(grid_points_indexes
+          #                                      )].tolist()
+        grid_points_basis = [[self._basis_set.basis_functions[index] for index
+                              in indexes] for indexes in grid_points_indexes]
+        #grid_points_basis = (numpy.array(self._basis_set.basis_functions)[
+         #   numpy.array(grid_points_indexes)].tolist())
 
         return IndexGrid(grid_points_indexes, grid_points,
                          grid_points_basis)

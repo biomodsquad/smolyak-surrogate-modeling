@@ -1,5 +1,7 @@
 import numpy
 import pytest
+import sys
+sys.path.insert(1, '/home/che_h2/mzf0069/Documents/code/smolyak-surrogate-modeling')
 
 from smolyay.basis import (ChebyshevFirstKind, BasisFunctionSet)
 from smolyay.grid import (IndexGridGenerator, SmolyakGridGenerator,
