@@ -1,7 +1,6 @@
 import numpy
 import pytest
 
-
 from smolyay.basis import (ChebyshevFirstKind, BasisFunctionSet)
 from smolyay.grid import (IndexGridGenerator, SmolyakGridGenerator,
                           TensorGridGenerator, generate_compositions)

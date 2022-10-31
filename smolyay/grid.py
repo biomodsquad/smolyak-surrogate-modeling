@@ -1,10 +1,9 @@
 import abc
 import itertools
 
-
 import numpy
 
-from smolyay.basis import (BasisFunctionSet, NestedBasisFunctionSet, ChebyshevFirstKind)
+from smolyay.basis import (BasisFunctionSet, NestedBasisFunctionSet)
 
 
 class IndexGridGenerator(abc.ABC):
@@ -29,8 +28,6 @@ class IndexGridGenerator(abc.ABC):
 
     def __init__(self, basis_set):
         self.basis_set = basis_set
-        if not isinstance(basis_set, BasisFunctionSet):
-            raise TypeError('Basis set must be a BasisFunctionSet')
 
     @property
     def basis_set(self):
@@ -39,6 +36,8 @@ class IndexGridGenerator(abc.ABC):
 
     @basis_set.setter
     def basis_set(self, basis_set):
+        if not isinstance(basis_set, BasisFunctionSet):
+            raise TypeError('Basis set must be a BasisFunctionSet')
         self._basis_set = basis_set
 
     @abc.abstractmethod
@@ -209,13 +208,16 @@ class SmolyakGridGenerator(IndexGridGenerator):
         grid_points_indexes = grid_points_indexes.tolist()
         level_lookup = {point: level for level, points in
                         enumerate(self._basis_set.levels) for point in points}
-        levels = [[level_lookup[index] for index in indexes] for indexes in
-                  grid_points_indexes]
-        grid_points = [[self._basis_set.points[index] for index in indexes] for
-                       indexes in grid_points_indexes]
-
-        grid_points_basis = [[self._basis_set.basis_functions[index] for index
-                              in indexes] for indexes in grid_points_indexes]
+        levels = []
+        grid_points = []
+        grid_points_basis = []
+        for indexes in grid_points_indexes:
+            levels.append([level_lookup[index]
+                           for index in indexes])
+            grid_points.append([self._basis_set.points[index]
+                                for index in indexes])
+            grid_points_basis.append([self._basis_set.basis_functions[index]
+                                      for index in indexes])
 
         return NestedIndexGrid(grid_points_indexes, grid_points,
                                grid_points_basis, levels)
@@ -259,10 +261,13 @@ class TensorGridGenerator(IndexGridGenerator):
         grid_points_indexes = list(itertools.product(
             *[points_indexes for point in range(dimension)]))
         grid_points_indexes = list(map(list, grid_points_indexes))
-        grid_points = [[self._basis_set.points[index] for index in indexes] for
-                       indexes in grid_points_indexes]
-        grid_points_basis = [[self._basis_set.basis_functions[index] for index
-                              in indexes] for indexes in grid_points_indexes]
+        grid_points = []
+        grid_points_basis = []
+        for indexes in grid_points_indexes:
+            grid_points.append([self._basis_set.points[index]
+                                for index in indexes])
+            grid_points_basis.append([self._basis_set.basis_functions[index]
+                                      for index in indexes])
 
         return IndexGrid(grid_points_indexes, grid_points,
                          grid_points_basis)
