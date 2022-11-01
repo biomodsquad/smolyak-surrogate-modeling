@@ -241,21 +241,20 @@ class Surrogate:
             raise IndexError('Input must be of length of the dimension.')
 
         # transform grids into basis domain
-        input_surr = []
+        input_surrogate = []
         for dimension_ in range(self._dimension):
             basis_domain_grid = numpy.polynomial.polyutils.mapdomain(
                 x[dimension_], self.domain[dimension_], (-1, 1))
-            input_surr.append(basis_domain_grid)
+            input_surrogate.append(basis_domain_grid)
 
         # evaluate surrogate
         surrogate_output = 0
         for index_point in range(len(self._grids.points)):
-            coeff_ = self._coefficients[index_point]
             output = 1
             for dimension_ in range(self._dimension):
                 output *= (self._grids.basis_functions[index_point]
-                           [dimension_](input_surr[dimension_]))
-            output *= coeff_
+                           [dimension_](input_surrogate[dimension_]))
+            output *= self._coefficients[index_point]
             surrogate_output += output
 
         return surrogate_output
