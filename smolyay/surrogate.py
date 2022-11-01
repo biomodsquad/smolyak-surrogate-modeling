@@ -203,13 +203,14 @@ class Surrogate:
 
         # fit
         if self.linear_solver == 'lu':
-            self._coeff = numpy.linalg.solve(
+            self._coefficients = numpy.linalg.solve(
                 self._basis_matrix, data)
         elif self.linear_solver == 'inv':
-            self._coeff = numpy.dot(numpy.linalg.inv(self._basis_matrix),
-                                    data)
+            self._coefficients = numpy.dot(
+                numpy.linalg.inv(self._basis_matrix),
+                data)
 
-        return self._coeff
+        return self._coefficients
 
     def __call__(self, x):
         """Evaluate surrogate at a given input.
