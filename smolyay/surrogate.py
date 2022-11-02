@@ -236,8 +236,8 @@ class Surrogate:
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
-        if len(x) == 1:
-            x = list(x)
+        if isinstance(x, (int, float)):
+            x = [x]
         if len(x) != self._dimension:
             raise IndexError('Input must be of length of the dimension.')
 
