@@ -182,6 +182,7 @@ class Surrogate:
             Method of solving linear equations:
                 'lu': lower upper decomposition
                 'inv': solve for coefficients through x = A^{-1}B.
+                'lstsq': least-square solution.
 
         Returns
         -------
