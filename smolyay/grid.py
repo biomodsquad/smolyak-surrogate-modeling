@@ -9,8 +9,8 @@ from smolyay.basis import (BasisFunctionSet, NestedBasisFunctionSet)
 class IndexGridGenerator(abc.ABC):
     """Grid points for making a surrogate.
 
-    Depending on the approach and dimensionality
-    , a set of grid points, and their corresponding
+    Depending on the approach and dimensionality,
+    a set of grid points, and their corresponding
     basis functions are generated. These grid points
     and functions can then be used for approximation
     of complex systems.
@@ -71,7 +71,7 @@ class SmolyakGridGenerator(IndexGridGenerator):
     are unidimensional.
 
     For a given number of independent variables (``dimension``), the
-    Smolyak method of sparse sampling, creates grid points, and their
+    Smolyak method of sparse sampling creates grid points, and their
     corresponding basis functions through sparse tensor product,
     meaning that more important elements are sampled rather than a
     full tensor product sampling. For instance, if there are four points,
@@ -102,7 +102,7 @@ class SmolyakGridGenerator(IndexGridGenerator):
                 (k_1 = 1, k_2 = 2)
                 (k_1 = 2, k_2 = 1)
 
-    An object of this class, generates the indexes of
+    An object of this class generates the indexes of
     grid points (integer grids) depending on dimensionality and
     exactness. First, as above, all possible combinations of
     indices are computed, which then can be
@@ -115,7 +115,7 @@ class SmolyakGridGenerator(IndexGridGenerator):
     Once grid points' indexes are generated, actual grid points
     and their corresponding basis functions can be made by simply replacing
     the indexes with their corresponding points and basis functions.
-    multi-dimensional levels (levels' indexes each basis function was taken
+    Multi-dimensional levels (levels' indexes each basis function was taken
     from) are also generated.
     All the mentioned outputs are stored in a :class:`NestedIndexGrid`
     object.
