@@ -91,14 +91,6 @@ class Surrogate:
         self._dimension = len(list(domain))
         self._grids = self.grids_generator(self._dimension)
         self._coefficients = None
-        self._linear_slovers = {'lu': 'numpy.linalg.solve(self._basis_matrix'
-                                ', real_function_at_grids)',
-                                'inv': 'numpy.dot(numpy.linalg'
-                                '.inv(self._basis_matrix),'
-                                'real_function_at_grids)',
-                                'lstsq': 'numpy.linalg.lstsq('
-                                'self._basis_matrix'
-                                ', real_function_at_grids, rcond=None)[0]'}
 
     @property
     def domain(self):
@@ -154,6 +146,7 @@ class Surrogate:
             Coefficients of the surrogate.
         """
         self.real_function = real_function
+        self.linear_solver = linear_solver
         self._make_basis_matrix()
 
         # transform grid points
@@ -172,7 +165,9 @@ class Surrogate:
                 self.real_function(*transformed_grids[point_num]))
 
         # fit
-        self._coefficients = eval(self._linear_slovers[linear_solver])
+        self._coefficients = solve_linear(
+            self._basis_matrix, real_function_at_grids,
+            self.linear_solver)
 
         return self._coefficients.tolist()
 
@@ -200,11 +195,14 @@ class Surrogate:
         """
         if len(real_function_at_grids) != len(self._grids.points):
             raise IndexError("Data must be in length of the grid points.")
-
+        self.real_function_at_grids = real_function_at_grids
+        self.linear_solver = linear_solver
         self._make_basis_matrix()
-        self._coefficients = eval(self._linear_slovers[linear_solver])
+        self._coefficients = solve_linear(self._basis_matrix,
+                                          self.real_function_at_grids,
+                                          self.linear_solver)
 
-        return self._coefficients
+        return self._coefficients.tolist()
 
     def __call__(self, x):
         """Evaluate surrogate at a given input.
@@ -253,3 +251,28 @@ class Surrogate:
             surrogate_output += output
 
         return surrogate_output
+
+
+def solve_linear(a, b, method):
+    """Solve for x in ax=b depending on a method.
+
+    Parameters
+    ----------
+    a: numpy.ndarray
+        square matrix.
+    b: numpy.ndarray
+        1D function.
+    method: string
+        Method for solving linear equations.
+
+    Returns
+    -------
+    numpy.ndarray
+            x matrix.
+    """
+    if method == 'lu':
+        return numpy.linalg.solve(a, b)
+    if method == 'inv':
+        return numpy.dot(numpy.linalg.inv(a), b)
+    if method == 'lstsq':
+        return numpy.linalg.lstsq(a, b, rcond=None)[0]
