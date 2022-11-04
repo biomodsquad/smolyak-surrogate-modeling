@@ -79,7 +79,8 @@ class Surrogate:
     since we have a full rank system of matrixes. The user can
     select between 'lower upper decomposition' ('lu'), and
     'inverse' ('inv') method for calculating the surrogate's (S)
-    coefficients.
+    coefficients. 'lstsq' solves the above equations through
+    least linear method.
 
     S = C_0B_0(x) + C_1B_1(x) + C_2B_2(x)
     """
@@ -90,6 +91,14 @@ class Surrogate:
         self._dimension = len(list(domain))
         self._grids = self.grids_generator(self._dimension)
         self._coefficients = None
+        self._linear_slovers = {'lu': 'numpy.linalg.solve(self._basis_matrix'
+                                ', real_function_at_grids)',
+                                'inv': 'numpy.dot(numpy.linalg'
+                                '.inv(self._basis_matrix),'
+                                'real_function_at_grids)',
+                                'lstsq': 'numpy.linalg.lstsq('
+                                'self._basis_matrix'
+                                ', real_function_at_grids, rcond=None)[0]'}
 
     @property
     def domain(self):
@@ -137,6 +146,7 @@ class Surrogate:
             Method of solving linear equations:
                 'lu': lower upper decomposition
                 'inv': solve for coefficients through x = A^{-1}B.
+                'lstsq': least-square solution.
 
         Returns
         -------
@@ -144,7 +154,6 @@ class Surrogate:
             Coefficients of the surrogate.
         """
         self.real_function = real_function
-        self.linear_solver = linear_solver
         self._make_basis_matrix()
 
         # transform grid points
@@ -163,21 +172,16 @@ class Surrogate:
                 self.real_function(*transformed_grids[point_num]))
 
         # fit
-        if self.linear_solver == 'lu':
-            self._coefficients = numpy.linalg.solve(
-                self._basis_matrix, real_function_at_grids)
-        elif self.linear_solver == 'inv':
-            self._coefficients = numpy.dot(
-                numpy.linalg.inv(self._basis_matrix), real_function_at_grids)
+        self._coefficients = eval(self._linear_slovers[linear_solver])
 
         return self._coefficients.tolist()
 
-    def train_from_data(self, data, linear_solver='lu'):
+    def train_from_data(self, real_function_at_grids, linear_solver='lu'):
         """Fit surrogate's components (basis functions) to data.
 
         Parameters
         ----------
-        data: list
+        real_function_at_grids: list
             Real function at grid points.
         linear_slover: string
             Method of solving linear equations:
@@ -194,21 +198,11 @@ class Surrogate:
         IndexError
             Data should be of length of the grid points.
         """
-        if len(data) != len(self._grids.points):
+        if len(real_function_at_grids) != len(self._grids.points):
             raise IndexError("Data must be in length of the grid points.")
 
-        self.data = data
-        self.linear_solver = linear_solver
         self._make_basis_matrix()
-
-        # fit
-        if self.linear_solver == 'lu':
-            self._coefficients = numpy.linalg.solve(
-                self._basis_matrix, data)
-        elif self.linear_solver == 'inv':
-            self._coefficients = numpy.dot(
-                numpy.linalg.inv(self._basis_matrix),
-                data)
+        self._coefficients = eval(self._linear_slovers[linear_solver])
 
         return self._coefficients
 
