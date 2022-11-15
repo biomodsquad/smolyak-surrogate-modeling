@@ -8,7 +8,7 @@ class Surrogate:
 
     Depending on the dimensionality (number of independent variables),
     and sampling method, a set of grid points and their corresponding
-    basis functions can be generated (``grids_generator``).
+    basis functions can be generated (``grid_generator``).
     :class:`IndexGridGenerator` contain different methods,
     such as :class:`SmolyakGridGenerator`, where a set of grid points
     and functions are generated depending on different approaches that
@@ -18,7 +18,6 @@ class Surrogate:
     Examples are :class:`SmolyakGridGenerator` which makes the grids based on
     sparse sampling and :class:`TensorGridGenerator` making them through
     full tensor product.
-
     ``domain`` is the domain of the real function to be approximated.
     Through linear transformation, grid points in the real
     function's domain are generated. Coefficients of the surrogate then
@@ -29,10 +28,8 @@ class Surrogate:
     the method that can be used for solving linear equations (Ax=B).
     A is square matrix, x is the matrix of coefficients, and B is the matrix
     where ``real_function`` is evaluated at grid points (see example).
-
     :meth:`train_from_data` computes the coefficients based on
     the a set of data (function values at transformed grid points).
-
     Once surrogate is constructed, one can evaluate the surrogate
     through :meth:`__call__(x)` at given input.
 
@@ -40,7 +37,7 @@ class Surrogate:
     ----------
     domain: list
         Domain of the real function to be approximated.
-    grids_generator: IndexGridGenerator
+    grid_generator: IndexGridGenerator
         Set of grids and their corresponding basis function.
 
     Raises
@@ -81,51 +78,72 @@ class Surrogate:
     'inverse' ('inv') method for calculating the surrogate's (S)
     coefficients. 'lstsq' solves the above equations through
     least linear method.
-
     S = C_0B_0(x) + C_1B_1(x) + C_2B_2(x)
     """
 
-    def __init__(self, domain, grids_generator):
-        self.domain = list(domain)
-        self.grids_generator = grids_generator
-        self._dimension = len(list(domain))
-        self._grids = self.grids_generator(self._dimension)
+    def __init__(self, domain, grid_generator):
+        self.domain = domain
+        self.grid_generator = grid_generator
         self._coefficients = None
 
     @property
     def domain(self):
-        """list: domain of the real function to be approximated."""
+        """numpy.ndarray: domain of the real function to be approximated."""
+        self._domain = numpy.array(self._domain)
         return self._domain
 
     @domain.setter
-    def domain(self, domain_real_function):
-        self._domain = domain_real_function
+    def domain(self, value):
+        self._domain = numpy.array(value, ndmin=2)
+        self._reset_grid()
 
     @property
-    def grids_generator(self):
+    def grid_generator(self):
         """:class:`IndexGridGenerator`: Generator used for making the grids."""
-        return self._grids_generator
+        return self._grid_generator
 
-    @grids_generator.setter
-    def grids_generator(self, grids_generator):
-        if not isinstance(grids_generator, IndexGridGenerator):
+    @grid_generator.setter
+    def grid_generator(self, value):
+        if not isinstance(value, IndexGridGenerator):
             raise TypeError('Grids must be IndexGridGenerator')
-        self._grids_generator = grids_generator
+        self._grid_generator = value
+        self._reset_grid()
+
+    @property
+    def grid(self):
+        """:class:`IndexGrid` data structure."""
+        if self._grid is None:
+            self._coefficients = None
+            self._grid = self.grid_generator(self.domain.shape[0])
+        return self._grid
+
+    def _reset_grid(self):
+        """Reset the points and basis functions if the generator is changed."""
+        self._grid = None
 
     def _make_basis_matrix(self):
-        """Generate basis matrix."""
-        self._basis_matrix = numpy.ones((len(self._grids.points),
-                                         len(self._grids.points)))
-        point_num = 0
-        for points in self._grids.points:
-            for dimension_ in range(self._dimension):
-                grid_num = 0
-                for basis_function in list(zip(
-                        *self._grids.basis_functions))[dimension_]:
-                    self._basis_matrix[point_num][grid_num] *= (
-                        basis_function(points[dimension_]))
-                    grid_num += 1
-            point_num += 1
+        """Generate basis matrix.
+
+        Parameters
+        ----------
+        points: list
+            Grid points.
+        basis_functions: list
+            Basis function of grid points.
+
+        Returns
+        -------
+        numpy.ndarray
+            Basis matrix.
+        """
+        points, basis_functions = self.grid.points, self.grid.basis_functions
+        basis_matrix = numpy.zeros((len(points),
+                                    len(points)))
+        for i, point in enumerate(points):
+            for j, basis in enumerate(basis_functions):
+                basis_matrix[i, j] = numpy.prod(
+                    [f(x) for x, f in zip(point, basis)])
+        return basis_matrix
 
     def train(self, real_function, linear_solver='lu'):
         """Fit surrogate's components (basis functions) to the function.
@@ -136,7 +154,7 @@ class Surrogate:
             Function to be approximated.
         linear_slover: string
             Method of solving linear equations:
-                'lu': lower upper decomposition
+                'lu': lower upper decomposition.
                 'inv': solve for coefficients through x = A^{-1}B.
                 'lstsq': least-square solution.
 
@@ -145,31 +163,24 @@ class Surrogate:
         list
             Coefficients of the surrogate.
         """
-        self.real_function = real_function
-        self.linear_solver = linear_solver
-        self._make_basis_matrix()
-
         # transform grid points
         transformed_grids = numpy.zeros((
-            len(self._grids.points), self._dimension))
-        for dimension_ in range(self._dimension):
-            transformed_grids[:, dimension_] = (
+            numpy.array(self.grid.points).shape[0], self._domain.shape[0]))
+        for dimension in range(self._domain.shape[0]):
+            transformed_grids[:, dimension] = (
                 numpy.polynomial.polyutils.mapdomain(
-                    numpy.array(self._grids.points)[:, dimension_],
-                    (-1, 1), self.domain[dimension_]))
+                    numpy.array(self.grid.points)[:, dimension],
+                    (-1, 1), self.domain[dimension]))
 
         # evaluate real function at grid points
-        real_function_at_grids = numpy.zeros((len(self._grids.points)))
-        for point_num in range(len(self._grids.points)):
+        real_function_at_grids = numpy.zeros((numpy.array(
+            self.grid.points).shape[0]))
+        for point_num in range(numpy.array(self.grid.points).shape[0]):
             real_function_at_grids[point_num] = (
-                self.real_function(*transformed_grids[point_num]))
+                real_function(*transformed_grids[point_num]))
 
         # fit
-        self._coefficients = solve_linear(
-            self._basis_matrix, real_function_at_grids,
-            self.linear_solver)
-
-        return self._coefficients.tolist()
+        return self.train_from_data(real_function_at_grids, linear_solver)
 
     def train_from_data(self, real_function_at_grids, linear_solver='lu'):
         """Fit surrogate's components (basis functions) to data.
@@ -194,16 +205,25 @@ class Surrogate:
         IndexError
             Data should be of length of the grid points.
         """
-        if len(real_function_at_grids) != len(self._grids.points):
+        real_function_at_grids = numpy.array(real_function_at_grids, ndmin=2)
+        if real_function_at_grids.shape[1] != (
+                numpy.array(self.grid.points).shape[0]):
             raise IndexError("Data must be in length of the grid points.")
-        self.real_function_at_grids = real_function_at_grids
-        self.linear_solver = linear_solver
-        self._make_basis_matrix()
-        self._coefficients = solve_linear(self._basis_matrix,
-                                          self.real_function_at_grids,
-                                          self.linear_solver)
 
-        return self._coefficients.tolist()
+        if linear_solver == 'lu':
+            self._coefficients = numpy.linalg.solve(
+                self._make_basis_matrix(),
+                real_function_at_grids).tolist()
+        elif linear_solver == 'inv':
+            self._coefficients = numpy.dot(numpy.linalg.inv(
+                self._make_basis_matrix()),
+                real_function_at_grids).tolist()
+        elif linear_solver == 'lstsq':
+            self._coefficients = numpy.linalg.lstsq(self._make_basis_matrix(),
+                                                    real_function_at_grids,
+                                                    rcond=None)[0].tolist()
+
+        return self._coefficients
 
     def __call__(self, x):
         """Evaluate surrogate at a given input.
@@ -222,58 +242,30 @@ class Surrogate:
         ------
         ValueError
             For surrogate to be evaluated, function needs to be trained.
-
         IndexError
             Input of the surrogate must be of length of the
             real function's dimensionality.
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
-        if isinstance(x, (int, float)):
-            x = [x]
-        if len(x) != self._dimension:
+        x = numpy.atleast_1d(x)
+        if x.shape != (self._domain.shape[0],):
             raise IndexError('Input must be of length of the dimension.')
 
         # transform grids into basis domain
         input_surrogate = []
-        for dimension_ in range(self._dimension):
+        for dimension in range(self._domain.shape[0]):
             basis_domain_grid = numpy.polynomial.polyutils.mapdomain(
-                x[dimension_], self.domain[dimension_], (-1, 1))
+                x[dimension], self.domain[dimension], (-1, 1))
             input_surrogate.append(basis_domain_grid)
 
         # evaluate surrogate
-        surrogate_output = 0
-        for index_point in range(len(self._grids.points)):
-            output = 1
-            for dimension_ in range(self._dimension):
-                output *= (self._grids.basis_functions[index_point]
-                           [dimension_](input_surrogate[dimension_]))
-            output *= self._coefficients[index_point]
-            surrogate_output += output
+        output = numpy.ones((len(self.grid.basis_functions)))
+        for i, input_ in enumerate(input_surrogate):
+            for j in range(len(self.grid.basis_functions)):
+                output[j] *= list(zip(
+                    *self.grid.basis_functions))[i][j](input_)
+        surrogate_output = numpy.sum(
+            numpy.multiply(self._coefficients, output))
 
         return surrogate_output
-
-
-def solve_linear(a, b, method):
-    """Solve for x in ax=b depending on a method.
-
-    Parameters
-    ----------
-    a: numpy.ndarray
-        square matrix.
-    b: numpy.ndarray
-        1D function.
-    method: string
-        Method for solving linear equations.
-
-    Returns
-    -------
-    numpy.ndarray
-            x matrix.
-    """
-    if method == 'lu':
-        return numpy.linalg.solve(a, b)
-    if method == 'inv':
-        return numpy.dot(numpy.linalg.inv(a), b)
-    if method == 'lstsq':
-        return numpy.linalg.lstsq(a, b, rcond=None)[0]
