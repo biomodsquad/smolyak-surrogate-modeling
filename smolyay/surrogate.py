@@ -17,7 +17,8 @@ class Surrogate:
     those 1D points generate multi-dimensional grid points and functions.
     Examples are :class:`SmolyakGridGenerator` which makes the grids based on
     sparse sampling and :class:`TensorGridGenerator` making them through
-    full tensor product.
+    full tensor product. Multi-dimnesional grid points and functions are stored
+    in the property ``grid``.
     ``domain`` is the domain of the real function to be approximated.
     Through linear transformation, grid points in the real
     function's domain are generated. Coefficients of the surrogate then
