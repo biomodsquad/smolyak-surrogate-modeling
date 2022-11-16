@@ -74,6 +74,27 @@ def test_initialization():
     assert surrogate_object._coefficients is None
     assert surrogate_object_one_dimension._grid is None
     assert isinstance(grid_object, IndexGrid)
+    assert surrogate_object_one_dimension.dimension == 1
+    assert surrogate_object.dimension == 2
+
+
+def test_map_function():
+    """Test if points are transfromed properly."""
+    mu = 1
+    grid_object = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(mu))
+    # 1D
+    domain_one_dimension = (-10, 10)
+    domain_one_dimension_ = [(-10, 10)]
+    expected_points_one_dimension = [0, -10, 10]
+    # 2D
+    domain = [(-10, 10), (-10, 10)]
+    expected_points = [[0, 0], [-10, 0], [10, 0], [0, -10], [0, 10]]
+    assert numpy.allclose(Surrogate(domain_one_dimension, grid_object).points,
+                          numpy.array(expected_points_one_dimension))
+    assert numpy.allclose(Surrogate(domain_one_dimension_, grid_object).points,
+                          numpy.array(expected_points_one_dimension))
+    assert numpy.allclose(Surrogate(domain, grid_object).points,
+                          numpy.array(expected_points))
 
 
 def test_basis_matrix():
@@ -128,7 +149,7 @@ def test_surrogate_0_shifted():
                           atol=1e10)
 
 
-def test_surrogate_function_2():
+def test_surrogate_2():
     """Test of surrogate can be built for 1D test function."""
     domain = (-10, 10)
     surrogate_object = Surrogate(domain, SmolyakGridGenerator(
