@@ -6,28 +6,32 @@ from smolyay.grid import SmolyakGridGenerator, IndexGrid
 from smolyay.surrogate import Surrogate
 
 
-def function_0(x1, x2, x3):
+def function_0(x):
     """Test function 0."""
+    x1, x2, x3 = x
     return 2*x1 + x2 - x3
 
 
-def function_0_shifted(x1, x2, x3):
+def function_0_shifted(x):
     """Test fucntion 0 which is shifted."""
+    x1, x2, x3 = x
     return 2*(x1 - 1) + (x2 + 1) - x3
 
 
-def function_1(x1, x2):
+def function_1(x):
     """Test fucntion 1."""
+    x1, x2 = x
     return x1 + (2*x2**2 - 1)
 
 
-def function_2(x1):
+def function_2(x):
     """Test funciton 2."""
-    return x1**2 - 3 * (2 + x1) - x1
+    return x**2 - 3 * (2 + x) - x
 
 
-def branin(x1, x2):
+def branin(x):
     """Branin function."""
+    x1, x2 = x
     branin1 = (x2 - 5.1 * x1 ** (2)/(4 * numpy.pi ** 2)
                + 5 * x1 / (numpy.pi) - 6) ** 2
     branin2 = 10 * (1 - 1 / (8 * numpy.pi)) * numpy.cos(x1)
@@ -49,7 +53,7 @@ def branin_at_grids():
                             (-1, 1), (0, 15))
     branin_at_grids = []
     for i in transformed_points:
-        branin_at_grids.append(branin(i[0], i[1]))
+        branin_at_grids.append(branin(i))
     return branin_at_grids
 
 
@@ -80,22 +84,21 @@ def test_initialization():
 
 def test_map_function():
     """Test if points are transfromed properly."""
-    mu = 1
-    grid_object = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(mu))
-    # 1D
-    domain_one_dimension = (-10, 10)
-    domain_one_dimension_ = [(-10, 10)]
-    expected_points_one_dimension = [0, -10, 10]
-    # 2D
-    domain = [(-10, 10), (-10, 10)]
-    expected_points = [[0, 0], [-10, 0], [10, 0], [0, -10], [0, 10]]
-    assert numpy.allclose(Surrogate(domain_one_dimension, grid_object).points,
-                          numpy.array(expected_points_one_dimension))
-    assert numpy.allclose(Surrogate(domain_one_dimension_, grid_object).points,
-                          numpy.array(expected_points_one_dimension))
-    assert numpy.allclose(Surrogate(domain, grid_object).points,
-                          numpy.array(expected_points))
+    grid = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(1))
 
+    # 1d
+    domain = (-8, 12)
+    new_domain = (0, 1)
+    f = Surrogate(domain, grid)
+    assert f._mapdomain(2, domain, new_domain) == pytest.approx(0.5)
+    assert numpy.allclose(f._mapdomain([-3, 7], domain, new_domain), [0.25, 0.75])
+
+    # 2d
+    domain = ((-10, 10), (0, 2))
+    new_domain = ((0, 1),(-1, 1))
+    f = Surrogate(domain, grid)
+    assert numpy.allclose(f._mapdomain((-10, 0), domain, new_domain), [0, -1])
+    assert numpy.allclose(f._mapdomain([(0, 1),(10, 2)], domain, new_domain), [[0.5, 0],[1, 1]])
 
 def test_basis_matrix():
     """Test if a correct basis matrix is generated."""
@@ -118,9 +121,9 @@ def test_surrogate_0():
     test_point = (0.649, 0, -0.9)
     test_point_ = (-0.885, 1, 0.275)
     assert numpy.allclose(surrogate_object(test_point),
-                          function_0(0.649, 0, -0.9))
+                          function_0([0.649, 0, -0.9]))
     assert numpy.allclose(surrogate_object(test_point_),
-                          function_0(-0.885, 1, 0.275))
+                          function_0([-0.885, 1, 0.275]))
 
 
 def test_surrogate_1():
@@ -131,9 +134,9 @@ def test_surrogate_1():
     test_point = (0.649, -0.9)
     test_point_ = (-0.885, 1)
     assert numpy.allclose(surrogate_object(test_point),
-                          function_1(0.649, -0.9))
+                          function_1([0.649, -0.9]))
     assert numpy.allclose(surrogate_object(test_point_),
-                          function_1(-0.885, 1))
+                          function_1([-0.885, 1]))
 
 
 def test_surrogate_0_shifted():
@@ -144,9 +147,8 @@ def test_surrogate_0_shifted():
     surrogate_object_ = Surrogate([(0, 2), (-2, 0), (-1, 1)],
                                   SmolyakGridGenerator(
                                       ChebyshevFirstKind.make_nested_set(2)))
-    assert numpy.allclose(surrogate_object.train(function_0, 'lu'),
-                          surrogate_object_.train(function_0_shifted, 'lu'),
-                          atol=1e10)
+    surrogate_object.train(function_0, 'lu')
+    surrogate_object_.train(function_0_shifted, 'lu')
 
 
 def test_surrogate_2():
@@ -167,7 +169,7 @@ def test_train_from_data():
         ChebyshevFirstKind.make_nested_set(4)))
     surrogate_object.train_from_data(branin_at_grids(), 'lu')
     assert numpy.allclose(surrogate_object((8, 0.75)),
-                          branin(8, 0.75), atol=1e-10)
+                          branin([8, 0.75]), atol=1e-10)
     with pytest.raises(IndexError):
         surrogate_object_.train_from_data(branin_at_grids()[:5], 'lu')
 

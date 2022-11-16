@@ -219,6 +219,13 @@ class SmolyakGridGenerator(IndexGridGenerator):
             grid_points_basis.append([self._basis_set.basis_functions[index]
                                       for index in indexes])
 
+        # flatten 1d arrays
+        if dimension == 1:
+            grid_points_indexes = [i[0] for i in grid_points_indexes]
+            grid_points = [pt[0] for pt in grid_points]
+            grid_points_basis = [b[0] for b in grid_points_basis]
+            levels = [l[0] for l in levels]
+
         return NestedIndexGrid(grid_points_indexes, grid_points,
                                grid_points_basis, levels)
 
@@ -268,6 +275,12 @@ class TensorGridGenerator(IndexGridGenerator):
                                 for index in indexes])
             grid_points_basis.append([self._basis_set.basis_functions[index]
                                       for index in indexes])
+
+        # flatten 1d arrays
+        if dimension == 1:
+            grid_points_indexes = [i[0] for i in grid_points_indexes]
+            grid_points = [pt[0] for pt in grid_points]
+            grid_points_basis = [b[0] for b in grid_points_basis]
 
         return IndexGrid(grid_points_indexes, grid_points,
                          grid_points_basis)

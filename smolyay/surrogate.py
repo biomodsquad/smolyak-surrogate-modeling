@@ -2,7 +2,6 @@ import numpy
 
 from smolyay.grid import IndexGridGenerator
 
-
 class Surrogate:
     r"""Create a surrogate to approximate a complex function.
     Depending on the dimensionality (number of independent variables),
@@ -91,6 +90,21 @@ class Surrogate:
         self.domain = domain
         self.grid_generator = grid_generator
         self._coefficients = None
+        self._grid = None
+        self._points = None
+
+    @property
+    def coefficients(self):
+        """list: coefficients of surrogate."""
+        if self._coefficients is not None:
+            return self._coefficients.tolist()
+        else:
+            return None
+
+    @property
+    def dimension(self):
+        """Numbers of independent variables."""
+        return self._domain.shape[0]
 
     @property
     def domain(self):
@@ -106,6 +120,13 @@ class Surrogate:
         self._reset_grid()
 
     @property
+    def grid(self):
+        """:class:`IndexGrid` data structure."""
+        if self._grid is None:
+            self._grid = self.grid_generator(self.dimension)
+        return self._grid
+
+    @property
     def grid_generator(self):
         """:class:`IndexGridGenerator`: Generator used for making the grids."""
         return self._grid_generator
@@ -118,163 +139,12 @@ class Surrogate:
         self._reset_grid()
 
     @property
-    def dimension(self):
-        """Numbers of independent variables."""
-        return self._domain.shape[0]
-
-    @property
-    def grid(self):
-        """:class:`IndexGrid` data structure."""
-        if self._grid is None:
-            self._grid = self.grid_generator(self.dimension)
-        return self._grid
-
-    @property
     def points(self):
         """numpy.ndarray: Points to be sampled."""
         if self._points is None:
             self._points = self._mapdomain(
-                self.grid.points, [[-1, 1]]*self.dimension, self.domain)
-
+                self.grid.points, [[-1, 1]]*self.dimension, self._domain)
         return self._points
-
-    @property
-    def coefficients(self):
-        """list: coefficients of surrogate."""
-        return self._coefficients.tolist()
-
-    def _reset_grid(self):
-        """Reset the grids, coefficients and points."""
-        self._grid = None
-        self._coefficients = None
-        self._points = None
-
-    def _mapdomain(self, x, old, new):
-        """Transform the points into new domain.
-
-        Parameters
-        ----------
-        x: list
-            point(s) to be transformed.
-        old: list
-            old domain.
-        new: list
-            new domain.
-
-        Returns
-        -------
-        numpy.ndarray
-            Transformed point(s).
-
-        Raises
-        ------
-        TypeError
-            Old and new domain must have the same shape.
-            Domain should be a dim x 2 array.
-            Points must be an N x dim array matching domain.
-        """
-        old = numpy.array(old, copy=False, ndmin=2)
-        new = numpy.array(new, copy=False, ndmin=2)
-        x = numpy.array(x, copy=False, ndmin=2)
-
-        # error checking
-        if old.shape != new.shape:
-            raise TypeError('Old and new domain must have the same shape')
-        if old.shape[1] != 2:
-            raise TypeError('Domain should be a dim x 2 array')
-        if old.shape[0] != x.shape[1]:
-            raise TypeError('Points must be an N x dim array matching domain')
-
-        new_x = (new[:, 0] + (new[:, 1]-new[:, 0])
-                 * ((x - old[:, 0]) / (old[:, 1] - old[:, 0])))
-        if new_x.shape[1] == 1 or new_x.shape[0] == 1:
-            return numpy.concatenate(new_x)
-        else:
-            return new_x
-
-    def _make_basis_matrix(self):
-        """Generate basis matrix.
-
-        Parameters
-        ----------
-        points: list
-            Grid points.
-        basis_functions: list
-            Basis function of grid points.
-
-        Returns
-        -------
-        numpy.ndarray
-            Basis matrix.
-        """
-        points, basis_functions = self.grid.points, self.grid.basis_functions
-        basis_matrix = numpy.zeros((len(points),
-                                    len(points)))
-        for i, point in enumerate(points):
-            for j, basis in enumerate(basis_functions):
-                basis_matrix[i, j] = numpy.prod(
-                    [f(x) for x, f in zip(point, basis)])
-        return basis_matrix
-
-    def train(self, function, linear_solver='lu'):
-        """Fit surrogate's components (basis functions) to the function.
-
-        Parameters
-        ----------
-        function: callabe
-            Function to be approximated.
-        linear_slover: string
-            Method of solving linear equations:
-                'lu': lower upper decomposition.
-                'inv': solve for coefficients through x = A^{-1}B.
-                'lstsq': least-square solution.
-        """
-        # evaluate function
-        if self.dimension == 1:
-            data = [function(point) for point in self.points]
-        else:
-            data = [function(*point) for point in self.points]
-        # fit
-        self.train_from_data(data, linear_solver)
-
-    def train_from_data(self, data, linear_solver='lu'):
-        """Fit surrogate's components (basis functions) to data.
-
-        Parameters
-        ----------
-        data: list
-            function at grid points.
-        linear_slover: string
-            Method of solving linear equations:
-                'lu': lower upper decomposition
-                'inv': solve for coefficients through x = A^{-1}B.
-                'lstsq': least-square solution.
-
-        Raises
-        ------
-        IndexError
-            Data should be of length of the grid points.
-        ValueError
-            Solver should be selected between defined methods.
-        """
-        data = numpy.array(data, copy=False, ndmin=2)
-        if data.shape[1] != self.points.shape[0]:
-            raise IndexError("Data must be same length as grid points.")
-        basis_matrix = self._make_basis_matrix()
-        if linear_solver == 'lu':
-            self._coefficients = numpy.linalg.solve(
-                basis_matrix,
-                data[0])
-        elif linear_solver == 'inv':
-            self._coefficients = numpy.dot(numpy.linalg.inv(
-                basis_matrix),
-                data[0])
-        elif linear_solver == 'lstsq':
-            self._coefficients = numpy.linalg.lstsq(basis_matrix,
-                                                    data[0],
-                                                    rcond=None)[0]
-        else:
-            raise ValueError('Solver not recognized')
 
     def __call__(self, x):
         """Evaluate surrogate at a given input.
@@ -303,12 +173,137 @@ class Surrogate:
         if x.shape != (self.dimension, ):
             raise IndexError('Input must match dimension of domain.')
 
-        # transform grids into basis domain
-        x_ = self._mapdomain(x, self.domain, [[-1, 1]]*self.dimension)
-
+        # transform point into basis domain and evaluate
+        x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
         value = 0
-        for coeff, basis in zip(self.coefficients, self.grid.basis_functions):
-            value += coeff*numpy.product(
-                numpy.array([f(xi) for f, xi in zip(basis, x_)]))
+        for coeff, basis in zip(self._coefficients, self.grid.basis_functions):
+            if self.dimension > 1:
+                term = numpy.product(
+                    [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled)])
+            else:
+                term = basis(x_scaled)
+            value += coeff*term
 
         return value
+
+    def train(self, function, linear_solver='lu'):
+        """Fit surrogate's components (basis functions) to the function.
+
+        Parameters
+        ----------
+        function: callabe
+            Function to be approximated.
+        linear_slover: string
+            Method of solving linear equations:
+                'lu': lower upper decomposition.
+                'inv': solve for coefficients through x = A^{-1}B.
+                'lstsq': least-square solution.
+        """
+        data = [function(point) for point in self.points]
+        self.train_from_data(data, linear_solver)
+
+    def train_from_data(self, data, linear_solver='lu'):
+        """Fit surrogate's components (basis functions) to data.
+
+        Parameters
+        ----------
+        data: list
+            function at grid points.
+        linear_slover: string
+            Method of solving linear equations:
+                'lu': lower upper decomposition
+                'inv': solve for coefficients through x = A^{-1}B.
+                'lstsq': least-square solution.
+
+        Raises
+        ------
+        IndexError
+            Data should be of length of the grid points.
+        ValueError
+            Solver should be selected between defined methods.
+        """
+        data = numpy.array(data, copy=False, ndmin=1)
+        if data.shape != (self.points.shape[0],):
+            raise IndexError("Data must be same length as grid points.")
+        basis_matrix = self._make_basis_matrix()
+        if linear_solver == 'lu':
+            self._coefficients = numpy.linalg.solve(
+                basis_matrix,
+                data)
+        elif linear_solver == 'inv':
+            self._coefficients = numpy.dot(numpy.linalg.inv(
+                basis_matrix),
+                data)
+        elif linear_solver == 'lstsq':
+            self._coefficients = numpy.linalg.lstsq(basis_matrix,
+                                                    data,
+                                                    rcond=None)[0]
+        else:
+            raise ValueError('Solver not recognized')
+
+    def _make_basis_matrix(self):
+        """Generate basis matrix.
+
+        Parameters
+        ----------
+        points: list
+            Grid points.
+        basis_functions: list
+            Basis function of grid points.
+
+        Returns
+        -------
+        numpy.ndarray
+            Basis matrix.
+        """
+        points, basis_functions = self.grid.points, self.grid.basis_functions
+        basis_matrix = numpy.zeros((len(points), len(points)))
+        for i, point in enumerate(points):
+            for j, basis in enumerate(basis_functions):
+                if self.dimension > 1:
+                    value = numpy.prod([f(x) for x, f in zip(point, basis)])
+                else:
+                    value = basis(point)
+                basis_matrix[i, j] = value
+        return basis_matrix
+
+    def _mapdomain(self, x, old, new):
+        """Transform the points into new domain.
+
+        Parameters
+        ----------
+        x: list
+            point(s) to be transformed.
+        old: list
+            old domain.
+        new: list
+            new domain.
+
+        Returns
+        -------
+        numpy.ndarray
+            Transformed point(s).
+
+        Raises
+        ------
+        TypeError
+            Old and new domain must have the same shape.
+            Domain should be a dim x 2 array.
+            Points must be an N x dim array matching domain.
+        """
+        old = numpy.array(old, copy=False, ndmin=2)
+        new = numpy.array(new, copy=False, ndmin=2)
+
+        # error checking
+        if old.shape != new.shape:
+            raise TypeError('Old and new domain must have the same shape')
+        if old.shape != (self.dimension, 2):
+            raise TypeError('Domain should be a dim x 2 array')
+
+        return new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
+
+    def _reset_grid(self):
+        """Reset the grids, coefficients and points."""
+        self._grid = None
+        self._coefficients = None
+        self._points = None
