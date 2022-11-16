@@ -49,6 +49,7 @@ class Surrogate:
     ------
     TypeError
         Grids must be :class:`IndexGridGenerator`.
+        Domain must be dim x 2.
 
     Example
     -------
@@ -92,6 +93,7 @@ class Surrogate:
         self._coefficients = None
         self._grid = None
         self._points = None
+        self._data = None
 
     @property
     def coefficients(self):
@@ -100,6 +102,11 @@ class Surrogate:
             return self._coefficients.tolist()
         else:
             return None
+
+    @property
+    def data(self):
+        """list: data at sampling grid points."""
+        return self._data
 
     @property
     def dimension(self):
@@ -116,19 +123,22 @@ class Surrogate:
 
     @domain.setter
     def domain(self, value):
-        self._domain = numpy.array(value, ndmin=2)
+        value = numpy.array(value, ndmin=2)
+        if value.ndim != 2 or value.shape[1] != 2:
+            raise TypeError('Domain must be dim x 2')
+        self._domain = value
         self._reset_grid()
 
     @property
     def grid(self):
-        """:class:`IndexGrid` data structure."""
+        """:class:`IndexGrid` Sampling grid."""
         if self._grid is None:
             self._grid = self.grid_generator(self.dimension)
         return self._grid
 
     @property
     def grid_generator(self):
-        """:class:`IndexGridGenerator`: Generator used for making the grids."""
+        """:class:`IndexGridGenerator`: Sampling grid generator."""
         return self._grid_generator
 
     @grid_generator.setter
@@ -181,7 +191,7 @@ class Surrogate:
                 term = numpy.product(
                     [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled)])
             else:
-                term = basis(x_scaled)
+                term = basis(x_scaled[0])
             value += coeff*term
 
         return value
@@ -199,8 +209,8 @@ class Surrogate:
                 'inv': solve for coefficients through x = A^{-1}B.
                 'lstsq': least-square solution.
         """
-        data = [function(point) for point in self.points]
-        self.train_from_data(data, linear_solver)
+        self._data = [function(point) for point in self.points]
+        self.train_from_data(self._data, linear_solver)
 
     def train_from_data(self, data, linear_solver='lu'):
         """Fit surrogate's components (basis functions) to data.
@@ -222,40 +232,12 @@ class Surrogate:
         ValueError
             Solver should be selected between defined methods.
         """
-        data = numpy.array(data, copy=False, ndmin=1)
-        if data.shape != (self.points.shape[0],):
+        self._data = data
+        self._data = numpy.array(self._data, copy=False, ndmin=1)
+        if self._data.shape != (numpy.array(self.grid.points).shape[0],):
             raise IndexError("Data must be same length as grid points.")
-        basis_matrix = self._make_basis_matrix()
-        if linear_solver == 'lu':
-            self._coefficients = numpy.linalg.solve(
-                basis_matrix,
-                data)
-        elif linear_solver == 'inv':
-            self._coefficients = numpy.dot(numpy.linalg.inv(
-                basis_matrix),
-                data)
-        elif linear_solver == 'lstsq':
-            self._coefficients = numpy.linalg.lstsq(basis_matrix,
-                                                    data,
-                                                    rcond=None)[0]
-        else:
-            raise ValueError('Solver not recognized')
 
-    def _make_basis_matrix(self):
-        """Generate basis matrix.
-
-        Parameters
-        ----------
-        points: list
-            Grid points.
-        basis_functions: list
-            Basis function of grid points.
-
-        Returns
-        -------
-        numpy.ndarray
-            Basis matrix.
-        """
+        # make basis matrix
         points, basis_functions = self.grid.points, self.grid.basis_functions
         basis_matrix = numpy.zeros((len(points), len(points)))
         for i, point in enumerate(points):
@@ -265,9 +247,24 @@ class Surrogate:
                 else:
                     value = basis(point)
                 basis_matrix[i, j] = value
-        return basis_matrix
 
-    def _mapdomain(self, x, old, new):
+        if linear_solver == 'lu':
+            self._coefficients = numpy.linalg.solve(
+                basis_matrix,
+                self._data)
+        elif linear_solver == 'inv':
+            self._coefficients = numpy.dot(numpy.linalg.inv(
+                basis_matrix),
+                self._data)
+        elif linear_solver == 'lstsq':
+            self._coefficients = numpy.linalg.lstsq(basis_matrix,
+                                                    self._data,
+                                                    rcond=None)[0]
+        else:
+            raise ValueError('Solver not recognized')
+
+    @staticmethod
+    def _mapdomain(x, old, new):
         """Transform the points into new domain.
 
         Parameters
@@ -297,7 +294,7 @@ class Surrogate:
         # error checking
         if old.shape != new.shape:
             raise TypeError('Old and new domain must have the same shape')
-        if old.shape != (self.dimension, 2):
+        if old.ndim != 2 or old.shape[1] != 2:
             raise TypeError('Domain should be a dim x 2 array')
 
         return new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
@@ -307,3 +304,4 @@ class Surrogate:
         self._grid = None
         self._coefficients = None
         self._points = None
+        self._data = None

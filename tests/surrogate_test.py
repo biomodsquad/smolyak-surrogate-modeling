@@ -40,36 +40,20 @@ def branin(x):
     return branin_function
 
 
-def branin_at_grids():
-    """Evaluate Branin function at grid points."""
-    points = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4)
-                                  )(2).points
-    transformed_points = numpy.zeros((len(points), 2))
-    transformed_points[:, 0] = numpy.polynomial.polyutils.mapdomain(
-                            numpy.array(points)[:, 0],
-                            (-1, 1), (-5, 10))
-    transformed_points[:, 1] = numpy.polynomial.polyutils.mapdomain(
-                            numpy.array(points)[:, 1],
-                            (-1, 1), (0, 15))
-    branin_at_grids = []
-    for i in transformed_points:
-        branin_at_grids.append(branin(i))
-    return branin_at_grids
-
-
 def test_initialization_1d():
     """Test if class is properly intiallized."""
     grid_generator = SmolyakGridGenerator(
         ChebyshevFirstKind.make_nested_set(2))
     domain = (-1, 1)
-    surrogate_object = Surrogate(domain, grid_generator)
-    assert numpy.allclose(surrogate_object.domain,
+    surrogate = Surrogate(domain, grid_generator)
+    assert numpy.allclose(surrogate.domain,
                           numpy.array(domain, ndmin=2))
-    assert surrogate_object._coefficients is None
-    assert surrogate_object._grid is None
-    grid_object = surrogate_object.grid
-    assert isinstance(grid_object, IndexGrid)
-    assert surrogate_object.dimension == 1
+    assert numpy.allclose(surrogate.domain, domain)
+    assert surrogate.coefficients is None
+    assert isinstance(surrogate.grid, IndexGrid)
+    assert surrogate.dimension == 1
+    assert numpy.allclose(surrogate.points,
+                          [0, -1, 1, -0.70710, 0.70710])
 
 
 def test_initialization_2d():
@@ -77,16 +61,20 @@ def test_initialization_2d():
     grid_generator = SmolyakGridGenerator(
         ChebyshevFirstKind.make_nested_set(2))
     domain = [(-5, 5), (-8, 0)]
-    grid_generator_ = 'not an IndexGridGenerator'
-    surrogate_object = Surrogate(domain, grid_generator)
-    assert numpy.allclose(surrogate_object.domain,
+    surrogate = Surrogate(domain, grid_generator)
+    grid_object = surrogate.grid
+    assert numpy.allclose(surrogate.domain,
                           numpy.array(domain, ndmin=2))
-    with pytest.raises(TypeError):
-        Surrogate(domain, grid_generator_)
-    assert surrogate_object._coefficients is None
-    grid_object = surrogate_object.grid
+    assert surrogate.coefficients is None
     assert isinstance(grid_object, IndexGrid)
-    assert surrogate_object.dimension == 2
+    assert surrogate.dimension == 2
+
+
+def test_error_grid_generator_type():
+    """Test grid generator's type."""
+    domain = [(-5, 5), (-8, 0)]
+    with pytest.raises(TypeError):
+        Surrogate(domain, 'not a grid generator')
 
 
 def test_map_function_1d():
@@ -111,96 +99,103 @@ def test_map_function_2d():
                                        domain, new_domain), [[0.5, 0], [1, 1]])
 
 
-def test_basis_matrix():
-    """Test if a correct basis matrix is generated."""
-    grid_generator = SmolyakGridGenerator(
-        ChebyshevFirstKind.make_nested_set(1))
-    surrogate_object = Surrogate([(-7, 3), (-18, 9)], grid_generator)
-    expected_basis_matrix = numpy.array(
-        [[1, 0, -1, 0, -1], [1, -1, 1, 0, -1], [1, 1, 1, 0, -1],
-         [1, 0, -1, -1, 1], [1, 0, -1, 1, 1]])
-    assert numpy.allclose(expected_basis_matrix,
-                          surrogate_object._make_basis_matrix())
+# evaluate function_0 at tests points for parametrization
+f_0_point_1 = function_0((0.649, 0, -0.9))
+f_0_point_2 = function_0((-0.885, 1, 0.275))
 
 
-def test_surrogate_0():
+@pytest.mark.parametrize('linear_solver, exact_values',
+                         [('lu', [f_0_point_1, f_0_point_2]),
+                          ('lstsq', [f_0_point_1, f_0_point_2]),
+                          ('inv', [f_0_point_1, f_0_point_2])])
+def test_surrogate_0(linear_solver, exact_values):
     """Test if surrogate generates exact results for test fucntion 0."""
-    surrogate_object = Surrogate([(-1, 1), (-1, 1), (-1, 1)],
-                                 SmolyakGridGenerator(
-                                     ChebyshevFirstKind.make_nested_set(2)))
-    surrogate_object.train(function_0, 'lu')
-    test_point = (0.649, 0, -0.9)
-    test_point_ = (-0.885, 1, 0.275)
-    assert numpy.allclose(surrogate_object(test_point),
-                          function_0([0.649, 0, -0.9]))
-    assert numpy.allclose(surrogate_object(test_point_),
-                          function_0([-0.885, 1, 0.275]))
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1), (-1, 1), (-1, 1)], grid_gen)
+    surrogate.train(function_0, linear_solver)
+    # random points in the domain
+    points = [(0.649, 0, -0.9), (-0.885, 1, 0.275)]
+    surrogate_values = [surrogate(x) for x in points]
+    assert numpy.allclose(surrogate_values, exact_values)
 
 
 def test_surrogate_1():
     """Test if surrogate generates exact results for test for Chebyshevs."""
-    surrogate_object = Surrogate([(-1, 1), (-1, 1)], SmolyakGridGenerator(
-        ChebyshevFirstKind.make_nested_set(2)))
-    surrogate_object.train(function_1, 'lstsq')
-    test_point = (0.649, -0.9)
-    test_point_ = (-0.885, 1)
-    assert numpy.allclose(surrogate_object(test_point),
-                          function_1([0.649, -0.9]))
-    assert numpy.allclose(surrogate_object(test_point_),
-                          function_1([-0.885, 1]))
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
+    surrogate.train(function_1, 'lstsq')
+    # random points in the domain
+    points = [(0.649, -0.9), (-0.885, 1)]
+    surrogate_values = [surrogate(x) for x in points]
+    exact_values = [function_1(x) for x in points]
+    assert numpy.allclose(surrogate_values, exact_values)
 
 
 def test_surrogate_0_shifted():
     """Test if surrogate generates exact results for a shifted function 0."""
-    surrogate_object = Surrogate([(-1, 1), (-1, 1), (-1, 1)],
-                                 SmolyakGridGenerator(
-                                     ChebyshevFirstKind.make_nested_set(2)))
-    surrogate_object_ = Surrogate([(0, 2), (-2, 0), (-1, 1)],
-                                  SmolyakGridGenerator(
-                                      ChebyshevFirstKind.make_nested_set(2)))
-    surrogate_object.train(function_0, 'lu')
-    surrogate_object_.train(function_0_shifted, 'lu')
-    assert numpy.allclose(surrogate_object.coefficients,
-                          surrogate_object_.coefficients)
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate_1 = Surrogate([(-1, 1), (-1, 1), (-1, 1)], grid_gen)
+    surrogate_2 = Surrogate([(0, 2), (-2, 0), (-1, 1)], grid_gen)
+    surrogate_1.train(function_0)
+    surrogate_2.train_from_data(surrogate_1.data)
+    assert numpy.allclose(surrogate_1.coefficients,
+                          surrogate_2. coefficients)
 
 
-def test_surrogate_2():
+# evaluate function_2 at test point for parametrization
+f_2_point = function_2(0.367)
+
+
+@pytest.mark.parametrize('linear_solver, exact_value',
+                         [('lu', f_2_point), ('lstsq', f_2_point),
+                          ('inv', f_2_point)])
+def test_surrogate_2(linear_solver, exact_value):
     """Test if surrogate generates exact results for simple 1D function."""
-    domain = (-10, 10)
-    surrogate_object = Surrogate(domain, SmolyakGridGenerator(
-        ChebyshevFirstKind.make_nested_set(2)))
-    surrogate_object.train(function_2, 'inv')
-    test_point = 0.367
-    assert numpy.allclose(surrogate_object(test_point), function_2(test_point))
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate((-10, 10), grid_gen)
+    surrogate.train(function_2, linear_solver)
+    # random point in the domain
+    point = 0.367
+    assert numpy.isclose(surrogate(point), exact_value)
 
 
 def test_train_from_data():
     """Test if train_from_data_works."""
-    surrogate_object = Surrogate([(-5, 10), (0, 15)], SmolyakGridGenerator(
-        ChebyshevFirstKind.make_nested_set(4)))
-    surrogate_object_ = Surrogate([(-5, 10), (0, 15)], SmolyakGridGenerator(
-        ChebyshevFirstKind.make_nested_set(4)))
-    surrogate_object.train_from_data(branin_at_grids(), 'lu')
-    assert numpy.allclose(surrogate_object((8, 0.75)),
-                          branin([8, 0.75]), atol=1e-10)
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4))
+    surrogate = Surrogate([(-5, 10), (0, 15)], grid_gen)
+    data = [branin(point) for point in surrogate.points]
+    surrogate.train_from_data(data)
+    # random point in the domain
+    point = (8, 0.75)
+    assert numpy.isclose(surrogate(point), branin(point))
     with pytest.raises(IndexError):
-        surrogate_object_.train_from_data(branin_at_grids()[:5], 'lu')
+        surrogate.train_from_data(data[:5])
+
+
+def test_error_solver():
+    """Test if invalid solver generates surrogate."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate((-10, 10), grid_gen)
+    with pytest.raises(ValueError):
+        surrogate.train(function_2, 'inverse')
 
 
 def test_error_function_needs_training():
     """Test if surrogate is generated without training."""
-    surrogate_object = Surrogate([(-1, 1), (-1, 1)], SmolyakGridGenerator(
-        ChebyshevFirstKind.make_nested_set(2)))
-    test_point = (0.649, 0)
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
+    # random point in the domain
+    point = (0.649, 0)
     with pytest.raises(ValueError):
-        surrogate_object(test_point)
+        surrogate(point)
 
 
 def test_error_input_surrogate():
     """Test the error related to surrogate's input dimension."""
-    surrogate_object = Surrogate([(-1, 1), (-1, 1)], SmolyakGridGenerator(
-        ChebyshevFirstKind.make_nested_set(2)))
-    surrogate_object.train(function_1, 'lstsq')
-    test_point = (0.649, 0, 0.5)
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
+    surrogate.train(function_1, 'lstsq')
+    # random point in the domain
+    point = (0.649, 0, 0.5)
     with pytest.raises(IndexError):
-        surrogate_object(test_point)
+        surrogate(point)
