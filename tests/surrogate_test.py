@@ -46,8 +46,6 @@ def test_initialization_1d():
         ChebyshevFirstKind.make_nested_set(2))
     domain = (-1, 1)
     surrogate = Surrogate(domain, grid_generator)
-    assert numpy.allclose(surrogate.domain,
-                          numpy.array(domain, ndmin=2))
     assert numpy.allclose(surrogate.domain, domain)
     assert surrogate.coefficients is None
     assert isinstance(surrogate.grid, IndexGrid)
@@ -68,6 +66,12 @@ def test_initialization_2d():
     assert surrogate.coefficients is None
     assert isinstance(grid_object, IndexGrid)
     assert surrogate.dimension == 2
+    assert numpy.allclose(surrogate.points, [[0, -4], [-5, -4], [5, -4],
+                                             [0, -8], [0, 0], [-3.5355, -4],
+                                             [3.5355, -4], [-5, -8],
+                                             [-5, 0], [5, -8], [5, 0],
+                                             [0, -6.8284], [0, -1.1715]],
+                          atol=1e-4)
 
 
 def test_error_grid_generator_type():
@@ -99,16 +103,8 @@ def test_map_function_2d():
                                        domain, new_domain), [[0.5, 0], [1, 1]])
 
 
-# evaluate function_0 at tests points for parametrization
-f_0_point_1 = function_0((0.649, 0, -0.9))
-f_0_point_2 = function_0((-0.885, 1, 0.275))
-
-
-@pytest.mark.parametrize('linear_solver, exact_values',
-                         [('lu', [f_0_point_1, f_0_point_2]),
-                          ('lstsq', [f_0_point_1, f_0_point_2]),
-                          ('inv', [f_0_point_1, f_0_point_2])])
-def test_surrogate_0(linear_solver, exact_values):
+@pytest.mark.parametrize('linear_solver', ['lu', 'lstsq', 'inv'])
+def test_surrogate_0(linear_solver):
     """Test if surrogate generates exact results for test fucntion 0."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = Surrogate([(-1, 1), (-1, 1), (-1, 1)], grid_gen)
@@ -116,6 +112,7 @@ def test_surrogate_0(linear_solver, exact_values):
     # random points in the domain
     points = [(0.649, 0, -0.9), (-0.885, 1, 0.275)]
     surrogate_values = [surrogate(x) for x in points]
+    exact_values = [function_0(x) for x in points]
     assert numpy.allclose(surrogate_values, exact_values)
 
 
@@ -123,7 +120,7 @@ def test_surrogate_1():
     """Test if surrogate generates exact results for test for Chebyshevs."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
-    surrogate.train(function_1, 'lstsq')
+    surrogate.train(function_1)
     # random points in the domain
     points = [(0.649, -0.9), (-0.885, 1)]
     surrogate_values = [surrogate(x) for x in points]
@@ -138,25 +135,21 @@ def test_surrogate_0_shifted():
     surrogate_2 = Surrogate([(0, 2), (-2, 0), (-1, 1)], grid_gen)
     surrogate_1.train(function_0)
     surrogate_2.train_from_data(surrogate_1.data)
+    point, point_shifted = (0, 0.5, -0.5), (1, -0.5, -0.5)
     assert numpy.allclose(surrogate_1.coefficients,
-                          surrogate_2. coefficients)
+                          surrogate_2.coefficients)
+    assert numpy.isclose(surrogate_1(point), surrogate_2(point_shifted))
 
 
-# evaluate function_2 at test point for parametrization
-f_2_point = function_2(0.367)
-
-
-@pytest.mark.parametrize('linear_solver, exact_value',
-                         [('lu', f_2_point), ('lstsq', f_2_point),
-                          ('inv', f_2_point)])
-def test_surrogate_2(linear_solver, exact_value):
+@pytest.mark.parametrize('linear_solver', ['lu', 'lstsq', 'inv'])
+def test_surrogate_2(linear_solver):
     """Test if surrogate generates exact results for simple 1D function."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = Surrogate((-10, 10), grid_gen)
     surrogate.train(function_2, linear_solver)
     # random point in the domain
     point = 0.367
-    assert numpy.isclose(surrogate(point), exact_value)
+    assert numpy.isclose(surrogate(point), function_2(point))
 
 
 def test_train_from_data():
@@ -197,5 +190,8 @@ def test_error_input_surrogate():
     surrogate.train(function_1, 'lstsq')
     # random point in the domain
     point = (0.649, 0, 0.5)
+    point_outside_domain = (-2, 1)
     with pytest.raises(IndexError):
         surrogate(point)
+    with pytest.raises(ValueError):
+        surrogate(point_outside_domain)

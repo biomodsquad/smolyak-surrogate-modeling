@@ -2,8 +2,10 @@ import numpy
 
 from smolyay.grid import IndexGridGenerator
 
+
 class Surrogate:
     r"""Create a surrogate to approximate a complex function.
+
     Depending on the dimensionality (number of independent variables),
     and sampling method, a set of grid points and their corresponding
     basis functions can be generated (``grid_generator``).
@@ -11,11 +13,11 @@ class Surrogate:
     such as :class:`SmolyakGridGenerator`, where a set of grid points
     and functions are generated depending on different approaches that
     make 1D points between -1 and 1 and their corresponding basis functions.
-    Then, given a dimensionality, the tensor products of
+    Then, given dimensionality, the tensor products of
     those 1D points generate multi-dimensional grid points and functions.
     Examples are :class:`SmolyakGridGenerator` which makes the grids based on
     sparse sampling and :class:`TensorGridGenerator` making them through
-    full tensor product.
+    the full tensor product.
     ``domain`` is the domain of the function to be approximated.
     Through linear transformation, grid points in the
     function's domain are generated (:meth:`_mapdomain`).
@@ -26,16 +28,17 @@ class Surrogate:
     :meth:`train`, generates the coefficients of the surrogate of
     a ``function`` depending on the ``linear_solver`` which determines
     the method that can be used for solving linear equations (Ax=B).
-    A is square matrix, x is the matrix of coefficients, and B is the matrix
-    where ``function`` is evaluated at transformed grid points (see example).
+    A is the square matrix, x is the matrix of coefficients,
+    and B is the matrix where ``function`` is evaluated at transformed
+    grid points (see example).
     ``points`` stores the points that are used for sampling.
     :meth:`train_from_data` computes the coefficients based on
-    the a set of data (function values at transformed grid points).
-    Once surrogate is constructed, one can evaluate the surrogate
-    through :meth:`__call__(x)` at given input.
+    a set of data (function values at transformed grid points).
+    Once the surrogate is constructed, one can evaluate the surrogate
+    through :meth:`__call__(x)` at a given input.
     :meth:`_reset_surrogate` resets the surrogate's coefficients,
     sampled points, original ``grids``(holds the grid points
-    and their corresponding basis fucntions depending on the
+    and their corresponding basis functions depending on the
     dimensionality and the generator), and ``data`` (function at
     sampling points).
 
@@ -57,11 +60,12 @@ class Surrogate:
     Consider a function :math:F(y) with one independent variable.
     Basis function B_n(x) is chosen for the approximation and
     three grid points and their corresponding basis functions
-    are generated in (-1, 1):
+    are generated in (-1, 1) domain:
     (:math:x_0, :math:x_1, :math:x_2)
     [:math:B_0(x), :math:B_1(x) :math:B_2(x)]
     Based on the domain of the approximation, grid points of the basis
-    functions can be moved to the domain, resulting in transformed grid points:
+    functions can be moved to the new domain,
+    resulting in transformed grid points:
     (:math:y_0, :math:y_1, :math:y_2)
     Then:
     ..math:
@@ -180,13 +184,17 @@ class Surrogate:
         IndexError
             Input of the surrogate must be of length of the
             function's dimensionality.
+        ValueError
+            Input must lie in domain of surrogate.
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
         x = numpy.array(x, copy=False, ndmin=1)
         if x.shape != (self.dimension, ):
             raise IndexError('Input must match dimension of domain.')
-
+        if not (numpy.all(x >= self._domain[:, 0])
+                and numpy.all(x <= self._domain[:, 1])):
+            raise ValueError('x must lie in domain of surrogate')
         # transform point into basis domain and evaluate
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
         value = 0
@@ -213,8 +221,8 @@ class Surrogate:
                 'inv': solve for coefficients through x = A^{-1}B.
                 'lstsq': least-square solution.
         """
-        self._data = [function(point) for point in self.points]
-        self.train_from_data(self._data, linear_solver)
+        data = [function(point) for point in self.points]
+        self.train_from_data(data, linear_solver)
 
     def train_from_data(self, data, linear_solver='lu'):
         """Fit surrogate's components (basis functions) to data.
@@ -236,9 +244,8 @@ class Surrogate:
         ValueError
             Solver should be selected between defined methods.
         """
-        self._data = data
-        self._data = numpy.array(self._data, copy=False, ndmin=1)
-        if self._data.shape != (numpy.array(self.grid.points).shape[0],):
+        self._data = numpy.array(data, ndmin=1)
+        if self._data.shape != (len(self.grid.points),):
             raise IndexError("Data must be same length as grid points.")
 
         # make basis matrix
@@ -290,7 +297,6 @@ class Surrogate:
         TypeError
             Old and new domain must have the same shape.
             Domain should be a dim x 2 array.
-            Points must be an N x dim array matching domain.
         """
         old = numpy.array(old, copy=False, ndmin=2)
         new = numpy.array(new, copy=False, ndmin=2)
