@@ -62,7 +62,7 @@ def test_initialization_2d():
     surrogate = Surrogate(domain, grid_generator)
     grid_object = surrogate.grid
     assert numpy.allclose(surrogate.domain,
-                          numpy.array(domain, ndmin=2))
+                          domain)
     assert surrogate.coefficients is None
     assert isinstance(grid_object, IndexGrid)
     assert surrogate.dimension == 2
