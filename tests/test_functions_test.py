@@ -1,9 +1,10 @@
 import pytest
 
-from smolyay.test_function_class import *
+import numpy
 import importlib
 import inspect
-import numpy
+
+from smolyay.test_function_class import *
 
 
 
