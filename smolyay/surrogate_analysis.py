@@ -20,6 +20,6 @@ for name, cls in inspect.getmembers(
 fun = functions[3]
 
 grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4))
-surrogate = Surrogate([(-5, 10), (0, 15)], grid_gen)
+surrogate = Surrogate(fun.bounds, grid_gen)
 data = [fun(point) for point in surrogate.points]
 surrogate.train_from_data(data)
