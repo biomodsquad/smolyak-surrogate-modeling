@@ -5,7 +5,9 @@ import importlib
 import inspect
 
 from smolyay.test_function_class import *
-
+from smolyay.basis import ChebyshevFirstKind
+from smolyay.grid import SmolyakGridGenerator
+from smolyay.surrogate import Surrogate
 
 
 functions = []
@@ -42,3 +44,13 @@ def test_bounds():
     """Test return bounds as list of tuples"""
     a = branin()
     assert a.bounds == [(-5,10),(0,15)]
+
+def test_surrogate():
+    """Test use of function class with surrogate"""
+    a = branin()
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4))
+    surrogate = Surrogate(a.bounds, grid_gen)
+    data = [a(point) for point in surrogate.points]
+    surrogate.train_from_data(data)
+    assert numpy.isclose(surrogate([6,0.5]),a([6,0.5]))
+
