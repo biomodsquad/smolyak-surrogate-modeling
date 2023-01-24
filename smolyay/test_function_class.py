@@ -49,6 +49,14 @@ class test_fun(abc.ABC):
         """list: lowever bounds of each variable"""
         return self._lower_bounds
 
+    @property
+    def bounds(self):
+        """list of tuples: tuples of each variable's bounds"""
+        b = []
+        for i in range(self._dim):
+            b.append((self._lower_bounds[i], self._upper_bounds[i]))
+        return b
+
     def check_bounds(self,x):
         """Check input is within class' bounds
 

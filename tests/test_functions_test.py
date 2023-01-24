@@ -38,4 +38,7 @@ def test_call_error_above():
         with pytest.raises(ValueError):
             f(above_bounds)
 
-
+def test_bounds():
+    """Test return bounds as list of tuples"""
+    a = branin()
+    assert a.bounds == [(-5,10),(0,15)]
