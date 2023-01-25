@@ -195,6 +195,9 @@ class SmolyakGridGenerator(IndexGridGenerator):
                 # the arrays along each dimension
                 level_composition_index = [self._basis_set.levels[index]
                                            for index in index_composition]
+                # skip compositions containing empty levels
+                if any(len(x) == 0 for x in level_composition_index):
+                    continue
                 grid_points_indexes_ = (numpy.array(
                     numpy.meshgrid(*level_composition_index))
                     .T.reshape(-1, dimension))
@@ -212,11 +215,11 @@ class SmolyakGridGenerator(IndexGridGenerator):
         grid_points = []
         grid_points_basis = []
         for indexes in grid_points_indexes:
-            levels.append([level_lookup[int(index)]
+            levels.append([level_lookup[index]
                        for index in indexes])
-            grid_points.append([self._basis_set.points[int(index)]
+            grid_points.append([self._basis_set.points[index]
                                 for index in indexes])
-            grid_points_basis.append([self._basis_set.basis_functions[int(index)]
+            grid_points_basis.append([self._basis_set.basis_functions[index]
                                       for index in indexes])
 
         # flatten 1d arrays
