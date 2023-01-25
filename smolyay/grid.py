@@ -211,12 +211,13 @@ class SmolyakGridGenerator(IndexGridGenerator):
         levels = []
         grid_points = []
         grid_points_basis = []
+        grid_points_indexes = grid_points_indexes
         for indexes in grid_points_indexes:
-            levels.append([level_lookup[index]
-                           for index in indexes])
-            grid_points.append([self._basis_set.points[index]
+            levels.append([level_lookup[int(index)]
+                       for index in indexes])
+            grid_points.append([self._basis_set.points[int(index)]
                                 for index in indexes])
-            grid_points_basis.append([self._basis_set.basis_functions[index]
+            grid_points_basis.append([self._basis_set.basis_functions[int(index)]
                                       for index in indexes])
 
         # flatten 1d arrays
