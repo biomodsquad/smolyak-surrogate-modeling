@@ -211,7 +211,6 @@ class SmolyakGridGenerator(IndexGridGenerator):
         levels = []
         grid_points = []
         grid_points_basis = []
-        grid_points_indexes = grid_points_indexes
         for indexes in grid_points_indexes:
             levels.append([level_lookup[int(index)]
                        for index in indexes])
