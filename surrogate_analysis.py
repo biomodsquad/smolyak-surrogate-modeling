@@ -21,7 +21,7 @@ for name, cls in inspect.getmembers(
 for fun in functions[0:10]:
     print(fun.name + '  ' + str(fun.dim))
     errors = []
-    for exact in range(2,6):
+    for exact in range(3,6):
         grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(
             exact))
         surrogate = Surrogate(fun.bounds, grid_gen)
