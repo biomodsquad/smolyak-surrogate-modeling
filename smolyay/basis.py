@@ -257,15 +257,15 @@ class ChebyshevSecondKind(BasisFunction):
         """
         if x > 1 or x < -1:
             raise ValueError("Input is outside the domain [-1,1]")
-        if n == 0:
+        if self._n == 0:
             return 1
-        elif n == 1:
+        elif self._n == 1:
             return 2*x
         else:
-            k_lim = floor(n/2)
+            k_lim = self._n//2
             answer = 0
             for k in range(0,k_lim+1):
-                answer += comb(n+1,2*k+1)*((x**2 - 1)**k)*(x**(n-2*k))
+                answer += math.comb(self._n+1,2*k+1)*((x**2 - 1)**k)*(x**(self._n-2*k))
             return answer
 
     @classmethod
