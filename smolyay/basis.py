@@ -242,12 +242,12 @@ class ChebyshevSecondKind(BasisFunction):
         Returns
         -------
         float
-            Value of Chebyshev polynomial of the first kind.
+            Value of Chebyshev polynomial of the second kind.
 
         Raises
         -------
         float
-            Value of Chebyshev polynomial of the first kind.
+            Value of Chebyshev polynomial of the second kind.
 
         Raises
         ------
