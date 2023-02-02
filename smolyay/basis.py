@@ -210,8 +210,7 @@ class ChebyshevSecondKind(BasisFunction):
     def __init__(self,n):
         super().__init__()
         self._n = n
-        self._points = (
-                list(numpy.polynomial.chebyshev.chebpts2(n+1)) if n>0 else [0])
+        self._points = (numpy.polynomial.chebyshev.chebpts2(n+2)[1:-1] if n>1 else [0])
 
     @property
     def points(self):
@@ -274,20 +273,20 @@ class ChebyshevSecondKind(BasisFunction):
 
         A nested set is created up to a given level of ``exactness``,
         which corresponds to a highest-order Chebyshev polynomial of
-        degree ``n = 2**exactness``.
+        degree ``n = 2**(exactness + 1) - 1``.
 
         Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**exactness``, with the first level being a special case. The
-        generating Chebyshev polynomials are hence of degree (0, 2, 4, 8, ...).
-        Each new point added in a level is paired with a basis function of
-        increasing order.
+        ``2**(exactness + 1) - 1``, with the first level being a special case. 
+        The generating Chebyshev polynomials are hence of degree (1, 3, 7, 
+        15, ...). Each new point added in a level is paired with a basis 
+        function of increasing order.
 
         For example, for an ``exactness`` of 3, the generating polynomials are
-        of degree 0, 2, 4, and 8, at each of 4 levels. There are 1, 2, 2, and 4
-        new points added at each level. The polynomial at level 0 is of degree
-        0, the polynomials at level 1 are of degrees 1 and 2, those at level 2
-        are of degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and
-        8.
+        of degree 1, 3, 7, and 16, at each of 4 levels. There are 2, 2, 4, and 8
+        new points added at each level. The polynomials at level 0 are of degree
+        0 and 1, the polynomials at level 1 are of degrees 2 and 3, those at 
+        level 2 are of degree 4, 5, 6, and 7, and those at level 3 are of 
+        degrees 8, 9, 10, 11, 12, 13, 14, and 15.
 
         Parameters
         ----------
@@ -304,15 +303,12 @@ class ChebyshevSecondKind(BasisFunction):
         levels = []
         points = []
         for i in range(0, exactness+1):
-            if i > 1:
-                start_level = 2**(i-1)+1
-                end_level = 2**i
-            elif i == 1:
-                start_level = 1
-                end_level = 2
+            if i > 0:
+                start_level = 2**i
+                end_level = 2**(i+1)-1
             else:
                 start_level = 0
-                end_level = 0
+                end_level = 1
             level_range = range(start_level, end_level+1)
 
             basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
@@ -320,6 +316,7 @@ class ChebyshevSecondKind(BasisFunction):
             for p in basis_functions[end_level].points:
                 if not numpy.isclose(points, p).any():
                     points.append(p)
+        points = [0] + points
         return NestedBasisFunctionSet(points,basis_functions,levels)
 
 
