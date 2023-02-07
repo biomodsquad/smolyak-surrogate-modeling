@@ -67,6 +67,18 @@ def test_cheb_call_random_points():
         f = ChebyshevFirstKind(n)
         assert numpy.isclose(f(x),special.eval_chebyt(n,x))
 
+
+def test_cheb_first_kind_derivative():
+    """Test if the correct derivative is generated."""
+    f = ChebyshevFirstKind(0)
+    g = ChebyshevFirstKind(1)
+    h = ChebyshevFirstKind(2)
+    x = 1
+    assert numpy.isclose(f.derivative(x), 0)
+    assert numpy.isclose(g.derivative(x), 1)
+    assert numpy.isclose(h.derivative(x), 4)
+
+
 def test_cheb_call_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
     f = ChebyshevFirstKind(4)
@@ -74,6 +86,14 @@ def test_cheb_call_invalid_input():
         f(2)
     with pytest.raises(ValueError):
         f(-2)
+
+def test_cheb_first_kind_derivative_invalid_input():
+    """Test call raises error if input is outside domain [-1,1]"""
+    f = ChebyshevFirstKind(4)
+    with pytest.raises(ValueError):
+        f.derivative(2)
+    with pytest.raises(ValueError):
+        f.derivative(-2)
 
 def test_cheb_2nd_initial_zero():
     """test degree of zero"""
