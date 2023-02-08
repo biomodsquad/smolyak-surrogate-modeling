@@ -72,8 +72,10 @@ class ChebyshevFirstKind(BasisFunction):
     def __init__(self,n):
         super().__init__()
         self._n = n
-        self._points = (
-                list(numpy.polynomial.chebyshev.chebpts2(n+1)) if n>0 else [0])
+        if n > 0:
+            self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
+        else:
+            self._points = [0]
 
     @property
     def points(self):
