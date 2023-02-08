@@ -192,7 +192,7 @@ class ChebyshevSecondKind(BasisFunction):
         U_1(x) = 2x
         U_{n+1}(x) = 2x U_n(x) - U_{n-1}(x)
 
-    The :attr:`points` for this polynomial are the extrema on the domain
+    The :attr:`points` for this polynomial are the zeros on the domain
     :math:`[-1,1]`:
 
     .. math::
