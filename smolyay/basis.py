@@ -304,16 +304,13 @@ class ChebyshevSecondKind(BasisFunction):
             Nested Chebyshev polynomials of the first kind.
 
         """
-        basis_functions = []
-        levels = []
-        points = []
-        for i in range(0, exactness+1):
-            if i > 0:
-                start_level = 2**i
-                end_level = 2**(i+1)-1
-            else:
-                start_level = 0
-                end_level = 1
+        # initialize 0th level to ensure it has 2 points
+        levels = [[0,1]]
+        basis_functions =  [ChebyshevSecondKind(0),ChebyshevSecondKind(1)]
+        points = basis_functions[0].points + basis_functions[1].points
+        for i in range(1, exactness+1):
+            start_level = 2**i
+            end_level = 2**(i+1)-1
             level_range = range(start_level, end_level+1)
 
             basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
@@ -321,7 +318,6 @@ class ChebyshevSecondKind(BasisFunction):
             for p in basis_functions[end_level].points:
                 if not numpy.isclose(points, p).any():
                     points.append(p)
-        points = [0] + points
         return NestedBasisFunctionSet(points,basis_functions,levels)
 
 
