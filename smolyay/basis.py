@@ -211,7 +211,7 @@ class ChebyshevSecondKind(BasisFunction):
         super().__init__()
         self._n = n
         if n > 1:
-            self._points = [numpy.cos(k*numpy.pi/(n+1)) for k in range(1, n+1)]
+            self._points = [-numpy.cos(k*numpy.pi/(n+1)) for k in range(1, n+1)]
         else:
             self._points = [0.]
 
