@@ -197,7 +197,7 @@ class ChebyshevSecondKind(BasisFunction):
 
     .. math::
 
-        x_i^* = -\cos(\pi i/n), i = 0,...,n
+        x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
 
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
 
