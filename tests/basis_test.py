@@ -3,7 +3,8 @@ import pytest
 import numpy
 from scipy import special
 
-from smolyay.basis import BasisFunction, ChebyshevFirstKind, BasisFunctionSet, NestedBasisFunctionSet
+from smolyay.basis import (BasisFunction, ChebyshevFirstKind, 
+        ChebyshevSecondKind, BasisFunctionSet, NestedBasisFunctionSet)
 
 @pytest.fixture
 def expected_points_3_set():
@@ -69,6 +70,66 @@ def test_cheb_call_random_points():
 def test_cheb_call_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
     f = ChebyshevFirstKind(4)
+    with pytest.raises(ValueError):
+        f(2)
+    with pytest.raises(ValueError):
+        f(-2)
+
+def test_cheb_2nd_initial_zero():
+    """test degree of zero"""
+    f = ChebyshevSecondKind(0)
+    assert f.n == 0
+    assert f.points == [0]
+
+def test_cheb_2nd_initial_1():
+    """test initial when degree is 1"""
+    f = ChebyshevSecondKind(1)
+    assert f.n == 1
+    assert f.points == [0]
+
+def test_cheb_2nd_initial_2():
+    """test initial when degree is 2"""
+    f = ChebyshevSecondKind(2)
+    assert f.n == 2
+    assert numpy.allclose(f.points,[-0.5, 0.5],atol=1e-10)
+
+def test_cheb_2nd_initial_3():
+    """test initial when degree is 3"""
+    expected_points = [-1/numpy.sqrt(2), 0, 1/numpy.sqrt(2)]
+    f = ChebyshevSecondKind(3)
+    assert f.n == 3
+    assert numpy.allclose(f.points,expected_points,atol=1e-10)
+
+def test_cheb_2nd_initial_7():
+    """test initial when degree is 7"""
+    expected_points = [-numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
+            -1/numpy.sqrt(2), -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 0,
+            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 1/numpy.sqrt(2),
+            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
+    f = ChebyshevSecondKind(7)
+    assert f.n == 7
+    assert numpy.allclose(f.points,expected_points,atol=1e-10)
+
+def test_cheb_2nd_call_degree_0_1():
+    """Chebyshev polynomial degree 0 is always 1 and degree 1 returns 2*input"""
+    f0 = ChebyshevSecondKind(0)
+    f1 = ChebyshevSecondKind(1)
+    for i in [-1, -0.5, 0, 0.5, 1]:
+        assert f0(i) == 1
+        assert f1(i) == i*2
+
+def test_cheb_2nd_call_random_points():
+    """Test chebyshev polynomial at some degree at some input"""
+    numpy.random.seed(567)
+    ns = numpy.random.randint(20,size = 20)
+    xs = numpy.random.rand(20) * 2 - 1
+    for n,x in zip(ns,xs):
+        f = ChebyshevSecondKind(n)
+        assert numpy.isclose(f(x),special.eval_chebyu(n,x))
+
+def test_cheb_2nd_call_invalid_input():
+    """Test call raises error if input is outside domain [-1,1]"""
+    f = ChebyshevSecondKind(4)
     with pytest.raises(ValueError):
         f(2)
     with pytest.raises(ValueError):
@@ -151,4 +212,27 @@ def test_make_nested_empty():
     assert len(basis_functions) == 1
     assert basis_functions[0].n == 0
 
+def test_make_nested_function_cheb_2nd(expected_points_3_set):
+    """Check make_nested_set creates NestedBasisFunctionSet"""
+    f = ChebyshevSecondKind.make_nested_set(2)
+    expected_points = [0, 0, -1/numpy.sqrt(2), 1/numpy.sqrt(2),
+            -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
+            -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
+            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
+            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
+    assert numpy.allclose(f.points,expected_points,atol=1e-10)
+    assert f.levels == [[0,1],[2,3],[4,5,6,7]]
+    basis_functions = f.basis_functions
+    assert len(basis_functions) == 8
+    for i in range(0,len(basis_functions)):
+        assert basis_functions[i].n == i
+
+def test_make_nested_empty_cheb_2nd():
+    """Check make_nested_set makes empty NestedBasisFunctionSet"""
+    f = ChebyshevSecondKind.make_nested_set(0)
+    assert f.points == [0,0]
+    assert f.levels == [[0,1]]
+    basis_functions = f.basis_functions
+    assert len(basis_functions) == 2
+    assert basis_functions[0].n == 0
 

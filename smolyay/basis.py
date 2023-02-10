@@ -72,8 +72,10 @@ class ChebyshevFirstKind(BasisFunction):
     def __init__(self,n):
         super().__init__()
         self._n = n
-        self._points = (
-                list(numpy.polynomial.chebyshev.chebpts2(n+1)) if n>0 else [0])
+        if n > 0:
+            self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
+        else:
+            self._points = [0]
 
     @property
     def points(self):
@@ -174,6 +176,144 @@ class ChebyshevFirstKind(BasisFunction):
             level_range = range(start_level, end_level+1)
 
             basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
+            levels.append(list(level_range))
+            for p in basis_functions[end_level].points:
+                if not numpy.isclose(points, p).any():
+                    points.append(p)
+        return NestedBasisFunctionSet(points,basis_functions,levels)
+
+class ChebyshevSecondKind(BasisFunction):
+    r"""Chebyshev polynomial of the second kind.
+
+    The Chebyshev polynomial :math:`U_n` of degree *n* is defined by the
+    recursive relationship:
+
+    .. math::
+
+        U_0(x) = 1
+        U_1(x) = 2x
+        U_{n+1}(x) = 2x U_n(x) - U_{n-1}(x)
+
+    The :attr:`points` for this polynomial are the zeros on the domain
+    :math:`[-1,1]`:
+
+    .. math::
+
+        x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
+
+    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+
+    Parameters
+    ----------
+    n : int
+        Degree of the Chebyshev polynomial.
+    """
+
+    def __init__(self,n):
+        super().__init__()
+        self._n = n
+        if n > 1:
+            self._points = [-numpy.cos(k*numpy.pi/(n+1)) for k in range(1, n+1)]
+        else:
+            self._points = [0.]
+
+    @property
+    def points(self):
+        """list: Sampling points at extrema of polynomial."""
+        return self._points
+
+    @property
+    def n(self):
+        """int: Degree of polynomial"""
+        return self._n
+
+    def __call__(self,x):
+        r"""Evaluate the basis function.
+
+        The Chebyshev polynomial is evaluated using the combinatorial formula:
+
+        .. math::
+
+            U_n(x) = \sum_{k=0}^{\lfloor n/2 \rfloor} {n+1 \choose 2k+1} (x^2-1)^k x^{n-2k}
+
+        for :math:`n \ge 2`, and by the direct formula for the other values of *n*.
+
+        Parameters
+        ----------
+        x : float
+            One-dimensional point on :math:`[-1,1]`.
+
+        Returns
+        -------
+        float
+            Value of Chebyshev polynomial of the second kind.
+
+        Raises
+        -------
+        float
+            Value of Chebyshev polynomial of the second kind.
+
+        Raises
+        ------
+        ValueError
+            if input is outside the domain [-1,1]
+
+        """
+        if x > 1 or x < -1:
+            raise ValueError("Input is outside the domain [-1,1]")
+        if self._n == 0:
+            return 1
+        elif self._n == 1:
+            return 2*x
+        else:
+            k_lim = self._n//2
+            answer = 0
+            for k in range(0,k_lim+1):
+                answer += math.comb(self._n+1,2*k+1)*((x**2 - 1)**k)*(x**(self._n-2*k))
+            return answer
+
+    @classmethod
+    def make_nested_set(cls, exactness):
+        """Create a nested set of Chebyshev polynomials.
+
+        A nested set is created up to a given level of ``exactness``,
+        which corresponds to a highest-order Chebyshev polynomial of
+        degree ``n = 2**(exactness + 1) - 1``.
+
+        Each nesting level corresponds to the increasing powers of 2 going up to
+        ``2**(exactness + 1) - 1``, with the first level being a special case. 
+        The generating Chebyshev polynomials are hence of degree (1, 3, 7, 
+        15, ...). Each new point added in a level is paired with a basis 
+        function of increasing order.
+
+        For example, for an ``exactness`` of 3, the generating polynomials are
+        of degree 1, 3, 7, and 16, at each of 4 levels. There are 2, 2, 4, and 8
+        new points added at each level. The polynomials at level 0 are of degree
+        0 and 1, the polynomials at level 1 are of degrees 2 and 3, those at 
+        level 2 are of degree 4, 5, 6, and 7, and those at level 3 are of 
+        degrees 8, 9, 10, 11, 12, 13, 14, and 15.
+
+        Parameters
+        ----------
+        exactness : int
+            Level of exactness.
+
+        Returns
+        -------
+        NestedBasisFunctionSet
+            Nested Chebyshev polynomials of the first kind.
+
+        """
+        # initialize 0th level to ensure it has 2 points
+        levels = [[0,1]]
+        basis_functions =  [ChebyshevSecondKind(0),ChebyshevSecondKind(1)]
+        points = basis_functions[0].points + basis_functions[1].points
+        for i in range(1, exactness+1):
+            start_level = 2**i
+            end_level = 2**(i+1)-1
+            level_range = range(start_level, end_level+1)
+
+            basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
             levels.append(list(level_range))
             for p in basis_functions[end_level].points:
                 if not numpy.isclose(points, p).any():
