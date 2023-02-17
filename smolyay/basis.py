@@ -80,7 +80,7 @@ class ChebyshevFirstKind(BasisFunction):
     def __init__(self,n):
         super().__init__()
         self._n = n
-
+        self._derivative = ChebyshevSecondKind(self._n-1)
         if n > 0:
             self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
         else:
