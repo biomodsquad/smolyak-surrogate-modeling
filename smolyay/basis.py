@@ -95,7 +95,7 @@ class ChebyshevFirstKind(BasisFunction):
     def __init__(self, n):
         super().__init__()
         self._n = n
-        self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
+        self._derivative_polynomial = None
         if n > 0:
             self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
         else:
@@ -179,6 +179,8 @@ class ChebyshevFirstKind(BasisFunction):
         """
         if x > 1 or x < -1:
             raise ValueError("Input is outside the domain [-1,1]")
+        if self._derivative_polynomial is None:
+            self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
         return self.n*self._derivative_polynomial(x)
 
     @classmethod
@@ -277,6 +279,7 @@ class ChebyshevSecondKind(BasisFunction):
     def __init__(self, n):
         super().__init__()
         self._n = n
+        self._derivative_polynomial = None
         if n > 1:
             self._points = [-numpy.cos(k*numpy.pi/(n+1)) for k in range(1, n+1)]
         else:
@@ -366,8 +369,10 @@ class ChebyshevSecondKind(BasisFunction):
         elif x == -1:
             return ((-1)**(self._n+1))*self._n*(self._n+1)*(self._n+2)/3
         else:
-            return ((self._n+1)*ChebyshevFirstKind(self._n+1)(x) -
-                    x*ChebyshevSecondKind(self._n)(x))/(x**2-1)
+            if self._derivative_polynomial is None:
+                self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
+            return ((self._n+1)*self._derivative_polynomial(x) -
+                    x*self(x))/(x**2-1)
 
     @classmethod
     def make_nested_set(cls, exactness):
