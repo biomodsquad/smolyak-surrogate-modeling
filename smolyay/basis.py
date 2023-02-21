@@ -10,9 +10,9 @@ class BasisFunction(abc.ABC):
      :math:`[-1,1]`. The function defines the :attr:`points` at
      which it should be sampled within this interval for interpolation.
      The function also has an associated :meth:`__call__` method
-     for evaluating it at a point within its domain.
-
-
+     for evaluating it at a point within its domain. Moreover,
+     the first derivative of the function can be evaluated via
+     :meth:`derivative`.
     """
 
     def __init__(self):
@@ -24,9 +24,8 @@ class BasisFunction(abc.ABC):
         """list: Sampling points for interpolation."""
         pass
 
-
     @abc.abstractmethod
-    def __call__(self,x):
+    def __call__(self, x):
         """Evaluate the basis function.
 
         Parameters
@@ -38,6 +37,22 @@ class BasisFunction(abc.ABC):
         -------
         float
             Value of basis function.
+        """
+        pass
+
+    @abc.abstractmethod
+    def derivative(self, x):
+        """Evaluate the first derivative of the basis function.
+
+        Parameters
+        ----------
+        x : float
+            one-dimensional point.
+
+        Returns
+        -------
+        float
+            Value of the derivative of the basis function.
         """
         pass
 
@@ -77,10 +92,10 @@ class ChebyshevFirstKind(BasisFunction):
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self,n):
+    def __init__(self, n):
         super().__init__()
         self._n = n
-        self._derivative = ChebyshevSecondKind(self._n-1)
+        self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
         if n > 0:
             self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
         else:
@@ -93,10 +108,10 @@ class ChebyshevFirstKind(BasisFunction):
 
     @property
     def n(self):
-        """int: Degree of polynomial"""
+        """int: Degree of polynomial."""
         return self._n
 
-    def __call__(self,x):
+    def __call__(self, x):
         r"""Evaluate the basis function.
 
         The Chebyshev polynomial is evaluated using the combinatorial formula:
@@ -164,7 +179,7 @@ class ChebyshevFirstKind(BasisFunction):
         """
         if x > 1 or x < -1:
             raise ValueError("Input is outside the domain [-1,1]")
-        return self.n*self._derivative(x)
+        return self.n*self._derivative_polynomial(x)
 
     @classmethod
     def make_nested_set(cls, exactness):
@@ -218,7 +233,8 @@ class ChebyshevFirstKind(BasisFunction):
             for p in basis_functions[end_level].points:
                 if not numpy.isclose(points, p).any():
                     points.append(p)
-        return NestedBasisFunctionSet(points,basis_functions,levels)
+        return NestedBasisFunctionSet(points, basis_functions, levels)
+
 
 class ChebyshevSecondKind(BasisFunction):
     r"""Chebyshev polynomial of the second kind.
@@ -240,6 +256,17 @@ class ChebyshevSecondKind(BasisFunction):
         x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
 
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    The :meth:`derivative` takes the derivative of Chebyshev polynomials
+    of fsecond kind:
+
+    ..math::
+        U_n'(x) = \frac{(n+1)T_{n+1}(x)-xU_n(x)}{x^{2}-1}
+
+    The above equation does not converge for :math:x={-1, 1}.
+
+    ..math::
+        \lim_{x \to 1} U_n'(x) = \frac{n(n+1)(n+2)}{3}
+        \lim_{x \to -1} U_n'(x) = (-1)^{n+1} \frac{n(n+1)(n+2)}{3}
 
     Parameters
     ----------
@@ -247,7 +274,7 @@ class ChebyshevSecondKind(BasisFunction):
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self,n):
+    def __init__(self, n):
         super().__init__()
         self._n = n
         if n > 1:
@@ -309,6 +336,38 @@ class ChebyshevSecondKind(BasisFunction):
             for k in range(0,k_lim+1):
                 answer += math.comb(self._n+1,2*k+1)*((x**2 - 1)**k)*(x**(self._n-2*k))
             return answer
+
+    def derivative(self, x):
+        r"""Evaluate the derivative of Chebyshev Second Kind.
+
+        The first derivative of Chebyshev polynomials of second kind is
+        evaluated using the connection between Chebyshev polynomial of
+        first kind and second kind.
+
+        Parameters
+        ----------
+        x: float
+            input in [-1, 1] domain.
+
+        Returns
+        -------
+        float
+            Value of the derivative of Chebyshev polynomials of first kind.
+
+        Raises
+        ------
+        ValueError
+            if input is outside the domain [-1,1].
+        """
+        if x > 1 or x < -1:
+            raise ValueError("Input is outside the domain [-1,1]")
+        if x == 1:
+            return self._n*(self._n+1)*(self._n+2)/3
+        elif x == -1:
+            return ((-1)**(self._n+1))*self._n*(self._n+1)*(self._n+2)/3
+        else:
+            return ((self._n+1)*ChebyshevFirstKind(self._n+1)(x) -
+                    x*ChebyshevSecondKind(self._n)(x))/(x**2-1)
 
     @classmethod
     def make_nested_set(cls, exactness):

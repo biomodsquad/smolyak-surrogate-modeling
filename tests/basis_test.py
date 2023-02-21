@@ -68,15 +68,35 @@ def test_cheb_call_random_points():
         assert numpy.isclose(f(x),special.eval_chebyt(n,x))
 
 
-def test_cheb_first_kind_derivative():
+def test_cheb_derivative():
     """Test if the correct derivative is generated."""
-    f = ChebyshevFirstKind(0)
-    g = ChebyshevFirstKind(1)
-    h = ChebyshevFirstKind(2)
-    x = 1
-    assert numpy.isclose(f.derivative(x), 0)
-    assert numpy.isclose(g.derivative(x), 1)
-    assert numpy.isclose(h.derivative(x), 4)
+    f0 = ChebyshevFirstKind(0)
+    f1 = ChebyshevFirstKind(1)
+    f2 = ChebyshevFirstKind(2)
+    x0, x1 = 1, -0.5
+    assert numpy.isclose(f0.derivative(x0), 0)
+    assert numpy.isclose(f1.derivative(x0), 1)
+    assert numpy.isclose(f2.derivative(x0), 4)
+    assert numpy.isclose(f0.derivative(x1), 0)
+    assert numpy.isclose(f1.derivative(x1), 1)
+    assert numpy.isclose(f2.derivative(x1), -2)
+
+
+def test_cheb_2nd_derivative():
+    """Test if the correct derivative is generated."""
+    u0 = ChebyshevSecondKind(0)
+    u1 = ChebyshevSecondKind(1)
+    u2 = ChebyshevSecondKind(2)
+    x0, x1, x2 = 1, -1, 0.5
+    assert numpy.isclose(u0.derivative(x0), 0)
+    assert numpy.isclose(u1.derivative(x0), 2)
+    assert numpy.isclose(u2.derivative(x0), 8)
+    assert numpy.isclose(u0.derivative(x1), 0)
+    assert numpy.isclose(u1.derivative(x1), 2)
+    assert numpy.isclose(u2.derivative(x1), -8)
+    assert numpy.isclose(u0.derivative(x2), 0)
+    assert numpy.isclose(u1.derivative(x2), 2)
+    assert numpy.isclose(u2.derivative(x2), 4)
 
 
 def test_cheb_call_invalid_input():
@@ -87,7 +107,7 @@ def test_cheb_call_invalid_input():
     with pytest.raises(ValueError):
         f(-2)
 
-def test_cheb_first_kind_derivative_invalid_input():
+def test_cheb_derivative_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
     f = ChebyshevFirstKind(4)
     with pytest.raises(ValueError):
@@ -154,6 +174,16 @@ def test_cheb_2nd_call_invalid_input():
         f(2)
     with pytest.raises(ValueError):
         f(-2)
+
+
+def test_cheb_2nd_derivative_invalid_input():
+    """Test call raises error if input is outside domain [-1,1]"""
+    f = ChebyshevSecondKind(4)
+    with pytest.raises(ValueError):
+        f(2)
+    with pytest.raises(ValueError):
+        f(-2)
+
 
 def test_set_initialize_empty():
     """Check BasisFunctionSet initializes with empty set"""
