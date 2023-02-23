@@ -476,10 +476,9 @@ class GradientSurrogate(Surrogate):
         # create basis matrix with appropriate size
         basis_matrix = numpy.zeros((self.dimension * len(points), len(points)))
         # evalaute each term
-        count = -1
+        count = 0
         for i, point in enumerate(points):
             for ni in range(self.dimension):
-                count += 1
                 for j, basis in enumerate(basis_functions):
                     if self.dimension > 1:
                         value = numpy.prod([f.derivative(x) if dim == ni
@@ -489,6 +488,7 @@ class GradientSurrogate(Surrogate):
                     else:
                         value = basis.derivative(point)
                     basis_matrix[count, j] = value
+                count += 1
         data = numpy.reshape(self._data,
                              (self.dimension*len(self.grid.points), ))
         self._coefficients = numpy.linalg.lstsq(basis_matrix,

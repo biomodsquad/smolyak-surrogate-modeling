@@ -78,14 +78,6 @@ class ChebyshevFirstKind(BasisFunction):
 
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
 
-    The :meth:`derivative` takes the derivative of Chebyshev polynomials
-    of first kind:
-    ..math:
-
-        T_n'(x) = nU_{n-1}(x)
-
-    where :math:`U_n` is Chebyshev polynomials of second kind.
-
     Parameters
     ----------
     n : int
@@ -160,7 +152,7 @@ class ChebyshevFirstKind(BasisFunction):
         first kind and second kind.
 
         ..math::
-        T_n'(x) = nU_{n-1}(x)
+            T_n'(x) = nU_{n-1}(x)
 
         Parameters
         ----------
@@ -258,17 +250,6 @@ class ChebyshevSecondKind(BasisFunction):
         x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
 
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
-    The :meth:`derivative` takes the derivative of Chebyshev polynomials
-    of fsecond kind:
-
-    ..math::
-        U_n'(x) = \frac{(n+1)T_{n+1}(x)-xU_n(x)}{x^{2}-1}
-
-    The above equation does not converge for :math:x={-1, 1}.
-
-    ..math::
-        \lim_{x \to 1} U_n'(x) = \frac{n(n+1)(n+2)}{3}
-        \lim_{x \to -1} U_n'(x) = (-1)^{n+1} \frac{n(n+1)(n+2)}{3}
 
     Parameters
     ----------
@@ -346,6 +327,15 @@ class ChebyshevSecondKind(BasisFunction):
         The first derivative of Chebyshev polynomials of second kind is
         evaluated using the connection between Chebyshev polynomial of
         first kind and second kind.
+
+        ..math::
+            U_n'(x) = \frac{(n+1)T_{n+1}(x)-xU_n(x)}{x^{2}-1}
+
+        The above equation does not converge for :math:x={-1, 1}.
+
+        ..math::
+            \lim_{x \to 1} U_n'(x) = \frac{n(n+1)(n+2)}{3}
+            \lim_{x \to -1} U_n'(x) = (-1)^{n+1} \frac{n(n+1)(n+2)}{3}
 
         Parameters
         ----------

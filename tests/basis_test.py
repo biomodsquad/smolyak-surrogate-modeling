@@ -73,23 +73,13 @@ def test_cheb_derivative():
     f0 = ChebyshevFirstKind(0)
     f1 = ChebyshevFirstKind(1)
     f2 = ChebyshevFirstKind(2)
-    x0, x1 = 1, -0.5
-    assert numpy.isclose(f0.derivative(x0), 0)
-    assert numpy.isclose(f1.derivative(x0), 1)
-    assert numpy.isclose(f2.derivative(x0), 4)
-    assert numpy.isclose(f0.derivative(x1), 0)
-    assert numpy.isclose(f1.derivative(x1), 1)
-    assert numpy.isclose(f2.derivative(x1), -2)
+    assert f0.derivative(1) == pytest.approx(0)
+    assert f1.derivative(1) == pytest.approx(1)
+    assert f2.derivative(1) == pytest.approx(4)
 
-
-def test_cheb_derivative_polynomial():
-    """Test if the correct object is created for derivation."""
-    f2 = ChebyshevFirstKind(2)
-    derivative_polynomial = f2._derivative_polynomial
-    f2_derivative = f2.derivative(0.5)
-    assert derivative_polynomial is None
-    assert isinstance(f2._derivative_polynomial, ChebyshevSecondKind)
-    assert numpy.isclose(f2._derivative_polynomial(0.5), 1)
+    assert f0.derivative(-0.5) == pytest.approx(0)
+    assert f1.derivative(-0.5) == pytest.approx(1)
+    assert f2.derivative(-0.5) == pytest.approx(-2)
 
 
 def test_cheb_2nd_derivative():
@@ -97,26 +87,17 @@ def test_cheb_2nd_derivative():
     u0 = ChebyshevSecondKind(0)
     u1 = ChebyshevSecondKind(1)
     u2 = ChebyshevSecondKind(2)
-    x0, x1, x2 = 1, -1, 0.5
-    assert numpy.isclose(u0.derivative(x0), 0)
-    assert numpy.isclose(u1.derivative(x0), 2)
-    assert numpy.isclose(u2.derivative(x0), 8)
-    assert numpy.isclose(u0.derivative(x1), 0)
-    assert numpy.isclose(u1.derivative(x1), 2)
-    assert numpy.isclose(u2.derivative(x1), -8)
-    assert numpy.isclose(u0.derivative(x2), 0)
-    assert numpy.isclose(u1.derivative(x2), 2)
-    assert numpy.isclose(u2.derivative(x2), 4)
+    assert u0.derivative(1) == pytest.approx(0)
+    assert u1.derivative(1) == pytest.approx(2)
+    assert u2.derivative(1) == pytest.approx(8)
 
+    assert u0.derivative(-1) == pytest.approx(0)
+    assert u1.derivative(-1) == pytest.approx(2)
+    assert u2.derivative(-1) == pytest.approx(-8)
 
-def test_cheb_2nd_derivative_polynomial():
-    """Test if the correct object is created for derivation."""
-    f1 = ChebyshevSecondKind(1)
-    derivative_polynomial = f1._derivative_polynomial
-    f1_derivative = f1.derivative(0.5)
-    assert derivative_polynomial is None
-    assert isinstance(f1._derivative_polynomial, ChebyshevFirstKind)
-    assert numpy.isclose(f1._derivative_polynomial(1), 1)
+    assert u0.derivative(0.5) == pytest.approx(0)
+    assert u1.derivative(0.5) == pytest.approx(2)
+    assert u2.derivative(0.5) == pytest.approx(4)
 
 
 def test_cheb_call_invalid_input():
@@ -135,11 +116,13 @@ def test_cheb_derivative_invalid_input():
     with pytest.raises(ValueError):
         f.derivative(-2)
 
+
 def test_cheb_2nd_initial_zero():
     """test degree of zero"""
     f = ChebyshevSecondKind(0)
     assert f.n == 0
     assert f.points == [0]
+
 
 def test_cheb_2nd_initial_1():
     """test initial when degree is 1"""
