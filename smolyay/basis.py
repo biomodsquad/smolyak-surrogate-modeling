@@ -10,9 +10,9 @@ class BasisFunction(abc.ABC):
      :math:`[-1,1]`. The function defines the :attr:`points` at
      which it should be sampled within this interval for interpolation.
      The function also has an associated :meth:`__call__` method
-     for evaluating it at a point within its domain.
-
-
+     for evaluating it at a point within its domain. Moreover,
+     the first derivative of the function can be evaluated via
+     :meth:`derivative`.
     """
 
     def __init__(self):
@@ -24,9 +24,8 @@ class BasisFunction(abc.ABC):
         """list: Sampling points for interpolation."""
         pass
 
-
     @abc.abstractmethod
-    def __call__(self,x):
+    def __call__(self, x):
         """Evaluate the basis function.
 
         Parameters
@@ -38,6 +37,22 @@ class BasisFunction(abc.ABC):
         -------
         float
             Value of basis function.
+        """
+        pass
+
+    @abc.abstractmethod
+    def derivative(self, x):
+        """Evaluate the first derivative of the basis function.
+
+        Parameters
+        ----------
+        x : float
+            one-dimensional point.
+
+        Returns
+        -------
+        float
+            Value of the derivative of the basis function.
         """
         pass
 
@@ -56,7 +71,7 @@ class ChebyshevFirstKind(BasisFunction):
 
     The :attr:`points` for this polynomial are the extrema on the domain
     :math:`[-1,1]`:
-   
+
     .. math::
 
         x_i^* = -\cos(\pi i/n), i = 0,...,n
@@ -69,9 +84,10 @@ class ChebyshevFirstKind(BasisFunction):
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self,n):
+    def __init__(self, n):
         super().__init__()
         self._n = n
+        self._derivative_polynomial = None
         if n > 0:
             self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
         else:
@@ -84,16 +100,16 @@ class ChebyshevFirstKind(BasisFunction):
 
     @property
     def n(self):
-        """int: Degree of polynomial"""
+        """int: Degree of polynomial."""
         return self._n
 
-    def __call__(self,x):
+    def __call__(self, x):
         r"""Evaluate the basis function.
 
         The Chebyshev polynomial is evaluated using the combinatorial formula:
-        
+
         .. math::
-        
+
             T_n(x) = \sum_{k=0}^{\lfloor n/2 \rfloor} {n \choose 2k} (x^2-1)^k x^{n-2k}
 
         for :math:`n \ge 2`, and by the direct formula for the other values of *n*.
@@ -128,6 +144,37 @@ class ChebyshevFirstKind(BasisFunction):
                 answer += math.comb(self._n,2*k)*((x**2 - 1)**k)*(x**(self._n-2*k))
             return answer
 
+    def derivative(self, x):
+        """Evaluate the derivative of ChebyshevFirstKind.
+
+        The first derivative of Chebyshev polynomials of first kind is
+        evaluated using the relation between Chebyshev polynomial of
+        first kind and second kind.
+
+        ..math::
+            T_n'(x) = nU_{n-1}(x)
+
+        Parameters
+        ----------
+        x: float
+            input in [-1, 1] domain.
+
+        Returns
+        -------
+        float
+            Value of the derivative of Chebyshev polynomials of first kind.
+
+        Raises
+        ------
+        ValueError
+            if input is outside the domain [-1,1].
+        """
+        if x > 1 or x < -1:
+            raise ValueError("Input is outside the domain [-1,1]")
+        if self._derivative_polynomial is None:
+            self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
+        return self.n*self._derivative_polynomial(x)
+
     @classmethod
     def make_nested_set(cls, exactness):
         """Create a nested set of Chebyshev polynomials.
@@ -137,15 +184,15 @@ class ChebyshevFirstKind(BasisFunction):
         degree ``n = 2**exactness``.
 
         Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**exactness``, with the first level being a special case. The 
+        ``2**exactness``, with the first level being a special case. The
         generating Chebyshev polynomials are hence of degree (0, 2, 4, 8, ...).
-        Each new point added in a level is paired with a basis function of 
+        Each new point added in a level is paired with a basis function of
         increasing order.
 
         For example, for an ``exactness`` of 3, the generating polynomials are
         of degree 0, 2, 4, and 8, at each of 4 levels. There are 1, 2, 2, and 4
-        new points added at each level. The polynomial at level 0 is of degree 
-        0, the polynomials at level 1 are of degrees 1 and 2, those at level 2 
+        new points added at each level. The polynomial at level 0 is of degree
+        0, the polynomials at level 1 are of degrees 1 and 2, those at level 2
         are of degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and
         8.
 
@@ -180,7 +227,8 @@ class ChebyshevFirstKind(BasisFunction):
             for p in basis_functions[end_level].points:
                 if not numpy.isclose(points, p).any():
                     points.append(p)
-        return NestedBasisFunctionSet(points,basis_functions,levels)
+        return NestedBasisFunctionSet(points, basis_functions, levels)
+
 
 class ChebyshevSecondKind(BasisFunction):
     r"""Chebyshev polynomial of the second kind.
@@ -209,9 +257,10 @@ class ChebyshevSecondKind(BasisFunction):
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self,n):
+    def __init__(self, n):
         super().__init__()
         self._n = n
+        self._derivative_polynomial = None
         if n > 1:
             self._points = [-numpy.cos(k*numpy.pi/(n+1)) for k in range(1, n+1)]
         else:
@@ -272,6 +321,49 @@ class ChebyshevSecondKind(BasisFunction):
                 answer += math.comb(self._n+1,2*k+1)*((x**2 - 1)**k)*(x**(self._n-2*k))
             return answer
 
+    def derivative(self, x):
+        r"""Evaluate the derivative of Chebyshev Second Kind.
+
+        The first derivative of Chebyshev polynomials of second kind is
+        evaluated using the connection between Chebyshev polynomial of
+        first kind and second kind.
+
+        ..math::
+            U_n'(x) = \frac{(n+1)T_{n+1}(x)-xU_n(x)}{x^{2}-1}
+
+        The above equation does not converge for :math:x={-1, 1}.
+
+        ..math::
+            \lim_{x \to 1} U_n'(x) = \frac{n(n+1)(n+2)}{3}
+            \lim_{x \to -1} U_n'(x) = (-1)^{n+1} \frac{n(n+1)(n+2)}{3}
+
+        Parameters
+        ----------
+        x: float
+            input in [-1, 1] domain.
+
+        Returns
+        -------
+        float
+            Value of the derivative of Chebyshev polynomials of first kind.
+
+        Raises
+        ------
+        ValueError
+            if input is outside the domain [-1,1].
+        """
+        if x > 1 or x < -1:
+            raise ValueError("Input is outside the domain [-1,1]")
+        if x == 1:
+            return self._n*(self._n+1)*(self._n+2)/3
+        elif x == -1:
+            return ((-1)**(self._n+1))*self._n*(self._n+1)*(self._n+2)/3
+        else:
+            if self._derivative_polynomial is None:
+                self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
+            return ((self._n+1)*self._derivative_polynomial(x) -
+                    x*self(x))/(x**2-1)
+
     @classmethod
     def make_nested_set(cls, exactness):
         """Create a nested set of Chebyshev polynomials.
@@ -281,16 +373,16 @@ class ChebyshevSecondKind(BasisFunction):
         degree ``n = 2**(exactness + 1) - 1``.
 
         Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**(exactness + 1) - 1``, with the first level being a special case. 
-        The generating Chebyshev polynomials are hence of degree (1, 3, 7, 
-        15, ...). Each new point added in a level is paired with a basis 
+        ``2**(exactness + 1) - 1``, with the first level being a special case.
+        The generating Chebyshev polynomials are hence of degree (1, 3, 7,
+        15, ...). Each new point added in a level is paired with a basis
         function of increasing order.
 
         For example, for an ``exactness`` of 3, the generating polynomials are
         of degree 1, 3, 7, and 16, at each of 4 levels. There are 2, 2, 4, and 8
         new points added at each level. The polynomials at level 0 are of degree
-        0 and 1, the polynomials at level 1 are of degrees 2 and 3, those at 
-        level 2 are of degree 4, 5, 6, and 7, and those at level 3 are of 
+        0 and 1, the polynomials at level 1 are of degrees 2 and 3, those at
+        level 2 are of degree 4, 5, 6, and 7, and those at level 3 are of
         degrees 8, 9, 10, 11, 12, 13, 14, and 15.
 
         Parameters
@@ -331,7 +423,7 @@ class BasisFunctionSet():
 
     points : list
         Sample point corresponding to each basis function.
-        
+
     """
 
     def __init__(self,points,basis_functions):
@@ -356,7 +448,7 @@ class NestedBasisFunctionSet(BasisFunctionSet):
     """Nested set of basis functions and points.
 
     Nested points/basis function grow in levels, such that an approximation
-    of a given level uses not only its sampling points but also all the points 
+    of a given level uses not only its sampling points but also all the points
     at lower levels. Nested sets (similarly to ogres) are like onions.
 
     Parameters

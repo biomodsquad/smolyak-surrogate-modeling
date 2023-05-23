@@ -3,7 +3,7 @@ import pytest
 import numpy
 from scipy import special
 
-from smolyay.basis import (BasisFunction, ChebyshevFirstKind, 
+from smolyay.basis import (BasisFunction, ChebyshevFirstKind,
         ChebyshevSecondKind, BasisFunctionSet, NestedBasisFunctionSet)
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def test_cheb_initial_4():
 
 def test_cheb_initial_8():
     """test initial when degree is 8"""
-    expected_points = [-1, -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75), 
+    expected_points = [-1, -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
             -1/numpy.sqrt(2), -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 0,
             numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 1/numpy.sqrt(2),
             numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75), 1]
@@ -67,6 +67,39 @@ def test_cheb_call_random_points():
         f = ChebyshevFirstKind(n)
         assert numpy.isclose(f(x),special.eval_chebyt(n,x))
 
+
+def test_cheb_derivative():
+    """Test if the correct derivative is generated."""
+    f0 = ChebyshevFirstKind(0)
+    f1 = ChebyshevFirstKind(1)
+    f2 = ChebyshevFirstKind(2)
+    assert f0.derivative(1) == pytest.approx(0)
+    assert f1.derivative(1) == pytest.approx(1)
+    assert f2.derivative(1) == pytest.approx(4)
+
+    assert f0.derivative(-0.5) == pytest.approx(0)
+    assert f1.derivative(-0.5) == pytest.approx(1)
+    assert f2.derivative(-0.5) == pytest.approx(-2)
+
+
+def test_cheb_2nd_derivative():
+    """Test if the correct derivative is generated."""
+    u0 = ChebyshevSecondKind(0)
+    u1 = ChebyshevSecondKind(1)
+    u2 = ChebyshevSecondKind(2)
+    assert u0.derivative(1) == pytest.approx(0)
+    assert u1.derivative(1) == pytest.approx(2)
+    assert u2.derivative(1) == pytest.approx(8)
+
+    assert u0.derivative(-1) == pytest.approx(0)
+    assert u1.derivative(-1) == pytest.approx(2)
+    assert u2.derivative(-1) == pytest.approx(-8)
+
+    assert u0.derivative(0.5) == pytest.approx(0)
+    assert u1.derivative(0.5) == pytest.approx(2)
+    assert u2.derivative(0.5) == pytest.approx(4)
+
+
 def test_cheb_call_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
     f = ChebyshevFirstKind(4)
@@ -75,11 +108,21 @@ def test_cheb_call_invalid_input():
     with pytest.raises(ValueError):
         f(-2)
 
+def test_cheb_derivative_invalid_input():
+    """Test call raises error if input is outside domain [-1,1]"""
+    f = ChebyshevFirstKind(4)
+    with pytest.raises(ValueError):
+        f.derivative(2)
+    with pytest.raises(ValueError):
+        f.derivative(-2)
+
+
 def test_cheb_2nd_initial_zero():
     """test degree of zero"""
     f = ChebyshevSecondKind(0)
     assert f.n == 0
     assert f.points == [0]
+
 
 def test_cheb_2nd_initial_1():
     """test initial when degree is 1"""
@@ -135,6 +178,16 @@ def test_cheb_2nd_call_invalid_input():
     with pytest.raises(ValueError):
         f(-2)
 
+
+def test_cheb_2nd_derivative_invalid_input():
+    """Test call raises error if input is outside domain [-1,1]"""
+    f = ChebyshevSecondKind(4)
+    with pytest.raises(ValueError):
+        f(2)
+    with pytest.raises(ValueError):
+        f(-2)
+
+
 def test_set_initialize_empty():
     """Check BasisFunctionSet initializes with empty set"""
     basis_functions = []
@@ -183,7 +236,7 @@ def test_set_nested_change_levels_invalid():
     f = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
     with pytest.raises(IndexError):
         f.levels = [[0],[1,2],[3,4]]
-    
+
 def test_set_nested_change_levels(expected_points_3_set):
     """Check NestedBasisFunctionSet updates levels correctly"""
     levels = [[0],[1,2],[3,4],[5,6,7,8]]
