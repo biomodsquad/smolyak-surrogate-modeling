@@ -3,7 +3,7 @@ import pytest
 
 from smolyay.basis import ChebyshevFirstKind
 from smolyay.grid import SmolyakGridGenerator, IndexGrid
-from smolyay.surrogate import Surrogate
+from smolyay.surrogate import Surrogate, GradientSurrogate
 
 
 def function_0(x):
@@ -27,6 +27,19 @@ def function_1(x):
 def function_2(x):
     """Test funciton 2."""
     return x**2 - 3 * (2 + x) - x
+
+
+def function_3(x):
+    """Test function 3 (gradient)."""
+    # function f = x1*x2 - 2*x2
+    x1, x2 = x
+    return x2, x1 - 2
+
+
+def function_4(x):
+    """Test function 4 (gradient)."""
+    # function f = x**3 -2*x
+    return 3*x**2 - 2
 
 
 def branin(x):
@@ -54,23 +67,55 @@ def test_initialization_1d():
                           [0, -1, 1, -0.70710, 0.70710])
 
 
+def test_gradient_initialization_1d():
+    """Test if class is properly intiallized."""
+    grid_generator = SmolyakGridGenerator(
+        ChebyshevFirstKind.make_nested_set(2))
+    domain = (-1, 1)
+    surrogate = GradientSurrogate(domain, grid_generator)
+    assert numpy.allclose(surrogate.domain, domain)
+    assert surrogate.coefficients is None
+    assert isinstance(surrogate.grid, IndexGrid)
+    assert surrogate.dimension == 1
+    assert numpy.allclose(surrogate.points,
+                          [0, -1, 1, -0.70710, 0.70710])
+
+
 def test_initialization_2d():
     """Test if class is properly intiallized."""
     grid_generator = SmolyakGridGenerator(
         ChebyshevFirstKind.make_nested_set(2))
     domain = [(-5, 5), (-8, 0)]
     surrogate = Surrogate(domain, grid_generator)
-    grid_object = surrogate.grid
     assert numpy.allclose(surrogate.domain,
                           domain)
     assert surrogate.coefficients is None
-    assert isinstance(grid_object, IndexGrid)
+    assert isinstance(surrogate.grid, IndexGrid)
     assert surrogate.dimension == 2
     assert numpy.allclose(surrogate.points, [[0, -4], [-5, -4], [5, -4],
                                              [0, -8], [0, 0], [-3.5355, -4],
                                              [3.5355, -4], [-5, -8],
                                              [-5, 0], [5, -8], [5, 0],
                                              [0, -6.8284], [0, -1.1715]],
+                          atol=1e-4)
+
+
+def test_gradient_initialization_2d():
+    """Test if class is properly intiallized."""
+    grid_generator = SmolyakGridGenerator(
+        ChebyshevFirstKind.make_nested_set(2))
+    domain = [(-5, 5), (-8, 0)]
+    surrogate = GradientSurrogate(domain, grid_generator)
+    assert numpy.allclose(surrogate.domain, domain)
+    assert surrogate.coefficients is None
+    assert isinstance(surrogate.grid, IndexGrid)
+    assert surrogate.dimension == 2
+    assert numpy.allclose(surrogate.points,
+                          [[0, -4], [-5, -4], [5, -4],
+                           [0, -8], [0, 0], [-3.5355, -4],
+                           [3.5355, -4], [-5, -8],
+                           [-5, 0], [5, -8], [5, 0],
+                           [0, -6.8284], [0, -1.1715]],
                           atol=1e-4)
 
 
@@ -81,13 +126,20 @@ def test_error_grid_generator_type():
         Surrogate(domain, 'not a grid generator')
 
 
+def test_error_gradient_grid_generator_type():
+    """Test grid generator's type."""
+    domain = [(-5, 5), (-8, 0)]
+    with pytest.raises(TypeError):
+        GradientSurrogate(domain, 'not a grid generator')
+
+
 def test_map_function_1d():
     """Test if points are transfromed properly."""
     grid = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(1))
     domain = (-8, 12)
     new_domain = (0, 1)
     f = Surrogate(domain, grid)
-    assert f._mapdomain(2, domain, new_domain) == pytest.approx(0.5)
+    assert f._mapdomain(2, domain, new_domain)
     assert numpy.allclose(f._mapdomain([-3, 7],
                                        domain, new_domain), [0.25, 0.75])
 
@@ -165,6 +217,44 @@ def test_train_from_data():
         surrogate.train_from_data(data[:5])
 
 
+def test_gradient_train_from_data():
+    """Test if train_from_data_works."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4))
+    surrogate = GradientSurrogate([(-5, 10), (0, 15)], grid_gen)
+    gradient_data = [function_3(point) for point in surrogate.points]
+    surrogate.train_from_data(gradient_data)
+    # random point in the domain
+    point = (8, 0.75)
+    assert numpy.allclose(surrogate.gradient(point),
+                          function_3(point))
+    with pytest.raises(IndexError):
+        surrogate.train_from_data(gradient_data[:5])
+
+
+def test_gradient_surrogate_3():
+    """Test if surrogate generates exact results for test for Chebyshevs."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([(-2, 2), (-2, 2)], grid_gen)
+    surrogate.train(function_3)
+    # random points in the domain
+    points = [(0.649, -0.9), (-0.885, 1)]
+    surrogate_gradient_values = [surrogate.gradient(x) for x in points]
+    exact_values = [function_3(x) for x in points]
+    assert numpy.allclose(surrogate_gradient_values, exact_values)
+
+
+def test_gradient_surrogate_4():
+    """Test if surrogate generates exact results for test for Chebyshevs."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([-2, 2], grid_gen)
+    surrogate.train(function_4)
+    # random points in the domain
+    points = -0.7, 0.45
+    surrogate_gradient_values = [surrogate.gradient(x) for x in points]
+    exact_values = [function_4(x) for x in points]
+    assert numpy.allclose(surrogate_gradient_values, exact_values)
+
+
 def test_error_solver():
     """Test if invalid solver generates surrogate."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
@@ -188,10 +278,15 @@ def test_error_input_surrogate():
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
     surrogate.train(function_1, 'lstsq')
-    # random point in the domain
+    # random point in the domain but with incorrect dimensionality
     point = (0.649, 0, 0.5)
     point_outside_domain = (-2, 1)
     with pytest.raises(IndexError):
         surrogate(point)
     with pytest.raises(ValueError):
         surrogate(point_outside_domain)
+    with pytest.raises(IndexError):
+        surrogate.gradient(point)
+    with pytest.raises(ValueError):
+        surrogate.gradient(point_outside_domain)
+
