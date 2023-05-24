@@ -24,7 +24,7 @@ grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exa
 index_names = []
 test_functions = []
 
-for name, cls in inspect.getmembers(importlib.import_module("test_function_class"), inspect.isclass):
+for name, cls in inspect.getmembers(importlib.import_module("smolyay.test_function_class"), inspect.isclass):
     if not name == 'test_fun':
         test_functions.append(cls())
 test_functions.sort(key=lambda x: x.dim)
