@@ -2,77 +2,95 @@ import abc
 import math
 
 import numpy
-
 class test_fun(abc.ABC):
-    """Test functions to analysis the surrogate model.
+    """Abstract test function class
 
-    Testing a surrogate model requires a data set that the model must try
-    to replicate. This example function is defined by the number of
-    variables defined by the :attr:`dim`, the domain of each variable
-    given by the :attr:`lower_bounds` and :attr:`upper_bounds that give
-    the lower and upper bounds of the domains, and by the function itself
-    defined by :meth:`__call__` method.
+    Stores data about each test function including call, name, the number of
+    dimensions, the domain, and how to normalize that domain to the interval
+    [-1,1]
+
+    Parameters
+    ----------
+    dim : int
+        the number of variables used as input
+
+    lower_bounds : list of floats of size 1xdim
+        the lower bounds of the domain of each variable
+
+    upper_bounds : list of floats of size 1xdim
+        the upper bounds of the domain of each variable
 
     Raises
     ------
-    ValueError 
-        number of bounds must be equal to `dim`
+    ValueError
+        The number of variables/dimensions should be greater than one
 
+    IndexError
+        All dimensions must have bounds
     """
     def __init__(self,dim,lower_bounds,upper_bounds):
-        if not (dim == len(lower_bounds) and dim == len(upper_bounds)):
-            raise ValueError("number of bounds must be equal to dim")
         self._dim = dim
-        self._upper_bounds = numpy.zeros(dim)
-        self._lower_bounds = numpy.zeros(dim)
-        for i in range(dim):
-            self._upper_bounds[i] = upper_bounds[i]
-            self._lower_bounds[i] = lower_bounds[i]
+        if dim < 1:
+            raise ValueError('The number of variables must be greater than 1')
+        if not(hasattr(lower_bounds,'__len__') and hasattr(upper_bounds,'__len__')):
+            if not dim == 1:
+                raise IndexError('All dimensions must have bounds')
+            # turn scalar inputs into 1x1 vectors
+            if not hasattr(lower_bounds,'__len__'):
+                self._lower_bounds = [lower_bounds]
+            else:
+                self._lower_bounds = [lower_bounds[0]]
+            if not hasattr(lower_bounds,'__len__'):
+                self._upper_bounds = [upper_bounds]
+            else:
+                self._upper_bounds = [upper_bounds[0]]
+        else:
+            if max(len(lower_bounds),len(upper_bounds)) < dim:
+                raise IndexError('All dimensions must have bounds')
+            self._upper_bounds = upper_bounds[0:dim]
+            self._lower_bounds = lower_bounds[0:dim]
     
     @property
     def name(self):
-        """string: name of the class for easy reference"""
+        """Name of the function"""
         return self.__class__.__name__
 
     @property
     def dim(self):
-        """int: number of variables"""
+        """Number of variables"""
         return self._dim
-    
-    @property
-    def upper_bounds(self):
-        """list: upper bounds of each variable"""
-        return self._upper_bounds
 
     @property
     def lower_bounds(self):
-        """list: lowever bounds of each variable"""
+        """ the lower bounds of the domain of each variable"""
         return self._lower_bounds
+    
+    @property
+    def upper_bounds(self):
+        """the upper bounds of the domain of each variable"""
+        return self._upper_bounds
 
     @property
     def bounds(self):
-        """list of tuples: tuples of each variable's bounds"""
-        b = []
-        for i in range(self._dim):
-            b.append((self._lower_bounds[i], self._upper_bounds[i]))
-        return b
+        """the lower and upper bounds of each variable"""
+        return list(zip(self._lower_bounds,self._upper_bounds))
 
     def check_bounds(self,x):
-        """Check input is within class' bounds
+        """Checks that the input of a call is within the bounds of the function
 
         Parameters
         ----------
-        x : list
-            input to check
+        x : list of floats
+            the input to the call method
 
         Raises
         ------
         ValueError
-            input is out of class' bounds
+            if the input is outside is outside the domain
         """
+        x = numpy.array(x,copy=False)
         for i in range(self.dim):
-            if not (self.lower_bounds[i]-(1e-10) <= x[i]
-                    <= self.upper_bounds[i]+1e-10):
+            if not (self.lower_bounds[i]-(1e-10) <= x[i] <= self.upper_bounds[i]+1e-10):
                 print("input: " + str(x[i]))
                 print("bounds: " + str(self.lower_bounds[i])
                       + " to " + str(self.upper_bounds[i]))
@@ -80,12 +98,12 @@ class test_fun(abc.ABC):
         
     @abc.abstractmethod
     def __call__(self,x):
-        """The test function
+        """Evaluate the test function
 
         Parameters
         ----------
-        x : list
-            input
+        x : list of floats
+            the input to the call method
         """
         pass
 
@@ -121,8 +139,7 @@ class branin(test_fun):
         super().__init__(2,[-5,0],[10,15])
     def __call__(self,x):
         self.check_bounds(x)
-        y1 = pow(x[1] - 5.1*pow(x[0],2)/(4*pow(numpy.pi,2)) + 
-                5*x[0]/numpy.pi - 6,2)
+        y1 = pow(x[1] - 5.1*pow(x[0],2)/(4*pow(numpy.pi,2)) + 5*x[0]/numpy.pi - 6,2)
         y2 = 10*(1-1/(8*numpy.pi))*numpy.cos(x[0]) + 10
         return y1 + y2
     
@@ -371,7 +388,7 @@ class fermat2_vareps(test_fun):
 class least(test_fun):
     def __init__(self):
         super().__init__(3,[473.98605675534, -159.3518936954, -5],
-                         [506.6511741726, -125.41670432586, 4.5])
+                         [ 506.6511741726, -125.41670432586, 4.5])
 
     def __call__(self,x):
         self.check_bounds(x)
@@ -836,7 +853,87 @@ class hart6(test_fun):
               3.2*math.exp(-(17*pow(x[0]-0.4047,2) + 8*pow(x[1]-0.8828,2) +
                              0.05*pow(x[2]-0.8732,2) + 10*pow(x[3]-0.5743,2) +
                              0.1*pow(x[4]-0.1091,2) + 14*pow(x[5]-0.0381,2))))
-        return y 
+        return y
+    
+# caused RuntimeWarning: invalid value encountered in double_scalars
+# trying to not do all terms at once causes deviation for unknown reasons
+##class palmer2a(test_fun):
+##    def __init__(self):
+##        super().__init__(6,[0, 0, -20.7797273226, -25.3729423234,
+##                            3.6520539577,-10.081937131],
+##                         [32.4286981517, 10.7435278989, -0.779727322599999,
+##                          -5.3729423234, 23.6520539577, 9.918062869])
+##
+##    def __call__(self,x):
+##        self.check_bounds(x)
+##        y = (pow(72.676767 - x[0]/(3.046173318241 + x[1]) - x[2] -
+##                 3.046173318241*x[3] -9.27917188476338*x[4] -
+##                 28.2659658107383*x[5],2) +
+##             pow(40.149455 - x[0]/(2.467400073616 + x[1]) - x[2] -
+##                 2.467400073616*x[3] - 6.08806312328024*x[4] -
+##                 5.0216873985605*x[5],2) +
+##             pow(18.8548 - x[0]/(1.949550365169 + x[1]) - x[2] -
+##                 1.949550365169*x[3] - 3.80074662633058*x[4] -
+##                 7.40974697327763*x[5],2) +
+##             pow(6.4762 - x[0]/(1.4926241929 + x[1]) - x[2] -
+##                 1.4926241929*x[3] - 2.22792698123038*x[4] -
+##                 3.32545771219912*x[5],2) +
+##             pow(0.8596 - x[0]/(1.096623651204 + x[1]) - x[2] -
+##                 1.096623651204*x[3] - 1.20258343237999*x[4] -
+##                 1.31878143449399*x[5],2) +
+##             pow((-x[0]/(0.878319472969 + x[1])) - x[2] -
+##                 0.878319472969*x[3] - 0.771445096596542*x[4] -
+##                 0.677575250667194*x[5],2) +
+##             pow(0.273 - x[0]/(0.761544202225 + x[1]) - x[2] -
+##                 0.761544202225*x[3] - 0.579949571942512*x[4] -
+##                 0.44165723409569*x[5],2) +
+##             pow(3.2043 - x[0]/(0.487388289424 + x[1]) - x[2] -
+##                 0.487388289424*x[3] -0.237547344667653*x[4] -
+##                 0.115777793974781*x[5],2) +
+##             pow(8.108 - x[0]/(0.274155912801 + x[1]) - x[2] -
+##                 0.274155912801*x[3] - 0.0751614645237495*x[4] -
+##                 0.0206059599139685*x[5],2) +
+##             pow(13.4291 - x[0]/(0.121847072356 + x[1]) - x[2] -
+##                 0.121847072356*x[3] - 0.0148467090417283*x[4] -
+##                 0.00180902803085595*x[5],2) +
+##             pow(17.714 - x[0]/(0.030461768089 + x[1]) - x[2] -
+##                 0.030461768089*x[3] -0.000927919315108019*x[4] -
+##                 2.82660629821242e-5*x[5],2) +
+##             pow(19.4529 - x[0]/x[1] -x[2],2) +
+##             pow(17.7149 - x[0]/(0.030461768089 + x[1]) - x[2] -
+##                 0.030461768089*x[3] - 0.000927919315108019*x[4] -
+##                 2.82660629821242e-5*x[5],2) +
+##             pow(13.4291 - x[0]/(0.121847072356 + x[1]) - x[2] -
+##                 0.121847072356*x[3] - 0.0148467090417283*x[4] -
+##                 0.00180902803085595*x[5],2) +
+##             pow(8.108 - x[0]/(0.274155912801 + x[1]) - x[2] -
+##                 0.274155912801*x[3] - 0.0751614645237495*x[4] -
+##                 0.0206059599139685*x[5],2) +
+##             pow(3.2053 - x[0]/(0.487388289424 + x[1]) - x[2] -
+##                 0.487388289424*x[3] -0.237547344667653*x[4] -
+##                 0.115777793974781*x[5],2) +
+##             pow(0.273 - x[0]/(0.761544202225 + x[1]) - x[2] -
+##                 0.761544202225*x[3] - 0.579949571942512*x[4] -
+##                 0.44165723409569*x[5],2) +
+##             pow((-x[0]/(0.878319472969 + x[1])) - x[2] -
+##                 0.878319472969*x[3] - 0.771445096596542*x[4] -
+##                 0.677575250667194*x[5],2) +
+##             pow(0.8596 - x[0]/(1.096623651204 + x[1]) - x[2] -
+##                 1.096623651204*x[3] -1.20258343237999*x[4] -
+##                 1.31878143449399*x[5],2) +
+##             pow(6.4762 - x[0]/(1.4926241929+ x[1]) - x[2] -
+##                 1.4926241929*x[3] - 2.22792698123038*x[4] -
+##                 3.32545771219912*x[5],2)+
+##             pow(18.8548 - x[0]/(1.949550365169 + x[1]) - x[2] -
+##                 1.949550365169*x[3] -3.80074662633058*x[4] -
+##                 7.40974697327763*x[5],2) +
+##             pow(40.149455 - x[0]/(2.467400073616 + x[1]) - x[2] -
+##                 2.467400073616*x[3] - 6.08806312328024*x[4] -
+##                 15.0216873985605*x[5],2) +
+##             pow(72.676767 - x[0]/(3.046173318241 + x[1]) - x[2] -
+##                 3.046173318241*x[3]-9.27917188476338*x[4]-
+##                 28.2659658107383*x[5],2))
+##        return y
 
 class palmer5c(test_fun):
     def __init__(self):
@@ -967,5 +1064,4 @@ class st_bsj3(test_fun):
         y = (10.5*x[0] - 1.5*(x[0]**2) - x[1]**2 - 3.95*x[1] - x[2]**2 + 3*x[2]-
              2*(x[3]**2) + 5*x[3] - x[4]**2 + 1.5*x[4] - 2.5*(x[5]**2)-1.5*x[5])
         return y
-
 
