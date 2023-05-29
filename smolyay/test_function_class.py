@@ -388,7 +388,7 @@ class fermat2_vareps(test_fun):
 class least(test_fun):
     def __init__(self):
         super().__init__(3,[473.98605675534, -159.3518936954, -5],
-                         [ 506.6511741726, -125.41670432586, 4.5])
+                         [506.6511741726, -125.41670432586, 4.5])
 
     def __call__(self,x):
         self.check_bounds(x)
