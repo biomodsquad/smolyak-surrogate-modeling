@@ -1,84 +1,109 @@
 import importlib
 import inspect
-import itertools
 import time
 
-import matplotlib
 import numpy
 import pandas
 
 from smolyay.adaptive import make_slow_nested_set
-from smolyay.basis import (ChebyshevFirstKind, BasisFunctionSet,
-                           NestedBasisFunctionSet)
-from smolyay.grid import (IndexGridGenerator, SmolyakGridGenerator,
-                          TensorGridGenerator, generate_compositions)
+from smolyay.basis import (ChebyshevFirstKind)
+from smolyay.grid import (SmolyakGridGenerator)
 from smolyay.surrogate import Surrogate
 from smolyay.test_function_class import *
+from compare_surrogates import (compare_error,compare_coefficients,
+                                compare_grid_indexes)
 
-print('Running...')
-exact = [2,3,4]
-points_along_each_dim = 50
-grid_norm_list = [SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(exa)) for exa in exact]
-grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exact]
+def print_functions(test_fun_list,names):
+    '''Prints functions that will be used in analysis
 
+    Parameters
+    ----------
+    test_fun_list : list of test_fun objects
+
+    names : names of objects in test_fun_list
+    '''
+    get_dim = lambda x: x.dim
+    d_list = [get_dim(x) for x in test_fun_list]
+    counts = numpy.cumsum(pandas.Series(d_list).value_counts(sort=False).values)
+    if len(counts) == 1:
+        print('Functions with '+str(d_list[0])+' dimensions: ',end='')
+        print(*names,sep=' ')
+    else:
+        counts = numpy.insert(counts,0,0)
+
+        for i in range(len(counts)-1):
+            print('Functions with '+str(d_list[counts[i]+1])+
+                  ' dimensions: ',end='')
+            print(*names[counts[i]:counts[i+1]],sep=' ')
+
+## Initialize parameters
+# get test functions
 index_names = []
 test_functions = []
-
 for name, cls in inspect.getmembers(importlib.import_module("smolyay.test_function_class"), inspect.isclass):
     if not name == 'test_fun':
         test_functions.append(cls())
-test_functions.sort(key=lambda x: x.dim)
+test_functions.sort(key=lambda x: x.dim) # do faster ones first
 index_names = [f.name for f in test_functions]
 print('All test functions collected')
-error_data_collection = numpy.zeros((len(test_functions),len(exact)*3))
-print('Begin calculations.')
-start_time = time.time()
+# print out functions gathered
+print_functions(test_functions,index_names)
+
+## Get Inputs
+# functions to test
+num_fun_start = len(test_functions)
+fun_temp = list(map(str,input("Type names of test functions to analyze " +
+                               "(leave blank to choose all): ").split()))
+if fun_temp:
+    chosen_fun = list(set(fun_temp).intersection(index_names))
+    test_fun_list_temp = []
+    for ans in chosen_fun:
+        fun_index = index_names.index(ans)
+        test_fun_list_temp.append(test_functions[fun_index])
+    if test_fun_list_temp:
+        test_functions = test_fun_list_temp
+        test_functions.sort(key=lambda x: x.name)
+        test_functions.sort(key=lambda x: x.dim)
+        index_names = [f.name for f in test_functions]
+    else:
+        print('No valid function names.')
+# print functions to be used
+if len(test_functions) < num_fun_start:
+    print('Test functions used: ')
+    print_functions(test_functions,index_names)
+else:
+    print("Analyzing all functions")
+# get other inputs
+exact = [2,3,4]
 try:
-    for (func,j) in zip(test_functions,range(len(test_functions))):
-        func_time_start = time.time()
-        # create test points
-        print('Estimating function : ' + func.name)
-        test_points = numpy.linspace(func.lower_bounds,
-                                  func.upper_bounds,points_along_each_dim)
-        for (grid_norm,grid_slow,k) in zip(grid_norm_list,grid_slow_list,range(len(exact))):
-            calc_time = time.time()
-            surrogate_norm = Surrogate(func.bounds,grid_norm)
-            surrogate_slow = Surrogate(func.bounds,grid_slow)
-            data_norm = [func(point) for point in surrogate_norm.points]
-            data_slow = [func(point) for point in surrogate_slow.points]
-            surrogate_norm.train_from_data(data_norm)
-            surrogate_slow.train_from_data(data_slow)
-            calc_time_end = time.time() - calc_time
-            # test the error of surrogates
-            error_norm = 0
-            error_slow = 0
-            for i in range(points_along_each_dim**func.dim):
-                loc = numpy.unravel_index(i,(points_along_each_dim,)*func.dim,order='F')
-                coor = list(zip(loc,list(range(len(loc)))))
-                x = [test_points[m] for m in coor]
-                error_norm += (func(x) - surrogate_norm(x))**2
-                error_slow += (func(x) - surrogate_slow(x))**2
-            error_data_collection[j,k] = error_norm
-            error_data_collection[j,k+len(exact)] = error_slow
-            error_data_collection[j,k+2*len(exact)] = calc_time_end
-        print('  Time for '+func.name+': ' +
-              str(round(time.time()-func_time_start,2))+' seconds')
-finally:
-    print('All done.')
-    end_time = time.time()
-    total_time = end_time-start_time # time to finish executing
-    print('Time to calculate: ' + str(total_time//60) +
-          ' min ' + str(total_time % 60) + ' sec')
-    print('Time to calculate: ' +  str(total_time) + ' sec')
-    print('')
-    head_names = ['Norm µ=','Slow µ=','Runtime µ=']
-    column_names = [''.join(x) for x in list(itertools.product(head_names,map(str,exact)))]
-    results = pandas.DataFrame(error_data_collection,index=index_names,columns=column_names)
-    date_t = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(start_time))
-    file_name = date_t + 'slow_results.csv'
-    results.to_csv(file_name)
+    temp = list(map(int,input("Levels of exactness to " +
+                               "use (default 2 3 4): ").split()))
+    if temp:
+        exact = temp
+except ValueError:
+    pass
+points_compare = int(input("Number of points used to " +
+                           "check model accuracy (default 5000): ")
+                       or "5000")
+## Make Grids
+grid_norm_list = [SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(exa)) for exa in exact]
+grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exact]
+## Do Analysis
+a = "Choose the information you want to calculate to do."
+b = "(1 = error analysis, 2 = coefficient analysis, 3 = grid index analysis)" 
+ana_options = list(input(a + "\n" + b + "\n").split())
+start_time = time.time()
+file_header = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(start_time))
 
-
-
-
-        
+if "1" in ana_options:
+    compare_error(test_functions,exact,points_compare,grid_norm_list,
+                  'Norm',grid_slow_list,'Slow',file_header)
+if "2" in ana_options:
+    compare_coefficients(test_functions,exact,grid_norm_list,
+                         'Norm',grid_slow_list,'Slow',file_header)
+if "3" in ana_options:
+    get_dim = lambda x: x.dim
+    d_list = numpy.unique([get_dim(x) for x in test_functions])
+    compare_grid_indexes(d_list,exact,grid_norm_list,
+                         'Norm',grid_slow_list,'Slow',file_header)
+print("All requested files created.")
