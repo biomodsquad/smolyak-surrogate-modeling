@@ -99,8 +99,7 @@ start_time = time.time()
 file_header = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(start_time))
 
 if "1" in ana_options:
-    compare_error(test_functions,exact,points_compare,grid_norm_list,
-                  'Norm',grid_slow_list,'Slow',file_header)
+    compare_error(test_functions,exact,points_compare,grid_lists,file_header)
 if "2" in ana_options:
     compare_coefficients(test_functions,exact,grid_lists,file_header)
 if "3" in ana_options:
