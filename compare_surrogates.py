@@ -75,7 +75,7 @@ def compare_error(test_functions,exact_list,points_compare,
                 func.lower_bounds, func.upper_bounds)
             real_output = [func(x) for x in test_points]
             # calculate surrogates for each exactness
-            for (grid_1,grid_2,k) in zip(grid_list_1,grid_list_1,
+            for (grid_1,grid_2,k) in zip(grid_list_1,grid_list_2,
                                                range(len(exact_list))):
                 calc_time = time.time() # time each exactness
                 ## Make Surrogate Models
@@ -176,7 +176,7 @@ def compare_coefficients(test_functions,exact_list,
             # initialize container for coefficients
             coeff_data = {}
             ## Make Surrogate Models
-            for (grid_1,grid_2,k) in zip(grid_list_1,grid_list_1,
+            for (grid_1,grid_2,k) in zip(grid_list_1,grid_list_2,
                                          range(len(exact_list))):
                 # initialize surrogates
                 surrogate_1 = Surrogate(func.bounds,grid_1)
