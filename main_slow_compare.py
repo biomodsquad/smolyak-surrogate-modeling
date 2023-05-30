@@ -89,6 +89,7 @@ points_compare = int(input("Number of points used to " +
 ## Make Grids
 grid_norm_list = [SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(exa)) for exa in exact]
 grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exact]
+grid_lists = {'Norm' : grid_norm_list,'Slow' : grid_slow_list}
 ## Do Analysis
 a = "Choose the information you want to calculate to do."
 b = "(1 = error analysis, 2 = coefficient analysis, 3 = grid index analysis"
@@ -101,22 +102,19 @@ if "1" in ana_options:
     compare_error(test_functions,exact,points_compare,grid_norm_list,
                   'Norm',grid_slow_list,'Slow',file_header)
 if "2" in ana_options:
-    compare_coefficients(test_functions,exact,grid_norm_list,
-                         'Norm',grid_slow_list,'Slow',file_header)
+    compare_coefficients(test_functions,exact,grid_lists,file_header)
 if "3" in ana_options:
     get_dim = lambda x: x.dim
     d_list = numpy.unique([get_dim(x) for x in test_functions])
-    compare_grid_indexes(d_list,exact,{'Norm' : grid_norm_list,
-                                       'Slow' : grid_slow_list},file_header)
+    compare_grid_indexes(d_list,exact,grid_lists,file_header)
 
 if "4" in ana_options:
-    compare_grid_plot(exact,{'Norm' : grid_norm_list,
-                             'Slow' : grid_slow_list},file_header)
+    compare_grid_plot(exact,grid_lists,file_header)
 if "5" in ana_options:
     plot_funct = []
     for func in test_functions:
         if func.dim == 2:
             plot_funct.append(func)
-    compare_surrogate_plot(plot_funct,exact,points_compare,{'Norm' : grid_norm_list,
-                             'Slow' : grid_slow_list},file_header)
+    compare_surrogate_plot(plot_funct,exact,points_compare,grid_lists,
+                           file_header)
 print("All requested files created.")

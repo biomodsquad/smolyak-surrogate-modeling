@@ -123,8 +123,7 @@ def compare_error(test_functions,exact_list,points_compare,
         results.to_csv(file_name)
         print('File created.')
    
-def compare_coefficients(test_functions,exact_list,
-        grid_list_1,grid_list_1_name,grid_list_2,grid_list_2_name,file_header):
+def compare_coefficients(test_functions,exact_list,grid_lists,file_header):
     '''Compares surrogates functions formed from different grid objects
 
     This analysis function takes in two lists of IndexGridGenerator objects,
@@ -138,18 +137,9 @@ def compare_coefficients(test_functions,exact_list,
 
     exact_list : list of int
         levels of exactness used to create the grids
-
-    grid_list_1 : list of IndexGridGenerator objects
+    
+    grid_lists : dict of lists of IndexGridGenerator objects
         grids for each exactness that will create surrogate functions
-
-    grid_list_1_name : string
-        label for data from surrogates made by grid_list_1 in exported file
-
-    grid_list_2 : list of IndexGridGenerator objects
-        grids for each exactness that will create surrogate functions
-
-    grid_list_1_name : string
-        label for data from surrogates made by grid_list_1 in exported file
 
     file_header : string
         information to go at the beginning of the file name
@@ -163,8 +153,6 @@ def compare_coefficients(test_functions,exact_list,
     print('\nStart...')
     warnings.filterwarnings("error")
     # initialize information for files and DataFrames
-    head_names = [grid_list_1_name+' µ=',grid_list_2_name+' µ=']
-    start_time = time.time()
     writer = pandas.ExcelWriter(file_header + '_coefficents.xlsx')
     ## Begin calculations
     print('Begin surrogate and error calculations.')
@@ -176,22 +164,17 @@ def compare_coefficients(test_functions,exact_list,
             # initialize container for coefficients
             coeff_data = {}
             ## Make Surrogate Models
-            for (grid_1,grid_2,k) in zip(grid_list_1,grid_list_2,
-                                         range(len(exact_list))):
-                # initialize surrogates
-                surrogate_1 = Surrogate(func.bounds,grid_1)
-                surrogate_2 = Surrogate(func.bounds,grid_2)
-                # get samples to train models
-                data_1 = [func(point) for point in surrogate_1.points]
-                data_2 = [func(point) for point in surrogate_2.points]
-                # train models
-                surrogate_1.train_from_data(data_1)
-                surrogate_2.train_from_data(data_2)
-                # collect surrogate data
-                coeff_data[head_names[0]+
-                                str(exact_list[k])] = surrogate_1.coefficients
-                coeff_data[head_names[1]+
-                                str(exact_list[k])] = surrogate_2.coefficients
+            for i in range(len(exact_list)):
+                for k in grid_lists.keys():
+                    # initialize surrogates
+                    surrogate = Surrogate(func.bounds,grid_lists[k][i])
+                    # get samples to train models
+                    data = [func(point) for point in surrogate.points]
+                    # train models
+                    surrogate.train_from_data(data)
+                    # collect surrogate data
+                    coeff_data[k +' µ =' +
+                            str(exact_list[i])] = surrogate.coefficients
             # add to excel sheet
             coeff_result = pandas.DataFrame.from_dict(coeff_data,orient='index')
             coeff_result = coeff_result.transpose()
@@ -240,7 +223,7 @@ def compare_grid_indexes(dimension_list,exact_list,grid_lists,file_header):
             grid_index_data = {}
             for i in range(len(exact_list)):
                 for k in grid_lists.keys():
-                    grid_index_data[k + ' µ =' + str(exact_list[i])
+                    grid_index_data[k +' µ='+ str(exact_list[i])
                                     ] = grid_lists[k][i](d).indexes
             grid_results = pandas.DataFrame.from_dict(grid_index_data,
                     orient='index')
