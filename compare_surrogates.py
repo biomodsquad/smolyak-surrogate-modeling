@@ -257,7 +257,7 @@ def compare_grid_indexes(dimension_list,exact_list,grid_lists,file_header):
 def compare_grid_plot(exact_list,grid_lists,file_header):
     '''Compare grid indexes for multiple dimensions
 
-    This analysis function takes in two lists of IndexGridGenerator objects,
+    This analysis function takes in lists of IndexGridGenerator objects,
     and plots the 2D representation of each Smolyak Grid that would be
     generated in 2 dimensions
 
@@ -294,6 +294,112 @@ def compare_grid_plot(exact_list,grid_lists,file_header):
                                 linewidth=0)
         matplotlib.pyplot.savefig(file_header + '_gridplot.png',
                                   bbox_inches='tight')
+    except KeyboardInterrupt:
+        print('Terminated prematurely.')
+    finally:
+        print('Finished calculations.')
+        # print total time spent
+        time_taken(start_time)
+
+def compare_surrogate_plot(test_functions,exact_list,points_compare,
+                           grid_lists,file_header):
+    '''Compare surrogate plots for 2D functions
+
+    This analysis function takes in lists of IndexGridGenerator objects and a
+    list of test functions with 2 variables and plots the surrogates in
+    comparison with the real function.
+
+    Parameters
+    ----------
+
+    test_functions : list of objects class test_fun
+        functions the surrogates will be fitted to
+    
+    exact_list : list of int
+        levels of exactness used to create the grids
+
+    points_compare : int
+        an approximate of the number of points used to graph the functions
+        squared
+        
+    grid_lists : dict of lists of IndexGridGenerator objects
+        grids for each exactness that will create surrogate functions
+
+    file_header : string
+        information to go at the beginning of the file name
+
+    Returns
+    -------
+    file
+    '''
+    warnings.filterwarnings("error")
+    start_time = time.time()
+    ax_rows = len(exact_list)
+    ax_columns = len(grid_lists.keys())
+    fig, ax = matplotlib.pyplot.subplots(ax_rows,ax_columns+1,
+                                         subplot_kw=dict(box_aspect=1),
+                                         figsize=((ax_columns+1)*4,ax_rows*4))
+    num_level = 20
+    # check that all test functions have only 2 dimensions
+    if not all(x.dim == 2 for x in test_functions):
+        raise ValueError('test functions must have only 2 variables')
+    points_compare = int(numpy.sqrt(points_compare))
+    # Start creating plots
+    try:
+        for func in test_functions:
+            # create axis
+            fig, ax = matplotlib.pyplot.subplots(ax_rows,ax_columns+1,
+                                         subplot_kw=dict(box_aspect=1),
+                                         figsize=((ax_columns+1)*4,ax_rows*4))
+            
+            print('Plotting function : ' + func.name)
+            func_time_start = time.time() # time each function
+            # create grids
+            X = numpy.linspace(*func.bounds[0],points_compare)
+            Y = numpy.linspace(*func.bounds[1],points_compare)
+            X_grid,Y_grid = numpy.meshgrid(X,Y)
+            Z = numpy.zeros(X_grid.shape)
+            # plot real function
+            for m in range(0,points_compare):
+                for n in range(0,points_compare):
+                    Z[m,n] = func([X[n],Y[m]])
+            print(Z)
+            ax[0,ax_columns].set_title(func.name)
+            p = ax[0,ax_columns].contourf(X_grid,Y_grid,Z,levels=num_level,
+                                      cmap='YlGnBu')
+            # trying to get all the plots to use the real function's scale
+            fig.colorbar(p,ax=ax[0,ax_columns])
+            vmin= p.zmin
+            vmax = p.zmax
+            # name rows
+            for i in range(ax_rows):
+                ax[i,0].set_ylabel('µ = ' + str(exact_list[i]))
+            for k,j in zip(grid_lists.keys(),list(range(ax_columns))):
+                ax[0,j].set_title(k) # title columns
+                for i in range(ax_rows):
+                    # create surrogates
+                    grid = grid_lists[k][i]
+                    surrogate = Surrogate(func.bounds,grid)
+                    data = [func(point) for point in surrogate.points]
+                    # train models
+                    surrogate.train_from_data(data)
+                    # get points to plot
+                    try:
+                        for m in range(0,points_compare):
+                            for n in range(0,points_compare):
+                                Z[m,n] = surrogate([X[n],Y[m]])
+                        ax[i,j].contourf(X_grid,Y_grid,Z,levels=num_level,
+                                         cmap='YlGnBu',vmin=vmin,vmax=vmax)
+                    except RuntimeWarning:
+                        pass
+            # save image
+            matplotlib.pyplot.savefig(file_header +'_'+func.name+
+                                      '_gridplot.png',
+                                      bbox_inches='tight')
+            # reset axis
+            matplotlib.pyplot.close(fig)
+            print('  Runtime: ' +
+                  str(round(time.time()-func_time_start,2))+' sec')
     except KeyboardInterrupt:
         print('Terminated prematurely.')
     finally:
