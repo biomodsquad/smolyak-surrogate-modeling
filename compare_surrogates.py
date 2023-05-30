@@ -2,6 +2,7 @@ import itertools
 import time
 import warnings
 
+import matplotlib.pyplot
 import numpy
 import pandas
 import scipy.stats
@@ -249,6 +250,53 @@ def compare_grid_indexes(dimension_list,exact_list,grid_lists,file_header):
         print('Terminated prematurely.')
     finally:
         writer.close()
+        print('Finished calculations.')
+        # print total time spent
+        time_taken(start_time)
+
+def compare_grid_plot(exact_list,grid_lists,file_header):
+    '''Compare grid indexes for multiple dimensions
+
+    This analysis function takes in two lists of IndexGridGenerator objects,
+    and plots the 2D representation of each Smolyak Grid that would be
+    generated in 2 dimensions
+
+    Parameters
+    ----------
+
+    exact_list : list of int
+        levels of exactness used to create the grids
+
+    grid_lists : dict of lists of IndexGridGenerator objects
+        grids for each exactness that will create surrogate functions
+
+    file_header : string
+        information to go at the beginning of the file name
+
+    Returns
+    -------
+    file
+    '''
+    start_time = time.time()
+    ax_rows = len(exact_list)
+    ax_columns = len(grid_lists.keys())
+    fig, ax = matplotlib.pyplot.subplots(ax_rows,ax_columns,
+                                         subplot_kw=dict(box_aspect=1),
+                                         figsize=(ax_columns*4,ax_rows*4))
+    # Start adding to file
+    try:
+        for i in range(ax_rows):
+            ax[i,0].set_ylabel('µ = ' + str(exact_list[i]))
+        for k,j in zip(grid_lists.keys(),list(range(ax_columns))):
+            ax[0,j].set_title(k)
+            for i in range(ax_rows):
+                ax[i,j].scatter(*numpy.array(grid_lists[k][i](2).points).T,
+                                linewidth=0)
+        matplotlib.pyplot.savefig(file_header + '_gridplot.png',
+                                  bbox_inches='tight')
+    except KeyboardInterrupt:
+        print('Terminated prematurely.')
+    finally:
         print('Finished calculations.')
         # print total time spent
         time_taken(start_time)
