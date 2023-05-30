@@ -63,7 +63,6 @@ def compare_error(test_functions,exact_list,points_compare,
     ## Begin calculations
     print('Begin surrogate and error calculations.')
     data_collection = numpy.zeros((len(test_functions),len(exact_list)*3))
-
     try:
         for (func,j) in zip(test_functions,range(len(test_functions))):
             print('Estimating function : ' + func.name)
@@ -206,8 +205,7 @@ def compare_coefficients(test_functions,exact_list,
         # print total time spent
         time_taken(start_time)
 
-def compare_grid_indexes(dimension_list,exact_list,
-        grid_list_1,grid_list_1_name,grid_list_2,grid_list_2_name,file_header):
+def compare_grid_indexes(dimension_list,exact_list,grid_lists,file_header):
     '''Compare grid indexes for multiple dimensions
 
     This analysis function takes in two lists of IndexGridGenerator objects,
@@ -222,17 +220,8 @@ def compare_grid_indexes(dimension_list,exact_list,
     exact_list : list of int
         levels of exactness used to create the grids
 
-    grid_list_1 : list of IndexGridGenerator objects
+    grid_lists : dict of lists of IndexGridGenerator objects
         grids for each exactness that will create surrogate functions
-
-    grid_list_1_name : string
-        label for data from surrogates made by grid_list_1 in exported file
-
-    grid_list_2 : list of IndexGridGenerator objects
-        grids for each exactness that will create surrogate functions
-
-    grid_list_1_name : string
-        label for data from surrogates made by grid_list_1 in exported file
 
     file_header : string
         information to go at the beginning of the file name
@@ -242,30 +231,27 @@ def compare_grid_indexes(dimension_list,exact_list,
     file
     '''
     start_time = time.time()
-    head_names = [grid_list_1_name+' µ=',grid_list_2_name+' µ=']
-    grid_columns = [''.join(x)
-                    for x in list(itertools.product(head_names,map(str,exact_list)))]
     writer = pandas.ExcelWriter(file_header + '_grids.xlsx')
     # Start adding to file
     try:
-    grid_index_data = {}
-    for d in dimension_list:
         grid_index_data = {}
-        for i in range(len(exact_list)):
-            grid_index_data[head_names[0]+
-                            str(exact_list[i])] = grid_list_1[i](d).indexes
-            grid_index_data[head_names[1]+
-                            str(exact_list[i])] = grid_list_2[i](d).indexes
-        grid_results = pandas.DataFrame.from_dict(grid_index_data,orient='index')
-        grid_results = grid_results.transpose()
-        grid_results.to_excel(writer,index=False,sheet_name='Dim = '+str(d))
+        for d in dimension_list:
+            grid_index_data = {}
+            for i in range(len(exact_list)):
+                for k in grid_lists.keys():
+                    grid_index_data[k + ' µ =' + str(exact_list[i])
+                                    ] = grid_lists[k][i](d).indexes
+            grid_results = pandas.DataFrame.from_dict(grid_index_data,
+                    orient='index')
+            grid_results = grid_results.transpose()
+            grid_results.to_excel(writer,index=False,sheet_name='Dim = '+str(d))
     except KeyboardInterrupt:
         print('Terminated prematurely.')
     finally:
-    writer.close()
-    print('Finished calculations.')
-    # print total time spent
-    time_taken(start_time)
+        writer.close()
+        print('Finished calculations.')
+        # print total time spent
+        time_taken(start_time)
 
 def time_taken(start_time):
     '''Print out the time between the starting time and now
