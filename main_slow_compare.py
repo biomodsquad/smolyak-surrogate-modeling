@@ -104,6 +104,6 @@ if "2" in ana_options:
 if "3" in ana_options:
     get_dim = lambda x: x.dim
     d_list = numpy.unique([get_dim(x) for x in test_functions])
-    compare_grid_indexes(d_list,exact,grid_norm_list,
-                         'Norm',grid_slow_list,'Slow',file_header)
+    compare_grid_indexes(d_list,exact,{'Norm' : grid_norm_list,
+        'Slow' : grid_slow_list},file_header)
 print("All requested files created.")
