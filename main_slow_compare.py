@@ -11,7 +11,8 @@ from smolyay.grid import (SmolyakGridGenerator)
 from smolyay.surrogate import Surrogate
 from smolyay.test_function_class import *
 from compare_surrogates import (compare_error,compare_coefficients,
-                                compare_grid_indexes,compare_grid_plot)
+                                compare_grid_indexes,compare_grid_plot,
+                                compare_surrogate_plot)
 
 def print_functions(test_fun_list,names):
     '''Prints functions that will be used in analysis
@@ -91,7 +92,7 @@ grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exa
 ## Do Analysis
 a = "Choose the information you want to calculate to do."
 b = "(1 = error analysis, 2 = coefficient analysis, 3 = grid index analysis"
-c = "4 = 2D plotted grids"
+c = "4 = 2D plotted grids, 5 = 2D plotted surrogates)"
 ana_options = list(input(a + "\n" + b + "\n" + c + "\n").split())
 start_time = time.time()
 file_header = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(start_time))
@@ -110,5 +111,12 @@ if "3" in ana_options:
 
 if "4" in ana_options:
     compare_grid_plot(exact,{'Norm' : grid_norm_list,
+                             'Slow' : grid_slow_list},file_header)
+if "5" in ana_options:
+    plot_funct = []
+    for func in test_functions:
+        if func.dim == 2:
+            plot_funct.append(func)
+    compare_surrogate_plot(plot_funct,exact,points_compare,{'Norm' : grid_norm_list,
                              'Slow' : grid_slow_list},file_header)
 print("All requested files created.")
