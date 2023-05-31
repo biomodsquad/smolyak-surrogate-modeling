@@ -13,7 +13,7 @@ from smolyay.surrogate import Surrogate
 from smolyay.test_function_class import *
 
 
-def compare_error(test_functions,exact_list,points_compare,grid_lists,
+def compare_error(test_functions,exact_list,points_compare,grid_lists,seed
         file_header):
     '''Compares surrogates functions formed from different grid objects
 
@@ -34,6 +34,9 @@ def compare_error(test_functions,exact_list,points_compare,grid_lists,
 
     grid_lists : dict of lists of IndexGridGenerator objects
         grids for each exactness that will create surrogate functions
+
+    seed : _
+        the seed used by the Latin Hypercube
 
     file_header : string
         information to go at the beginning of the file name
@@ -61,7 +64,7 @@ def compare_error(test_functions,exact_list,points_compare,grid_lists,
             func_time_start = time.time() # time each function
             # create test points
             points_gener = scipy.stats.qmc.LatinHypercube(d=
-                func.dim).random(n=points_compare)
+                func.dim,seed=seed).random(n=points_compare)
             test_points = scipy.stats.qmc.scale(points_gener, 
                 func.lower_bounds, func.upper_bounds)
             real_output = [func(x) for x in test_points]
@@ -275,7 +278,7 @@ def compare_grid_plot(exact_list,grid_lists,file_header):
         # print total time spent
         time_taken(start_time)
 
-def compare_surrogate_plot(test_functions,exact_list,points_compare,
+def compare_surrogate_plot(test_functions,exact_list,points_plot,
                            grid_lists,file_header):
     '''Compare surrogate plots for 2D functions
 
@@ -292,9 +295,8 @@ def compare_surrogate_plot(test_functions,exact_list,points_compare,
     exact_list : list of int
         levels of exactness used to create the grids
 
-    points_compare : int
-        an approximate of the number of points used to graph the functions
-        squared
+    points_plot : int
+        the number of points used to graph the functions
         
     grid_lists : dict of lists of IndexGridGenerator objects
         grids for each exactness that will create surrogate functions
@@ -317,7 +319,6 @@ def compare_surrogate_plot(test_functions,exact_list,points_compare,
     # check that all test functions have only 2 dimensions
     if not all(x.dim == 2 for x in test_functions):
         raise ValueError('test functions must have only 2 variables')
-    points_compare = int(numpy.sqrt(points_compare))
     # Start creating plots
     try:
         for func in test_functions:
@@ -329,13 +330,13 @@ def compare_surrogate_plot(test_functions,exact_list,points_compare,
             print('Plotting function : ' + func.name)
             func_time_start = time.time() # time each function
             # create grids
-            X = numpy.linspace(*func.bounds[0],points_compare)
-            Y = numpy.linspace(*func.bounds[1],points_compare)
+            X = numpy.linspace(*func.bounds[0],points_plot)
+            Y = numpy.linspace(*func.bounds[1],points_plot)
             X_grid,Y_grid = numpy.meshgrid(X,Y)
             Z = numpy.zeros(X_grid.shape)
             # plot real function
-            for m in range(0,points_compare):
-                for n in range(0,points_compare):
+            for m in range(0,points_plot):
+                for n in range(0,points_plot):
                     Z[m,n] = func([X[n],Y[m]])
             print(Z)
             ax[0,ax_columns].set_title(func.name)
@@ -359,8 +360,8 @@ def compare_surrogate_plot(test_functions,exact_list,points_compare,
                     surrogate.train_from_data(data)
                     # get points to plot
                     try:
-                        for m in range(0,points_compare):
-                            for n in range(0,points_compare):
+                        for m in range(0,points_plot):
+                            for n in range(0,points_plot):
                                 Z[m,n] = surrogate([X[n],Y[m]])
                         ax[i,j].contourf(X_grid,Y_grid,Z,levels=num_level,
                                          cmap='YlGnBu',vmin=vmin,vmax=vmax)

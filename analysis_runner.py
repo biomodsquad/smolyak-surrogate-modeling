@@ -63,7 +63,7 @@ args = parser.parse_args()
 # Required for option gridplot: 
 # Required for option surrogateplot: test_functions,points_plot
 print(args)
-points_comp
+
 ## Get test functions and dimensions
 # get dimensions chosen
 test_dimensions = [x for x in args.function_and_dimension if x.isdigit()]
@@ -90,6 +90,7 @@ if chosen_fun_set:
     function_names = [f.name for f in test_functions]
 
 ## Make Grids
+# turn this part into bash somehow
 grid_norm_list = [SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(exa)) for exa in exact]
 grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exact]
 grid_lists = {'Norm' : grid_norm_list,'Slow' : grid_slow_list}
@@ -99,10 +100,10 @@ folder_name = './analysisopt_'+ time_header
 folder = os.makedir(folder_name)
 ## Do Analysis
 if "error" in ana_options:
-    compare_error(test_functions,args.exactness_list,points_compare,
-                  args.grid_lists,file_header)
+    compare_error(test_functions,args.exactness_list,args.points_compare,
+                  args.grid_lists,args.seed,file_header)
 if "coeff" in ana_options:
-    compare_coefficients(test_functions,args.exactness_list,grid_lists,
+    compare_coefficients(test_functions,args.exactness_list,args.grid_lists,
                          file_header)
 if "indexes" in ana_options:
     compare_grid_indexes(test_dimensions,args.exactness_list,
@@ -113,6 +114,6 @@ if "gridplot" in ana_options:
     
 if "surrogateplot" in ana_options:
     plot_funct = [x for x in test_functions if f.dim == 2]
-    compare_surrogate_plot(plot_funct,args.exactness_list,points_plot,
+    compare_surrogate_plot(plot_funct,args.exactness_list,args.points_plot,
                            args.grid_lists,file_header)
 print("All requested files created.")
