@@ -13,8 +13,8 @@ from smolyay.surrogate import Surrogate
 from smolyay.test_function_class import *
 
 
-def compare_error(test_functions,exact_list,points_compare,grid_lists,seed
-        file_header):
+def compare_error(test_functions,exact_list,points_compare,grid_lists,seed,
+                  file_header):
     '''Compares surrogates functions formed from different grid objects
 
     This analysis function takes in two lists of IndexGridGenerator objects
@@ -279,7 +279,7 @@ def compare_grid_plot(exact_list,grid_lists,file_header):
         time_taken(start_time)
 
 def compare_surrogate_plot(test_functions,exact_list,points_plot,
-                           grid_lists,file_header):
+                           grid_lists,file_header,scale='linear'):
     '''Compare surrogate plots for 2D functions
 
     This analysis function takes in lists of IndexGridGenerator objects and a
@@ -304,6 +304,9 @@ def compare_surrogate_plot(test_functions,exact_list,points_plot,
     file_header : string
         information to go at the beginning of the file name
 
+    scale : string
+        the scale to be used for the colormap
+
     Returns
     -------
     file
@@ -312,10 +315,6 @@ def compare_surrogate_plot(test_functions,exact_list,points_plot,
     start_time = time.time()
     ax_rows = len(exact_list)
     ax_columns = len(grid_lists.keys())
-    fig, ax = matplotlib.pyplot.subplots(ax_rows,ax_columns+1,
-                                         subplot_kw=dict(box_aspect=1),
-                                         figsize=((ax_columns+1)*4,ax_rows*4))
-    num_level = 20
     # check that all test functions have only 2 dimensions
     if not all(x.dim == 2 for x in test_functions):
         raise ValueError('test functions must have only 2 variables')
@@ -338,17 +337,28 @@ def compare_surrogate_plot(test_functions,exact_list,points_plot,
             for m in range(0,points_plot):
                 for n in range(0,points_plot):
                     Z[m,n] = func([X[n],Y[m]])
-            print(Z)
+            # define limits
+            vmin = numpy.amin(Z)
+            vmax = numpy.amax(Z)
+            # determine the scale to use
+            match(scale):
+                case 'log':
+                    norm_scale = matplotlib.colors.LogNorm(vmin=vmin,vmax=vmax)
+                case 'symlog':
+                    norm_scale = matplotlib.colors.SymLogNorm(1,vmin=vmin,vmax=vmax)
+                case 'linear':
+                    norm_scale = matplotlib.colors.Normalize(vmin=vmin,vmax=vmax)
+                case _:
+                    norm_scale = None
+            # plot the real function
             ax[0,ax_columns].set_title(func.name)
-            p = ax[0,ax_columns].contourf(X_grid,Y_grid,Z,levels=num_level,
-                                      cmap='YlGnBu')
-            # trying to get all the plots to use the real function's scale
+            p = ax[0,ax_columns].pcolormesh(X_grid,Y_grid,Z,norm=norm_scale,
+                                            cmap='YlGnBu')
             fig.colorbar(p,ax=ax[0,ax_columns])
-            vmin= p.zmin
-            vmax = p.zmax
             # name rows
             for i in range(ax_rows):
                 ax[i,0].set_ylabel('µ = ' + str(exact_list[i]))
+            # plot surrogates
             for k,j in zip(grid_lists.keys(),list(range(ax_columns))):
                 ax[0,j].set_title(k) # title columns
                 for i in range(ax_rows):
@@ -363,8 +373,8 @@ def compare_surrogate_plot(test_functions,exact_list,points_plot,
                         for m in range(0,points_plot):
                             for n in range(0,points_plot):
                                 Z[m,n] = surrogate([X[n],Y[m]])
-                        ax[i,j].contourf(X_grid,Y_grid,Z,levels=num_level,
-                                         cmap='YlGnBu',vmin=vmin,vmax=vmax)
+                        ax[i,j].pcolormesh(X_grid,Y_grid,Z,norm=norm_scale,
+                                           cmap='YlGnBu')
                     except RuntimeWarning:
                         pass
             # save image
