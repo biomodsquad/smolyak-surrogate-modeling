@@ -1,5 +1,7 @@
+import argparse
 import importlib
 import inspect
+import os
 import time
 
 import numpy
@@ -14,30 +16,9 @@ from compare_surrogates import (compare_error,compare_coefficients,
                                 compare_grid_indexes,compare_grid_plot,
                                 compare_surrogate_plot)
 
-def print_functions(test_fun_list,names):
-    '''Prints functions that will be used in analysis
-
-    Parameters
-    ----------
-    test_fun_list : list of test_fun objects
-
-    names : names of objects in test_fun_list
-    '''
-    d_list = [get_dim(x) for x in test_fun_list]
-    counts = numpy.cumsum(pandas.Series(d_list).value_counts(sort=False).values)
-    if len(counts) == 1:
-        print('Functions with '+str(d_list[0])+' dimensions: ',end='')
-        print(*names,sep=' ')
-    else:
-        counts = numpy.insert(counts,0,0)
-
-        for i in range(len(counts)-1):
-            print('Functions with '+str(d_list[counts[i]+1])+
-                  ' dimensions: ',end='')
-            print(*names[counts[i]:counts[i+1]],sep=' ')
-
-## Initialize parameters
-# get test functions
+## Grab arguments
+# get defaults
+start_time = time.time()
 get_dim = lambda x : x.dim
 index_names = []
 test_functions = []
@@ -45,85 +26,93 @@ for name, cls in inspect.getmembers(importlib.import_module("smolyay.test_functi
     if not name == 'test_fun':
         test_functions.append(cls())
 test_functions.sort(key=lambda x: x.dim) # do faster ones first
-index_names = [f.name for f in test_functions]
-print('All test functions collected')
-# print out functions gathered
-print_functions(test_functions,index_names)
+function_names = [f.name for f in test_functions]
+d_list = numpy.unique([get_dim(x) for x in test_functions])
+# get arguments
+parser = argparse.ArgumentParser()
+# required arguments
+parser.add_argument("--analysis_options",required=True,nargs="+",
+                    help=("surrogate function properties to analyze. Valid "+
+                          "options are \'error\', \'coeff\', \'indexes\', " +
+                          "\'gridplot\',\'surrogateplot\'"))
 
-## Get Inputs
-# functions to test
-num_fun_start = len(test_functions)
-fun_temp = list(map(str,input("Type names of test functions to analyze " +
-                               "(leave blank to choose all): ").split()))
-if fun_temp:
-    chosen_fun = list(set(fun_temp).intersection(index_names))
-    leftover_fun = list(set(fun_temp).difference(index_names))
-    test_fun_list_temp = set()
-    # add functions given by name
+parser.add_argument("--exactness_list",required=True,nargs="+",
+                    default=[2,3,4],
+                    help=("list of exactnesses that corresponds to the "+
+                          "grids in grid_lists"))
+parser.add_argument("--grid_lists",required=False,
+                    help=("a dictionary of lists of IndexGridGenerator "+
+                          "objects"))
+# optional arguments
+parser.add_argument("--function_and_dimension",required=False,nargs="+",
+                    default=function_names,help="list of functions to test, "+
+                    "given by name or dimension")
+parser.add_argument("--points_compare",required=False,nargs="?",default=5000,
+                    help="number of points used for compare error")
+parser.add_argument("--points_plot",required=False,nargs="?",default=50,
+                    help="number of points used for 2D surrogate plots")
+parser.add_argument("--seed",required=False,nargs="?",default=start_time,
+                    help="the random seed for compare error")
+
+args = parser.parse_args()
+
+## Initialize parameters
+# Required for option error: test_functions,points_compare,seed
+# Required for option coeff: test_functions 
+# Required for option indexes: test_functions (only needs dimensions)
+# Required for option gridplot: 
+# Required for option surrogateplot: test_functions,points_plot
+print(args)
+points_comp
+## Get test functions and dimensions
+# get dimensions chosen
+test_dimensions = [x for x in args.function_and_dimension if x.isdigit()]
+# get test functions available
+chosen_by_name = list(set(args.functions_to_test).intersection(function_names))
+chosen_by_dim = list(set(args.functions_to_test).intersection(d_list))
+chosen_fun_set = set()
+# add functions given by name
+if chosen_by_name:
     for ans in chosen_fun:
-        fun_index = index_names.index(ans)
-        test_fun_list_temp.add(test_functions[fun_index])
-    # add functions by dimension
-    if not len(leftover_fun) == 0:
-        d_list = numpy.unique([str(get_dim(x)) for x in test_functions])
-        dim_picked = list(set(leftover_fun).intersection(d_list))
-        if not len(dim_picked) == 0:
-            for f in test_functions:
-                if str(f.dim) in dim_picked:
-                    test_fun_list_temp.add(f)
-    if test_fun_list_temp:
-        test_functions = list(test_fun_list_temp)
-        test_functions.sort(key=lambda x: x.name)
-        test_functions.sort(key=lambda x: x.dim)
-        index_names = [f.name for f in test_functions]
-    else:
-        print('No valid function names.')
-# print functions to be used
-if len(test_functions) < num_fun_start:
-    print('Test functions used: ')
-    print_functions(test_functions,index_names)
-else:
-    print("Analyzing all functions")
-# get other inputs
-exact = [2,3,4]
-try:
-    temp = list(map(int,input("Levels of exactness to " +
-                               "use (default 2 3 4): ").split()))
-    if temp:
-        exact = temp
-except ValueError:
-    pass
-points_compare = int(input("Number of points used to " +
-                           "check model accuracy (default 5000): ")
-                       or "5000")
+        fun_index = function_names.index(ans)
+        chosen_fun_set.add(test_functions[fun_index])
+        
+# add functions by dimension
+if chosen_by_dim:
+    for f in test_functions:
+        if str(f.dim) in dim_picked:
+            chosen_fun_set.add(f)
+# sort functions
+if chosen_fun_set:
+    test_functions = list(chosen_fun_set)
+    test_functions.sort(key=lambda x: x.name)
+    test_functions.sort(key=lambda x: x.dim)
+    function_names = [f.name for f in test_functions]
+
 ## Make Grids
 grid_norm_list = [SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(exa)) for exa in exact]
 grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exact]
 grid_lists = {'Norm' : grid_norm_list,'Slow' : grid_slow_list}
+# create file header
+time_header = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(start_time))
+folder_name = './analysisopt_'+ time_header
+folder = os.makedir(folder_name)
 ## Do Analysis
-a = "Choose the information you want to calculate to do."
-b = "(1 = error analysis, 2 = coefficient analysis, 3 = grid index analysis"
-c = "4 = 2D plotted grids, 5 = 2D plotted surrogates)"
-ana_options = list(input(a + "\n" + b + "\n" + c + "\n").split())
-start_time = time.time()
-file_header = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(start_time))
+if "error" in ana_options:
+    compare_error(test_functions,args.exactness_list,points_compare,
+                  args.grid_lists,file_header)
+if "coeff" in ana_options:
+    compare_coefficients(test_functions,args.exactness_list,grid_lists,
+                         file_header)
+if "indexes" in ana_options:
+    compare_grid_indexes(test_dimensions,args.exactness_list,
+                         args.grid_lists,file_header)
 
-if "1" in ana_options:
-    compare_error(test_functions,exact,points_compare,grid_lists,file_header)
-if "2" in ana_options:
-    compare_coefficients(test_functions,exact,grid_lists,file_header)
-if "3" in ana_options:
-    get_dim = lambda x: x.dim
-    d_list = numpy.unique([get_dim(x) for x in test_functions])
-    compare_grid_indexes(d_list,exact,grid_lists,file_header)
-
-if "4" in ana_options:
-    compare_grid_plot(exact,grid_lists,file_header)
-if "5" in ana_options:
-    plot_funct = []
-    for func in test_functions:
-        if func.dim == 2:
-            plot_funct.append(func)
-    compare_surrogate_plot(plot_funct,exact,points_compare,grid_lists,
-                           file_header)
+if "gridplot" in ana_options:
+    compare_grid_plot(args.exactness_list,args.grid_lists,file_header)
+    
+if "surrogateplot" in ana_options:
+    plot_funct = [x for x in test_functions if f.dim == 2]
+    compare_surrogate_plot(plot_funct,args.exactness_list,points_plot,
+                           args.grid_lists,file_header)
 print("All requested files created.")
