@@ -378,7 +378,7 @@ def compare_surrogate_plot(test_functions,exact_list,points_plot,
                     except RuntimeWarning:
                         pass
             # save image
-            matplotlib.pyplot.savefig(file_header +'_'+func.name+
+            matplotlib.pyplot.savefig(file_header +'_'+func.name+scale+
                                       '_gridplot.png',
                                       bbox_inches='tight')
             # reset axis
