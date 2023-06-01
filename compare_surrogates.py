@@ -47,15 +47,14 @@ def compare_error(test_functions,exact_list,points_compare,grid_lists,seed,
 
     '''
     start_time = time.time()
-    print('\nStart...')
     warnings.filterwarnings("error")
+    print('Begin surrogate and error analysis.')
     # initialize information for files and DataFrames
     index_names = [f.name for f in test_functions] 
     head_names = [x + ' µ =' for x in list(grid_lists.keys())]
     column_names = [''.join(x) for x in 
         list(itertools.product(head_names,map(str,exact_list)))]
     # Begin calculations
-    print('Begin surrogate and error calculations.')
     error_collection = numpy.zeros((len(test_functions),len(column_names)))
     runtime_collection = numpy.zeros((len(test_functions),len(column_names)))
     try:
@@ -144,13 +143,11 @@ def compare_coefficients(test_functions,exact_list,grid_lists,file_header):
 
     '''
     start_time = time.time()
-    print('\nStart...')
     warnings.filterwarnings("error")
+    print('Begin surrogate coefficient calculations.')
     # initialize information for files and DataFrames
     writer = pandas.ExcelWriter(file_header + '_coefficents.xlsx')
     ## Begin calculations
-    print('Begin surrogate and error calculations.')
-
     try:
         for (func,j) in zip(test_functions,range(len(test_functions))):
             print('Estimating function : ' + func.name)
@@ -209,11 +206,14 @@ def compare_grid_indexes(dimension_list,exact_list,grid_lists,file_header):
     file
     '''
     start_time = time.time()
+    print('Begin collecting indexes from grids.')
     writer = pandas.ExcelWriter(file_header + '_grids.xlsx')
     # Start adding to file
     try:
         grid_index_data = {}
         for d in dimension_list:
+            print('Collecting indexes for %2d dimensions' % d)
+            calc_time_start = time.time()
             grid_index_data = {}
             for i in range(len(exact_list)):
                 for k in grid_lists.keys():
@@ -223,6 +223,7 @@ def compare_grid_indexes(dimension_list,exact_list,grid_lists,file_header):
                     orient='index')
             grid_results = grid_results.transpose()
             grid_results.to_excel(writer,index=False,sheet_name='Dim = '+str(d))
+            print('  Runtime: ' +str(round(time.time()-calc_time_start,2))+' sec')
     except KeyboardInterrupt:
         print('Terminated prematurely.')
     finally:
@@ -255,6 +256,7 @@ def compare_grid_plot(exact_list,grid_lists,file_header):
     file
     '''
     start_time = time.time()
+    print('Begin plot grid points.')
     ax_rows = len(exact_list)
     ax_columns = len(grid_lists.keys())
     fig, ax = matplotlib.pyplot.subplots(ax_rows,ax_columns,
@@ -311,8 +313,10 @@ def compare_surrogate_plot(test_functions,exact_list,points_plot,
     -------
     file
     '''
-    warnings.filterwarnings("error")
     start_time = time.time()
+    warnings.filterwarnings("error")
+    print('Begin plotting surrogate functions.')
+    # determine number of rows and columns for surrogate plots
     ax_rows = len(exact_list)
     ax_columns = len(grid_lists.keys())
     # check that all test functions have only 2 dimensions
