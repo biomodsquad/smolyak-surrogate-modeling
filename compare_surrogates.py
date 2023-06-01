@@ -413,7 +413,5 @@ def time_taken(start_time):
               str((total_time % 3600) % 60) + ' sec')
     elif(total_time > 60):
         print(str(total_time//60) +' min ' + str(total_time % 60) + ' sec')
-    else:
-        print(str(total_time) + ' sec')
     print('Time to calculate: ' +  str(total_time) + ' sec')
     print('')
