@@ -8,8 +8,10 @@ import numpy
 import pandas
 
 from smolyay.adaptive import make_slow_nested_set
-from smolyay.basis import (ChebyshevFirstKind)
-from smolyay.grid import (SmolyakGridGenerator)
+from smolyay.basis import (ChebyshevFirstKind, BasisFunctionSet, 
+                           NestedBasisFunctionSet)
+from smolyay.grid import (IndexGridGenerator, SmolyakGridGenerator,
+                          TensorGridGenerator)
 from smolyay.surrogate import Surrogate
 from smolyay.test_function_class import *
 from compare_surrogates import (compare_error,compare_coefficients,
@@ -27,7 +29,7 @@ for name, cls in inspect.getmembers(importlib.import_module("smolyay.test_functi
         test_functions.append(cls())
 test_functions.sort(key=lambda x: x.dim) # do faster ones first
 function_names = [f.name for f in test_functions]
-d_list = numpy.unique([get_dim(x) for x in test_functions])
+d_list = numpy.unique([str(get_dim(x)) for x in test_functions])
 # get arguments
 parser = argparse.ArgumentParser()
 # required arguments
@@ -62,58 +64,64 @@ args = parser.parse_args()
 # Required for option indexes: test_functions (only needs dimensions)
 # Required for option gridplot: 
 # Required for option surrogateplot: test_functions,points_plot
-print(args)
+exactness_list = [int(x) for x in args.exactness_list if x.isdigit()]
+points_compare = int(args.points_compare)
+points_plot = int(args.points_plot)
+seed = int(args.seed)
+
 
 ## Get test functions and dimensions
-# get dimensions chosen
-test_dimensions = [x for x in args.function_and_dimension if x.isdigit()]
 # get test functions available
-chosen_by_name = list(set(args.functions_to_test).intersection(function_names))
-chosen_by_dim = list(set(args.functions_to_test).intersection(d_list))
+chosen_by_name = list(set(args.function_and_dimension).intersection(function_names))
+chosen_by_dim = list(set(args.function_and_dimension).intersection(d_list))
 chosen_fun_set = set()
-# add functions given by name
-if chosen_by_name:
-    for ans in chosen_fun:
-        fun_index = function_names.index(ans)
-        chosen_fun_set.add(test_functions[fun_index])
-        
-# add functions by dimension
-if chosen_by_dim:
-    for f in test_functions:
-        if str(f.dim) in dim_picked:
-            chosen_fun_set.add(f)
+chosen_dim_set = set([int(x) for x in args.function_and_dimension if x.isdigit()])
+# add functions given by name and dimension
+for f in test_functions:
+    if (str(f.dim) in chosen_by_dim) or (f.name in chosen_by_name):
+        chosen_fun_set.add(f)
+        chosen_dim_set.add(f.dim)
 # sort functions
 if chosen_fun_set:
     test_functions = list(chosen_fun_set)
     test_functions.sort(key=lambda x: x.name)
     test_functions.sort(key=lambda x: x.dim)
     function_names = [f.name for f in test_functions]
+    test_dimensions = list(chosen_dim_set)
+    test_dimensions.sort()
 
 ## Make Grids
 # turn this part into bash somehow
-grid_norm_list = [SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(exa)) for exa in exact]
-grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa)) for exa in exact]
+##grid_norm_list = [SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(exa))
+##                  for exa in args.exactness_list]
+##grid_slow_list = [SmolyakGridGenerator(make_slow_nested_set(exa))
+##                  for exa in args.exactness_list]
+grid_norm_list = [TensorGridGenerator(ChebyshevFirstKind.make_nested_set(exa))
+                  for exa in exactness_list]
+grid_slow_list = [TensorGridGenerator(make_slow_nested_set(exa))
+                  for exa in exactness_list]
 grid_lists = {'Norm' : grid_norm_list,'Slow' : grid_slow_list}
 # create file header
 time_header = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(start_time))
 folder_name = './analysisopt_'+ time_header
-folder = os.makedir(folder_name)
+folder = os.makedirs(folder_name)
+file_header = folder_name + '/'
 ## Do Analysis
-if "error" in ana_options:
-    compare_error(test_functions,args.exactness_list,args.points_compare,
-                  args.grid_lists,args.seed,file_header)
-if "coeff" in ana_options:
-    compare_coefficients(test_functions,args.exactness_list,args.grid_lists,
+if "error" in args.analysis_options:
+    compare_error(test_functions,exactness_list,args.points_compare,
+                  grid_lists,seed,file_header)
+if "coeff" in args.analysis_options:
+    compare_coefficients(test_functions,exactness_list,grid_lists,
                          file_header)
-if "indexes" in ana_options:
-    compare_grid_indexes(test_dimensions,args.exactness_list,
-                         args.grid_lists,file_header)
+if "indexes" in args.analysis_options:
+    compare_grid_indexes(test_dimensions,exactness_list,
+                         grid_lists,file_header)
 
-if "gridplot" in ana_options:
-    compare_grid_plot(args.exactness_list,args.grid_lists,file_header)
+if "gridplot" in args.analysis_options:
+    compare_grid_plot(exactness_list,grid_lists,file_header)
     
-if "surrogateplot" in ana_options:
-    plot_funct = [x for x in test_functions if f.dim == 2]
-    compare_surrogate_plot(plot_funct,args.exactness_list,args.points_plot,
-                           args.grid_lists,file_header)
+if "surrogateplot" in args.analysis_options:
+    plot_funct = [x for x in test_functions if x.dim == 2]
+    compare_surrogate_plot(plot_funct,exactness_list,points_plot,
+                           grid_lists,file_header)
 print("All requested files created.")
