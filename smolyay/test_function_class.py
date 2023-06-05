@@ -1,7 +1,7 @@
 import abc
-import math
 
 import numpy
+
 class test_fun(abc.ABC):
     """Abstract test function class
 
@@ -131,7 +131,7 @@ class box2(test_fun):
         term2 = [round(x*-0.1,ndigits=1) for x in range(1,len(term1)+1)]
         y = 0
         for i in range(len(term1)):
-            y += pow(math.exp(term2[i]*x[0])-math.exp(term2[i]*x[1])-term1[i],2)
+            y += pow(numpy.exp(term2[i]*x[0])-numpy.exp(term2[i]*x[1])-term1[i],2)
         return y
 
 class branin(test_fun):
@@ -166,9 +166,9 @@ class chi(test_fun):
         super().__init__(2,[-30,-30],[30,30])
     def __call__(self,x):
         self.check_bounds(x)
-        y = (pow(x[0],2) - 12*x[0] + 10*math.cos(1.5707963267949*x[0]) +
-             8*math.sin(15.707963267949*x[0]) -
-             0.447213595499958*math.exp(-0.5*pow((-0.5)+x[1],2)) + 11)
+        y = (pow(x[0],2) - 12*x[0] + 10*numpy.cos(1.5707963267949*x[0]) +
+             8*numpy.sin(15.707963267949*x[0]) -
+             0.447213595499958*numpy.exp(-0.5*pow((-0.5)+x[1],2)) + 11)
         return y
     
 class cliff(test_fun):
@@ -176,7 +176,7 @@ class cliff(test_fun):
         super().__init__(2,[-7, -6.8502133863], [11.7, 11.83480795233])
     def __call__(self,x):
         self.check_bounds(x)
-        y = pow(-0.03+0.01*x[0],2)-x[0]+math.exp(20*x[0]-20*x[1])+x[1]
+        y = pow(-0.03+0.01*x[0],2)-x[0]+numpy.exp(20*x[0]-20*x[1])+x[1]
         return y
     
 class cube(test_fun):
@@ -192,7 +192,7 @@ class denschna(test_fun):
         super().__init__(2,[-20, -20], [9, 9])
     def __call__(self,x):
         self.check_bounds(x)
-        y = pow(x[0],4)+pow(x[0]+x[1],2)+pow(math.exp(x[1])-1,2)
+        y = pow(x[0],4)+pow(x[0]+x[1],2)+pow(numpy.exp(x[1])-1,2)
         return y
 
 class himmelp1(test_fun):
@@ -210,7 +210,7 @@ class himmelp1(test_fun):
               (3.405462e-4*x[0] - 5.2375e-6*pow(x[0],2)-
                6.3e-9*pow(x[0],3))*(x[1]**2) +
               (7e-10*pow(x[0],3) - 1.6638e-6*x[0])*pow(x[1],3) -
-              2.8673112392*math.exp(5e-4*x[0]*x[1]))+ 6.8306567613*x[1] -
+              2.8673112392*numpy.exp(5e-4*x[0]*x[1]))+ 6.8306567613*x[1] -
              75.1963666677)
         return y
 
@@ -259,7 +259,7 @@ class jensmp(test_fun):
         term1 = [x*2 for x in range(2,12)]
         y = 0
         for i in range(len(term1)):
-            y += pow(term1[i] - math.exp((i+1)*x[0]) - math.exp((i+1)*x[1]),2)
+            y += pow(term1[i] - numpy.exp((i+1)*x[0]) - numpy.exp((i+1)*x[1]),2)
         return y
 
 class logros(test_fun):
@@ -268,7 +268,7 @@ class logros(test_fun):
 
     def __call__(self,x):
         self.check_bounds(x)
-        y = math.log(1+10000*pow(x[1]-x[0]**2,2)+pow(1-x[0],2))
+        y = numpy.log(1+10000*pow(x[1]-x[0]**2,2)+pow(1-x[0],2))
         return y
 
 class mdhole(test_fun):
@@ -277,7 +277,7 @@ class mdhole(test_fun):
         
     def __call__(self,x):
         self.check_bounds(x)
-        y = 100*pow(math.sin(x[0])-x[1],2)+x[0]
+        y = 100*pow(numpy.sin(x[0])-x[1],2)+x[0]
         return y
 
 class median_vareps(test_fun):
@@ -293,7 +293,7 @@ class median_vareps(test_fun):
                  -0.159517864,-0.250080533,-0.668928609]
         y = x[0]
         for i in range(len(term1)):
-            y += math.sqrt(x[0]**2 + pow(term1[i] + x[1],2))
+            y += numpy.sqrt(x[0]**2 + pow(term1[i] + x[1],2))
         return y
 
 class s328(test_fun):
@@ -330,10 +330,10 @@ class allinit(test_fun):
                          [8.8573308847, 11.2456257795, 1])
     def __call__(self,x):
         self.check_bounds(x)
-        y = (x[0]**2 + x[1]**2 + pow(x[2] + 2,2) + x[2] + math.sin(x[2])**2 +
-             pow(x[0],2)*pow(x[1],2) + math.sin(x[2])**2 + pow(x[1],4) +
-             pow(-4 + math.sin(2)**2 + pow(x[1],2)*pow(x[2],2) + x[0],2) +
-             pow(x[2]**2 + pow(x[0] + 2,2),2) + pow(math.sin(2),4) - 1)
+        y = (x[0]**2 + x[1]**2 + pow(x[2] + 2,2) + x[2] + numpy.sin(x[2])**2 +
+             pow(x[0],2)*pow(x[1],2) + numpy.sin(x[2])**2 + pow(x[1],4) +
+             pow(-4 + numpy.sin(2)**2 + pow(x[1],2)*pow(x[2],2) + x[0],2) +
+             pow(x[2]**2 + pow(x[0] + 2,2),2) + pow(numpy.sin(2),4) - 1)
         return y
     
 class box3(test_fun):
@@ -349,7 +349,7 @@ class box3(test_fun):
                   0.36783404124168]
         y = 0
         for i in range(10):
-            y += pow(math.exp(-coeffs[i]*x[0])-math.exp(-coeffs[i]*x[1])
+            y += pow(numpy.exp(-coeffs[i]*x[0])-numpy.exp(-coeffs[i]*x[1])
                      -coeff2[i]*x[2],2)
         return y
 
@@ -358,7 +358,7 @@ class eg1(test_fun):
         super().__init__(3,[-10.2302657121, -1, 1], [9.7697342879, 1, 2])
     def __call__(self,x):
         self.check_bounds(x)
-        y = x[0]**2 + pow(x[1]*x[2],4)+x[0]*x[2] + math.sin(x[0]+x[2])*x[1]+x[1]
+        y = x[0]**2 + pow(x[1]*x[2],4)+x[0]*x[2] + numpy.sin(x[0]+x[2])*x[1]+x[1]
         return y
 
 class fermat_vareps(test_fun):
@@ -368,9 +368,9 @@ class fermat_vareps(test_fun):
 
     def __call__(self,x):
         self.check_bounds(x)
-        y = (math.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
-             math.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
-             math.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 4,2)) + x[2])
+        y = (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
+             numpy.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
+             numpy.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 4,2)) + x[2])
         return y
 
 class fermat2_vareps(test_fun):
@@ -380,9 +380,9 @@ class fermat2_vareps(test_fun):
 
     def __call__(self,x):
         self.check_bounds(x)
-        y = (math.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
-             math.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
-             math.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 1,2)) + x[2])
+        y = (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
+             numpy.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
+             numpy.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 1,2)) + x[2])
         return y
 
 class least(test_fun):
@@ -396,7 +396,7 @@ class least(test_fun):
         term1 = [-5,-3,-1,5,3,1]
         y = 0
         for i in range(len(term0)):
-            y += pow(term0[i] + (-x[1]*math.exp(term1[i]*x[2])) - x[0],2)
+            y += pow(term0[i] + (-x[1]*numpy.exp(term1[i]*x[2])) - x[0],2)
         return y
 
 class s242(test_fun):
@@ -413,7 +413,7 @@ class s242(test_fun):
                   0.36783404124168]
         y = 0
         for i in range(10):
-            y += pow(math.exp(-coeffs[i]*x[0])-math.exp(-coeffs[i]*x[1])
+            y += pow(numpy.exp(-coeffs[i]*x[0])-numpy.exp(-coeffs[i]*x[1])
                      -coeff2[i]*x[2],2)
         return y
 
@@ -423,12 +423,12 @@ class s244(test_fun):
 
     def __call__(self,x):
         self.check_bounds(x)
-        y = (pow(0.934559787821252 + math.exp(-0.1*x[0]) -
-                 math.exp(-0.1*x[1])*x[2],2) +
-             pow(-0.142054336894918 + math.exp(-0.2*x[0]) -
-                 math.exp(-0.2*x[1])*x[2],2) +
-             pow(-0.491882878842398 + math.exp(-0.3*x[0]) -
-                 math.exp(-0.3*x[1])*x[2],2))
+        y = (pow(0.934559787821252 + numpy.exp(-0.1*x[0]) -
+                 numpy.exp(-0.1*x[1])*x[2],2) +
+             pow(-0.142054336894918 + numpy.exp(-0.2*x[0]) -
+                 numpy.exp(-0.2*x[1])*x[2],2) +
+             pow(-0.491882878842398 + numpy.exp(-0.3*x[0]) -
+                 numpy.exp(-0.3*x[1])*x[2],2))
         return y
 
 class s333(test_fun):
@@ -443,7 +443,7 @@ class s333(test_fun):
                   0.769230769230769,1.66666666666667]
         y = 0
         for i in range(8):
-            y += pow(1-coeff2[i]*math.exp(coeff1[i]*x[1])*x[0]-coeff2[i]*x[2],2)
+            y += pow(1-coeff2[i]*numpy.exp(coeff1[i]*x[1])*x[0]-coeff2[i]*x[2],2)
         return y
 
 class st_cqpjk2(test_fun):
@@ -469,7 +469,7 @@ class yfit(test_fun):
                    17.591719,21.158931,24.753206,28.379405,32.042552,35.747869]
         y = 0
         for i in range(17):
-            y += pow(coeff_s[i]+math.atan(coeff0[i]*x[0]+coeff1[i]*x[1])*x[2],2)
+            y += pow(coeff_s[i]+numpy.arctan(coeff0[i]*x[0]+coeff1[i]*x[1])*x[2],2)
         return y
 
 class brownden(test_fun):
@@ -515,8 +515,8 @@ class hatflda(test_fun):
                           10.9999999281, 10.9999998559])
     def __call__(self,x):
         self.check_bounds(x)
-        y = (pow(x[0] - 1, 2) + pow(x[0] - math.sqrt(x[1]), 2) +
-             pow(x[1] - math.sqrt(x[2]), 2) + pow(x[2] - math.sqrt(x[3]), 2))
+        y = (pow(x[0] - 1, 2) + pow(x[0] - numpy.sqrt(x[1]), 2) +
+             pow(x[1] - numpy.sqrt(x[2]), 2) + pow(x[2] - numpy.sqrt(x[3]), 2))
         return y
 
 class hatfldb(test_fun):
@@ -526,8 +526,8 @@ class hatfldb(test_fun):
 
     def __call__(self,x):
         self.check_bounds(x)
-        y = (pow(x[0] - 1, 2) + pow(x[0] - math.sqrt(x[1]), 2) +
-             pow(x[1] - math.sqrt(x[2]), 2) + pow(x[2] - math.sqrt(x[3]),2))
+        y = (pow(x[0] - 1, 2) + pow(x[0] - numpy.sqrt(x[1]), 2) +
+             pow(x[1] - numpy.sqrt(x[2]), 2) + pow(x[2] - numpy.sqrt(x[3]),2))
         return y
 
 class hatfldc(test_fun):
@@ -792,8 +792,8 @@ class s267(test_fun):
         term2 = [round(x*-0.1,ndigits=1) for x in range(1,len(term1)+1)]
         y = 0
         for i in range(len(term1)):
-            y += pow(term1[i] + math.exp(term2[i]*x[0])*x[2] -
-                     math.exp(term2[i]*x[1])*x[3] + 3*math.exp(term2[i]*x[4]),2)
+            y += pow(term1[i] + numpy.exp(term2[i]*x[0])*x[2] -
+                     numpy.exp(term2[i]*x[1])*x[3] + 3*numpy.exp(term2[i]*x[4]),2)
         return y
 
 class s358(test_fun):
@@ -810,8 +810,8 @@ class s358(test_fun):
         term2 = [round(x*-10,ndigits=1) for x in range(len(term1))]
         y = 0
         for i in range(len(term1)):
-            y += pow(term1[i] - math.exp(term2[i]*x[3])*x[1] -
-                     math.exp(term2[i]*x[4])*x[2] - x[0],2)
+            y += pow(term1[i] - numpy.exp(term2[i]*x[3])*x[1] -
+                     numpy.exp(term2[i]*x[4])*x[2] - x[0],2)
         return y
 
 class biggs6(test_fun):
@@ -831,9 +831,9 @@ class biggs6(test_fun):
         term2 = [round(x*-0.1,ndigits=1) for x in range(1,len(term1)+1)]
         y = 0
         for i in range(len(term1)):
-            y += pow(term1[i] + math.exp(term2[i]*x[0])*x[2] -
-                     math.exp(term2[i]*x[1])*x[3] +
-                     math.exp(term2[i]*x[4])*x[5],2)
+            y += pow(term1[i] + numpy.exp(term2[i]*x[0])*x[2] -
+                     numpy.exp(term2[i]*x[1])*x[3] +
+                     numpy.exp(term2[i]*x[4])*x[5],2)
         return y
 
 class hart6(test_fun):
@@ -841,16 +841,16 @@ class hart6(test_fun):
         super().__init__(6,[0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1])
     def __call__(self,x):
         self.check_bounds(x)
-        y = -(math.exp(-(10*pow(x[0]-0.1312,2) + 0.05*pow(x[1]-0.1696,2) +
+        y = -(numpy.exp(-(10*pow(x[0]-0.1312,2) + 0.05*pow(x[1]-0.1696,2) +
                          17*pow(x[2]-0.5569,2) + 3.5*pow(x[3]-0.0124,2) +
                          1.7*pow(x[4]-0.8283,2) + 8*pow(x[5]-0.5886,2))) +
-              1.2*math.exp(-(0.05*pow(x[0]-0.2329,2)+ 10*pow(x[1]-0.4135,2) +
+              1.2*numpy.exp(-(0.05*pow(x[0]-0.2329,2)+ 10*pow(x[1]-0.4135,2) +
                              17*pow(x[2]-0.8307,2) + 0.1*pow(x[3]-0.3736,2) +
                              8*pow(x[4]-0.1004,2) + 14*pow(x[5]-0.9991,2))) +
-              3*math.exp(-(3*pow(x[0]-0.2348,2) + 3.5*pow(x[1]-0.1451,2) +
+              3*numpy.exp(-(3*pow(x[0]-0.2348,2) + 3.5*pow(x[1]-0.1451,2) +
                              1.7*pow(x[2]-0.3522,2) + 10*pow(x[3]-0.2883,2) +
                              17*pow(x[4]-0.3047,2) + 8*pow(x[5]-0.665,2))) +
-              3.2*math.exp(-(17*pow(x[0]-0.4047,2) + 8*pow(x[1]-0.8828,2) +
+              3.2*numpy.exp(-(17*pow(x[0]-0.4047,2) + 8*pow(x[1]-0.8828,2) +
                              0.05*pow(x[2]-0.8732,2) + 10*pow(x[3]-0.5743,2) +
                              0.1*pow(x[4]-0.1091,2) + 14*pow(x[5]-0.0381,2))))
         return y
@@ -1050,9 +1050,9 @@ class s272(test_fun):
         term1 = [round(x*-0.1,ndigits=1) for x in range(1,len(term0)+1)]
         y = 0
         for i in range(len(term1)):
-            y += pow(term0[i] + math.exp(term1[i]*x[0])*x[3] -
-                     math.exp(term1[i]*x[1])*x[4] +
-                     math.exp(term1[i]*x[2])*x[5],2)
+            y += pow(term0[i] + numpy.exp(term1[i]*x[0])*x[3] -
+                     numpy.exp(term1[i]*x[1])*x[4] +
+                     numpy.exp(term1[i]*x[2])*x[5],2)
         return y
 
 class st_bsj3(test_fun):
