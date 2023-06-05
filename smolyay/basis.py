@@ -2,6 +2,7 @@ import abc
 import math
 
 import numpy
+import scipy.special
 
 class BasisFunction(abc.ABC):
     """Basis function for interpolating data.
@@ -133,16 +134,7 @@ class ChebyshevFirstKind(BasisFunction):
         if x > 1 or x < -1:
             raise ValueError("Input is outside the domain [-1,1]")
 
-        if self._n == 0:
-            return 1
-        elif self._n == 1:
-            return x
-        else:
-            k_lim = self._n//2
-            answer = 0
-            for k in range(0,k_lim+1):
-                answer += math.comb(self._n,2*k)*((x**2 - 1)**k)*(x**(self._n-2*k))
-            return answer
+        return scipy.special.eval_chebyt(self._n,x)
 
     def derivative(self, x):
         """Evaluate the derivative of ChebyshevFirstKind.
@@ -402,16 +394,7 @@ class ChebyshevSecondKind(BasisFunction):
         """
         if x > 1 or x < -1:
             raise ValueError("Input is outside the domain [-1,1]")
-        if self._n == 0:
-            return 1
-        elif self._n == 1:
-            return 2*x
-        else:
-            k_lim = self._n//2
-            answer = 0
-            for k in range(0,k_lim+1):
-                answer += math.comb(self._n+1,2*k+1)*((x**2 - 1)**k)*(x**(self._n-2*k))
-            return answer
+        return scipy.special.eval_chebyu(self._n,x)
 
     def derivative(self, x):
         r"""Evaluate the derivative of Chebyshev Second Kind.
