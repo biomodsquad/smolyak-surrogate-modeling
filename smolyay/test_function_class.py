@@ -100,11 +100,11 @@ class beale(test_fun):
                          [11.69999999928, 9.44999999982])
 
     def _function(self,x):
-        y = (((-1.5) + x[0]*(1 - x[1]))**2 +
-             ((-2.25) + (1 - (x[1])**2)*x[0])**2 +
-             ((-2.625)+(1-pow(x[1],3))*x[0])**2)
-        return y
+        return ((-1.5 + x[0]*(1 - x[1]))**2 +
+                (-2.25 + (1 - (x[1])**2)*x[0])**2 +
+                (-2.625+(1-x[1]**3)*x[0])**2)
 
+# expressions are close
 class box2(test_fun):
     def __init__(self):
         super().__init__([-10,0],[10,10])
@@ -115,9 +115,8 @@ class box2(test_fun):
                  0.495673421825855,0.448993501489319,0.406446249936512,
                  0.36783404124168]
         term2 = [round(x*-0.1,ndigits=1) for x in range(1,len(term1)+1)]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(numpy.exp(term2[i]*x[0])-numpy.exp(term2[i]*x[1])-term1[i],2)
+        y = numpy.sum((numpy.exp(numpy.multiply(term2,x[0]))-
+                       numpy.exp(numpy.multiply(term2,x[1]))-term1)**2)
         return y
 
 class branin(test_fun):
@@ -125,7 +124,7 @@ class branin(test_fun):
         super().__init__([-5,0],[10,15])
         
     def _function(self,x):
-        y1 = pow(x[1] - 5.1*pow(x[0],2)/(4*pow(numpy.pi,2)) + 5*x[0]/numpy.pi - 6,2)
+        y1 = (x[1] - 5.1*x[0]**2/(4*numpy.pi**2) + 5*x[0]/numpy.pi - 6)**2
         y2 = 10*(1-1/(8*numpy.pi))*numpy.cos(x[0]) + 10
         return y1 + y2
     
@@ -134,131 +133,117 @@ class camel1(test_fun):
         super().__init__([-5,-5],[5,5])
         
     def _function(self,x):
-        y = (4*pow(x[0],2)-2.1*pow(x[0],4)+0.333333333333333*pow(x[0],6) +
-                 x[0]*x[1]-4*pow(x[1],2)+4*pow(x[1],4))
-        return y
+        return (4*x[0]**2-2.1*x[0]**4+0.333333333333333*x[0]**6 +
+                x[0]*x[1]-4*x[1]**2+4*x[1]**4)
 
 class camel6(test_fun):
     def __init__(self):
         super().__init__([-3,-1.5],[3,1.5])
         
     def _function(self,x):
-        y = (4*pow(x[0],2)-2.1*pow(x[0],4)+0.333333333333333*pow(x[0],6) +
-             x[0]*x[1]-4*pow(x[1],2)+4*pow(x[1],4))
-        return y
+        return (4*x[0]**2-2.1*x[0]**4+0.333333333333333*x[0]**6 +
+                x[0]*x[1]-4*x[1]**2+4*x[1]**4)
 
 class chi(test_fun):
     def __init__(self):
         super().__init__([-30,-30],[30,30])
         
     def _function(self,x):
-        y = (pow(x[0],2) - 12*x[0] + 10*numpy.cos(1.5707963267949*x[0]) +
-             8*numpy.sin(15.707963267949*x[0]) -
-             0.447213595499958*numpy.exp(-0.5*pow((-0.5)+x[1],2)) + 11)
-        return y
+        return (x[0]**2 - 12*x[0] + 10*numpy.cos(1.5707963267949*x[0]) +
+                8*numpy.sin(15.707963267949*x[0]) -
+                0.447213595499958*numpy.exp(-0.5*(-0.5+x[1])**2) + 11)
     
 class cliff(test_fun):
     def __init__(self):
         super().__init__([-7, -6.8502133863], [11.7, 11.83480795233])
         
     def _function(self,x):
-        y = pow(-0.03+0.01*x[0],2)-x[0]+numpy.exp(20*x[0]-20*x[1])+x[1]
-        return y
+        return (-0.03+0.01*x[0])**2-x[0]+numpy.exp(20*x[0]-20*x[1])+x[1]
     
 class cube(test_fun):
     def __init__(self):
         super().__init__([-18, -18], [9.9, 9.9])
         
     def _function(self,x):
-        y = pow(-1+x[0],2)+100*pow(x[1]-pow(x[0],3),2)
-        return y
+        return (-1+x[0])**2+100*(x[1]-x[0]**3)**2
     
 class denschna(test_fun):
     def __init__(self):
         super().__init__([-20, -20], [9, 9])
         
     def _function(self,x):
-        y = pow(x[0],4)+pow(x[0]+x[1],2)+pow(numpy.exp(x[1])-1,2)
-        return y
+        return x[0]**4+(x[0]+x[1])**2+(numpy.exp(x[1])-1)**2
 
 class himmelp1(test_fun):
     def __init__(self):
         super().__init__([0, 0], [95, 75])
         
     def _function(self,x):
-        y = (3.8112755343*x[0] -
-             (0.1269366345*pow(x[0],2) - 0.0020567665*pow(x[0],3) +
-              1.0345e-5*pow(x[0],4) +
-              (0.0302344793*x[0] - 0.0012813448*pow(x[0],2) +
-               3.52599e-5*pow(x[0],3) - 2.266e-7*pow(x[0],4))*x[1] +
-              0.2564581253*pow(x[1],2) - 0.003460403*pow(x[1],3) +
-              1.35139e-5*pow(x[1],4) - 28.1064434908/(1 +x[1]) +
-              (3.405462e-4*x[0] - 5.2375e-6*pow(x[0],2)-
-               6.3e-9*pow(x[0],3))*(x[1]**2) +
-              (7e-10*pow(x[0],3) - 1.6638e-6*x[0])*pow(x[1],3) -
-              2.8673112392*numpy.exp(5e-4*x[0]*x[1]))+ 6.8306567613*x[1] -
-             75.1963666677)
-        return y
+        return (3.8112755343*x[0] -
+                (0.1269366345*x[0]**2 - 0.0020567665*x[0]**3 +
+                 1.0345e-5*x[0]**4 +
+                 (0.0302344793*x[0] - 0.0012813448*x[0]**2 +
+                  3.52599e-5*x[0]**3 - 2.266e-7*x[0]**4)*x[1] +
+                 0.2564581253*x[1]**2 - 0.003460403*x[1]**3 +
+                 1.35139e-5*x[1]**4 - 28.1064434908/(1 +x[1]) +
+                 (3.405462e-4*x[0] - 5.2375e-6*x[0]**2-
+                  6.3e-9*x[0]**3)*(x[1]**2) +
+                 (7e-10*x[0]**3 - 1.6638e-6*x[0])*x[1]**3 -
+                 2.8673112392*numpy.exp(5e-4*x[0]*x[1]))+
+                6.8306567613*x[1] -75.1963666677)
 
 class hs002(test_fun):
     def __init__(self):
         super().__init__([-8.7756292513, 1.5], [11.2243707487, 11.5])
 
     def _function(self,x):
-        y = 100*pow(x[1]-pow(x[0],2),2)+pow(1-x[0],2)
-        return y
+        return 100*(x[1]-x[0]**2)**2+(1-x[0])**2
 
 class hs003(test_fun):
     def __init__(self):
         super().__init__([-10, 0], [10, 10])
 
     def _function(self,x):
-        y = 1e-5*pow(x[1]-x[0],2)+x[1]
-        return y
+        return 1e-5*(x[1]-x[0])**2+x[1]
 
 class hs004(test_fun):
     def __init__(self):
         super().__init__([1, 0], [11, 10])
 
     def _function(self,x):
-        y = 0.333333333333333*pow(1+x[0],3)+x[1]
-        return y
+        return 0.333333333333333*(1+x[0])**3+x[1]
 
 class hs3mod(test_fun):
     def __init__(self):
         super().__init__([-10, 0], [10, 10])
 
     def _function(self,x):
-        y = pow(x[1]-x[0],2) + x[1]
-        return y
+        return (x[1]-x[0])**2 + x[1]
 
+# expressions are close
 class jensmp(test_fun):
     def __init__(self):
         super().__init__([0.1, 0.1], [0.9, 0.9])
 
     def _function(self,x):
-        term1 = [x*2 for x in range(2,12)]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] - numpy.exp((i+1)*x[0]) - numpy.exp((i+1)*x[1]),2)
-        return y
+        return numpy.sum([((i+2)*2 - numpy.exp((i+1)*x[0]) -
+                           numpy.exp((i+1)*x[1]))**2 for i in range(10)])
 
 class logros(test_fun):
     def __init__(self):
         super().__init__([0, 0], [11, 11])
 
     def _function(self,x):
-        y = numpy.log(1+10000*pow(x[1]-x[0]**2,2)+pow(1-x[0],2))
-        return y
+        return numpy.log(1+10000*(x[1]-x[0]**2)**2+(1-x[0])**2)
 
 class mdhole(test_fun):
     def __init__(self):
         super().__init__([0, -10], [10, 10])
         
     def _function(self,x):
-        y = 100*pow(numpy.sin(x[0])-x[1],2)+x[0]
-        return y
+        return 100*(numpy.sin(x[0])-x[1])**2+x[0]
 
+# expressions are close
 class median_vareps(test_fun):
     def __init__(self):
         super().__init__([1e-08, -9.499789331], [10.00000001, 10.500210669])
@@ -269,35 +254,29 @@ class median_vareps(test_fun):
                  -0.067113723,-0.500210669,-0.998117627,-0.578733378,
                  -0.991133039,-0.762250467,-0.130692483,-0.639718759,
                  -0.159517864,-0.250080533,-0.668928609]
-        y = x[0]
-        for i in range(len(term1)):
-            y += numpy.sqrt(x[0]**2 + pow(term1[i] + x[1],2))
-        return y
+        return x[0] + numpy.sum(numpy.sqrt(x[0]**2 + (term1 + x[1])**2))
 
 class s328(test_fun):
     def __init__(self):
         super().__init__([1, 1], [2.7, 2.7])
 
     def _function(self,x):
-        y = (0.1*(x[0]**2 + (1 + (x[1]**2))/(x[0]**2) +
-                  (100 + (x[0]**2)*(x[1]**2))/(pow(x[0],4)*pow(x[1],4))) + 1.2)
-        return y
+        return (0.1*(x[0]**2 + (1 + (x[1]**2))/(x[0]**2) +
+                    (100 + (x[0]**2)*(x[1]**2))/(x[0]**4*x[1]**4)) + 1.2)
 
 class sim2bqp(test_fun):
     def __init__(self):
         super().__init__([-10, 0], [9, 0.45])
 
     def _function(self,x):
-        y = pow(x[1]-x[0],2)+x[1]+pow(x[0]+x[1],2)
-        return y
+        return (x[1]-x[0])**2+x[1]+(x[0]+x[1])**2
 
 class simbqp(test_fun):
     def __init__(self):
         super().__init__([-10, 0], [9, 0.45])
 
     def _function(self,x):
-        y = pow(x[1]-x[0],2)+x[1]+pow(2*x[0]+x[1],2)
-        return y
+        return (x[1]-x[0])**2+x[1]+(2*x[0]+x[1])**2
 
 class allinit(test_fun):
     def __init__(self):
@@ -305,11 +284,10 @@ class allinit(test_fun):
                          [8.8573308847, 11.2456257795, 1])
         
     def _function(self,x):
-        y = (x[0]**2 + x[1]**2 + pow(x[2] + 2,2) + x[2] + numpy.sin(x[2])**2 +
-             pow(x[0],2)*pow(x[1],2) + numpy.sin(x[2])**2 + pow(x[1],4) +
-             pow(-4 + numpy.sin(2)**2 + pow(x[1],2)*pow(x[2],2) + x[0],2) +
-             pow(x[2]**2 + pow(x[0] + 2,2),2) + pow(numpy.sin(2),4) - 1)
-        return y
+        return (x[0]**2 + x[1]**2 + (x[2] + 2)**2 + x[2] + numpy.sin(x[2])**2 +
+                x[0]**2*x[1]**2 + numpy.sin(x[2])**2 + x[1]**4 +
+                (-4 + numpy.sin(2)**2 + x[1]**2*x[2]**2 + x[0])**2 +
+                (x[2]**2 + (x[0] + 2)**2)**2 + numpy.sin(2)**4 - 1)
     
 class box3(test_fun):
     def __init__(self):
@@ -333,7 +311,7 @@ class eg1(test_fun):
         super().__init__([-10.2302657121, -1, 1], [9.7697342879, 1, 2])
         
     def _function(self,x):
-        y = x[0]**2 + pow(x[1]*x[2],4)+x[0]*x[2] + numpy.sin(x[0]+x[2])*x[1]+x[1]
+        y = x[0]**2 + pow(x[1]*x[2],4)+x[0]*x[2] +numpy.sin(x[0]+x[2])*x[1]+x[1]
         return y
 
 class fermat_vareps(test_fun):
