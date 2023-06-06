@@ -23,15 +23,15 @@ class test_fun(abc.ABC):
     Raises
     ------
     ValueError
-        The number of variables/dimensions should be greater than one
+        The number of variables/dimensions should be greater than zero
 
     IndexError
         All dimensions must have bounds
     """
     def __init__(self,dim,lower_bounds,upper_bounds):
         self._dim = dim
-        if dim < 1:
-            raise ValueError('The number of variables must be greater than 1')
+        if dim < 0:
+            raise ValueError('The number of variables must be greater than 0')
         if not(hasattr(lower_bounds,'__len__') and hasattr(upper_bounds,'__len__')):
             if not dim == 1:
                 raise IndexError('All dimensions must have bounds')
@@ -74,9 +74,9 @@ class test_fun(abc.ABC):
     def bounds(self):
         """the lower and upper bounds of each variable"""
         return list(zip(self._lower_bounds,self._upper_bounds))
-
-    def check_bounds(self,x):
-        """Checks that the input of a call is within the bounds of the function
+        
+    def __call__(self,x):
+        """Evaluate the test function
 
         Parameters
         ----------
@@ -88,23 +88,18 @@ class test_fun(abc.ABC):
         ValueError
             if the input is outside is outside the domain
         """
-        x = numpy.array(x,copy=False)
-        for i in range(self.dim):
-            if not (self.lower_bounds[i]-(1e-10) <= x[i] <= self.upper_bounds[i]+1e-10):
-                print("input: " + str(x[i]))
-                print("bounds: " + str(self.lower_bounds[i])
-                      + " to " + str(self.upper_bounds[i]))
-                raise ValueError("input out of bounds")
-        
-    @abc.abstractmethod
-    def __call__(self,x):
-        """Evaluate the test function
+        if self.dim > 1:
+            oob = any(
+                xi < bound[0]-1e-10 or xi > bound[1]+1e-10 for xi,bound in
+                zip(x,self.bounds))
+        else:
+            oob = x < self.bounds[0] or x > self.bounds[1]
+        if oob:
+            raise ValueError("Input out domain of function.")
+        return self._function(x)
 
-        Parameters
-        ----------
-        x : list of floats
-            the input to the call method
-        """
+    @abc.abstractmethod
+    def _function(self,x):
         pass
 
 class beale(test_fun):
@@ -112,8 +107,7 @@ class beale(test_fun):
         super().__init__(2,[-7.0000000008, -9.5000000002],
                          [11.69999999928, 9.44999999982])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (((-1.5) + x[0]*(1 - x[1]))**2 +
              ((-2.25) + (1 - (x[1])**2)*x[0])**2 +
              ((-2.625)+(1-pow(x[1],3))*x[0])**2)
@@ -122,8 +116,8 @@ class beale(test_fun):
 class box2(test_fun):
     def __init__(self):
         super().__init__(2,[-10,0],[10,10])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         term1 = [0.536957976864517,0.683395469841369,0.691031152313854,
                  0.652004407146905,0.599792712713548,0.546332883917360,
                  0.495673421825855,0.448993501489319,0.406446249936512,
@@ -137,8 +131,8 @@ class box2(test_fun):
 class branin(test_fun):
     def __init__(self):
         super().__init__(2,[-5,0],[10,15])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y1 = pow(x[1] - 5.1*pow(x[0],2)/(4*pow(numpy.pi,2)) + 5*x[0]/numpy.pi - 6,2)
         y2 = 10*(1-1/(8*numpy.pi))*numpy.cos(x[0]) + 10
         return y1 + y2
@@ -146,8 +140,8 @@ class branin(test_fun):
 class camel1(test_fun):
     def __init__(self):
         super().__init__(2,[-5,-5],[5,5])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = (4*pow(x[0],2)-2.1*pow(x[0],4)+0.333333333333333*pow(x[0],6) +
                  x[0]*x[1]-4*pow(x[1],2)+4*pow(x[1],4))
         return y
@@ -155,8 +149,8 @@ class camel1(test_fun):
 class camel6(test_fun):
     def __init__(self):
         super().__init__(2,[-3,-1.5],[3,1.5])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = (4*pow(x[0],2)-2.1*pow(x[0],4)+0.333333333333333*pow(x[0],6) +
              x[0]*x[1]-4*pow(x[1],2)+4*pow(x[1],4))
         return y
@@ -164,8 +158,8 @@ class camel6(test_fun):
 class chi(test_fun):
     def __init__(self):
         super().__init__(2,[-30,-30],[30,30])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = (pow(x[0],2) - 12*x[0] + 10*numpy.cos(1.5707963267949*x[0]) +
              8*numpy.sin(15.707963267949*x[0]) -
              0.447213595499958*numpy.exp(-0.5*pow((-0.5)+x[1],2)) + 11)
@@ -174,32 +168,32 @@ class chi(test_fun):
 class cliff(test_fun):
     def __init__(self):
         super().__init__(2,[-7, -6.8502133863], [11.7, 11.83480795233])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = pow(-0.03+0.01*x[0],2)-x[0]+numpy.exp(20*x[0]-20*x[1])+x[1]
         return y
     
 class cube(test_fun):
     def __init__(self):
         super().__init__(2,[-18, -18], [9.9, 9.9])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = pow(-1+x[0],2)+100*pow(x[1]-pow(x[0],3),2)
         return y
     
 class denschna(test_fun):
     def __init__(self):
         super().__init__(2,[-20, -20], [9, 9])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = pow(x[0],4)+pow(x[0]+x[1],2)+pow(numpy.exp(x[1])-1,2)
         return y
 
 class himmelp1(test_fun):
     def __init__(self):
         super().__init__(2,[0, 0], [95, 75])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = (3.8112755343*x[0] -
              (0.1269366345*pow(x[0],2) - 0.0020567665*pow(x[0],3) +
               1.0345e-5*pow(x[0],4) +
@@ -218,8 +212,7 @@ class hs002(test_fun):
     def __init__(self):
         super().__init__(2,[-8.7756292513, 1.5], [11.2243707487, 11.5])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = 100*pow(x[1]-pow(x[0],2),2)+pow(1-x[0],2)
         return y
 
@@ -227,8 +220,7 @@ class hs003(test_fun):
     def __init__(self):
         super().__init__(2,[-10, 0], [10, 10])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = 1e-5*pow(x[1]-x[0],2)+x[1]
         return y
 
@@ -236,8 +228,7 @@ class hs004(test_fun):
     def __init__(self):
         super().__init__(2,[1, 0], [11, 10])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = 0.333333333333333*pow(1+x[0],3)+x[1]
         return y
 
@@ -245,8 +236,7 @@ class hs3mod(test_fun):
     def __init__(self):
         super().__init__(2,[-10, 0], [10, 10])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = pow(x[1]-x[0],2) + x[1]
         return y
 
@@ -254,8 +244,7 @@ class jensmp(test_fun):
     def __init__(self):
         super().__init__(2,[0.1, 0.1], [0.9, 0.9])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [x*2 for x in range(2,12)]
         y = 0
         for i in range(len(term1)):
@@ -266,8 +255,7 @@ class logros(test_fun):
     def __init__(self):
         super().__init__(2,[0, 0], [11, 11])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = numpy.log(1+10000*pow(x[1]-x[0]**2,2)+pow(1-x[0],2))
         return y
 
@@ -275,8 +263,7 @@ class mdhole(test_fun):
     def __init__(self):
         super().__init__(2,[0, -10], [10, 10])
         
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = 100*pow(numpy.sin(x[0])-x[1],2)+x[0]
         return y
 
@@ -284,8 +271,7 @@ class median_vareps(test_fun):
     def __init__(self):
         super().__init__(2,[1e-08, -9.499789331], [10.00000001, 10.500210669])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [-0.171747132,-0.843266708,-0.550375356,-0.301137904,
                  -0.292212117,-0.224052867,-0.349830504,-0.856270347,
                  -0.067113723,-0.500210669,-0.998117627,-0.578733378,
@@ -300,8 +286,7 @@ class s328(test_fun):
     def __init__(self):
         super().__init__(2,[1, 1], [2.7, 2.7])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (0.1*(x[0]**2 + (1 + (x[1]**2))/(x[0]**2) +
                   (100 + (x[0]**2)*(x[1]**2))/(pow(x[0],4)*pow(x[1],4))) + 1.2)
         return y
@@ -310,8 +295,7 @@ class sim2bqp(test_fun):
     def __init__(self):
         super().__init__(2,[-10, 0], [9, 0.45])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = pow(x[1]-x[0],2)+x[1]+pow(x[0]+x[1],2)
         return y
 
@@ -319,8 +303,7 @@ class simbqp(test_fun):
     def __init__(self):
         super().__init__(2,[-10, 0], [9, 0.45])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = pow(x[1]-x[0],2)+x[1]+pow(2*x[0]+x[1],2)
         return y
 
@@ -328,8 +311,8 @@ class allinit(test_fun):
     def __init__(self):
         super().__init__(3,[-11.1426691153, 1, -1e10],
                          [8.8573308847, 11.2456257795, 1])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = (x[0]**2 + x[1]**2 + pow(x[2] + 2,2) + x[2] + numpy.sin(x[2])**2 +
              pow(x[0],2)*pow(x[1],2) + numpy.sin(x[2])**2 + pow(x[1],4) +
              pow(-4 + numpy.sin(2)**2 + pow(x[1],2)*pow(x[2],2) + x[0],2) +
@@ -340,8 +323,8 @@ class box3(test_fun):
     def __init__(self):
         super().__init__(3,[-9.0000004305, 3.23989999984065e-06, -8.9999997323],
                          [9.89999961255, 18.00000291591, 9.90000024093])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         coeffs = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
         coeff2 = [0.536957976864517,0.683395469841369,0.691031152313854,
                   0.652004407146905,0.599792712713548,0.54633288391736,
@@ -356,8 +339,8 @@ class box3(test_fun):
 class eg1(test_fun):
     def __init__(self):
         super().__init__(3,[-10.2302657121, -1, 1], [9.7697342879, 1, 2])
-    def __call__(self,x):
-        self.check_bounds(x)
+        
+    def _function(self,x):
         y = x[0]**2 + pow(x[1]*x[2],4)+x[0]*x[2] + numpy.sin(x[0]+x[2])*x[1]+x[1]
         return y
 
@@ -366,8 +349,7 @@ class fermat_vareps(test_fun):
         super().__init__(3,[-7.9999999999, -8.8452994616, 1e-08],
                          [12.0000000001, 11.1547005384, 10.00000001])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
              numpy.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
              numpy.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 4,2)) + x[2])
@@ -378,8 +360,7 @@ class fermat2_vareps(test_fun):
         super().__init__(3,[-8, -9.00000002, 1e-08],
                          [12, 10.99999998, 10.00000001])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
              numpy.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
              numpy.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 1,2)) + x[2])
@@ -390,8 +371,7 @@ class least(test_fun):
         super().__init__(3,[473.98605675534, -159.3518936954, -5],
                          [ 506.6511741726, -125.41670432586, 4.5])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term0 = [127,151,379,421,460,426]
         term1 = [-5,-3,-1,5,3,1]
         y = 0
@@ -404,8 +384,7 @@ class s242(test_fun):
     def __init__(self):
         super().__init__(3,[0, 0, 0], [10, 10, 10])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         coeffs = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
         coeff2 = [0.536957976864517,0.683395469841369,0.691031152313854,
                   0.652004407146905,0.599792712713548,0.54633288391736,
@@ -421,8 +400,7 @@ class s244(test_fun):
     def __init__(self):
         super().__init__(3,[0, 0, 0], [10, 10, 10])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (pow(0.934559787821252 + numpy.exp(-0.1*x[0]) -
                  numpy.exp(-0.1*x[1])*x[2],2) +
              pow(-0.142054336894918 + numpy.exp(-0.2*x[0]) -
@@ -435,8 +413,7 @@ class s333(test_fun):
     def __init__(self):
         super().__init__(3,[79.901992908, -1, -1], [89.9117936172, 0.9, 0.9])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         coeff1 = [-4,-5.75,-7.5,-24,-32,-48,-72,-96]
         coeff2 = [0.013869625520111,0.0152439024390244,0.0178890876565295,
                   0.0584795321637427,0.102040816326531,0.222222222222222,
@@ -450,8 +427,7 @@ class st_cqpjk2(test_fun):
     def __init__(self):
         super().__init__(3,[0, 0, 0], [0.9, 0.9, 0.9])
         
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = 9*x[0]*x[0]-15*x[0]+9*x[1]*x[1]-12*x[1]+9*x[2]*x[2]-9*x[2]
         return y
 
@@ -460,8 +436,7 @@ class yfit(test_fun):
         super().__init__(3,[-9.9978786299, -10.0035439984, 0],
                          [10.0021213701, 9.9964560016, 10010])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         coeff1 = [x*0.0625 for x in range(17)]
         coeff0 = [x*0.0625 for x in reversed(range(17))]
         coeff_s = [-21.158931,-17.591719,-14.046854,-10.519732,-7.0058392,
@@ -478,8 +453,7 @@ class brownden(test_fun):
                             -10.4034394882, -9.7632212255],
                          [-1.43499591432, 20.88326704608,
                           8.63690446062, 9.21310089705])
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         coeff1 = [round(x*0.2,ndigits=1) for x in range(1,21)]
         coeff_s1 = [-1.22140275816017,-1.49182469764127,-1.82211880039051,
                     -2.22554092849247,-2.71828182845905,-3.32011692273655,
@@ -513,8 +487,7 @@ class hatflda(test_fun):
         super().__init__(4,[1e-07, 1e-07, 1e-07, 1e-07],
                          [10.999999997, 10.9999999714,
                           10.9999999281, 10.9999998559])
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (pow(x[0] - 1, 2) + pow(x[0] - numpy.sqrt(x[1]), 2) +
              pow(x[1] - numpy.sqrt(x[2]), 2) + pow(x[2] - numpy.sqrt(x[3]), 2))
         return y
@@ -524,8 +497,7 @@ class hatfldb(test_fun):
         super().__init__(4,[1e-07, 1e-07, 1e-07, 1e-07],
                          [10.9472135922, 0.8, 10.6400000036, 10.4096000079])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (pow(x[0] - 1, 2) + pow(x[0] - numpy.sqrt(x[1]), 2) +
              pow(x[1] - numpy.sqrt(x[2]), 2) + pow(x[2] - numpy.sqrt(x[3]),2))
         return y
@@ -535,8 +507,7 @@ class hatfldc(test_fun):
         super().__init__(4,[0, 0, 0, -8.9999999978],
                          [10, 10, 10, 11.0000000022])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = pow(x[0]-1,2)+pow(x[2]-x[1]**2,2)+pow(x[3]-x[2]**2,2)+pow(x[3]-1,2)
         return y
 
@@ -544,8 +515,7 @@ class himmelbf(test_fun):
     def __init__(self):
         super().__init__(4,[0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = 1e4*(pow(0.135299688810716*(x[0]**2) - 1,2) +
                  pow((x[0]**2 + 4.28e-4*(x[1]**2) +
                       1.83184e-7*(x[2]**2))/(11.18 + 4.78504e-3*(x[3]**2))-1,2)+
@@ -565,8 +535,7 @@ class kowalik(test_fun):
     def __init__(self):
         super().__init__(4,[0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [0.1957,0.1947,0.1735,0.16,0.0844,0.0627,0.0456,0.0342,0.0323,
                  0.0235,0.0246]
         term2 = [16,4,1,0.25,0.0625,0.0277777777777778,0.015625,0.01,
@@ -585,8 +554,7 @@ class palmer1(test_fun):
                          [21.3636340716, 160.4544000091, 11.5013647921,
                           10.0931561774])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [78.596218,65.77963,43.96947,27.038816,14.6126,6.2614,1.53833,
                  0,1.188045,4.6841,16.9321,33.6988,52.3664,70.163,83.4221,
                  88.3995,78.596218,65.77963,43.96947,27.038816,14.6126,6.2614,
@@ -613,8 +581,7 @@ class palmer3(test_fun):
                          [10.0375049888, 10.0034428969,
                           14.6439962785, 27.3225711014])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [64.87939,50.46046,28.2034,13.4575,4.6547,0.59447,0,0.2177,
                  2.3029,5.5191,8.5519,9.8919,8.5519,5.5191,2.3029,0.2177,
                  0,0.59447,4.6547,13.4575,28.2034,50.46046,64.87939]
@@ -638,8 +605,7 @@ class palmer4(test_fun):
                          [19.3292787916, 10.8767116668,
                           10.0158603779, 28.2655580306])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [67.27625,52.8537,30.2718,14.9888,5.56750,0.92603,0,0.085108,
                  1.867422,5.014768,8.263520,9.8046208,8.263520,5.014768,
                  1.867422,0.085108,0,0.92603,5.5675,14.9888,30.2718,52.8537,
@@ -662,8 +628,7 @@ class palmer5d(test_fun):
                          [81.22618603521, -109.89535387383, 55.47611779317,
                           9.6257828934])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [83.57418,81.007654,18.983286,8.051067,2.044762,0,1.170451,
                  10.479881,25.785001,44.126844,62.822177,77.719674]
         term2 = [0,2.467400073616,1.949550365169,1.713473146009,1.4926241929,
@@ -687,8 +652,7 @@ class s257(test_fun):
     def __init__(self):
         super().__init__(4,[0, -9, 0, -9], [11, 11, 11, 11])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (100*pow(x[0]**2 - x[1],2) + pow(x[0] - 1,2) +
              90*pow(x[2]**2 - x[3],2) + pow(x[2] - 1,2)+
              10.1*(pow(x[1] - 1,2)+pow(x[3] - 1,2))+ (19.8*x[0]-19.8)*(x[3]-1))
@@ -698,8 +662,7 @@ class s351(test_fun):
     def __init__(self):
         super().__init__(4,[-7.3, 80, 1359, 0], [11.43, 90, 1490, 18])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term0 = [0.135299688810716,0.0894454382826476,0.0608272506082725,
                  0.0617283950617284,0.045045045045045,0.0416319733555371,
                  0.0416319733555371]
@@ -720,8 +683,7 @@ class s352(test_fun):
                          [-0.20121624009, 19.71758581533,
                           8.58776292405, 9.52228772613])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [-1.22140275816017,-1.49182469764127,-1.82211880039051,
                  -2.22554092849247,-2.71828182845905,-3.32011692273655,
                  -4.05519996684468,-4.95303242439511,-6.04964746441295,
@@ -753,8 +715,7 @@ class s352(test_fun):
 class shekel(test_fun):
     def __init__(self):
         super().__init__(4,[0, 0, 0, 0], [10, 10, 10, 10])
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = -(1/(0.1 + pow(x[0] - 4,2) + pow(x[1] - 4,2) +
                  pow(x[2] - 4,2) + pow(x[3] - 4,2)) +
               1/(0.2 + pow(x[0] - 1,2) + pow(x[1] - 1,2) +
@@ -771,8 +732,7 @@ class hs045(test_fun):
     def __init__(self):
         super().__init__(5,[0, 0, 0, 0, 0], [1, 2, 3, 4, 5])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = -(0.00833333333333333*x[0]*x[1]*x[2]*x[3]*x[4] - ( 2 ))
         return y
 
@@ -783,8 +743,7 @@ class s267(test_fun):
                          [11.7767204712, 26.1236156871, 9.4057916023,
                           14.7071712155, 0])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
                  -1.18443140557593,-0.978846774427044,-0.808571735078932,
                  -0.674456081839291,-0.569938262912808,-0.487923778062043,
@@ -801,8 +760,7 @@ class s358(test_fun):
         super().__init__(5,[-0.5, 1.5, -2, 0.001, 0.001],
                          [0.45, 2.25, -0.9, 0.09, 0.09])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [0.844,0.908,0.932,0.936,0.925,0.908,0.881,0.85,0.818,0.784,
                  0.751,0.718,0.685,0.658,0.628,0.603,0.58,0.558,0.538,
                  0.522,0.506,0.49,0.478,0.467,0.457,0.448,0.438,0.431,0.424,
@@ -821,8 +779,7 @@ class biggs6(test_fun):
                          [10.54027440018, 24.91487849493, 15.247543113,
                           13.66790545143, 10.54027440306, 4.84611547473])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term1 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
                  -1.18443140557593,-0.978846774427044,-0.808571735078932,
                  -0.674456081839291,-0.569938262912808,-0.487923778062043,
@@ -839,8 +796,7 @@ class biggs6(test_fun):
 class hart6(test_fun):
     def __init__(self):
         super().__init__(6,[0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1])
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = -(numpy.exp(-(10*pow(x[0]-0.1312,2) + 0.05*pow(x[1]-0.1696,2) +
                          17*pow(x[2]-0.5569,2) + 3.5*pow(x[3]-0.0124,2) +
                          1.7*pow(x[4]-0.8283,2) + 8*pow(x[5]-0.5886,2))) +
@@ -864,8 +820,7 @@ class hart6(test_fun):
 ##                         [32.4286981517, 10.7435278989, -0.779727322599999,
 ##                          -5.3729423234, 23.6520539577, 9.918062869])
 ##
-##    def __call__(self,x):
-##        self.check_bounds(x)
+##    def _function(self,x):
 ##        y = (pow(72.676767 - x[0]/(3.046173318241 + x[1]) - x[2] -
 ##                 3.046173318241*x[3] -9.27917188476338*x[4] -
 ##                 28.2659658107383*x[5],2) +
@@ -942,8 +897,7 @@ class palmer5c(test_fun):
                          [42.78331415682, 7.44278956452, 45.71443571076,
                           9.74719152207, 12.33805637844, 8.84049320925])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term0 = [83.57418,81.007654,18.983286,8.051067,2.044762,0,1.170451,
                  10.479881,25.785001,44.126844,62.822177,77.719674]
         term1 = [ 1,                 -1,                  -0.580246662076097,
@@ -979,8 +933,7 @@ class palmer6a(test_fun):
                          [-24.1581372624, 20.120997701, 18.8191791112,
                           11.366938574, 43.2710391882, 10.7437425261])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term0 = [10.678659,75.414511,41.513459,20.104735,7.432436,1.298082,
                  0.1713,0,0.068203,0.774499,2.070002,5.574556,9.026378]
         term1 = [0,2.467400073616,1.949550365169,1.4926241929,1.096623651204,
@@ -1010,8 +963,7 @@ class palmer8a(test_fun):
                          [12.4961104793, 10.2011908033, 2.2870328813,
                           14.9700265152, 22.8287670723, 10.9504996568])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term0 = [4.757534,3.121416,1.207606,0.131916,0,0.258514,
                  3.380161,10.762813,23.745996,44.471864,76.541947,97.874528]
         term1 = [0,0.030461768089,0.098695877281,0.190385614224,0.264714366016,
@@ -1040,8 +992,7 @@ class s272(test_fun):
                          [10.999999907, 20.0000005284, 13.9999995189,
                           10.9999998493, 14.9999995532, 12.99999966])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         term0 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
                  -1.18443140557593,-0.978846774427044,-0.808571735078932,
                  -0.674456081839291,-0.569938262912808,-0.487923778062043,
@@ -1059,8 +1010,7 @@ class st_bsj3(test_fun):
     def __init__(self):
         super().__init__(6,[0, 0, 0, 0, 0, 0], [99, 99, 99, 99, 99, 99])
 
-    def __call__(self,x):
-        self.check_bounds(x)
+    def _function(self,x):
         y = (10.5*x[0] - 1.5*(x[0]**2) - x[1]**2 - 3.95*x[1] - x[2]**2 + 3*x[2]-
              2*(x[3]**2) + 5*x[3] - x[4]**2 + 1.5*x[4] - 2.5*(x[5]**2)-1.5*x[5])
         return y
