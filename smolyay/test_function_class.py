@@ -515,10 +515,8 @@ class palmer1(test_fun):
                  1.949550365169,1.713473146009,1.485015206544,1.287008567296,
                  1.096623651204,0.761544202225,0.487388289424,0.274155912801,
                  0.121847072356,0.030461768089]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] - x[1]/(term2[i]/x[3] + x[2]) -term2[i]*x[0],2)
-        return y
+        return numpy.sum((term1 - x[1]/(term2/x[3] + x[2]) -
+                          numpy.multiply(term2,x[0]))**2)
 
 # needs more precise floats
 class palmer3(test_fun):
@@ -537,10 +535,8 @@ class palmer3(test_fun):
                  0.121847072356,0.274155912801,0.487388289424,0.587569773961,
                  0.761544202225,1.096623651204,1.4926241929,1.949550365169,
                  2.467400073616,2.749172911969]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] - x[0]/(term2[i]/x[2] + x[1]) -term2[i]*x[3],2)
-        return y
+        return numpy.sum((term1 - x[0]/(term2/x[2] + x[1]) -
+                          numpy.multiply(term2,x[3]))**2)
 
 
 # needs more precise floats
@@ -561,10 +557,8 @@ class palmer4(test_fun):
                  0.121847072356,0.274155912801,0.487388289424,0.549257372161,
                  0.761544202225,1.096623651204,1.4926241929,1.949550365169,
                  2.467400073616,2.749172911969]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] - x[0]/(term2[i]/x[2] + x[1]) - term2[i]*x[3],2)
-        return y
+        return numpy.sum((term1 - x[0]/(term2/x[2] + x[1]) -
+                          numpy.multiply(term2,x[3]))**2)
 
 # needs more precise floats
 class palmer5d(test_fun):
@@ -853,6 +847,7 @@ class palmer5c(test_fun):
                        numpy.multiply(term5,x[5]))**2)
         return y
 
+# needs more precise floats
 class palmer6a(test_fun):
     def __init__(self):
         super().__init__([-44.1581372624, 0.120997701, -1.1808208888,
@@ -877,10 +872,9 @@ class palmer6a(test_fun):
         term5 = [0,2.467400073616,1.949550365169,1.4926241929,1.096623651204,
                  0.761544202225,0.616850018404,0.536979718521,0.487388289424,
                  0.373156048225,0.274155912801,0.121847072356,0.030461768089]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term0[i] - x[4]/(term5[i] + x[5])- x[0] -term1[i]*x[1] -
-                     term2[i]*x[2] - term3[i]*x[3],2)
+        y = numpy.sum((term0 - x[4]/(term5 + x[5]) - x[0] -
+                       numpy.multiply(term1,x[1]) -numpy.multiply(term2,x[2]) -
+                       numpy.multiply(term3,x[3]))**2)
         return y
 
 # needs more precise floats
