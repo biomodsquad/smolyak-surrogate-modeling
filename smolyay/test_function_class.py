@@ -104,7 +104,6 @@ class beale(test_fun):
                 (-2.25 + (1 - (x[1])**2)*x[0])**2 +
                 (-2.625+(1-x[1]**3)*x[0])**2)
 
-# expressions are close
 class box2(test_fun):
     def __init__(self):
         super().__init__([-10,0],[10,10])
@@ -220,7 +219,6 @@ class hs3mod(test_fun):
     def _function(self,x):
         return (x[1]-x[0])**2 + x[1]
 
-# expressions are close
 class jensmp(test_fun):
     def __init__(self):
         super().__init__([0.1, 0.1], [0.9, 0.9])
@@ -243,7 +241,6 @@ class mdhole(test_fun):
     def _function(self,x):
         return 100*(numpy.sin(x[0])-x[1])**2+x[0]
 
-# expressions are close
 class median_vareps(test_fun):
     def __init__(self):
         super().__init__([1e-08, -9.499789331], [10.00000001, 10.500210669])
@@ -295,24 +292,22 @@ class box3(test_fun):
                          [9.89999961255, 18.00000291591, 9.90000024093])
         
     def _function(self,x):
-        coeffs = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+        coeffs = [-0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-0.7,-0.8,-0.9,-1]
         coeff2 = [0.536957976864517,0.683395469841369,0.691031152313854,
                   0.652004407146905,0.599792712713548,0.54633288391736,
                   0.495673421825855,0.448993501489319,0.406446249936512,
                   0.36783404124168]
-        y = 0
-        for i in range(10):
-            y += pow(numpy.exp(-coeffs[i]*x[0])-numpy.exp(-coeffs[i]*x[1])
-                     -coeff2[i]*x[2],2)
+        y = numpy.sum((numpy.exp(numpy.multiply(coeffs,x[0]))-
+                       numpy.exp(numpy.multiply(coeffs,x[1]))-
+                       numpy.multiply(coeff2,x[2]))**2)
         return y
-
 class eg1(test_fun):
     def __init__(self):
         super().__init__([-10.2302657121, -1, 1], [9.7697342879, 1, 2])
         
     def _function(self,x):
-        y = x[0]**2 + pow(x[1]*x[2],4)+x[0]*x[2] +numpy.sin(x[0]+x[2])*x[1]+x[1]
-        return y
+        return (x[0]**2 + (x[1]*x[2])**4 + x[0]*x[2] +
+                numpy.sin(x[0]+x[2])*x[1] + x[1])
 
 class fermat_vareps(test_fun):
     def __init__(self):
@@ -320,10 +315,9 @@ class fermat_vareps(test_fun):
                          [12.0000000001, 11.1547005384, 10.00000001])
 
     def _function(self,x):
-        y = (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
-             numpy.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
-             numpy.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 4,2)) + x[2])
-        return y
+        return (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
+                numpy.sqrt(x[2]**2 + (x[0] - 4)**2 + x[1]**2)+
+                numpy.sqrt(x[2]**2 + (x[0] - 2)**2 + (x[1] - 4)**2) + x[2])
 
 class fermat2_vareps(test_fun):
     def __init__(self):
@@ -331,10 +325,9 @@ class fermat2_vareps(test_fun):
                          [12, 10.99999998, 10.00000001])
 
     def _function(self,x):
-        y = (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
-             numpy.sqrt(x[2]**2 + pow(x[0] - 4,2) + x[1]**2)+
-             numpy.sqrt(x[2]**2 + pow(x[0] - 2,2) + pow(x[1] - 1,2)) + x[2])
-        return y
+        return (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
+                numpy.sqrt(x[2]**2 + (x[0] - 4)**2 + x[1]**2)+
+                numpy.sqrt(x[2]**2 + (x[0] - 2)**2 + (x[1] - 1)**2) + x[2])
 
 class least(test_fun):
     def __init__(self):
@@ -344,10 +337,8 @@ class least(test_fun):
     def _function(self,x):
         term0 = [127,151,379,421,460,426]
         term1 = [-5,-3,-1,5,3,1]
-        y = 0
-        for i in range(len(term0)):
-            y += pow(term0[i] + (-x[1]*numpy.exp(term1[i]*x[2])) - x[0],2)
-        return y
+        return numpy.sum((term0 - x[1]*numpy.exp(numpy.multiply(term1,x[2])) -
+                          x[0])**2)
 
 class s242(test_fun):
     # is exactly the same as box3 with different bounds
@@ -360,25 +351,23 @@ class s242(test_fun):
                   0.652004407146905,0.599792712713548,0.54633288391736,
                   0.495673421825855,0.448993501489319,0.406446249936512,
                   0.36783404124168]
-        y = 0
-        for i in range(10):
-            y += pow(numpy.exp(-coeffs[i]*x[0])-numpy.exp(-coeffs[i]*x[1])
-                     -coeff2[i]*x[2],2)
-        return y
+        return numpy.sum((numpy.exp(numpy.multiply(coeffs,-x[0]))-
+                          numpy.exp(numpy.multiply(coeffs,-x[1]))-
+                          numpy.multiply(coeff2,-x[2]))**2)
 
 class s244(test_fun):
     def __init__(self):
         super().__init__([0, 0, 0], [10, 10, 10])
 
     def _function(self,x):
-        y = (pow(0.934559787821252 + numpy.exp(-0.1*x[0]) -
-                 numpy.exp(-0.1*x[1])*x[2],2) +
-             pow(-0.142054336894918 + numpy.exp(-0.2*x[0]) -
-                 numpy.exp(-0.2*x[1])*x[2],2) +
-             pow(-0.491882878842398 + numpy.exp(-0.3*x[0]) -
-                 numpy.exp(-0.3*x[1])*x[2],2))
-        return y
+        return ((0.934559787821252 + numpy.exp(-0.1*x[0]) -
+                 numpy.exp(-0.1*x[1])*x[2])**2 +
+                (-0.142054336894918 + numpy.exp(-0.2*x[0]) -
+                 numpy.exp(-0.2*x[1])*x[2])**2 +
+                (-0.491882878842398 + numpy.exp(-0.3*x[0]) -
+                 numpy.exp(-0.3*x[1])*x[2])**2)
 
+# REALLY needs more precise floats
 class s333(test_fun):
     def __init__(self):
         super().__init__([79.901992908, -1, -1], [89.9117936172, 0.9, 0.9])
@@ -390,7 +379,7 @@ class s333(test_fun):
                   0.769230769230769,1.66666666666667]
         y = 0
         for i in range(8):
-            y += pow(1-coeff2[i]*numpy.exp(coeff1[i]*x[1])*x[0]-coeff2[i]*x[2],2)
+            y += (1-coeff2[i]*numpy.exp(coeff1[i]*x[1])*x[0]-coeff2[i]*x[2])**2
         return y
 
 class st_cqpjk2(test_fun):
@@ -398,9 +387,9 @@ class st_cqpjk2(test_fun):
         super().__init__([0, 0, 0], [0.9, 0.9, 0.9])
         
     def _function(self,x):
-        y = 9*x[0]*x[0]-15*x[0]+9*x[1]*x[1]-12*x[1]+9*x[2]*x[2]-9*x[2]
-        return y
+        return 9*x[0]*x[0]-15*x[0]+9*x[1]*x[1]-12*x[1]+9*x[2]*x[2]-9*x[2]
 
+# needs more precise floats
 class yfit(test_fun):
     def __init__(self):
         super().__init__([-9.9978786299, -10.0035439984, 0],
@@ -412,11 +401,11 @@ class yfit(test_fun):
         coeff_s = [-21.158931,-17.591719,-14.046854,-10.519732,-7.0058392,
                    -3.5007293,0,3.5007293,7.0058392,10.519732,14.046854,
                    17.591719,21.158931,24.753206,28.379405,32.042552,35.747869]
-        y = 0
-        for i in range(17):
-            y += pow(coeff_s[i]+numpy.arctan(coeff0[i]*x[0]+coeff1[i]*x[1])*x[2],2)
-        return y
+        return numpy.sum((coeff_s+
+                          numpy.arctan(numpy.multiply(coeff0,x[0])+
+                                       numpy.multiply(coeff1,x[1]))*x[2])**2)
 
+# needs more precise floats
 class brownden(test_fun):
     def __init__(self):
         super().__init__([-21.5944399048, 3.2036300512,
@@ -446,10 +435,8 @@ class brownden(test_fun):
                   0.515501371821464,0.334988150155905,0.141120008059867,
                   -0.0583741434275801,-0.255541102026831,-0.442520443294852,
                   -0.611857890942719,-0.756802495307928]
-        y = 0
-        for i in range(len(coeff1)):
-            y += pow(pow(coeff_s1[i] + x[0] + coeff1[i]*x[1],2) +
-                     pow(coeff_s2[i] + x[2] + coeff3[i]*x[3],2),2)
+        y = numpy.sum(((coeff_s1 + x[0] + numpy.multiply(coeff1,x[1]))**2 +
+                       (coeff_s2 + x[2] + numpy.multiply(coeff3,x[3]))**2)**2)
         return y
 
 class hatflda(test_fun):
@@ -458,9 +445,8 @@ class hatflda(test_fun):
                          [10.999999997, 10.9999999714,
                           10.9999999281, 10.9999998559])
     def _function(self,x):
-        y = (pow(x[0] - 1, 2) + pow(x[0] - numpy.sqrt(x[1]), 2) +
-             pow(x[1] - numpy.sqrt(x[2]), 2) + pow(x[2] - numpy.sqrt(x[3]), 2))
-        return y
+        return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
+                (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
 
 class hatfldb(test_fun):
     def __init__(self):
@@ -468,9 +454,8 @@ class hatfldb(test_fun):
                          [10.9472135922, 0.8, 10.6400000036, 10.4096000079])
 
     def _function(self,x):
-        y = (pow(x[0] - 1, 2) + pow(x[0] - numpy.sqrt(x[1]), 2) +
-             pow(x[1] - numpy.sqrt(x[2]), 2) + pow(x[2] - numpy.sqrt(x[3]),2))
-        return y
+        return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
+                (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
 
 class hatfldc(test_fun):
     def __init__(self):
@@ -478,28 +463,22 @@ class hatfldc(test_fun):
                          [10, 10, 10, 11.0000000022])
 
     def _function(self,x):
-        y = pow(x[0]-1,2)+pow(x[2]-x[1]**2,2)+pow(x[3]-x[2]**2,2)+pow(x[3]-1,2)
-        return y
+        return (x[0]-1)**2 + (x[2]-x[1]**2)**2 + (x[3]-x[2]**2)**2 + (x[3]-1)**2
 
 class himmelbf(test_fun):
     def __init__(self):
         super().__init__([0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
 
     def _function(self,x):
-        y = 1e4*(pow(0.135299688810716*(x[0]**2) - 1,2) +
-                 pow((x[0]**2 + 4.28e-4*(x[1]**2) +
-                      1.83184e-7*(x[2]**2))/(11.18 + 4.78504e-3*(x[3]**2))-1,2)+
-                 pow((x[0]**2 +1e-3*(x[1]**2) +
-                      1e-6*(x[2]**2))/(16.44 + 0.01644*(x[3]**2))-1,2) +
-                 pow((x[0]**2 + 1.61e-3*(x[1]**2) +
-                      2.5921e-6*(x[2]**2))/(16.2+ 0.026082*(x[3]**2))-1,2) +
-                 pow((x[0]**2 + 2.09e-3*(x[1]**2) +
-                      4.3681e-6*(x[2]**2))/(22.2 + 0.046398*(x[3]**2))-1,2) +
-                 pow((x[0]**2 + 3.48e-3*(x[1]**2) +
-                      1.21104e-5*(x[2]**2))/(24.02+0.0835896*(x[3]**2))-1,2) +
-                 pow((x[0]**2+0.00525*(x[1]**2)+
-                      2.75625e-5*(x[2]**2))/(31.32+0.16443*(x[3]**2))-1,2))
-        return y
+        coeff0 = numpy.array([0.135299688810716,1,1,1,1,1,1])
+        coeff1 = numpy.array([0,4.28e-4,1e-3,1.61e-3,2.09e-3,3.48e-3,0.00525])
+        coeff2 = numpy.array([0,1.83184e-7,1e-6,2.5921e-6,4.3681e-6,
+                              1.21104e-5,2.75625e-5])
+        coeff3 = numpy.array([0,4.78504e-3,0.01644,0.026082,0.046398,
+                              0.0835896,0.16443])
+        coeffa = numpy.array([1,11.18,16.44,16.2,22.2,24.02,31.32])
+        return numpy.sum(((coeff0*x[0]**2+coeff1*x[1]**2+
+                           coeff2*x[2]**2)/(coeffa+coeff3*x[3]**2)-1)**2)*1e4
 
 class kowalik(test_fun):
     def __init__(self):
@@ -512,12 +491,10 @@ class kowalik(test_fun):
                  0.00694444444444444,0.00510204081632653,0.00390625]
         coeff = [4,2,1,0.5,0.25,0.166666666666667,0.125,0.1,0.0833333333333333,
                  0.0714285714285714,0.0625]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] - x[0]*(term2[i] + coeff[i]*x[1])/
-                     (term2[i] + coeff[i]*x[2] + x[3]),2)
-        return y
+        return numpy.sum((term1 - x[0]*(term2 + numpy.multiply(coeff,x[1]))/
+                          (term2 + numpy.multiply(coeff,x[2]) + x[3]))**2)
 
+# needs more precise floats
 class palmer1(test_fun):
     def __init__(self):
         super().__init__([1.3636340716, 1e-05, 1e-05, 1e-05],
@@ -532,7 +509,7 @@ class palmer1(test_fun):
                  83.4221]
         term2 = [3.200388615369,3.046173318241,2.749172911969,2.467400073616,
                  2.2008612609,1.949550365169,1.713473146009,1.485015206544,
-                 1.287008567296, 1.096623651204,0.761544202225,0.487388289424,
+                 1.287008567296,1.096623651204,0.761544202225,0.487388289424,
                  0.274155912801,0.121847072356,0.030461768089,0,3.200388615369,
                  3.046173318241,2.749172911969,2.467400073616,2.2008612609,
                  1.949550365169,1.713473146009,1.485015206544,1.287008567296,
@@ -543,8 +520,7 @@ class palmer1(test_fun):
             y += pow(term1[i] - x[1]/(term2[i]/x[3] + x[2]) -term2[i]*x[0],2)
         return y
 
-# caused RuntimeWarning: divide by zero encountered in double_scalars
-# fixed when LU for x's changed from 0 to 0.000001
+# needs more precise floats
 class palmer3(test_fun):
     def __init__(self):
         super().__init__([0.000001, 0.000001, 0.000001, 7.3225711014],
@@ -567,8 +543,7 @@ class palmer3(test_fun):
         return y
 
 
-# caused RuntimeWarning: divide by zero encountered in double_scalars
-# fixed when LU for x's changed from 0 to 0.000001
+# needs more precise floats
 class palmer4(test_fun):
     def __init__(self):
         super().__init__([0.00001, 0.00001, 0.00001, 8.2655580306],
@@ -591,6 +566,7 @@ class palmer4(test_fun):
             y += pow(term1[i] - x[0]/(term2[i]/x[2] + x[1]) - term2[i]*x[3],2)
         return y
 
+# needs more precise floats
 class palmer5d(test_fun):
     def __init__(self):
         super().__init__([70.2513178169, -142.1059487487, 41.6401308813,
@@ -612,40 +588,35 @@ class palmer5d(test_fun):
                  3.32545771219912,2.03633148110156,1.31878143449399,
                  0.44165723409569,0.115777793974781,0.0206059599139685,
                  0.00180902803085595,2.82660629821242e-5]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] - x[0] - term2[i]*x[1] - term3[i]*x[2] -
-                     term4[i]*x[3],2)
-        return y
+        return numpy.sum((term1 - x[0] - numpy.multiply(term2,x[1]) -
+                          numpy.multiply(term3,x[2])-
+                          numpy.multiply(term4,x[3]))**2)
 
 class s257(test_fun):
     def __init__(self):
         super().__init__([0, -9, 0, -9], [11, 11, 11, 11])
 
     def _function(self,x):
-        y = (100*pow(x[0]**2 - x[1],2) + pow(x[0] - 1,2) +
-             90*pow(x[2]**2 - x[3],2) + pow(x[2] - 1,2)+
-             10.1*(pow(x[1] - 1,2)+pow(x[3] - 1,2))+ (19.8*x[0]-19.8)*(x[3]-1))
-        return y
+        return (100*(x[0]**2 - x[1])**2 + (x[0] - 1)**2 +
+                90*(x[2]**2 - x[3])**2 + (x[2] - 1)**2 +
+                10.1*((x[1] - 1)**2 + (x[3] - 1)**2)+(19.8*x[0]-19.8)*(x[3]-1))
 
 class s351(test_fun):
     def __init__(self):
         super().__init__([-7.3, 80, 1359, 0], [11.43, 90, 1490, 18])
 
     def _function(self,x):
-        term0 = [0.135299688810716,0.0894454382826476,0.0608272506082725,
-                 0.0617283950617284,0.045045045045045,0.0416319733555371,
-                 0.0416319733555371]
-        term1 = [0,4.28e-4,0.001,0.00161,0.00209,0.00348,0.00525]
-        term2 = [0,1.83184e-7,1e-6,2.5921e-6,4.3681e-6,1.21104e-5,2.75625e-5]
-        y = 0
-        for i in range(len(term0)):
-            y += pow(-1 +
-                     term0[i]*(x[0]**2 +term1[i]*(x[1]**2) +
-                               term2[i]*(x[2]**2))/(1+term1[i]*(x[3]**2)),2)
-        y = y * 10000
-        return y
+        term0 = numpy.array([0.135299688810716,0.0894454382826476,
+                             0.0608272506082725,0.0617283950617284,
+                             0.045045045045045,0.0416319733555371,
+                             0.0416319733555371],dtype=numpy.longdouble)
+        term1 = numpy.array([0,4.28e-4,0.001,0.00161,0.00209,0.00348,0.00525])
+        term2 = numpy.array([0,1.83184e-7,1e-6,2.5921e-6,4.3681e-6,1.21104e-5,
+                             2.75625e-5])
+        return numpy.sum((term0*(x[0]**2 +term1*x[1]**2 +
+                                 term2*x[2]**2)/(1+term1*x[3]**2)-1)**2)*1e4
 
+# needs more precise floats
 class s352(test_fun):
     def __init__(self):
         super().__init__([-20.2235736001, 1.9084286837,
@@ -676,26 +647,18 @@ class s352(test_fun):
                  0.515501371821464,0.334988150155905,0.141120008059867,
                  -0.0583741434275801,-0.255541102026832,-0.442520443294852,
                  -0.611857890942719,-0.756802495307928]
-        y = 0
-        for i in range(20):
-            y += (pow(term1[i] + x[0] + term2[i]*x[1],2) +
-                  pow(term3[i] + x[2] + term4[i]*x[3],2))
-        return y
+        return numpy.sum((term1 + x[0] + numpy.multiply(term2,x[1]))**2 +
+                         (term3 + x[2] + numpy.multiply(term4,x[3]))**2)
 
 class shekel(test_fun):
     def __init__(self):
         super().__init__([0, 0, 0, 0], [10, 10, 10, 10])
     def _function(self,x):
-        y = -(1/(0.1 + pow(x[0] - 4,2) + pow(x[1] - 4,2) +
-                 pow(x[2] - 4,2) + pow(x[3] - 4,2)) +
-              1/(0.2 + pow(x[0] - 1,2) + pow(x[1] - 1,2) +
-                 pow(x[2] - 1,2) + pow(x[3] - 1,2)) +
-              1/(0.2 + pow(x[0] - 8,2) + pow(x[1] - 8,2) +
-                 pow(x[2] - 8,2) + pow(x[3] - 8,2)) +
-              1/(0.4 + pow(x[0] - 6,2) + pow(x[1] - 6,2) +
-                 pow(x[2] - 6,2) + pow(x[3] - 6,2)) +
-              1/(0.4 + pow(x[0] - 3,2) + pow(x[1] - 7,2) +
-                 pow(x[2] - 3,2) + pow(x[3] - 7,2)))
+        term1 = [0.1,0.2,0.2,0.4,0.4]
+        term2 = [4,1,8,6,3]
+        term3 = [4,1,8,6,7]
+        y = -numpy.sum(1/(term1 + (x[0] - term2)**2 + (x[1] - term3)**2 +
+                          (x[2] - term2)**2 + (x[3] - term3)**2))
         return y
 
 class hs045(test_fun):
@@ -703,9 +666,9 @@ class hs045(test_fun):
         super().__init__([0, 0, 0, 0, 0], [1, 2, 3, 4, 5])
 
     def _function(self,x):
-        y = -(0.00833333333333333*x[0]*x[1]*x[2]*x[3]*x[4] - (2))
-        return y
+        return -(0.00833333333333333*x[0]*x[1]*x[2]*x[3]*x[4] - 2)
 
+# needs more precise floats
 class s267(test_fun):
     def __init__(self):
         super().__init__([-8.2232795288, 6.1236156871,
@@ -719,12 +682,12 @@ class s267(test_fun):
                  -0.674456081839291,-0.569938262912808,-0.487923778062043,
                  -0.422599358188832,-0.369619594903334]
         term2 = [round(x*-0.1,ndigits=1) for x in range(1,len(term1)+1)]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] + numpy.exp(term2[i]*x[0])*x[2] -
-                     numpy.exp(term2[i]*x[1])*x[3] + 3*numpy.exp(term2[i]*x[4]),2)
+        y = numpy.sum((term1 + numpy.exp(numpy.multiply(term2,x[0]))*x[2] -
+                       numpy.exp(numpy.multiply(term2,x[1]))*x[3] +
+                       3*numpy.exp(numpy.multiply(term2,x[4])))**2)
         return y
 
+# needs more precise floats
 class s358(test_fun):
     def __init__(self):
         super().__init__([-0.5, 1.5, -2, 0.001, 0.001],
@@ -736,12 +699,10 @@ class s358(test_fun):
                  0.522,0.506,0.49,0.478,0.467,0.457,0.448,0.438,0.431,0.424,
                  0.420,0.414,0.411,0.406]
         term2 = [round(x*-10,ndigits=1) for x in range(len(term1))]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] - numpy.exp(term2[i]*x[3])*x[1] -
-                     numpy.exp(term2[i]*x[4])*x[2] - x[0],2)
-        return y
+        return numpy.sum((term1 - numpy.exp(numpy.multiply(term2,x[3]))*x[1] -
+                          numpy.exp(numpy.multiply(term2,x[4]))*x[2] -x[0])**2)
 
+# needs more precise floats
 class biggs6(test_fun):
     def __init__(self):
         super().__init__([-8.2885839998, 7.6831983277, -3.05828543,
@@ -756,12 +717,9 @@ class biggs6(test_fun):
                  -0.422599358188832,-0.369619594903334,-0.325852731997495,
                  -0.28907018464926]
         term2 = [round(x*-0.1,ndigits=1) for x in range(1,len(term1)+1)]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term1[i] + numpy.exp(term2[i]*x[0])*x[2] -
-                     numpy.exp(term2[i]*x[1])*x[3] +
-                     numpy.exp(term2[i]*x[4])*x[5],2)
-        return y
+        return numpy.sum((term1 + numpy.exp(numpy.multiply(term2,x[0]))*x[2] -
+                          numpy.exp(numpy.multiply(term2,x[1]))*x[3] +
+                          numpy.exp(numpy.multiply(term2,x[4]))*x[5])**2)
 
 class hart6(test_fun):
     def __init__(self):
@@ -861,6 +819,7 @@ class hart6(test_fun):
 ##                 28.2659658107383*x[5],2))
 ##        return y
 
+# needs more precise floats
 class palmer5c(test_fun):
     def __init__(self):
         super().__init__([27.5370157298, -11.7302338172, 30.7938174564,
@@ -891,10 +850,10 @@ class palmer5c(test_fun):
                  -0.910488005847614, -0.871003461121532,  -0.136592965107211,
                   0.528386840404683,  0.923813594034239,  -0.106642728074,
                  -0.96721309838044,  -0.62109261804035,    0.441603837591961]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term0[i] - x[0] + term1[i]*x[1] + term2[i]*x[2] +
-                     term3[i]*x[3] + term4[i]*x[4] + term5[i]*x[5],2)
+        y = numpy.sum((term0 - x[0] + numpy.multiply(term1,x[1]) +
+                       numpy.multiply(term2,x[2])+numpy.multiply(term3,x[3]) +
+                       numpy.multiply(term4,x[4]) +
+                       numpy.multiply(term5,x[5]))**2)
         return y
 
 class palmer6a(test_fun):
@@ -927,6 +886,7 @@ class palmer6a(test_fun):
                      term2[i]*x[2] - term3[i]*x[3],2)
         return y
 
+# needs more precise floats
 class palmer8a(test_fun):
     def __init__(self):
         super().__init__([1e-05, 1e-05, -17.7129671187, -5.0299734848,
@@ -951,12 +911,12 @@ class palmer8a(test_fun):
                  0.0185495138986012,0.0519602767531113,0.234713865602508,
                  0.782420286049465,2.13178947509392,5.03074040250303,
                  10.6605104045911,15.0216873985605]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term0[i] - x[0]/(term1[i] + x[1]) - x[2] - term3[i]*x[3] -
-                     term4[i]*x[4] - term5[i]*x[5],2)
+        y = numpy.sum((term0 - x[0]/(term1 + x[1]) - x[2] -
+                       numpy.multiply(term3,x[3]) -numpy.multiply(term4,x[4]) -
+                       numpy.multiply(term5,x[5]))**2)
         return y
 
+# needs more precise floats
 class s272(test_fun):
     def __init__(self):
         super().__init__([0, 0, 0, 0, 0, 0],
@@ -964,18 +924,16 @@ class s272(test_fun):
                           10.9999998493, 14.9999995532, 12.99999966])
 
     def _function(self,x):
-        term0 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
+        term1 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
                  -1.18443140557593,-0.978846774427044,-0.808571735078932,
                  -0.674456081839291,-0.569938262912808,-0.487923778062043,
                  -0.422599358188832,-0.369619594903334,-0.325852731997496,
                  -0.28907018464926]
-        term1 = [round(x*-0.1,ndigits=1) for x in range(1,len(term0)+1)]
-        y = 0
-        for i in range(len(term1)):
-            y += pow(term0[i] + numpy.exp(term1[i]*x[0])*x[3] -
-                     numpy.exp(term1[i]*x[1])*x[4] +
-                     numpy.exp(term1[i]*x[2])*x[5],2)
-        return y
+        term2 = [round(x*-0.1,ndigits=1) for x in range(1,len(term1)+1)]
+        return numpy.sum((term1 + numpy.exp(numpy.multiply(term2,x[0]))*x[3] -
+                          numpy.exp(numpy.multiply(term2,x[1]))*x[4] +
+                          numpy.exp(numpy.multiply(term2,x[2]))*x[5])**2)
+
 
 class st_bsj3(test_fun):
     def __init__(self):
@@ -983,7 +941,7 @@ class st_bsj3(test_fun):
 
 
     def _function(self,x):
-        y = (10.5*x[0] - 1.5*(x[0]**2) - x[1]**2 - 3.95*x[1] - x[2]**2 + 3*x[2]-
-             2*(x[3]**2) + 5*x[3] - x[4]**2 + 1.5*x[4] - 2.5*(x[5]**2)-1.5*x[5])
+        y = (10.5*x[0] - 1.5*x[0]**2 - x[1]**2 - 3.95*x[1] - x[2]**2 + 3*x[2]-
+             2*x[3]**2 + 5*x[3] - x[4]**2 + 1.5*x[4] - 2.5*x[5]**2-1.5*x[5])
         return y
 
