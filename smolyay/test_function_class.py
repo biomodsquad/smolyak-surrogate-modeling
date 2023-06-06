@@ -22,19 +22,11 @@ class test_fun(abc.ABC):
 
     Raises
     ------
-    ValueError
-        The number of variables/dimensions should be greater than zero
-
     IndexError
         All dimensions must have bounds
     """
-    def __init__(self,dim,lower_bounds,upper_bounds):
-        self._dim = dim
-        if dim < 0:
-            raise ValueError('The number of variables must be greater than 0')
+    def __init__(self,lower_bounds,upper_bounds):
         if not(hasattr(lower_bounds,'__len__') and hasattr(upper_bounds,'__len__')):
-            if not dim == 1:
-                raise IndexError('All dimensions must have bounds')
             # turn scalar inputs into 1x1 vectors
             if not hasattr(lower_bounds,'__len__'):
                 self._lower_bounds = [lower_bounds]
@@ -45,10 +37,10 @@ class test_fun(abc.ABC):
             else:
                 self._upper_bounds = [upper_bounds[0]]
         else:
-            if max(len(lower_bounds),len(upper_bounds)) < dim:
+            if not len(lower_bounds) == len(upper_bounds):
                 raise IndexError('All dimensions must have bounds')
-            self._upper_bounds = upper_bounds[0:dim]
-            self._lower_bounds = lower_bounds[0:dim]
+            self._upper_bounds = upper_bounds
+            self._lower_bounds = lower_bounds
     
     @property
     def name(self):
@@ -58,7 +50,7 @@ class test_fun(abc.ABC):
     @property
     def dim(self):
         """Number of variables"""
-        return self._dim
+        return len(self.bounds)
 
     @property
     def lower_bounds(self):
@@ -104,7 +96,7 @@ class test_fun(abc.ABC):
 
 class beale(test_fun):
     def __init__(self):
-        super().__init__(2,[-7.0000000008, -9.5000000002],
+        super().__init__([-7.0000000008, -9.5000000002],
                          [11.69999999928, 9.44999999982])
 
     def _function(self,x):
@@ -115,7 +107,7 @@ class beale(test_fun):
 
 class box2(test_fun):
     def __init__(self):
-        super().__init__(2,[-10,0],[10,10])
+        super().__init__([-10,0],[10,10])
         
     def _function(self,x):
         term1 = [0.536957976864517,0.683395469841369,0.691031152313854,
@@ -130,7 +122,7 @@ class box2(test_fun):
 
 class branin(test_fun):
     def __init__(self):
-        super().__init__(2,[-5,0],[10,15])
+        super().__init__([-5,0],[10,15])
         
     def _function(self,x):
         y1 = pow(x[1] - 5.1*pow(x[0],2)/(4*pow(numpy.pi,2)) + 5*x[0]/numpy.pi - 6,2)
@@ -139,7 +131,7 @@ class branin(test_fun):
     
 class camel1(test_fun):
     def __init__(self):
-        super().__init__(2,[-5,-5],[5,5])
+        super().__init__([-5,-5],[5,5])
         
     def _function(self,x):
         y = (4*pow(x[0],2)-2.1*pow(x[0],4)+0.333333333333333*pow(x[0],6) +
@@ -148,7 +140,7 @@ class camel1(test_fun):
 
 class camel6(test_fun):
     def __init__(self):
-        super().__init__(2,[-3,-1.5],[3,1.5])
+        super().__init__([-3,-1.5],[3,1.5])
         
     def _function(self,x):
         y = (4*pow(x[0],2)-2.1*pow(x[0],4)+0.333333333333333*pow(x[0],6) +
@@ -157,7 +149,7 @@ class camel6(test_fun):
 
 class chi(test_fun):
     def __init__(self):
-        super().__init__(2,[-30,-30],[30,30])
+        super().__init__([-30,-30],[30,30])
         
     def _function(self,x):
         y = (pow(x[0],2) - 12*x[0] + 10*numpy.cos(1.5707963267949*x[0]) +
@@ -167,7 +159,7 @@ class chi(test_fun):
     
 class cliff(test_fun):
     def __init__(self):
-        super().__init__(2,[-7, -6.8502133863], [11.7, 11.83480795233])
+        super().__init__([-7, -6.8502133863], [11.7, 11.83480795233])
         
     def _function(self,x):
         y = pow(-0.03+0.01*x[0],2)-x[0]+numpy.exp(20*x[0]-20*x[1])+x[1]
@@ -175,7 +167,7 @@ class cliff(test_fun):
     
 class cube(test_fun):
     def __init__(self):
-        super().__init__(2,[-18, -18], [9.9, 9.9])
+        super().__init__([-18, -18], [9.9, 9.9])
         
     def _function(self,x):
         y = pow(-1+x[0],2)+100*pow(x[1]-pow(x[0],3),2)
@@ -183,7 +175,7 @@ class cube(test_fun):
     
 class denschna(test_fun):
     def __init__(self):
-        super().__init__(2,[-20, -20], [9, 9])
+        super().__init__([-20, -20], [9, 9])
         
     def _function(self,x):
         y = pow(x[0],4)+pow(x[0]+x[1],2)+pow(numpy.exp(x[1])-1,2)
@@ -191,7 +183,7 @@ class denschna(test_fun):
 
 class himmelp1(test_fun):
     def __init__(self):
-        super().__init__(2,[0, 0], [95, 75])
+        super().__init__([0, 0], [95, 75])
         
     def _function(self,x):
         y = (3.8112755343*x[0] -
@@ -210,7 +202,7 @@ class himmelp1(test_fun):
 
 class hs002(test_fun):
     def __init__(self):
-        super().__init__(2,[-8.7756292513, 1.5], [11.2243707487, 11.5])
+        super().__init__([-8.7756292513, 1.5], [11.2243707487, 11.5])
 
     def _function(self,x):
         y = 100*pow(x[1]-pow(x[0],2),2)+pow(1-x[0],2)
@@ -218,7 +210,7 @@ class hs002(test_fun):
 
 class hs003(test_fun):
     def __init__(self):
-        super().__init__(2,[-10, 0], [10, 10])
+        super().__init__([-10, 0], [10, 10])
 
     def _function(self,x):
         y = 1e-5*pow(x[1]-x[0],2)+x[1]
@@ -226,7 +218,7 @@ class hs003(test_fun):
 
 class hs004(test_fun):
     def __init__(self):
-        super().__init__(2,[1, 0], [11, 10])
+        super().__init__([1, 0], [11, 10])
 
     def _function(self,x):
         y = 0.333333333333333*pow(1+x[0],3)+x[1]
@@ -234,7 +226,7 @@ class hs004(test_fun):
 
 class hs3mod(test_fun):
     def __init__(self):
-        super().__init__(2,[-10, 0], [10, 10])
+        super().__init__([-10, 0], [10, 10])
 
     def _function(self,x):
         y = pow(x[1]-x[0],2) + x[1]
@@ -242,7 +234,7 @@ class hs3mod(test_fun):
 
 class jensmp(test_fun):
     def __init__(self):
-        super().__init__(2,[0.1, 0.1], [0.9, 0.9])
+        super().__init__([0.1, 0.1], [0.9, 0.9])
 
     def _function(self,x):
         term1 = [x*2 for x in range(2,12)]
@@ -253,7 +245,7 @@ class jensmp(test_fun):
 
 class logros(test_fun):
     def __init__(self):
-        super().__init__(2,[0, 0], [11, 11])
+        super().__init__([0, 0], [11, 11])
 
     def _function(self,x):
         y = numpy.log(1+10000*pow(x[1]-x[0]**2,2)+pow(1-x[0],2))
@@ -261,7 +253,7 @@ class logros(test_fun):
 
 class mdhole(test_fun):
     def __init__(self):
-        super().__init__(2,[0, -10], [10, 10])
+        super().__init__([0, -10], [10, 10])
         
     def _function(self,x):
         y = 100*pow(numpy.sin(x[0])-x[1],2)+x[0]
@@ -269,7 +261,7 @@ class mdhole(test_fun):
 
 class median_vareps(test_fun):
     def __init__(self):
-        super().__init__(2,[1e-08, -9.499789331], [10.00000001, 10.500210669])
+        super().__init__([1e-08, -9.499789331], [10.00000001, 10.500210669])
 
     def _function(self,x):
         term1 = [-0.171747132,-0.843266708,-0.550375356,-0.301137904,
@@ -284,7 +276,7 @@ class median_vareps(test_fun):
 
 class s328(test_fun):
     def __init__(self):
-        super().__init__(2,[1, 1], [2.7, 2.7])
+        super().__init__([1, 1], [2.7, 2.7])
 
     def _function(self,x):
         y = (0.1*(x[0]**2 + (1 + (x[1]**2))/(x[0]**2) +
@@ -293,7 +285,7 @@ class s328(test_fun):
 
 class sim2bqp(test_fun):
     def __init__(self):
-        super().__init__(2,[-10, 0], [9, 0.45])
+        super().__init__([-10, 0], [9, 0.45])
 
     def _function(self,x):
         y = pow(x[1]-x[0],2)+x[1]+pow(x[0]+x[1],2)
@@ -301,7 +293,7 @@ class sim2bqp(test_fun):
 
 class simbqp(test_fun):
     def __init__(self):
-        super().__init__(2,[-10, 0], [9, 0.45])
+        super().__init__([-10, 0], [9, 0.45])
 
     def _function(self,x):
         y = pow(x[1]-x[0],2)+x[1]+pow(2*x[0]+x[1],2)
@@ -309,7 +301,7 @@ class simbqp(test_fun):
 
 class allinit(test_fun):
     def __init__(self):
-        super().__init__(3,[-11.1426691153, 1, -1e10],
+        super().__init__([-11.1426691153, 1, -1e10],
                          [8.8573308847, 11.2456257795, 1])
         
     def _function(self,x):
@@ -321,7 +313,7 @@ class allinit(test_fun):
     
 class box3(test_fun):
     def __init__(self):
-        super().__init__(3,[-9.0000004305, 3.23989999984065e-06, -8.9999997323],
+        super().__init__([-9.0000004305, 3.23989999984065e-06, -8.9999997323],
                          [9.89999961255, 18.00000291591, 9.90000024093])
         
     def _function(self,x):
@@ -338,7 +330,7 @@ class box3(test_fun):
 
 class eg1(test_fun):
     def __init__(self):
-        super().__init__(3,[-10.2302657121, -1, 1], [9.7697342879, 1, 2])
+        super().__init__([-10.2302657121, -1, 1], [9.7697342879, 1, 2])
         
     def _function(self,x):
         y = x[0]**2 + pow(x[1]*x[2],4)+x[0]*x[2] + numpy.sin(x[0]+x[2])*x[1]+x[1]
@@ -346,7 +338,7 @@ class eg1(test_fun):
 
 class fermat_vareps(test_fun):
     def __init__(self):
-        super().__init__(3,[-7.9999999999, -8.8452994616, 1e-08],
+        super().__init__([-7.9999999999, -8.8452994616, 1e-08],
                          [12.0000000001, 11.1547005384, 10.00000001])
 
     def _function(self,x):
@@ -357,7 +349,7 @@ class fermat_vareps(test_fun):
 
 class fermat2_vareps(test_fun):
     def __init__(self):
-        super().__init__(3,[-8, -9.00000002, 1e-08],
+        super().__init__([-8, -9.00000002, 1e-08],
                          [12, 10.99999998, 10.00000001])
 
     def _function(self,x):
@@ -368,7 +360,7 @@ class fermat2_vareps(test_fun):
 
 class least(test_fun):
     def __init__(self):
-        super().__init__(3,[473.98605675534, -159.3518936954, -5],
+        super().__init__([473.98605675534, -159.3518936954, -5],
                          [ 506.6511741726, -125.41670432586, 4.5])
 
     def _function(self,x):
@@ -382,7 +374,7 @@ class least(test_fun):
 class s242(test_fun):
     # is exactly the same as box3 with different bounds
     def __init__(self):
-        super().__init__(3,[0, 0, 0], [10, 10, 10])
+        super().__init__([0, 0, 0], [10, 10, 10])
 
     def _function(self,x):
         coeffs = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
@@ -398,7 +390,7 @@ class s242(test_fun):
 
 class s244(test_fun):
     def __init__(self):
-        super().__init__(3,[0, 0, 0], [10, 10, 10])
+        super().__init__([0, 0, 0], [10, 10, 10])
 
     def _function(self,x):
         y = (pow(0.934559787821252 + numpy.exp(-0.1*x[0]) -
@@ -411,7 +403,7 @@ class s244(test_fun):
 
 class s333(test_fun):
     def __init__(self):
-        super().__init__(3,[79.901992908, -1, -1], [89.9117936172, 0.9, 0.9])
+        super().__init__([79.901992908, -1, -1], [89.9117936172, 0.9, 0.9])
 
     def _function(self,x):
         coeff1 = [-4,-5.75,-7.5,-24,-32,-48,-72,-96]
@@ -425,7 +417,7 @@ class s333(test_fun):
 
 class st_cqpjk2(test_fun):
     def __init__(self):
-        super().__init__(3,[0, 0, 0], [0.9, 0.9, 0.9])
+        super().__init__([0, 0, 0], [0.9, 0.9, 0.9])
         
     def _function(self,x):
         y = 9*x[0]*x[0]-15*x[0]+9*x[1]*x[1]-12*x[1]+9*x[2]*x[2]-9*x[2]
@@ -433,7 +425,7 @@ class st_cqpjk2(test_fun):
 
 class yfit(test_fun):
     def __init__(self):
-        super().__init__(3,[-9.9978786299, -10.0035439984, 0],
+        super().__init__([-9.9978786299, -10.0035439984, 0],
                          [10.0021213701, 9.9964560016, 10010])
 
     def _function(self,x):
@@ -449,7 +441,7 @@ class yfit(test_fun):
 
 class brownden(test_fun):
     def __init__(self):
-        super().__init__(4,[-21.5944399048, 3.2036300512,
+        super().__init__([-21.5944399048, 3.2036300512,
                             -10.4034394882, -9.7632212255],
                          [-1.43499591432, 20.88326704608,
                           8.63690446062, 9.21310089705])
@@ -484,7 +476,7 @@ class brownden(test_fun):
 
 class hatflda(test_fun):
     def __init__(self):
-        super().__init__(4,[1e-07, 1e-07, 1e-07, 1e-07],
+        super().__init__([1e-07, 1e-07, 1e-07, 1e-07],
                          [10.999999997, 10.9999999714,
                           10.9999999281, 10.9999998559])
     def _function(self,x):
@@ -494,7 +486,7 @@ class hatflda(test_fun):
 
 class hatfldb(test_fun):
     def __init__(self):
-        super().__init__(4,[1e-07, 1e-07, 1e-07, 1e-07],
+        super().__init__([1e-07, 1e-07, 1e-07, 1e-07],
                          [10.9472135922, 0.8, 10.6400000036, 10.4096000079])
 
     def _function(self,x):
@@ -504,7 +496,7 @@ class hatfldb(test_fun):
 
 class hatfldc(test_fun):
     def __init__(self):
-        super().__init__(4,[0, 0, 0, -8.9999999978],
+        super().__init__([0, 0, 0, -8.9999999978],
                          [10, 10, 10, 11.0000000022])
 
     def _function(self,x):
@@ -513,7 +505,7 @@ class hatfldc(test_fun):
 
 class himmelbf(test_fun):
     def __init__(self):
-        super().__init__(4,[0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
+        super().__init__([0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
 
     def _function(self,x):
         y = 1e4*(pow(0.135299688810716*(x[0]**2) - 1,2) +
@@ -533,7 +525,7 @@ class himmelbf(test_fun):
 
 class kowalik(test_fun):
     def __init__(self):
-        super().__init__(4,[0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
+        super().__init__([0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
 
     def _function(self,x):
         term1 = [0.1957,0.1947,0.1735,0.16,0.0844,0.0627,0.0456,0.0342,0.0323,
@@ -550,7 +542,7 @@ class kowalik(test_fun):
 
 class palmer1(test_fun):
     def __init__(self):
-        super().__init__(4,[1.3636340716, 1e-05, 1e-05, 1e-05],
+        super().__init__([1.3636340716, 1e-05, 1e-05, 1e-05],
                          [21.3636340716, 160.4544000091, 11.5013647921,
                           10.0931561774])
 
@@ -577,7 +569,7 @@ class palmer1(test_fun):
 # fixed when LU for x's changed from 0 to 0.000001
 class palmer3(test_fun):
     def __init__(self):
-        super().__init__(4,[0.000001, 0.000001, 0.000001, 7.3225711014],
+        super().__init__([0.000001, 0.000001, 0.000001, 7.3225711014],
                          [10.0375049888, 10.0034428969,
                           14.6439962785, 27.3225711014])
 
@@ -601,7 +593,7 @@ class palmer3(test_fun):
 # fixed when LU for x's changed from 0 to 0.000001
 class palmer4(test_fun):
     def __init__(self):
-        super().__init__(4,[0.00001, 0.00001, 0.00001, 8.2655580306],
+        super().__init__([0.00001, 0.00001, 0.00001, 8.2655580306],
                          [19.3292787916, 10.8767116668,
                           10.0158603779, 28.2655580306])
 
@@ -623,7 +615,7 @@ class palmer4(test_fun):
 
 class palmer5d(test_fun):
     def __init__(self):
-        super().__init__(4,[70.2513178169, -142.1059487487, 41.6401308813,
+        super().__init__([70.2513178169, -142.1059487487, 41.6401308813,
                             -9.304685674],
                          [81.22618603521, -109.89535387383, 55.47611779317,
                           9.6257828934])
@@ -650,7 +642,7 @@ class palmer5d(test_fun):
 
 class s257(test_fun):
     def __init__(self):
-        super().__init__(4,[0, -9, 0, -9], [11, 11, 11, 11])
+        super().__init__([0, -9, 0, -9], [11, 11, 11, 11])
 
     def _function(self,x):
         y = (100*pow(x[0]**2 - x[1],2) + pow(x[0] - 1,2) +
@@ -660,7 +652,7 @@ class s257(test_fun):
 
 class s351(test_fun):
     def __init__(self):
-        super().__init__(4,[-7.3, 80, 1359, 0], [11.43, 90, 1490, 18])
+        super().__init__([-7.3, 80, 1359, 0], [11.43, 90, 1490, 18])
 
     def _function(self,x):
         term0 = [0.135299688810716,0.0894454382826476,0.0608272506082725,
@@ -678,7 +670,7 @@ class s351(test_fun):
 
 class s352(test_fun):
     def __init__(self):
-        super().__init__(4,[-20.2235736001, 1.9084286837,
+        super().__init__([-20.2235736001, 1.9084286837,
                             -10.4580411955, -9.4196803043],
                          [-0.20121624009, 19.71758581533,
                           8.58776292405, 9.52228772613])
@@ -714,7 +706,7 @@ class s352(test_fun):
 
 class shekel(test_fun):
     def __init__(self):
-        super().__init__(4,[0, 0, 0, 0], [10, 10, 10, 10])
+        super().__init__([0, 0, 0, 0], [10, 10, 10, 10])
     def _function(self,x):
         y = -(1/(0.1 + pow(x[0] - 4,2) + pow(x[1] - 4,2) +
                  pow(x[2] - 4,2) + pow(x[3] - 4,2)) +
@@ -730,15 +722,15 @@ class shekel(test_fun):
 
 class hs045(test_fun):
     def __init__(self):
-        super().__init__(5,[0, 0, 0, 0, 0], [1, 2, 3, 4, 5])
+        super().__init__([0, 0, 0, 0, 0], [1, 2, 3, 4, 5])
 
     def _function(self,x):
-        y = -(0.00833333333333333*x[0]*x[1]*x[2]*x[3]*x[4] - ( 2 ))
+        y = -(0.00833333333333333*x[0]*x[1]*x[2]*x[3]*x[4] - (2))
         return y
 
 class s267(test_fun):
     def __init__(self):
-        super().__init__(5,[-8.2232795288, 6.1236156871,
+        super().__init__([-8.2232795288, 6.1236156871,
                             -10.5942083977, -5.2928287845, -8.2232796262],
                          [11.7767204712, 26.1236156871, 9.4057916023,
                           14.7071712155, 0])
@@ -757,7 +749,7 @@ class s267(test_fun):
 
 class s358(test_fun):
     def __init__(self):
-        super().__init__(5,[-0.5, 1.5, -2, 0.001, 0.001],
+        super().__init__([-0.5, 1.5, -2, 0.001, 0.001],
                          [0.45, 2.25, -0.9, 0.09, 0.09])
 
     def _function(self,x):
@@ -774,7 +766,7 @@ class s358(test_fun):
 
 class biggs6(test_fun):
     def __init__(self):
-        super().__init__(6,[-8.2885839998, 7.6831983277, -3.05828543,
+        super().__init__([-8.2885839998, 7.6831983277, -3.05828543,
                             -4.8134383873, -8.2885839966, -14.6154272503],
                          [10.54027440018, 24.91487849493, 15.247543113,
                           13.66790545143, 10.54027440306, 4.84611547473])
@@ -795,7 +787,8 @@ class biggs6(test_fun):
 
 class hart6(test_fun):
     def __init__(self):
-        super().__init__(6,[0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1])
+        super().__init__([0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1])
+        
     def _function(self,x):
         y = -(numpy.exp(-(10*pow(x[0]-0.1312,2) + 0.05*pow(x[1]-0.1696,2) +
                          17*pow(x[2]-0.5569,2) + 3.5*pow(x[3]-0.0124,2) +
@@ -892,7 +885,7 @@ class hart6(test_fun):
 
 class palmer5c(test_fun):
     def __init__(self):
-        super().__init__(6,[27.5370157298, -11.7302338172, 30.7938174564,
+        super().__init__([27.5370157298, -11.7302338172, 30.7938174564,
                             -9.1697871977, -6.2910484684, -10.1772297675],
                          [42.78331415682, 7.44278956452, 45.71443571076,
                           9.74719152207, 12.33805637844, 8.84049320925])
@@ -928,7 +921,7 @@ class palmer5c(test_fun):
 
 class palmer6a(test_fun):
     def __init__(self):
-        super().__init__(6,[-44.1581372624, 0.120997701, -1.1808208888,
+        super().__init__([-44.1581372624, 0.120997701, -1.1808208888,
                             -8.633061426, 1e-05, 1e-05],
                          [-24.1581372624, 20.120997701, 18.8191791112,
                           11.366938574, 43.2710391882, 10.7437425261])
@@ -958,7 +951,7 @@ class palmer6a(test_fun):
 
 class palmer8a(test_fun):
     def __init__(self):
-        super().__init__(6,[1e-05, 1e-05, -17.7129671187, -5.0299734848,
+        super().__init__([1e-05, 1e-05, -17.7129671187, -5.0299734848,
                             2.8287670723, -9.0495003432],
                          [12.4961104793, 10.2011908033, 2.2870328813,
                           14.9700265152, 22.8287670723, 10.9504996568])
@@ -988,7 +981,7 @@ class palmer8a(test_fun):
 
 class s272(test_fun):
     def __init__(self):
-        super().__init__(6,[0, 0, 0, 0, 0, 0],
+        super().__init__([0, 0, 0, 0, 0, 0],
                          [10.999999907, 20.0000005284, 13.9999995189,
                           10.9999998493, 14.9999995532, 12.99999966])
 
@@ -1008,7 +1001,8 @@ class s272(test_fun):
 
 class st_bsj3(test_fun):
     def __init__(self):
-        super().__init__(6,[0, 0, 0, 0, 0, 0], [99, 99, 99, 99, 99, 99])
+        super().__init__([0, 0, 0, 0, 0, 0], [99, 99, 99, 99, 99, 99])
+
 
     def _function(self,x):
         y = (10.5*x[0] - 1.5*(x[0]**2) - x[1]**2 - 3.95*x[1] - x[2]**2 + 3*x[2]-
