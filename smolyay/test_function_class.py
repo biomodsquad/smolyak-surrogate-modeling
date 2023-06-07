@@ -11,6 +11,9 @@ class test_fun(abc.ABC):
 
     Parameters
     ----------
+    name : str
+        the name of the class
+
     dim : int
         the number of variables used as input
 
@@ -113,24 +116,21 @@ class branin(test_fun):
         y1 = (x[1] - 5.1*x[0]**2/(4*numpy.pi**2) + 5*x[0]/numpy.pi - 6)**2
         y2 = 10*(1-1/(8*numpy.pi))*numpy.cos(x[0]) + 10
         return y1 + y2
-    
-class camel1(test_fun):
-    @property
-    def domain(self):
-        return [[-5, 5], [-5, 5]]
-        
+
+class _camel(test_fun):
     def _function(self,x):
         return (4*x[0]**2-2.1*x[0]**4+0.333333333333333*x[0]**6 +
                 x[0]*x[1]-4*x[1]**2+4*x[1]**4)
 
-class camel6(test_fun):
+class camel1(_camel):
+    @property
+    def domain(self):
+        return [[-5, 5], [-5, 5]]
+
+class camel6(_camel):
     @property
     def domain(self):
         return [[-3, 3], [-1.5, 1.5]]
-        
-    def _function(self,x):
-        return (4*x[0]**2-2.1*x[0]**4+0.333333333333333*x[0]**6 +
-                x[0]*x[1]-4*x[1]**2+4*x[1]**4)
 
 class chi(test_fun):
     @property
