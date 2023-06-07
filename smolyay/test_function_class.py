@@ -456,24 +456,22 @@ class brownden(test_fun):
                        (coeff_s2 + x[2] + numpy.multiply(coeff3,x[3]))**2)**2)
         return y
 
-class hatflda(test_fun):
+class _hatfld(test_fun):
+    def _function(self,x):
+        return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
+                (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
+
+class hatflda(_hatfld):
     @property
     def domain(self):
         return [[1e-07, 10.999999997], [1e-07, 10.9999999714],
                 [1e-07, 10.9999999281], [1e-07, 10.9999998559]]
-    def _function(self,x):
-        return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
-                (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
 
-class hatfldb(test_fun):
+class hatfldb(_hatfld):
     @property
     def domain(self):
         return [[1e-07, 10.9472135922], [1e-07, 0.8],
                 [1e-07, 10.6400000036], [1e-07, 10.4096000079]]
-
-    def _function(self,x):
-        return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
-                (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
 
 class hatfldc(test_fun):
     @property
