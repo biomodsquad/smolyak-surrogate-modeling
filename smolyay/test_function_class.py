@@ -20,53 +20,9 @@ class test_fun(abc.ABC):
     upper_bounds : list of floats of size 1xdim
         the upper bounds of the domain of each variable
 
-    Raises
-    ------
-    IndexError
-        All dimensions must have bounds
+    domain : list of lists
+        the domain of the inputs for each dimension
     """
-    def __init__(self,lower_bounds,upper_bounds):
-        if not(hasattr(lower_bounds,'__len__') and hasattr(upper_bounds,'__len__')):
-            # turn scalar inputs into 1x1 vectors
-            if not hasattr(lower_bounds,'__len__'):
-                self._lower_bounds = [lower_bounds]
-            else:
-                self._lower_bounds = [lower_bounds[0]]
-            if not hasattr(lower_bounds,'__len__'):
-                self._upper_bounds = [upper_bounds]
-            else:
-                self._upper_bounds = [upper_bounds[0]]
-        else:
-            if not len(lower_bounds) == len(upper_bounds):
-                raise IndexError('All dimensions must have bounds')
-            self._upper_bounds = upper_bounds
-            self._lower_bounds = lower_bounds
-    
-    @property
-    def name(self):
-        """Name of the function"""
-        return self.__class__.__name__
-
-    @property
-    def dim(self):
-        """Number of variables"""
-        return len(self.bounds)
-
-    @property
-    def lower_bounds(self):
-        """ the lower bounds of the domain of each variable"""
-        return self._lower_bounds
-    
-    @property
-    def upper_bounds(self):
-        """the upper bounds of the domain of each variable"""
-        return self._upper_bounds
-
-    @property
-    def bounds(self):
-        """the lower and upper bounds of each variable"""
-        return list(zip(self._lower_bounds,self._upper_bounds))
-        
     def __call__(self,x):
         """Evaluate the test function
 
@@ -83,21 +39,50 @@ class test_fun(abc.ABC):
         if self.dim > 1:
             oob = any(
                 xi < bound[0]-1e-10 or xi > bound[1]+1e-10 for xi,bound in
-                zip(x,self.bounds))
+                zip(x,self.domain))
         else:
-            oob = x < self.bounds[0] or x > self.bounds[1]
+            oob = x > self.upper_bounds[0] or x < self.lower_bounds[0]
         if oob:
             raise ValueError("Input out domain of function.")
         return self._function(x)
+    
+    @property
+    def name(self):
+        """Name of the function"""
+        return self.__class__.__name__
 
+    @property
+    def dim(self):
+        """Number of variables"""
+        return len(self.domain)
+
+    @property
+    def lower_bounds(self):
+        """ the lower bounds of the domain of each variable"""
+        lower, _ = zip(*self.domain)
+        return list(lower)
+    
+    @property
+    def upper_bounds(self):
+        """the upper bounds of the domain of each variable"""
+        _, upper = zip(*self.domain)
+        return list(upper)
+
+    @property
+    @abc.abstractmethod
+    def domain(self):
+        """the lower and upper bounds of each variable"""
+        pass
+ 
     @abc.abstractmethod
     def _function(self,x):
         pass
 
 class beale(test_fun):
-    def __init__(self):
-        super().__init__([-7.0000000008, -9.5000000002],
-                         [11.69999999928, 9.44999999982])
+    @property
+    def domain(self):
+        return ([[-7.0000000008, 11.69999999928],
+                          [-9.5000000002,9.44999999982]])
 
     def _function(self,x):
         return ((-1.5 + x[0]*(1 - x[1]))**2 +
@@ -105,8 +90,9 @@ class beale(test_fun):
                 (-2.625+(1-x[1]**3)*x[0])**2)
 
 class box2(test_fun):
-    def __init__(self):
-        super().__init__([-10,0],[10,10])
+    @property
+    def domain(self):
+        return [-10, 10], [0, 10]
         
     def _function(self,x):
         term1 = [0.536957976864517,0.683395469841369,0.691031152313854,
@@ -119,8 +105,9 @@ class box2(test_fun):
         return y
 
 class branin(test_fun):
-    def __init__(self):
-        super().__init__([-5,0],[10,15])
+    @property
+    def domain(self):
+        return [[-5, 10], [0, 15]]
         
     def _function(self,x):
         y1 = (x[1] - 5.1*x[0]**2/(4*numpy.pi**2) + 5*x[0]/numpy.pi - 6)**2
@@ -128,24 +115,27 @@ class branin(test_fun):
         return y1 + y2
     
 class camel1(test_fun):
-    def __init__(self):
-        super().__init__([-5,-5],[5,5])
+    @property
+    def domain(self):
+        return [[-5, 5], [-5, 5]]
         
     def _function(self,x):
         return (4*x[0]**2-2.1*x[0]**4+0.333333333333333*x[0]**6 +
                 x[0]*x[1]-4*x[1]**2+4*x[1]**4)
 
 class camel6(test_fun):
-    def __init__(self):
-        super().__init__([-3,-1.5],[3,1.5])
+    @property
+    def domain(self):
+        return [[-3, 3], [-1.5, 1.5]]
         
     def _function(self,x):
         return (4*x[0]**2-2.1*x[0]**4+0.333333333333333*x[0]**6 +
                 x[0]*x[1]-4*x[1]**2+4*x[1]**4)
 
 class chi(test_fun):
-    def __init__(self):
-        super().__init__([-30,-30],[30,30])
+    @property
+    def domain(self):
+        return [[-30, 30], [-30, 30]]
         
     def _function(self,x):
         return (x[0]**2 - 12*x[0] + 10*numpy.cos(1.5707963267949*x[0]) +
@@ -153,29 +143,33 @@ class chi(test_fun):
                 0.447213595499958*numpy.exp(-0.5*(-0.5+x[1])**2) + 11)
     
 class cliff(test_fun):
-    def __init__(self):
-        super().__init__([-7, -6.8502133863], [11.7, 11.83480795233])
+    @property
+    def domain(self):
+        return [[-7, 11.7], [-6.8502133863, 11.83480795233]]
         
     def _function(self,x):
         return (-0.03+0.01*x[0])**2-x[0]+numpy.exp(20*x[0]-20*x[1])+x[1]
     
 class cube(test_fun):
-    def __init__(self):
-        super().__init__([-18, -18], [9.9, 9.9])
+    @property
+    def domain(self):
+        return [[-18, 9.9], [-18, 9.9]]
         
     def _function(self,x):
         return (-1+x[0])**2+100*(x[1]-x[0]**3)**2
     
 class denschna(test_fun):
-    def __init__(self):
-        super().__init__([-20, -20], [9, 9])
+    @property
+    def domain(self):
+        return [[-20, 9], [-20, 9]]
         
     def _function(self,x):
         return x[0]**4+(x[0]+x[1])**2+(numpy.exp(x[1])-1)**2
 
 class himmelp1(test_fun):
-    def __init__(self):
-        super().__init__([0, 0], [95, 75])
+    @property
+    def domain(self):
+        return [[0, 95], [0, 75]]
         
     def _function(self,x):
         return (3.8112755343*x[0] -
@@ -192,58 +186,66 @@ class himmelp1(test_fun):
                 6.8306567613*x[1] -75.1963666677)
 
 class hs002(test_fun):
-    def __init__(self):
-        super().__init__([-8.7756292513, 1.5], [11.2243707487, 11.5])
+    @property
+    def domain(self):
+        return [[-8.7756292513, 11.2243707487], [1.5, 11.5]]
 
     def _function(self,x):
         return 100*(x[1]-x[0]**2)**2+(1-x[0])**2
 
 class hs003(test_fun):
-    def __init__(self):
-        super().__init__([-10, 0], [10, 10])
+    @property
+    def domain(self):
+        return [[-10, 10], [0, 10]]
 
     def _function(self,x):
         return 1e-5*(x[1]-x[0])**2+x[1]
 
 class hs004(test_fun):
-    def __init__(self):
-        super().__init__([1, 0], [11, 10])
+    @property
+    def domain(self):
+        return [[1, 11], [0, 10]]
 
     def _function(self,x):
         return 0.333333333333333*(1+x[0])**3+x[1]
 
 class hs3mod(test_fun):
-    def __init__(self):
-        super().__init__([-10, 0], [10, 10])
+    @property
+    def domain(self):
+        return [[-10, 10], [0, 10]]
 
     def _function(self,x):
         return (x[1]-x[0])**2 + x[1]
 
 class jensmp(test_fun):
-    def __init__(self):
-        super().__init__([0.1, 0.1], [0.9, 0.9])
+    @property
+    def domain(self):
+        return [[0.1, 0.9], [0.1, 0.9]]
 
     def _function(self,x):
         return numpy.sum([((i+2)*2 - numpy.exp((i+1)*x[0]) -
                            numpy.exp((i+1)*x[1]))**2 for i in range(10)])
 
 class logros(test_fun):
-    def __init__(self):
-        super().__init__([0, 0], [11, 11])
+    @property
+    def domain(self):
+        return [[0, 11], [0, 11]]
 
     def _function(self,x):
         return numpy.log(1+10000*(x[1]-x[0]**2)**2+(1-x[0])**2)
 
 class mdhole(test_fun):
-    def __init__(self):
-        super().__init__([0, -10], [10, 10])
+    @property
+    def domain(self):
+        return [[0, 10], [-10, 10]]
         
     def _function(self,x):
         return 100*(numpy.sin(x[0])-x[1])**2+x[0]
 
 class median_vareps(test_fun):
-    def __init__(self):
-        super().__init__([1e-08, -9.499789331], [10.00000001, 10.500210669])
+    @property
+    def domain(self):
+        return [[1e-08, 10.00000001], [-9.499789331, 10.500210669]]
 
     def _function(self,x):
         term1 = [-0.171747132,-0.843266708,-0.550375356,-0.301137904,
@@ -254,31 +256,34 @@ class median_vareps(test_fun):
         return x[0] + numpy.sum(numpy.sqrt(x[0]**2 + (term1 + x[1])**2))
 
 class s328(test_fun):
-    def __init__(self):
-        super().__init__([1, 1], [2.7, 2.7])
+    @property
+    def domain(self):
+        return [[1, 2.7], [1, 2.7]]
 
     def _function(self,x):
         return (0.1*(x[0]**2 + (1 + (x[1]**2))/(x[0]**2) +
                     (100 + (x[0]**2)*(x[1]**2))/(x[0]**4*x[1]**4)) + 1.2)
 
 class sim2bqp(test_fun):
-    def __init__(self):
-        super().__init__([-10, 0], [9, 0.45])
+    @property
+    def domain(self):
+        return [[-10, 9], [0, 0.45]]
 
     def _function(self,x):
         return (x[1]-x[0])**2+x[1]+(x[0]+x[1])**2
 
 class simbqp(test_fun):
-    def __init__(self):
-        super().__init__([-10, 0], [9, 0.45])
+    @property
+    def domain(self):
+        return [[-10, 9], [0, 0.45]]
 
     def _function(self,x):
         return (x[1]-x[0])**2+x[1]+(2*x[0]+x[1])**2
 
 class allinit(test_fun):
-    def __init__(self):
-        super().__init__([-11.1426691153, 1, -1e10],
-                         [8.8573308847, 11.2456257795, 1])
+    @property
+    def domain(self):
+        return [[-11.1426691153, 8.8573308847], [1, 11.2456257795],[-1e10, 1]]
         
     def _function(self,x):
         return (x[0]**2 + x[1]**2 + (x[2] + 2)**2 + x[2] + numpy.sin(x[2])**2 +
@@ -287,9 +292,11 @@ class allinit(test_fun):
                 (x[2]**2 + (x[0] + 2)**2)**2 + numpy.sin(2)**4 - 1)
     
 class box3(test_fun):
-    def __init__(self):
-        super().__init__([-9.0000004305, 3.23989999984065e-06, -8.9999997323],
-                         [9.89999961255, 18.00000291591, 9.90000024093])
+    @property
+    def domain(self):
+        return [[-9.0000004305, 9.89999961255],
+                [3.23989999984065e-06, 18.00000291591],
+                [-8.9999997323, 9.90000024093]]
         
     def _function(self,x):
         coeffs = [-0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-0.7,-0.8,-0.9,-1]
@@ -301,18 +308,21 @@ class box3(test_fun):
                        numpy.exp(numpy.multiply(coeffs,x[1]))-
                        numpy.multiply(coeff2,x[2]))**2)
         return y
+    
 class eg1(test_fun):
-    def __init__(self):
-        super().__init__([-10.2302657121, -1, 1], [9.7697342879, 1, 2])
+    @property
+    def domain(self):
+        return [[-10.2302657121, 9.7697342879], [-1, 1], [1, 2]]
         
     def _function(self,x):
         return (x[0]**2 + (x[1]*x[2])**4 + x[0]*x[2] +
                 numpy.sin(x[0]+x[2])*x[1] + x[1])
 
 class fermat_vareps(test_fun):
-    def __init__(self):
-        super().__init__([-7.9999999999, -8.8452994616, 1e-08],
-                         [12.0000000001, 11.1547005384, 10.00000001])
+    @property
+    def domain(self):
+        return [[-7.9999999999, 12.0000000001],
+                [-8.8452994616, 11.1547005384], [1e-08, 10.00000001]]
 
     def _function(self,x):
         return (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
@@ -320,9 +330,9 @@ class fermat_vareps(test_fun):
                 numpy.sqrt(x[2]**2 + (x[0] - 2)**2 + (x[1] - 4)**2) + x[2])
 
 class fermat2_vareps(test_fun):
-    def __init__(self):
-        super().__init__([-8, -9.00000002, 1e-08],
-                         [12, 10.99999998, 10.00000001])
+    @property
+    def domain(self):
+        return [[-8, 12], [-9.00000002, 10.99999998], [1e-08, 10.00000001]]
 
     def _function(self,x):
         return (numpy.sqrt(x[2]**2 + x[0]**2 + x[1]**2) +
@@ -330,9 +340,10 @@ class fermat2_vareps(test_fun):
                 numpy.sqrt(x[2]**2 + (x[0] - 2)**2 + (x[1] - 1)**2) + x[2])
 
 class least(test_fun):
-    def __init__(self):
-        super().__init__([473.98605675534, -159.3518936954, -5],
-                         [ 506.6511741726, -125.41670432586, 4.5])
+    @property
+    def domain(self):
+        return [[473.98605675534, 506.6511741726],
+                [-159.3518936954, -125.41670432586],[-5, 4.5]]
 
     def _function(self,x):
         term0 = [127,151,379,421,460,426]
@@ -342,8 +353,9 @@ class least(test_fun):
 
 class s242(test_fun):
     # is exactly the same as box3 with different bounds
-    def __init__(self):
-        super().__init__([0, 0, 0], [10, 10, 10])
+    @property
+    def domain(self):
+        return [[0, 10], [0, 10], [0, 10]]
 
     def _function(self,x):
         coeffs = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
@@ -356,8 +368,9 @@ class s242(test_fun):
                           numpy.multiply(coeff2,-x[2]))**2)
 
 class s244(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0], [10, 10, 10])
+    @property
+    def domain(self):
+        return [[0, 10], [0, 10], [0, 10]]
 
     def _function(self,x):
         return ((0.934559787821252 + numpy.exp(-0.1*x[0]) -
@@ -369,8 +382,9 @@ class s244(test_fun):
 
 # REALLY needs more precise floats
 class s333(test_fun):
-    def __init__(self):
-        super().__init__([79.901992908, -1, -1], [89.9117936172, 0.9, 0.9])
+    @property
+    def domain(self):
+        return [[79.901992908, 89.9117936172], [-1, 0.9], [-1, 0.9]]
 
     def _function(self,x):
         coeff1 = [-4,-5.75,-7.5,-24,-32,-48,-72,-96]
@@ -383,17 +397,19 @@ class s333(test_fun):
         return y
 
 class st_cqpjk2(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0], [0.9, 0.9, 0.9])
+    @property
+    def domain(self):
+        return [[0, 0.9], [0, 0.9], [0, 0.9]]
         
     def _function(self,x):
         return 9*x[0]*x[0]-15*x[0]+9*x[1]*x[1]-12*x[1]+9*x[2]*x[2]-9*x[2]
 
 # needs more precise floats
 class yfit(test_fun):
-    def __init__(self):
-        super().__init__([-9.9978786299, -10.0035439984, 0],
-                         [10.0021213701, 9.9964560016, 10010])
+    @property
+    def domain(self):
+        return [[-9.9978786299, 10.0021213701],
+                [-10.0035439984, 9.9964560016], [0, 10010]]
 
     def _function(self,x):
         coeff1 = [x*0.0625 for x in range(17)]
@@ -407,11 +423,12 @@ class yfit(test_fun):
 
 # needs more precise floats
 class brownden(test_fun):
-    def __init__(self):
-        super().__init__([-21.5944399048, 3.2036300512,
-                            -10.4034394882, -9.7632212255],
-                         [-1.43499591432, 20.88326704608,
-                          8.63690446062, 9.21310089705])
+    @property
+    def domain(self):
+        return [[-21.5944399048, -1.43499591432],
+                [3.2036300512, 20.88326704608],
+                [-10.4034394882, 8.63690446062],
+                [-9.7632212255, 9.21310089705]]
     def _function(self,x):
         coeff1 = [round(x*0.2,ndigits=1) for x in range(1,21)]
         coeff_s1 = [-1.22140275816017,-1.49182469764127,-1.82211880039051,
@@ -440,34 +457,36 @@ class brownden(test_fun):
         return y
 
 class hatflda(test_fun):
-    def __init__(self):
-        super().__init__([1e-07, 1e-07, 1e-07, 1e-07],
-                         [10.999999997, 10.9999999714,
-                          10.9999999281, 10.9999998559])
+    @property
+    def domain(self):
+        return [[1e-07, 10.999999997], [1e-07, 10.9999999714],
+                [1e-07, 10.9999999281], [1e-07, 10.9999998559]]
     def _function(self,x):
         return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
                 (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
 
 class hatfldb(test_fun):
-    def __init__(self):
-        super().__init__([1e-07, 1e-07, 1e-07, 1e-07],
-                         [10.9472135922, 0.8, 10.6400000036, 10.4096000079])
+    @property
+    def domain(self):
+        return [[1e-07, 10.9472135922], [1e-07, 0.8],
+                [1e-07, 10.6400000036], [1e-07, 10.4096000079]]
 
     def _function(self,x):
         return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
                 (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
 
 class hatfldc(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, -8.9999999978],
-                         [10, 10, 10, 11.0000000022])
+    @property
+    def domain(self):
+        return [[0, 10], [0, 10], [0, 10], [-8.9999999978, 11.0000000022]]
 
     def _function(self,x):
         return (x[0]-1)**2 + (x[2]-x[1]**2)**2 + (x[3]-x[2]**2)**2 + (x[3]-1)**2
 
 class himmelbf(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
+    @property
+    def domain(self):
+        return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
 
     def _function(self,x):
         coeff0 = numpy.array([0.135299688810716,1,1,1,1,1,1])
@@ -481,8 +500,9 @@ class himmelbf(test_fun):
                            coeff2*x[2]**2)/(coeffa+coeff3*x[3]**2)-1)**2)*1e4
 
 class kowalik(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, 0], [0.378, 0.378, 0.378, 0.378])
+    @property
+    def domain(self):
+        return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
 
     def _function(self,x):
         term1 = [0.1957,0.1947,0.1735,0.16,0.0844,0.0627,0.0456,0.0342,0.0323,
@@ -496,10 +516,10 @@ class kowalik(test_fun):
 
 # needs more precise floats
 class palmer1(test_fun):
-    def __init__(self):
-        super().__init__([1.3636340716, 1e-05, 1e-05, 1e-05],
-                         [21.3636340716, 160.4544000091, 11.5013647921,
-                          10.0931561774])
+    @property
+    def domain(self):
+        return [[1.3636340716, 21.3636340716], [1e-05, 160.4544000091],
+                [1e-05, 11.5013647921], [1e-05, 10.0931561774]]
 
     def _function(self,x):
         term1 = [78.596218,65.77963,43.96947,27.038816,14.6126,6.2614,1.53833,
@@ -520,10 +540,10 @@ class palmer1(test_fun):
 
 # needs more precise floats
 class palmer3(test_fun):
-    def __init__(self):
-        super().__init__([0.000001, 0.000001, 0.000001, 7.3225711014],
-                         [10.0375049888, 10.0034428969,
-                          14.6439962785, 27.3225711014])
+    @property
+    def domain(self):
+        return [[1e-06, 10.0375049888], [1e-06, 10.0034428969],
+                [1e-06, 14.6439962785], [7.3225711014, 27.3225711014]]
 
     def _function(self,x):
         term1 = [64.87939,50.46046,28.2034,13.4575,4.6547,0.59447,0,0.2177,
@@ -541,10 +561,10 @@ class palmer3(test_fun):
 
 # needs more precise floats
 class palmer4(test_fun):
-    def __init__(self):
-        super().__init__([0.00001, 0.00001, 0.00001, 8.2655580306],
-                         [19.3292787916, 10.8767116668,
-                          10.0158603779, 28.2655580306])
+    @property
+    def domain(self):
+        return [[1e-05, 19.3292787916], [1e-05, 10.8767116668],
+                [1e-05, 10.0158603779], [8.2655580306, 28.2655580306]]
 
     def _function(self,x):
         term1 = [67.27625,52.8537,30.2718,14.9888,5.56750,0.92603,0,0.085108,
@@ -562,11 +582,10 @@ class palmer4(test_fun):
 
 # needs more precise floats
 class palmer5d(test_fun):
-    def __init__(self):
-        super().__init__([70.2513178169, -142.1059487487, 41.6401308813,
-                            -9.304685674],
-                         [81.22618603521, -109.89535387383, 55.47611779317,
-                          9.6257828934])
+    @property
+    def domain(self):
+        return [[70.2513178169, 81.22618603521], [-142.1059487487, -109.89535387383],
+                [41.6401308813, 55.47611779317], [-9.304685674, 9.6257828934]]
 
     def _function(self,x):
         term1 = [83.57418,81.007654,18.983286,8.051067,2.044762,0,1.170451,
@@ -587,8 +606,9 @@ class palmer5d(test_fun):
                           numpy.multiply(term4,x[3]))**2)
 
 class s257(test_fun):
-    def __init__(self):
-        super().__init__([0, -9, 0, -9], [11, 11, 11, 11])
+    @property
+    def domain(self):
+        return [[0, 11], [-9, 11], [0, 11], [-9, 11]]
 
     def _function(self,x):
         return (100*(x[0]**2 - x[1])**2 + (x[0] - 1)**2 +
@@ -596,8 +616,9 @@ class s257(test_fun):
                 10.1*((x[1] - 1)**2 + (x[3] - 1)**2)+(19.8*x[0]-19.8)*(x[3]-1))
 
 class s351(test_fun):
-    def __init__(self):
-        super().__init__([-7.3, 80, 1359, 0], [11.43, 90, 1490, 18])
+    @property
+    def domain(self):
+        return [[-7.3, 11.43], [80, 90], [1359, 1490], [0, 18]]
 
     def _function(self,x):
         term0 = numpy.array([0.135299688810716,0.0894454382826476,
@@ -612,11 +633,12 @@ class s351(test_fun):
 
 # needs more precise floats
 class s352(test_fun):
-    def __init__(self):
-        super().__init__([-20.2235736001, 1.9084286837,
-                            -10.4580411955, -9.4196803043],
-                         [-0.20121624009, 19.71758581533,
-                          8.58776292405, 9.52228772613])
+    @property
+    def domain(self):
+        return [[-20.2235736001, -0.20121624009],
+                [1.9084286837, 19.71758581533],
+                [-10.4580411955, 8.58776292405],
+                [-9.4196803043, 9.52228772613]]
 
     def _function(self,x):
         term1 = [-1.22140275816017,-1.49182469764127,-1.82211880039051,
@@ -645,8 +667,9 @@ class s352(test_fun):
                          (term3 + x[2] + numpy.multiply(term4,x[3]))**2)
 
 class shekel(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, 0], [10, 10, 10, 10])
+    @property
+    def domain(self):
+        return [[0, 10], [0, 10], [0, 10], [0, 10]]
     def _function(self,x):
         term1 = [0.1,0.2,0.2,0.4,0.4]
         term2 = [4,1,8,6,3]
@@ -656,19 +679,20 @@ class shekel(test_fun):
         return y
 
 class hs045(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, 0, 0], [1, 2, 3, 4, 5])
+    @property
+    def domain(self):
+        return [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5]]
 
     def _function(self,x):
         return -(0.00833333333333333*x[0]*x[1]*x[2]*x[3]*x[4] - 2)
 
 # needs more precise floats
 class s267(test_fun):
-    def __init__(self):
-        super().__init__([-8.2232795288, 6.1236156871,
-                            -10.5942083977, -5.2928287845, -8.2232796262],
-                         [11.7767204712, 26.1236156871, 9.4057916023,
-                          14.7071712155, 0])
+    @property
+    def domain(self):
+        return [[-8.2232795288, 11.7767204712],
+                [6.1236156871, 26.1236156871], [-10.5942083977, 9.4057916023],
+                [-5.2928287845, 14.7071712155], [-8.2232796262, 0]]
 
     def _function(self,x):
         term1 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
@@ -683,9 +707,10 @@ class s267(test_fun):
 
 # needs more precise floats
 class s358(test_fun):
-    def __init__(self):
-        super().__init__([-0.5, 1.5, -2, 0.001, 0.001],
-                         [0.45, 2.25, -0.9, 0.09, 0.09])
+    @property
+    def domain(self):
+        return [[-0.5, 0.45], [1.5, 2.25],
+                [-2, -0.9], [0.001, 0.09], [0.001, 0.09]]
 
     def _function(self,x):
         term1 = [0.844,0.908,0.932,0.936,0.925,0.908,0.881,0.85,0.818,0.784,
@@ -698,11 +723,13 @@ class s358(test_fun):
 
 # needs more precise floats
 class biggs6(test_fun):
-    def __init__(self):
-        super().__init__([-8.2885839998, 7.6831983277, -3.05828543,
-                            -4.8134383873, -8.2885839966, -14.6154272503],
-                         [10.54027440018, 24.91487849493, 15.247543113,
-                          13.66790545143, 10.54027440306, 4.84611547473])
+    @property
+    def domain(self):
+        return [[-8.2885839998, 10.54027440018],
+                [7.6831983277, 24.91487849493],
+                [-3.05828543, 15.247543113], [-4.8134383873, 13.66790545143],
+                [-8.2885839966, 10.54027440306],
+                [-14.6154272503, 4.84611547473]]
 
     def _function(self,x):
         term1 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
@@ -716,8 +743,9 @@ class biggs6(test_fun):
                           numpy.exp(numpy.multiply(term2,x[4]))*x[5])**2)
 
 class hart6(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1])
+    @property
+    def domain(self):
+        return [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]
         
     def _function(self,x):
         coeff = numpy.array([[10,0.05,17,3.5,1.7,8],[0.05,10,17,0.1,8,14],
@@ -734,8 +762,9 @@ class hart6(test_fun):
 # caused RuntimeWarning: invalid value encountered in double_scalars
 # trying to not do all terms at once causes deviation for unknown reasons
 ##class palmer2a(test_fun):
-##    def __init__(self):
-##        super().__init__(6,[0, 0, -20.7797273226, -25.3729423234,
+##    @property
+##    def domain(self):
+##        return ([0, 0, -20.7797273226, -25.3729423234,
 ##                            3.6520539577,-10.081937131],
 ##                         [32.4286981517, 10.7435278989, -0.779727322599999,
 ##                          -5.3729423234, 23.6520539577, 9.918062869])
@@ -812,11 +841,14 @@ class hart6(test_fun):
 
 # needs more precise floats
 class palmer5c(test_fun):
-    def __init__(self):
-        super().__init__([27.5370157298, -11.7302338172, 30.7938174564,
-                            -9.1697871977, -6.2910484684, -10.1772297675],
-                         [42.78331415682, 7.44278956452, 45.71443571076,
-                          9.74719152207, 12.33805637844, 8.84049320925])
+    @property
+    def domain(self):
+        return [[27.5370157298, 42.78331415682],
+                [-11.7302338172, 7.44278956452],
+                [30.7938174564, 45.71443571076],
+                [-9.1697871977, 9.74719152207],
+                [-6.2910484684, 12.33805637844],
+                [-10.1772297675, 8.84049320925]]
 
     def _function(self,x):
         term0 = [83.57418,81.007654,18.983286,8.051067,2.044762,0,1.170451,
@@ -849,11 +881,12 @@ class palmer5c(test_fun):
 
 # needs more precise floats
 class palmer6a(test_fun):
-    def __init__(self):
-        super().__init__([-44.1581372624, 0.120997701, -1.1808208888,
-                            -8.633061426, 1e-05, 1e-05],
-                         [-24.1581372624, 20.120997701, 18.8191791112,
-                          11.366938574, 43.2710391882, 10.7437425261])
+    @property
+    def domain(self):
+        return [[-44.1581372624, -24.1581372624], [0.120997701, 20.120997701],
+                [-1.1808208888, 18.8191791112],
+                [-8.633061426, 11.366938574], [1e-05, 43.2710391882],
+                [1e-05, 10.7437425261]]
 
     def _function(self,x):
         term0 = [10.678659,75.414511,41.513459,20.104735,7.432436,1.298082,
@@ -879,11 +912,12 @@ class palmer6a(test_fun):
 
 # needs more precise floats
 class palmer8a(test_fun):
-    def __init__(self):
-        super().__init__([1e-05, 1e-05, -17.7129671187, -5.0299734848,
-                            2.8287670723, -9.0495003432],
-                         [12.4961104793, 10.2011908033, 2.2870328813,
-                          14.9700265152, 22.8287670723, 10.9504996568])
+    @property
+    def domain(self):
+        return [[1e-05, 12.4961104793], [1e-05, 10.2011908033],
+                [-17.7129671187, 2.2870328813],
+                [-5.0299734848, 14.9700265152],
+                [2.8287670723, 22.8287670723], [-9.0495003432, 10.9504996568]]
 
     def _function(self,x):
         term0 = [4.757534,3.121416,1.207606,0.131916,0,0.258514,
@@ -909,10 +943,10 @@ class palmer8a(test_fun):
 
 # needs more precise floats
 class s272(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, 0, 0, 0],
-                         [10.999999907, 20.0000005284, 13.9999995189,
-                          10.9999998493, 14.9999995532, 12.99999966])
+    @property
+    def domain(self):
+        return [[0, 10.999999907], [0, 20.0000005284], [0, 13.9999995189],
+                [0, 10.9999998493], [0, 14.9999995532], [0, 12.99999966]]
 
     def _function(self,x):
         term1 = [-1.07640035028567,-1.49004122924658,-1.395465514579,
@@ -927,12 +961,12 @@ class s272(test_fun):
 
 
 class st_bsj3(test_fun):
-    def __init__(self):
-        super().__init__([0, 0, 0, 0, 0, 0], [99, 99, 99, 99, 99, 99])
+    @property
+    def domain(self):
+        return [[0, 99], [0, 99], [0, 99], [0, 99], [0, 99], [0, 99]]
 
 
     def _function(self,x):
         y = (10.5*x[0] - 1.5*x[0]**2 - x[1]**2 - 3.95*x[1] - x[2]**2 + 3*x[2]-
              2*x[3]**2 + 5*x[3] - x[4]**2 + 1.5*x[4] - 2.5*x[5]**2-1.5*x[5])
         return y
-

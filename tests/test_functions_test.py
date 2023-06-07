@@ -18,6 +18,38 @@ for name, cls in inspect.getmembers(
         f = cls()
         functions.append(f)
 
+def test_name():
+    """Test name is the name of the function"""
+    for f in functions:
+        a = eval(f.name + '()')
+        assert type(a) is type(f)
+
+def test_domain():
+    """Test return domain as list of lists"""
+    a = branin()
+    assert a.domain == [[-5,10],[0,15]]
+
+def test_lower_bounds():
+    """Test return lower bounds"""
+    a = branin()
+    assert a.lower_bounds == [-5,0]
+
+def test_upper_bounds():
+    """Test return upper bounds"""
+    a = branin()
+    assert a.upper_bounds == [10,15]
+
+def test_good_bounds():
+    """Test if all lower bounds are lower than upper bounds"""
+    for f in functions:
+        domain = f.domain
+        for bound in domain:
+            assert bound[0] < bound[1]
+
+def test_dim():
+    """Test return dimension"""
+    a = allinit()
+    assert a.dim == 3
 
 def test_call():
     """Test all functions do not raise error for inputs in bounds"""
@@ -40,16 +72,11 @@ def test_call_error_above():
         with pytest.raises(ValueError):
             f(above_bounds)
 
-def test_bounds():
-    """Test return bounds as list of tuples"""
-    a = branin()
-    assert a.bounds == [(-5,10),(0,15)]
-
 def test_surrogate():
     """Test use of function class with surrogate"""
     a = branin()
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4))
-    surrogate = Surrogate(a.bounds, grid_gen)
+    surrogate = Surrogate(a.domain, grid_gen)
     data = [a(point) for point in surrogate.points]
     surrogate.train_from_data(data)
     assert numpy.isclose(surrogate([6,0.5]),a([6,0.5]))
