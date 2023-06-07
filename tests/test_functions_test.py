@@ -14,7 +14,7 @@ functions = []
 for name, cls in inspect.getmembers(
         importlib.import_module("smolyay.test_function_class"), 
         inspect.isclass):
-    if not name == 'test_fun':
+    if not inspect.isabstract(cls):
         f = cls()
         functions.append(f)
 
