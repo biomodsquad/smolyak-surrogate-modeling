@@ -95,7 +95,7 @@ class beale(test_fun):
 class box2(test_fun):
     @property
     def domain(self):
-        return [-10, 10], [0, 10]
+        return [[-10, 10], [0, 10]]
         
     def _function(self,x):
         term1 = [0.536957976864517,0.683395469841369,0.691031152313854,
@@ -290,24 +290,24 @@ class allinit(test_fun):
                 x[0]**2*x[1]**2 + numpy.sin(x[2])**2 + x[1]**4 +
                 (-4 + numpy.sin(2)**2 + x[1]**2*x[2]**2 + x[0])**2 +
                 (x[2]**2 + (x[0] + 2)**2)**2 + numpy.sin(2)**4 - 1)
-    
-class box3(test_fun):
-    @property
-    def domain(self):
-        return [[-9.0000004305, 9.89999961255],
-                [3.23989999984065e-06, 18.00000291591],
-                [-8.9999997323, 9.90000024093]]
-        
+
+class _box(test_fun):
     def _function(self,x):
         coeffs = [-0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-0.7,-0.8,-0.9,-1]
         coeff2 = [0.536957976864517,0.683395469841369,0.691031152313854,
                   0.652004407146905,0.599792712713548,0.54633288391736,
                   0.495673421825855,0.448993501489319,0.406446249936512,
                   0.36783404124168]
-        y = numpy.sum((numpy.exp(numpy.multiply(coeffs,x[0]))-
-                       numpy.exp(numpy.multiply(coeffs,x[1]))-
-                       numpy.multiply(coeff2,x[2]))**2)
-        return y
+        return numpy.sum((numpy.exp(numpy.multiply(coeffs,x[0]))-
+                          numpy.exp(numpy.multiply(coeffs,x[1]))-
+                          numpy.multiply(coeff2,x[2]))**2)
+   
+class box3(_box):
+    @property
+    def domain(self):
+        return [[-9.0000004305, 9.89999961255],
+                [3.23989999984065e-06, 18.00000291591],
+                [-8.9999997323, 9.90000024093]]
     
 class eg1(test_fun):
     @property
@@ -351,21 +351,11 @@ class least(test_fun):
         return numpy.sum((term0 - x[1]*numpy.exp(numpy.multiply(term1,x[2])) -
                           x[0])**2)
 
-class s242(test_fun):
-    # is exactly the same as box3 with different bounds
+class s242(_box):
     @property
     def domain(self):
         return [[0, 10], [0, 10], [0, 10]]
 
-    def _function(self,x):
-        coeffs = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
-        coeff2 = [0.536957976864517,0.683395469841369,0.691031152313854,
-                  0.652004407146905,0.599792712713548,0.54633288391736,
-                  0.495673421825855,0.448993501489319,0.406446249936512,
-                  0.36783404124168]
-        return numpy.sum((numpy.exp(numpy.multiply(coeffs,-x[0]))-
-                          numpy.exp(numpy.multiply(coeffs,-x[1]))-
-                          numpy.multiply(coeff2,-x[2]))**2)
 
 class s244(test_fun):
     @property
