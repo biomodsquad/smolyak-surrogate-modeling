@@ -1,4 +1,5 @@
 import pytest
+import warnings
 
 import numpy
 import importlib
@@ -8,7 +9,6 @@ from smolyay.test_function_class import *
 from smolyay.basis import ChebyshevFirstKind
 from smolyay.grid import SmolyakGridGenerator
 from smolyay.surrogate import Surrogate
-
 
 functions = []
 for name, cls in inspect.getmembers(
@@ -51,6 +51,7 @@ def test_dim():
     a = allinit()
     assert a.dim == 3
 
+@pytest.mark.filterwarnings("error")
 def test_call():
     """Test all functions do not raise error for inputs in bounds"""
     for f in functions:
