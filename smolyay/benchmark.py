@@ -402,7 +402,7 @@ class ex8_1_6(BenchmarkFunction):
         v[0] = -8. + x[1]
         v[1] = v[0] * v[0]
         v[3] += v[1]
-        if (v[3] == 0):
+        if not (v[3] == 0):
             v[1] = 1. / v[3]
         else:
             v[1] = 1
@@ -2612,7 +2612,7 @@ class kowosb(BenchmarkFunction):
         v[1] = 4. * x[2]
         v[1] += 16.;
         v[1] += x[3]
-        if (v[1] == 0.):
+        if not (v[1] == 0.):
             v[2] = v[0] / v[1]
         else:
             v[2] = v[0]
@@ -2624,7 +2624,7 @@ class kowosb(BenchmarkFunction):
         v[1] = 2. * x[2]
         v[1] += 4.;
         v[1] += x[3]
-        if (v[1] == 0.):
+        if not (v[1] == 0.):
             v[3] = v[0] / v[1]
         else:
             v[3] = v[0]
@@ -2635,7 +2635,7 @@ class kowosb(BenchmarkFunction):
         v[0] = x[0] * v[3]
         v[3] = 1. + x[2]
         v[3] += x[3]
-        if (v[3] == 0):
+        if not (v[3] == 0):
             v[1] = v[0] / v[3]
         else:
             v[1] = v[0]
@@ -2648,7 +2648,7 @@ class kowosb(BenchmarkFunction):
         v[0] = 0.5 * x[2]
         v[0] += 0.25;
         v[0] += x[3]
-        if (v[0] == 0):
+        if not (v[0] == 0):
             v[3] = v[1] / v[0]
         else:
             v[3] = v[1]
@@ -2661,7 +2661,7 @@ class kowosb(BenchmarkFunction):
         v[1] = 0.25 * x[2]
         v[1] += 0.0625;
         v[1] += x[3]
-        if (v[1] == 0):
+        if not (v[1] == 0):
             v[0] = v[3] / v[1]
         else:
             v[0] = v[3]
@@ -2674,7 +2674,7 @@ class kowosb(BenchmarkFunction):
         v[3] = 0.167 * x[2]
         v[3] += 0.027889000000000004;
         v[3] += x[3]
-        if (v[3] == 0):
+        if not (v[3] == 0):
             v[1] = v[0] / v[3]
         else:
             v[1] = v[0]
@@ -2687,7 +2687,7 @@ class kowosb(BenchmarkFunction):
         v[0] = 0.125 * x[2]
         v[0] += 0.015625;
         v[0] += x[3]
-        if (v[0] == 0):
+        if not (v[0] == 0):
             v[3] = v[1] / v[0]
         else:
             v[3] = v[1]
@@ -2700,7 +2700,7 @@ class kowosb(BenchmarkFunction):
         v[1] = 0.1 * x[2]
         v[1] += 0.010000000000000002;
         v[1] += x[3]
-        if (v[1] == 0):
+        if not (v[1] == 0):
             v[0] = v[3] / v[1]
         else:
             v[0] = v[3]
@@ -2713,7 +2713,7 @@ class kowosb(BenchmarkFunction):
         v[3] = 0.0833 * x[2]
         v[3] += 0.00693889;
         v[3] += x[3]
-        if (v[3] == 0):
+        if not (v[3] == 0):
             v[1] = v[0] / v[3]
         else:
             v[1] = v[0]
@@ -3095,7 +3095,7 @@ class s350(BenchmarkFunction):
         v[1] = 4. * x[2]
         v[1] += 16.;
         v[1] += x[3]
-        if (v[1] == 0):
+        if not (v[1] == 0):
             v[2] = v[0] / v[1]
         else:
             v[2] = v[0]
@@ -3107,7 +3107,7 @@ class s350(BenchmarkFunction):
         v[1] = 2. * x[2]
         v[1] += 4.;
         v[1] += x[3]
-        if (v[1] == 0):
+        if not (v[1] == 0):
             v[3] = v[0] / v[1]
         else:
             v[3] = v[0]
@@ -3118,7 +3118,7 @@ class s350(BenchmarkFunction):
         v[0] = x[0] * v[3]
         v[3] = 1. + x[2]
         v[3] += x[3]
-        if (v[3] == 0):
+        if not (v[3] == 0):
             v[1] = v[0] / v[3]
         else:
             v[1] = v[0]
@@ -3131,7 +3131,7 @@ class s350(BenchmarkFunction):
         v[0] = 0.5 * x[2]
         v[0] += 0.25;
         v[0] += x[3]
-        if (v[0] == 0):
+        if not (v[0] == 0):
             v[3] = v[1] / v[0]
         else:
             v[3] = v[1]
@@ -3144,7 +3144,7 @@ class s350(BenchmarkFunction):
         v[1] = 0.25 * x[2]
         v[1] += 0.0625;
         v[1] += x[3]
-        if (v[1] == 0):
+        if not (v[1] == 0):
             v[0] = v[3] / v[1]
         else:
             v[0] = v[3]
@@ -3157,7 +3157,7 @@ class s350(BenchmarkFunction):
         v[3] = 0.167 * x[2]
         v[3] += 0.027889000000000004;
         v[3] += x[3]
-        if (v[3] == 0):
+        if not (v[3] == 0):
             v[1] = v[0] / v[3]
         else:
             v[1] = v[0]
@@ -3170,7 +3170,7 @@ class s350(BenchmarkFunction):
         v[0] = 0.125 * x[2]
         v[0] += 0.015625;
         v[0] += x[3]
-        if (v[0] == 0):
+        if not (v[0] == 0):
             v[3] = v[1] / v[0]
         else:
             v[3] = v[1]
@@ -3183,7 +3183,7 @@ class s350(BenchmarkFunction):
         v[1] = 0.1 * x[2]
         v[1] += 0.010000000000000002;
         v[1] += x[3]
-        if (v[1] == 0):
+        if not (v[1] == 0):
             v[0] = v[3] / v[1]
         else:
             v[0] = v[3]
@@ -3196,7 +3196,7 @@ class s350(BenchmarkFunction):
         v[3] = 0.0833 * x[2]
         v[3] += 0.00693889;
         v[3] += x[3]
-        if (v[3] == 0):
+        if not (v[3] == 0):
             v[1] = v[0] / v[3]
         else:
             v[1] = v[0]
@@ -3209,7 +3209,7 @@ class s350(BenchmarkFunction):
         v[0] = 0.0714 * x[2]
         v[0] += 0.00509796;
         v[0] += x[3]
-        if (v[0] == 0):
+        if not (v[0] == 0):
             v[3] = v[1] / v[0]
         else:
             v[3] = v[1]
@@ -3222,7 +3222,7 @@ class s350(BenchmarkFunction):
         v[1] = 0.0625 * x[2]
         v[1] += 0.00390625;
         v[1] += x[3]
-        if (v[1] == 0):
+        if not (v[1] == 0):
             v[0] = v[3] / v[1]
         else:
             v[0] = v[3]
