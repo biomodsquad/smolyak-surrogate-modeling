@@ -32,7 +32,7 @@ class BenchmarkFunction(abc.ABC):
                 xi < bound[0]-1e-10 or xi > bound[1]+1e-10 for xi,bound in
                 zip(x,self.domain))
         else:
-            oob = x > self.upper_bounds[0] or x < self.lower_bounds[0]
+            oob = x < self.domain[0][0] or x > self.domain[0][1]
         if oob:
             raise ValueError("Input out domain of function.")
         return self._function(x)
