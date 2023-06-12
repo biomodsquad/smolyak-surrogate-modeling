@@ -361,7 +361,16 @@ class Surrogate:
         if old.ndim != 2 or old.shape[1] != 2:
             raise TypeError('Domain should be a dim x 2 array')
 
-        return new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
+        new_x = new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
+        # clamp lower bound
+        flags = numpy.array(new_x < new[:, 0])
+        test = numpy.broadcast_to(new[:, 0],flags.shape)
+        new_x[flags] = test[flags]
+        # clamp upper bound
+        flags = numpy.array(new_x > new[:, 1])
+        test = numpy.broadcast_to(new[:, 1],flags.shape)
+        new_x[flags] = test[flags]
+        return new_x
 
     def _reset_grid(self):
         """Reset the grids, coefficients and points."""
