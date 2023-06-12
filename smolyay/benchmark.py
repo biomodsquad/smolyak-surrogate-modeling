@@ -27,7 +27,7 @@ class BenchmarkFunction(abc.ABC):
         ValueError
             If the input is outside the function domain.
         """
-        if self.dim > 1:
+        if self.dimension > 1:
             oob = any(
                 xi < bound[0]-1e-10 or xi > bound[1]+1e-10 for xi,bound in
                 zip(x,self.domain))
@@ -43,21 +43,19 @@ class BenchmarkFunction(abc.ABC):
         return type(self).__name__
 
     @property
-    def dim(self):
-        """Number of variables"""
+    def dimension(self):
+        """int: Number of variables."""
         return len(self.domain)
 
     @property
     def lower_bounds(self):
-        """ the lower bounds of the domain of each variable"""
-        lower, _ = zip(*self.domain)
-        return list(lower)
+        """list: the lower bounds of the domain of each variable."""
+        return [bound[0] for bound in self.domain]
     
     @property
     def upper_bounds(self):
-        """the upper bounds of the domain of each variable"""
-        _, upper = zip(*self.domain)
-        return list(upper)
+        """list: the upper bounds of the domain of each variable."""
+        return [bound[1] for bound in self.domain]
 
     @property
     @abc.abstractmethod

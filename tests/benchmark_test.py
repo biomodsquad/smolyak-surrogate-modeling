@@ -46,10 +46,10 @@ def test_good_bounds():
         for bound in domain:
             assert bound[0] < bound[1]
 
-def test_dim():
+def test_dimension():
     """Test return dimension"""
     a = allinit()
-    assert a.dim == 3
+    assert a.dimension == 3
 
 @pytest.mark.filterwarnings("error")
 def test_call():
