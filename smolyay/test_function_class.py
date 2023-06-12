@@ -74,7 +74,10 @@ class test_fun(abc.ABC):
     @property
     @abc.abstractmethod
     def domain(self):
-        """the lower and upper bounds of each variable"""
+        """list: Domain of the function.
+        
+        The domain must be specified as lower and upper bounds for each variable as a list of lists.
+        """
         pass
  
     @abc.abstractmethod
