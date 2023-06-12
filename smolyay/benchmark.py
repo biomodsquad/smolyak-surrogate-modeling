@@ -2,29 +2,17 @@ import abc
 
 import numpy
 
-class test_fun(abc.ABC):
-    """Abstract test function class
+class BenchmarkFunction(abc.ABC):
+    """Benchmark Function
 
-    Stores data about each test function including call, name, the number of
-    dimensions, the domain, and how to normalize that domain to the interval
-    [-1,1]
+    Implementation of benchmark problems used for optimization, testing, and 
+    analysis of surrogate function solvers. These benchmark problems come from
+    https://sahinidis.coe.gatech.edu/dfo
 
-    Parameters
-    ----------
-    name : str
-        the name of the class
+    These functions operate on a defined `domain` they can be evaluated on,
+    and the upper and lower bounds of this domain can be the domain in which
+    solutions exist or can be arbitrary.
 
-    dim : int
-        the number of variables used as input
-
-    lower_bounds : list of floats of size 1xdim
-        the lower bounds of the domain of each variable
-
-    upper_bounds : list of floats of size 1xdim
-        the upper bounds of the domain of each variable
-
-    domain : list of lists
-        the domain of the inputs for each dimension
     """
     def __call__(self,x):
         """Evaluate the function.
@@ -84,7 +72,7 @@ class test_fun(abc.ABC):
     def _function(self,x):
         pass
 
-class beale(test_fun):
+class beale(BenchmarkFunction):
     @property
     def domain(self):
         return ([[-7.0000000008, 11.69999999928],
@@ -95,7 +83,7 @@ class beale(test_fun):
                 (-2.25 + (1 - (x[1])**2)*x[0])**2 +
                 (-2.625+(1-x[1]**3)*x[0])**2)
 
-class box2(test_fun):
+class box2(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10, 10], [0, 10]]
@@ -110,7 +98,7 @@ class box2(test_fun):
                        numpy.exp(numpy.multiply(term2,x[1]))-term1)**2)
         return y
 
-class branin(test_fun):
+class branin(BenchmarkFunction):
     @property
     def domain(self):
         return [[-5, 10], [0, 15]]
@@ -121,7 +109,7 @@ class branin(test_fun):
         return y1 + y2
 
 # new
-class brownbs(test_fun):
+class brownbs(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10000000.0, 10000000.0], [-10000.0, 10000.0]]
@@ -140,7 +128,7 @@ class brownbs(test_fun):
         return v[1]
 
 
-class _camel(test_fun):
+class _camel(BenchmarkFunction):
     def _function(self,x):
         return (4*x[0]**2-2.1*x[0]**4+0.333333333333333*x[0]**6 +
                 x[0]*x[1]-4*x[1]**2+4*x[1]**4)
@@ -155,7 +143,7 @@ class camel6(_camel):
     def domain(self):
         return [[-3, 3], [-1.5, 1.5]]
 
-class chi(test_fun):
+class chi(BenchmarkFunction):
     @property
     def domain(self):
         return [[-30, 30], [-30, 30]]
@@ -165,7 +153,7 @@ class chi(test_fun):
                 8*numpy.sin(15.707963267949*x[0]) -
                 0.447213595499958*numpy.exp(-0.5*(-0.5+x[1])**2) + 11)
     
-class cliff(test_fun):
+class cliff(BenchmarkFunction):
     @property
     def domain(self):
         return [[-7, 11.7], [-6.8502133863, 11.83480795233]]
@@ -173,7 +161,7 @@ class cliff(test_fun):
     def _function(self,x):
         return (-0.03+0.01*x[0])**2-x[0]+numpy.exp(20*x[0]-20*x[1])+x[1]
     
-class cube(test_fun):
+class cube(BenchmarkFunction):
     @property
     def domain(self):
         return [[-18, 9.9], [-18, 9.9]]
@@ -181,7 +169,7 @@ class cube(test_fun):
     def _function(self,x):
         return (-1+x[0])**2+100*(x[1]-x[0]**3)**2
     
-class denschna(test_fun):
+class denschna(BenchmarkFunction):
     @property
     def domain(self):
         return [[-20, 9], [-20, 9]]
@@ -190,7 +178,7 @@ class denschna(test_fun):
         return x[0]**4+(x[0]+x[1])**2+(numpy.exp(x[1])-1)**2
 
 # new
-class denschnb(test_fun):
+class denschnb(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.0, 10.8], [-11.0, 8.1]]
@@ -209,7 +197,7 @@ class denschnb(test_fun):
         return v[1]
 
 # new
-class denschnc(test_fun):
+class denschnc(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
@@ -231,7 +219,7 @@ class denschnc(test_fun):
         return v[2]
 
 # new
-class denschnf(test_fun):
+class denschnf(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10000.0, 10000.0], [-10000.0, 10000.0]]
@@ -258,7 +246,7 @@ class denschnf(test_fun):
         return v[2]
 
 # new
-class ex4_1_5(test_fun):
+class ex4_1_5(BenchmarkFunction):
     @property
     def domain(self):
         return [[-5.0, 10.0], [-10.0, 0.0]]
@@ -282,7 +270,7 @@ class ex4_1_5(test_fun):
         return v[1]
 
 # new
-class ex8_1_1(test_fun):
+class ex8_1_1(BenchmarkFunction):
     @property
     def domain(self):
         return [[-1.0, 2.0], [-1.0, 1.0]]
@@ -304,7 +292,7 @@ class ex8_1_1(test_fun):
 
         return v[1]
 # new
-class ex8_1_3(test_fun):
+class ex8_1_3(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.6, 8.46], [-10.4, 8.64]]
@@ -352,7 +340,7 @@ class ex8_1_3(test_fun):
         return v[4]
 
 # new
-class ex8_1_4(test_fun):
+class ex8_1_4(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
@@ -375,7 +363,7 @@ class ex8_1_4(test_fun):
         v[1] += v[0]
         return v[1]
 # new
-class ex8_1_5(test_fun):
+class ex8_1_5(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9101579868, 9.08085781188], [-10.7126564026, 8.35860923766]]
@@ -401,7 +389,7 @@ class ex8_1_5(test_fun):
 
         return v[1]
 # new
-class ex8_1_6(test_fun):
+class ex8_1_6(BenchmarkFunction):
     @property
     def domain(self):
         return [[-6.0000519964, 12.59995320324], [-6.0000519964, 12.59995320324]]
@@ -444,7 +432,7 @@ class ex8_1_6(test_fun):
         v[2] += v[3]
         return v[2]
 # new
-class expfit(test_fun):
+class expfit(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.5210154534, 9.43108609194], [-9.3116998055, 9.61947017505]]
@@ -512,7 +500,7 @@ class expfit(test_fun):
         return v[0]
 
 # new
-class gold(test_fun):
+class gold(BenchmarkFunction):
     @property
     def domain(self):
         return [[-2.0, 2.0], [-2.0, 2.0]]
@@ -559,7 +547,7 @@ class gold(test_fun):
         v[4] = v[1] * v[3]
         return v[4]
 # new
-class griewank(test_fun):
+class griewank(BenchmarkFunction):
     @property
     def domain(self):
         return [[-100.0, 90.0], [-100.0, 90.0]]
@@ -580,7 +568,7 @@ class griewank(test_fun):
         v[1] += 1.;
         return v[1]
 # new
-class hairy(test_fun):
+class hairy(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
@@ -608,7 +596,7 @@ class hairy(test_fun):
         v[0] += v[1]
         return v[0]
 # new
-class himmelbb(test_fun):
+class himmelbb(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.7002462348, 9.26977838868], [-9.29902796, 9.630874836]]
@@ -627,7 +615,7 @@ class himmelbb(test_fun):
         v[2] = v[0] * v[0]
         return v[2]
 # new
-class himmelbg(test_fun):
+class himmelbg(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
@@ -646,7 +634,7 @@ class himmelbg(test_fun):
 
         return v[2]
 
-class himmelp1(test_fun):
+class himmelp1(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 95], [0, 75]]
@@ -666,7 +654,7 @@ class himmelp1(test_fun):
                 6.8306567613*x[1] -75.1963666677)
 
 # new
-class hs001(test_fun):
+class hs001(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0000000086, 10.9999999914], [-1.5, 10.9999999828]]
@@ -682,7 +670,7 @@ class hs001(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 
-class hs002(test_fun):
+class hs002(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.7756292513, 11.2243707487], [1.5, 11.5]]
@@ -690,7 +678,7 @@ class hs002(test_fun):
     def _function(self,x):
         return 100*(x[1]-x[0]**2)**2+(1-x[0])**2
 
-class hs003(test_fun):
+class hs003(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10, 10], [0, 10]]
@@ -698,7 +686,7 @@ class hs003(test_fun):
     def _function(self,x):
         return 1e-5*(x[1]-x[0])**2+x[1]
 
-class hs004(test_fun):
+class hs004(BenchmarkFunction):
     @property
     def domain(self):
         return [[1, 11], [0, 10]]
@@ -707,7 +695,7 @@ class hs004(test_fun):
         return 0.333333333333333*(1+x[0])**3+x[1]
 
 # new
-class hs005(test_fun):
+class hs005(BenchmarkFunction):
     @property
     def domain(self):
         return [[-1.5, 4.0], [-3.0, 3.0]]
@@ -724,7 +712,7 @@ class hs005(test_fun):
         rv += 2.5*x[1]
         return rv;
 
-class hs3mod(test_fun):
+class hs3mod(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10, 10], [0, 10]]
@@ -733,7 +721,7 @@ class hs3mod(test_fun):
         return (x[1]-x[0])**2 + x[1]
 
 # new
-class hs5(test_fun):
+class hs5(BenchmarkFunction):
     @property
     def domain(self):
         return [[-1.5, 4.0], [-3.0, 3.0]]
@@ -750,7 +738,7 @@ class hs5(test_fun):
         rv += 2.5*x[1]
         return rv;
 # new
-class humps(test_fun):
+class humps(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0000000029, 8.99999999739], [-10.000000004, 8.9999999964]]
@@ -771,7 +759,7 @@ class humps(test_fun):
         v[1] += v[0]
         return v[1]
 
-class jensmp(test_fun):
+class jensmp(BenchmarkFunction):
     @property
     def domain(self):
         return [[0.1, 0.9], [0.1, 0.9]]
@@ -781,7 +769,7 @@ class jensmp(test_fun):
                            numpy.exp((i+1)*x[1]))**2 for i in range(10)])
 
 # new
-class levy3(test_fun):
+class levy3(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 10.0], [-10.0, 10.0]]
@@ -838,7 +826,7 @@ class levy3(test_fun):
         v[0] = -v[2]
         return v[0]
 # new
-class loghairy(test_fun):
+class loghairy(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9999999999, 9.00000000009], [-9.9999999974, 9.00000000234]]
@@ -870,7 +858,7 @@ class loghairy(test_fun):
         return v[0]
 
 
-class logros(test_fun):
+class logros(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 11], [0, 11]]
@@ -879,7 +867,7 @@ class logros(test_fun):
         return numpy.log(1+10000*(x[1]-x[0]**2)**2+(1-x[0])**2)
 
 # new
-class maratosb(test_fun):
+class maratosb(BenchmarkFunction):
     @property
     def domain(self):
         return [[-11.000000125, 8.0999998875], [-10.0, 9.0]]
@@ -895,7 +883,7 @@ class maratosb(test_fun):
         rv = v[0] + x[0]
         return rv;
 
-class mdhole(test_fun):
+class mdhole(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 10], [-10, 10]]
@@ -903,7 +891,7 @@ class mdhole(test_fun):
     def _function(self,x):
         return 100*(numpy.sin(x[0])-x[1])**2+x[0]
 
-class median_vareps(test_fun):
+class median_vareps(BenchmarkFunction):
     @property
     def domain(self):
         return [[1e-08, 10.00000001], [-9.499789331, 10.500210669]]
@@ -917,7 +905,7 @@ class median_vareps(test_fun):
         return x[0] + numpy.sum(numpy.sqrt(x[0]**2 + (term1 + x[1])**2))
 
 # new
-class mexhat(test_fun):
+class mexhat(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.1417744688, 9.77240297808], [-9.2634512042, 9.66289391622]]
@@ -941,7 +929,7 @@ class mexhat(test_fun):
 
         return v[3]
 # new
-class nasty(test_fun):
+class nasty(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
@@ -956,7 +944,7 @@ class nasty(test_fun):
         v[0] = v[2] + v[1]
         return v[0]
 # new
-class price(test_fun):
+class price(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
@@ -978,7 +966,7 @@ class price(test_fun):
 
         return v[2]
 # new
-class rbrock(test_fun):
+class rbrock(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 5.0], [-10.0, 10.0]]
@@ -994,7 +982,7 @@ class rbrock(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class rosenbr(test_fun):
+class rosenbr(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 5.0], [-10.0, 10.0]]
@@ -1010,7 +998,7 @@ class rosenbr(test_fun):
         v[4] = v[2] + v[3]
         return v[4]
 # new
-class s201(test_fun):
+class s201(BenchmarkFunction):
     @property
     def domain(self):
         return [[-5.0, 13.5], [-4.0, 14.4]]
@@ -1025,7 +1013,7 @@ class s201(test_fun):
         v[1] = v[0] + v[2]
         return v[1]
 # new
-class s202(test_fun):
+class s202(BenchmarkFunction):
     @property
     def domain(self):
         return [[-4.9999999725, 13.50000002475], [-6.0000000005, 12.59999999955]]
@@ -1052,7 +1040,7 @@ class s202(test_fun):
         v[1] = v[0] + v[2]
         return v[1]
 # new
-class s204(test_fun):
+class s204(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10000.0, 10000.0], [-10000.0, 10000.0]]
@@ -1111,7 +1099,7 @@ class s204(test_fun):
         v[6] += v[7]
         return v[6]
 # new
-class s205(test_fun):
+class s205(BenchmarkFunction):
     @property
     def domain(self):
         return [[-7.0000000003, 11.69999999973], [-9.5000000001, 9.44999999991]]
@@ -1137,7 +1125,7 @@ class s205(test_fun):
 
         return v[1]
 # new
-class s206(test_fun):
+class s206(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
@@ -1153,7 +1141,7 @@ class s206(test_fun):
         v[2] = v[0] + v[1]
         return v[2]
 # new
-class s207(test_fun):
+class s207(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0000000009, 9.89999999919], [-9.0000000021, 9.89999999811]]
@@ -1168,7 +1156,7 @@ class s207(test_fun):
         v[1] = v[0] + v[2]
         return v[1]
 # new
-class s208(test_fun):
+class s208(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0000000001, 9.89999999991]]
@@ -1184,7 +1172,7 @@ class s208(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class s209(test_fun):
+class s209(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
@@ -1200,7 +1188,7 @@ class s209(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class s210(test_fun):
+class s210(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0000000407, 9.89999996337], [-9.0000000813, 9.89999992683]]
@@ -1216,7 +1204,7 @@ class s210(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class s211(test_fun):
+class s211(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
@@ -1232,7 +1220,7 @@ class s211(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class s212(test_fun):
+class s212(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
@@ -1256,7 +1244,7 @@ class s212(test_fun):
         v[1] = v[0] + v[2]
         return v[1]
 # new
-class s213(test_fun):
+class s213(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.9315761266, 9.96158148606], [-8.9315761266, 9.96158148606]]
@@ -1272,7 +1260,7 @@ class s213(test_fun):
         v[0] = pow(v[1], 4)
         return v[0]
 # new
-class s214(test_fun):
+class s214(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
@@ -1288,7 +1276,7 @@ class s214(test_fun):
         v[0] = pow(v[1], 0.25);
         return v[0]
 # new
-class s229(test_fun):
+class s229(BenchmarkFunction):
     @property
     def domain(self):
         return [[-2.0, 2.0], [-2.0, 2.0]]
@@ -1304,7 +1292,7 @@ class s229(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class s274(test_fun):
+class s274(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0000000052, 8.99999999532],[-10.0000000026, 8.99999999766]]
@@ -1321,7 +1309,7 @@ class s274(test_fun):
         v[3] = v[0] + v[1]
         return v[3]
 # new
-class s290(test_fun):
+class s290(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
@@ -1334,7 +1322,7 @@ class s290(test_fun):
         v[1] = v[0] + v[2]
         return v[1]
 # new
-class s308(test_fun):
+class s308(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.8445627595, 9.13989351645], [-10.6945637774, 8.37489260034]]
@@ -1356,7 +1344,7 @@ class s308(test_fun):
 
         return v[1]
 # new
-class s309(test_fun):
+class s309(BenchmarkFunction):
     @property
     def domain(self):
         return [[-6.517315694, 12.1344158754], [-6.1, 12.51]]
@@ -1378,7 +1366,7 @@ class s309(test_fun):
         rv = v[1] + -51.93*x[0]
         return rv;
 # new
-class s311(test_fun):
+class s311(BenchmarkFunction):
     @property
     def domain(self):
         return [[-7.0, 11.7], [-8.0, 10.8]]
@@ -1396,7 +1384,7 @@ class s311(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class s312(test_fun):
+class s312(BenchmarkFunction):
     @property
     def domain(self):
         return [[-31.0266522627, -9.92398703643], [-46.7600087813, -24.08400790317]]
@@ -1422,7 +1410,7 @@ class s312(test_fun):
         v[3] = v[2] + v[1]
         return v[3]
 
-class s328(test_fun):
+class s328(BenchmarkFunction):
     @property
     def domain(self):
         return [[1, 2.7], [1, 2.7]]
@@ -1432,7 +1420,7 @@ class s328(test_fun):
                     (100 + (x[0]**2)*(x[1]**2))/(x[0]**4*x[1]**4)) + 1.2)
 
 # new
-class s386(test_fun):
+class s386(BenchmarkFunction):
     @property
     def domain(self):
         return [[-5.0, 13.5], [-4.0, 14.4]]
@@ -1447,7 +1435,7 @@ class s386(test_fun):
         v[1] = v[0] + v[2]
         return v[1]
 
-class sim2bqp(test_fun):
+class sim2bqp(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10, 9], [0, 0.45]]
@@ -1455,7 +1443,7 @@ class sim2bqp(test_fun):
     def _function(self,x):
         return (x[1]-x[0])**2+x[1]+(x[0]+x[1])**2
 
-class simbqp(test_fun):
+class simbqp(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10, 9], [0, 0.45]]
@@ -1464,7 +1452,7 @@ class simbqp(test_fun):
         return (x[1]-x[0])**2+x[1]+(2*x[0]+x[1])**2
 
 # new
-class sineval(test_fun):
+class sineval(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0000000002, 8.99999999982], [-10.0000000002, 8.99999999982]]
@@ -1480,7 +1468,7 @@ class sineval(test_fun):
         v[0] = v[1] + v[2]
         return v[0]
 # new
-class sisser(test_fun):
+class sisser(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9978640372, 9.00192236652], [-9.9983980285, 9.00144177435]]
@@ -1498,7 +1486,7 @@ class sisser(test_fun):
         v[1] += v[2]
         return v[1]
 # new
-class st_e39(test_fun):
+class st_e39(BenchmarkFunction):
     @property
     def domain(self):
         return [[-6.0000519964, 12.59995320324], [-6.0000519964, 12.59995320324]]
@@ -1541,7 +1529,7 @@ class st_e39(test_fun):
         v[2] += v[3]
         return v[2]
 # new
-class tre(test_fun):
+class tre(BenchmarkFunction):
     @property
     def domain(self):
         return [[-5.0, 5.0], [-5.0, 5.0]]
@@ -1559,7 +1547,7 @@ class tre(test_fun):
         v[0] += v[1]
         return v[0]
 # new
-class zangwil2(test_fun):
+class zangwil2(BenchmarkFunction):
     @property
     def domain(self):
         return [[-6.0, 12.6], [-1.0, 17.1]]
@@ -1580,7 +1568,7 @@ class zangwil2(test_fun):
         rv += -17.066666666666666*x[1]
         return rv;
 
-class allinit(test_fun):
+class allinit(BenchmarkFunction):
     @property
     def domain(self):
         return [[-11.1426691153, 8.8573308847], [1, 11.2456257795],[-1e10, 1]]
@@ -1592,7 +1580,7 @@ class allinit(test_fun):
                 (x[2]**2 + (x[0] + 2)**2)**2 + numpy.sin(2)**4 - 1)
 
 # new
-class biggs3(test_fun):
+class biggs3(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0000000168, 9.89999998488], [-1.96500000271271e-07, 17.99999982315], [-5.0000001349, 13.49999987859]]
@@ -1730,7 +1718,7 @@ class biggs3(test_fun):
         v[2] += v[0]
         return v[2]
 
-class _box(test_fun):
+class _box(BenchmarkFunction):
     def _function(self,x):
         coeffs = [-0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-0.7,-0.8,-0.9,-1]
         coeff2 = [0.536957976864517,0.683395469841369,0.691031152313854,
@@ -1749,7 +1737,7 @@ class box3(_box):
                 [-8.9999997323, 9.90000024093]]
 
 # new
-class denschnd(test_fun):
+class denschnd(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0002179404, 8.99980385364], [-9.9733994128, 9.02394052848], [-10.0001458391, 8.99986874481]]
@@ -1779,7 +1767,7 @@ class denschnd(test_fun):
 
         return v[2]
 # new
-class denschne(test_fun):
+class denschne(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0], [-10.0, 9.0]]
@@ -1797,7 +1785,7 @@ class denschne(test_fun):
         v[0] += v[1]
         return v[0]
 
-class eg1(test_fun):
+class eg1(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.2302657121, 9.7697342879], [-1, 1], [1, 2]]
@@ -1807,7 +1795,7 @@ class eg1(test_fun):
                 numpy.sin(x[0]+x[2])*x[1] + x[1])
 
 # new
-class engval2(test_fun):
+class engval2(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0], [-9.0, 9.9]]
@@ -1854,7 +1842,7 @@ class engval2(test_fun):
         v[0] += v[1]
         return v[0]
 
-class fermat_vareps(test_fun):
+class fermat_vareps(BenchmarkFunction):
     @property
     def domain(self):
         return [[-7.9999999999, 12.0000000001],
@@ -1865,7 +1853,7 @@ class fermat_vareps(test_fun):
                 numpy.sqrt(x[2]**2 + (x[0] - 4)**2 + x[1]**2)+
                 numpy.sqrt(x[2]**2 + (x[0] - 2)**2 + (x[1] - 4)**2) + x[2])
 
-class fermat2_vareps(test_fun):
+class fermat2_vareps(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8, 12], [-9.00000002, 10.99999998], [1e-08, 10.00000001]]
@@ -1876,7 +1864,7 @@ class fermat2_vareps(test_fun):
                 numpy.sqrt(x[2]**2 + (x[0] - 2)**2 + (x[1] - 1)**2) + x[2])
 
 # new
-class growth(test_fun):
+class growth(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.53967303, 10.314294273], [-9.5571937886, 9.39852559026], [-9.836246351, 9.1473782841]]
@@ -1980,7 +1968,7 @@ class growth(test_fun):
         v[0] += v[1]
         return v[0]
 # new
-class growthls(test_fun):
+class growthls(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.53967303, 10.314294273], [-9.5571937886, 9.39852559026], [-9.836246351, 9.1473782841]]
@@ -2156,7 +2144,7 @@ class growthls(test_fun):
         v[0] += v[1]
         return v[0]
 # new
-class hatfldd(test_fun):
+class hatfldd(BenchmarkFunction):
     @property
     def domain(self):
         return [[-6.8005223172, 11.87952991452], [-11.0178316754, 8.08395149214], [-10.7584301644, 8.31741285204]]
@@ -2254,7 +2242,7 @@ class hatfldd(test_fun):
         v[2] += v[3]
         return v[2]
 
-class least(test_fun):
+class least(BenchmarkFunction):
     @property
     def domain(self):
         return [[473.98605675534, 506.6511741726],
@@ -2267,7 +2255,7 @@ class least(test_fun):
                           x[0])**2)
 
 # new
-class s240(test_fun):
+class s240(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0], [-10.0, 9.0]]
@@ -2294,7 +2282,7 @@ class s242(_box):
         return [[0, 10], [0, 10], [0, 10]]
 
 # new
-class s243(test_fun):
+class s243(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10000.0, 10000.0], [-10000.0, 10000.0], [-10000.0, 10000.0]]
@@ -2398,7 +2386,7 @@ class s243(test_fun):
         v[5] += v[6]
         return v[5]
 
-class s244(test_fun):
+class s244(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 10], [0, 10], [0, 10]]
@@ -2412,7 +2400,7 @@ class s244(test_fun):
                  numpy.exp(-0.3*x[1])*x[2])**2)
 
 # new
-class s245(test_fun):
+class s245(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0000000001, 0.0], [-7.90000065364893e-09, 0.0], [-8.9999999998, 0.0]]
@@ -2512,7 +2500,7 @@ class s245(test_fun):
         v[2] += v[1]
         return v[2]
 # new
-class s246(test_fun):
+class s246(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0000000002, 9.89999999982], [-9.0000000002, 9.89999999982], [-9.0000000004, 9.89999999964]]
@@ -2534,7 +2522,7 @@ class s246(test_fun):
         return v[1]
 
 # REALLY needs more precise floats
-class s333(test_fun):
+class s333(BenchmarkFunction):
     @property
     def domain(self):
         return [[79.901992908, 89.9117936172], [-1, 0.9], [-1, 0.9]]
@@ -2549,7 +2537,7 @@ class s333(test_fun):
             y += (1-coeff2[i]*numpy.exp(coeff1[i]*x[1])*x[0]-coeff2[i]*x[2])**2
         return y
 
-class st_cqpjk2(test_fun):
+class st_cqpjk2(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 0.9], [0, 0.9], [0, 0.9]]
@@ -2558,7 +2546,7 @@ class st_cqpjk2(test_fun):
         return 9*x[0]*x[0]-15*x[0]+9*x[1]*x[1]-12*x[1]+9*x[2]*x[2]-9*x[2]
 
 # needs more precise floats
-class yfit(test_fun):
+class yfit(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9978786299, 10.0021213701],
@@ -2575,7 +2563,7 @@ class yfit(test_fun):
                                        numpy.multiply(coeff1,x[1]))*x[2])**2)
 
 # new
-class allinitu(test_fun):
+class allinitu(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.5401384356, 10.31387540796], [-10.0, 9.0], [-9.9191099435, 9.07280105085], [-10.8111130846, 8.26999822386]]
@@ -2629,7 +2617,7 @@ class allinitu(test_fun):
         return rv;
 
 # needs more precise floats
-class brownden(test_fun):
+class brownden(BenchmarkFunction):
     @property
     def domain(self):
         return [[-21.5944399048, -1.43499591432],
@@ -2663,7 +2651,7 @@ class brownden(test_fun):
                        (coeff_s2 + x[2] + numpy.multiply(coeff3,x[3]))**2)**2)
         return y
 
-class _hatfld(test_fun):
+class _hatfld(BenchmarkFunction):
     def _function(self,x):
         return ((x[0] - 1)**2 + (x[0] - numpy.sqrt(x[1]))**2 +
                 (x[1] - numpy.sqrt(x[2]))**2 + (x[2] - numpy.sqrt(x[3]))**2)
@@ -2680,7 +2668,7 @@ class hatfldb(_hatfld):
         return [[1e-07, 10.9472135922], [1e-07, 0.8],
                 [1e-07, 10.6400000036], [1e-07, 10.4096000079]]
 
-class hatfldc(test_fun):
+class hatfldc(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 10], [0, 10], [0, 10], [-8.9999999978, 11.0000000022]]
@@ -2688,7 +2676,7 @@ class hatfldc(test_fun):
     def _function(self,x):
         return (x[0]-1)**2 + (x[2]-x[1]**2)**2 + (x[3]-x[2]**2)**2 + (x[3]-1)**2
 
-class himmelbf(test_fun):
+class himmelbf(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
@@ -2705,7 +2693,7 @@ class himmelbf(test_fun):
                            coeff2*x[2]**2)/(coeffa+coeff3*x[3]**2)-1)**2)*1e4
 
 # new
-class hs038(test_fun):
+class hs038(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 10.0], [-9.0, 11.0], [-9.0000000001, 10.9999999999], [-9.0000000001, 10.9999999999]]
@@ -2742,7 +2730,7 @@ class hs038(test_fun):
         v[1] += v[3]
         return v[1]
 
-class kowalik(test_fun):
+class kowalik(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
@@ -2758,7 +2746,7 @@ class kowalik(test_fun):
                           (term2 + numpy.multiply(coeff,x[2]) + x[3]))**2)
 
 # new
-class kowosb(test_fun):
+class kowosb(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.8071930634, 9.17352624294], [-9.8087176971, 9.17215407261], [-9.8769435657, 9.11075079087], [-9.8639376421, 9.12245612211]]
@@ -2908,7 +2896,7 @@ class kowosb(test_fun):
         return v[2]
 
 # needs more precise floats
-class palmer1(test_fun):
+class palmer1(BenchmarkFunction):
     @property
     def domain(self):
         return [[1.3636340716, 21.3636340716], [1e-05, 160.4544000091],
@@ -2932,7 +2920,7 @@ class palmer1(test_fun):
                           numpy.multiply(term2,x[0]))**2)
 
 # needs more precise floats
-class palmer3(test_fun):
+class palmer3(BenchmarkFunction):
     @property
     def domain(self):
         return [[1e-06, 10.0375049888], [1e-06, 10.0034428969],
@@ -2953,7 +2941,7 @@ class palmer3(test_fun):
 
 
 # needs more precise floats
-class palmer4(test_fun):
+class palmer4(BenchmarkFunction):
     @property
     def domain(self):
         return [[1e-05, 19.3292787916], [1e-05, 10.8767116668],
@@ -2974,7 +2962,7 @@ class palmer4(test_fun):
                           numpy.multiply(term2,x[3]))**2)
 
 # needs more precise floats
-class palmer5d(test_fun):
+class palmer5d(BenchmarkFunction):
     @property
     def domain(self):
         return [[70.2513178169, 81.22618603521], [-142.1059487487, -109.89535387383],
@@ -2999,7 +2987,7 @@ class palmer5d(test_fun):
                           numpy.multiply(term4,x[3]))**2)
 
 # new
-class powell(test_fun):
+class powell(BenchmarkFunction):
     @property
     def domain(self):
         return [[-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0]]
@@ -3023,7 +3011,7 @@ class powell(test_fun):
         v[0] += v[1]
         return v[0]
 # new
-class pspdoc(test_fun):
+class pspdoc(BenchmarkFunction):
     @property
     def domain(self):
         return [[-11.0, 0.0], [-9.999999972, 10.000000028], [-9.9999999213, 10.0000000787], [-9.9999998676, 10.0000001324]]
@@ -3045,7 +3033,7 @@ class pspdoc(test_fun):
         v[0] = v[2] + v[3]
         return v[0]
 # new
-class s256(test_fun):
+class s256(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9981379886, 9.00167581026], [-10.0001862011, 8.99983241901], [-9.9994511045, 9.00049400595], [-9.9994511048, 9.00049400568]]
@@ -3069,7 +3057,7 @@ class s256(test_fun):
         v[0] += v[1]
         return v[0]
 
-class s257(test_fun):
+class s257(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 11], [-9, 11], [0, 11], [-9, 11]]
@@ -3080,7 +3068,7 @@ class s257(test_fun):
                 10.1*((x[1] - 1)**2 + (x[3] - 1)**2)+(19.8*x[0]-19.8)*(x[3]-1))
 
 # new
-class s258(test_fun):
+class s258(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-8.9999999999, 9.90000000009]]
@@ -3117,7 +3105,7 @@ class s258(test_fun):
         v[1] += v[3]
         return v[1]
 # new
-class s259(test_fun):
+class s259(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.5641580904, 11.4358419096], [-7.936840288, 12.063159712], [-9.9310254894, 10.0689745106], [-10.0999682161, 0.0]]
@@ -3153,7 +3141,7 @@ class s259(test_fun):
         v[1] += v[3]
         return v[1]
 # new
-class s260(test_fun):
+class s260(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-8.9999999999, 9.90000000009]]
@@ -3191,7 +3179,7 @@ class s260(test_fun):
         return v[1]
         
 # new
-class s261(test_fun):
+class s261(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9909450357, 9.00814946787], [-8.991563976, 9.9075924216], [-9.0016688312, 9.89849805192], [-9.0000000002, 9.89999999982]]
@@ -3216,7 +3204,7 @@ class s261(test_fun):
         v[0] += v[2]
         return v[0]
 # new
-class s275(test_fun):
+class s275(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9999927549, 9.00000652059], [-10.000081616, 8.9999265456], [-9.999803482, 9.0001768662], [-10.0001277807, 8.99988499737]]
@@ -3259,7 +3247,7 @@ class s275(test_fun):
         v[1] += v[2]
         return v[1]
 # new
-class s350(test_fun):
+class s350(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.75, 9.225], [-9.61, 9.351], [-9.585, 9.3735], [-9.61, 9.351]]
@@ -3408,7 +3396,7 @@ class s350(test_fun):
         v[2] += v[0]
         return v[2]
 
-class s351(test_fun):
+class s351(BenchmarkFunction):
     @property
     def domain(self):
         return [[-7.3, 11.43], [80, 90], [1359, 1490], [0, 18]]
@@ -3425,7 +3413,7 @@ class s351(test_fun):
                                  term2*x[2]**2)/(1+term1*x[3]**2)-1)**2)*1e4
 
 # needs more precise floats
-class s352(test_fun):
+class s352(BenchmarkFunction):
     @property
     def domain(self):
         return [[-20.2235736001, -0.20121624009],
@@ -3459,7 +3447,7 @@ class s352(test_fun):
         return numpy.sum((term1 + x[0] + numpy.multiply(term2,x[1]))**2 +
                          (term3 + x[2] + numpy.multiply(term4,x[3]))**2)
 
-class shekel(test_fun):
+class shekel(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 10], [0, 10], [0, 10], [0, 10]]
@@ -3472,7 +3460,7 @@ class shekel(test_fun):
         return y
 
 # new
-class aircrftb(test_fun):
+class aircrftb(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.9654790084, 8.13106889244], [-9.9364470184, 9.05719768344], [-10.0579260446, 8.94786655986], [-9.9385332696, 9.05532005736], [-10.0108611902, 8.99022492882]]
@@ -3547,7 +3535,7 @@ class aircrftb(test_fun):
         v[6] += v[5]
         return v[6]
 # new
-class biggs5(test_fun):
+class biggs5(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.9999996463, 9.90000031833], [-9.10100000695024e-07, 17.99999918091], [-8.999999498, 9.9000004518], [-4.999999779, 13.5000001989], [-5.999999158, 12.6000007578]]
@@ -3556,7 +3544,7 @@ class biggs5(test_fun):
         v = numpy.zeros(3)
 
 # new
-class genhumps(test_fun):
+class genhumps(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.999999999, 9.0000000009], [-10.0000000017, 8.99999999847], [-10.0000000095, 8.99999999145], [-9.9999999989, 9.00000000099], [-10.0000000027, 8.99999999757]]
@@ -3620,7 +3608,7 @@ class genhumps(test_fun):
         v[2] += v[0]
         return v[2]
 
-class hs045(test_fun):
+class hs045(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5]]
@@ -3629,7 +3617,7 @@ class hs045(test_fun):
         return -(0.00833333333333333*x[0]*x[1]*x[2]*x[3]*x[4] - 2)
 
 # new
-class osborne1(test_fun):
+class osborne1(BenchmarkFunction):
     @property
     def domain(self):
         # originally -2 and 2 for all, changed to avoid runtime warning
@@ -4060,7 +4048,7 @@ class osborne1(test_fun):
         v[0] += v[3]
         return v[0]
 # new
-class osbornea(test_fun):
+class osbornea(BenchmarkFunction):
     @property
     def domain(self):
         return [[-1.0, 1.0], [-1.0, 2.0], [-2.0, 1.0], [-1.0, 1.0], [-1.0, 1.0]]
@@ -4489,7 +4477,7 @@ class osbornea(test_fun):
         v[1] += v[0]
         return v[1]
 # new
-class s266(test_fun):
+class s266(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9999999907, 9.00000000837], [-10.0000000009, 8.99999999919], [-10.0000000271, 8.99999997561], [-10.0, 9.0], [-9.9999999805, 9.00000001755]]
@@ -5178,7 +5166,7 @@ class s266(test_fun):
         return v[12]
 
 # needs more precise floats
-class s267(test_fun):
+class s267(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.2232795288, 11.7767204712],
@@ -5197,7 +5185,7 @@ class s267(test_fun):
         return y
 
 # needs more precise floats
-class s358(test_fun):
+class s358(BenchmarkFunction):
     @property
     def domain(self):
         return [[-0.5, 0.45], [1.5, 2.25],
@@ -5213,7 +5201,7 @@ class s358(test_fun):
                           numpy.exp(numpy.multiply(term2,x[4]))*x[2] -x[0])**2)
 
 # new
-class schwefel(test_fun):
+class schwefel(BenchmarkFunction):
     @property
     def domain(self):
         return [[-0.5, 0.36], [-0.5, 0.36], [-0.5, 0.36], [-0.5, 0.36], [-0.5, 0.36]]
@@ -5233,7 +5221,7 @@ class schwefel(test_fun):
         return v[0]
 
 # needs more precise floats
-class biggs6(test_fun):
+class biggs6(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.2885839998, 10.54027440018],
@@ -5253,7 +5241,7 @@ class biggs6(test_fun):
                           numpy.exp(numpy.multiply(term2,x[1]))*x[3] +
                           numpy.exp(numpy.multiply(term2,x[4]))*x[5])**2)
 
-class hart6(test_fun):
+class hart6(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]
@@ -5271,7 +5259,7 @@ class hart6(test_fun):
         return y
 
 # new
-class heart6ls(test_fun):
+class heart6ls(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9969001405, 9.00278987355], [-10.0002239415, 8.99979845265], [-7.3184801716, 11.41336784556], [-7.7497837397, 11.02519463427], [-30.2417255436, -9.21755298924], [-9.2029016565, 9.71738850915]]
@@ -5411,7 +5399,7 @@ class heart6ls(test_fun):
         v[1] += v[2]
         return v[1]
 
-class palmer2a(test_fun):
+class palmer2a(BenchmarkFunction):
     @property
     def domain(self):
         return [[0,32.4286981517],[1e-10,10.7435278989],
@@ -5454,7 +5442,7 @@ class palmer2a(test_fun):
         return y
 
 # needs more precise floats
-class palmer5c(test_fun):
+class palmer5c(BenchmarkFunction):
     @property
     def domain(self):
         return [[27.5370157298, 42.78331415682],
@@ -5494,7 +5482,7 @@ class palmer5c(test_fun):
         return y
 
 # needs more precise floats
-class palmer6a(test_fun):
+class palmer6a(BenchmarkFunction):
     @property
     def domain(self):
         return [[-44.1581372624, -24.1581372624], [0.120997701, 20.120997701],
@@ -5522,7 +5510,7 @@ class palmer6a(test_fun):
         return y
 
 # needs more precise floats
-class palmer8a(test_fun):
+class palmer8a(BenchmarkFunction):
     @property
     def domain(self):
         return [[1e-05, 12.4961104793], [1e-05, 10.2011908033],
@@ -5551,7 +5539,7 @@ class palmer8a(test_fun):
         return y
 
 # new
-class s271(test_fun):
+class s271(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9]]
@@ -5584,7 +5572,7 @@ class s271(test_fun):
         return v[0]
     
 # needs more precise floats
-class s272(test_fun):
+class s272(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 10.999999907], [0, 20.0000005284], [0, 13.9999995189],
@@ -5602,7 +5590,7 @@ class s272(test_fun):
                           numpy.exp(numpy.multiply(term2,x[2]))*x[5])**2)
 
 # new
-class s273(test_fun):
+class s273(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9]]
@@ -5660,7 +5648,7 @@ class s273(test_fun):
         v[0] += v[1]
         return v[0]
 # new
-class s276(test_fun):
+class s276(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0013714286, 9.9986285714], [-9.96, 10.04], [-10.2742857143, 9.7257142857], [-9.28, 10.72], [-10.8, 0.0], [-9.6832, 10.3168]]
@@ -5745,7 +5733,7 @@ class s276(test_fun):
         v[1] += v[2]
         return v[1]
 # new
-class s294(test_fun):
+class s294(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.9865749796, 0.0], [-9.0166017712, 10.9833982288], [-9.0278933299, 10.9721066701], [-9.0525625632, 10.9474374368], [-9.1013488151, 10.8986511849], [-9.192426048, 10.807573952]]
@@ -5793,7 +5781,7 @@ class s294(test_fun):
         v[1] += v[2]
         return v[1]
 # new
-class s370(test_fun):
+class s370(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0157250871, 8.98584742161], [-8.9875651305, 9.91119138255], [-10.2329916267, 8.79030753597], [-8.7395699127, 10.13438707857], [-11.5137289215, 7.63764397065], [-9.0070035692, 9.89369678772]]
@@ -6470,7 +6458,7 @@ class s370(test_fun):
         v[0] += v[1]
         return v[0]
 
-class st_bsj3(test_fun):
+class st_bsj3(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 99], [0, 99], [0, 99], [0, 99], [0, 99], [0, 99]]
