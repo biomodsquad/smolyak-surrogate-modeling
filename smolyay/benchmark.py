@@ -719,23 +719,6 @@ class hs3mod(BenchmarkFunction):
         return (x[1]-x[0])**2 + x[1]
 
 # new
-class hs5(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[-1.5, 4.0], [-3.0, 3.0]]
-
-    def _function(self,x):
-        v = numpy.zeros(3)
-        v[0] = x[0] + x[1]
-        v[1] = numpy.sin(v[0]);
-        v[0] = x[0] - x[1]
-        v[2] = v[0] * v[0]
-        v[1] += v[2]
-        v[1] += 1.;
-        rv = v[1] + -1.5*x[0]
-        rv += 2.5*x[1]
-        return rv;
-# new
 class humps(BenchmarkFunction):
     @property
     def domain(self):
@@ -1416,22 +1399,6 @@ class s328(BenchmarkFunction):
     def _function(self,x):
         return (0.1*(x[0]**2 + (1 + (x[1]**2))/(x[0]**2) +
                     (100 + (x[0]**2)*(x[1]**2))/(x[0]**4*x[1]**4)) + 1.2)
-
-# new
-class s386(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[-5.0, 13.5], [-4.0, 14.4]]
-
-    def _function(self,x):
-        v = numpy.zeros(3)
-        v[0] = -5. + x[0]
-        v[1] = v[0] * v[0]
-        v[0] = 4. * v[1]
-        v[1] = -6. + x[1]
-        v[2] = v[1] * v[1]
-        v[1] = v[0] + v[2]
-        return v[1]
 
 class sim2bqp(BenchmarkFunction):
     @property
@@ -3532,14 +3499,6 @@ class aircrftb(BenchmarkFunction):
         v[5] = v[7] * v[7]
         v[6] += v[5]
         return v[6]
-# new
-class biggs5(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[-8.9999996463, 9.90000031833], [-9.10100000695024e-07, 17.99999918091], [-8.999999498, 9.9000004518], [-4.999999779, 13.5000001989], [-5.999999158, 12.6000007578]]
-
-    def _function(self,x):
-        v = numpy.zeros(3)
 
 # new
 class genhumps(BenchmarkFunction):
