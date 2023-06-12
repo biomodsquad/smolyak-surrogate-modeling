@@ -27,17 +27,17 @@ class test_fun(abc.ABC):
         the domain of the inputs for each dimension
     """
     def __call__(self,x):
-        """Evaluate the test function
+        """Evaluate the function.
 
         Parameters
         ----------
-        x : list of floats
-            the input to the call method
+        x : list
+            Function input.
 
         Raises
         ------
         ValueError
-            if the input is outside is outside the domain
+            If the input is outside the function domain.
         """
         if self.dim > 1:
             oob = any(
