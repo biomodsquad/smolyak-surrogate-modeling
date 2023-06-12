@@ -2839,12 +2839,7 @@ class palmer5d(BenchmarkFunction):
                           numpy.multiply(term3,x[2])-
                           numpy.multiply(term4,x[3]))**2)
 
-# new
-class powell(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0]]
-
+class _powell(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(3)
         v[0] = 10. * x[1]
@@ -2863,6 +2858,12 @@ class powell(BenchmarkFunction):
         v[1] = 10. * v[2]
         v[0] += v[1]
         return v[0]
+
+# new
+class powell(_powell):
+    @property
+    def domain(self):
+        return [[-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0]]
 # new
 class pspdoc(BenchmarkFunction):
     @property
@@ -2886,29 +2887,10 @@ class pspdoc(BenchmarkFunction):
         v[0] = v[2] + v[3]
         return v[0]
 # new
-class s256(BenchmarkFunction):
+class s256(_powell):
     @property
     def domain(self):
         return [[-9.9981379886, 9.00167581026], [-10.0001862011, 8.99983241901], [-9.9994511045, 9.00049400595], [-9.9994511048, 9.00049400568]]
-
-    def _function(self,x):
-        v = numpy.zeros(3)
-        v[0] = 10. * x[1]
-        v[1] = x[0] + v[0]
-        v[0] = v[1] * v[1]
-        v[1] = x[2] - x[3]
-        v[2] = v[1] * v[1]
-        v[1] = 5. * v[2]
-        v[0] += v[1]
-        v[1] = -2. * x[2]
-        v[2] = x[1] + v[1]
-        v[1] = pow(v[2], 4)
-        v[0] += v[1]
-        v[1] = x[0] - x[3]
-        v[2] = pow(v[1], 4)
-        v[1] = 10. * v[2]
-        v[0] += v[1]
-        return v[0]
 
 class s257(BenchmarkFunction):
     @property
