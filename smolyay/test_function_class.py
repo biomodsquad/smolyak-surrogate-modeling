@@ -52,7 +52,7 @@ class test_fun(abc.ABC):
     @property
     def name(self):
         """Name of the function"""
-        return self.__class__.__name__
+        return type(self).__name__
 
     @property
     def dim(self):
