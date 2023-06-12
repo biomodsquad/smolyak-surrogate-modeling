@@ -203,13 +203,13 @@ class denschnc(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(3)
         v[0] = x[0] * x[0]
-        v[0] += -2.;
+        v[0] += -2.
         v[1] = x[1] * x[1]
         v[0] += v[1]
         v[1] = v[0] * v[0]
         v[0] = -1. + x[0]
-        v[2] = numpy.exp(v[0]);
-        v[2] += -2.;
+        v[2] = numpy.exp(v[0])
+        v[2] += -2.
         v[0] = pow(x[1], 3)
         v[2] += v[0]
         v[0] = v[2] * v[2]
@@ -321,7 +321,7 @@ class ex8_1_3(BenchmarkFunction):
         v[0] = v[3] * v[3]
         v[3] = x[0] * x[0]
         v[2] = 12. * v[3]
-        v[2] += 18.;
+        v[2] += 18.
         v[3] = -32. * x[0]
         v[2] += v[3]
         v[3] = 36. * x[0]
@@ -376,7 +376,7 @@ class ex8_1_6(BenchmarkFunction):
         v = numpy.zeros(4)
         v[0] = -4. + x[0]
         v[1] = v[0] * v[0]
-        v[1] += 0.1;
+        v[1] += 0.1
         v[0] = -4. + x[1]
         v[2] = v[0] * v[0]
         v[1] += v[2]
@@ -386,7 +386,7 @@ class ex8_1_6(BenchmarkFunction):
             v[2] = -1
         v[1] = -1. + x[0]
         v[0] = v[1] * v[1]
-        v[0] += 0.2;
+        v[0] += 0.2
         v[1] = -1. + x[1]
         v[3] = v[1] * v[1]
         v[0] += v[3]
@@ -398,7 +398,7 @@ class ex8_1_6(BenchmarkFunction):
         v[2] += v[0]
         v[0] = -8. + x[0]
         v[3] = v[0] * v[0]
-        v[3] += 0.2;
+        v[3] += 0.2
         v[0] = -8. + x[1]
         v[1] = v[0] * v[0]
         v[3] += v[1]
@@ -418,59 +418,59 @@ class expfit(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(3)
         v[0] = 0.25 * x[1]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = x[0] * v[1]
         v[1] = -0.25 + v[0]
         v[0] = v[1] * v[1]
         v[1] = 0.5 * x[1]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -0.5 + v[1]
         v[1] = v[2] * v[2]
         v[0] += v[1]
         v[1] = 0.75 * x[1]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -0.75 + v[1]
         v[1] = v[2] * v[2]
         v[0] += v[1]
-        v[1] = numpy.exp(x[1]);
+        v[1] = numpy.exp(x[1])
         v[2] = x[0] * v[1]
         v[1] = -1. + v[2]
         v[2] = v[1] * v[1]
         v[0] += v[2]
         v[2] = 1.25 * x[1]
-        v[1] = numpy.exp(v[2]);
+        v[1] = numpy.exp(v[2])
         v[2] = x[0] * v[1]
         v[1] = -1.25 + v[2]
         v[2] = v[1] * v[1]
         v[0] += v[2]
         v[2] = 1.5 * x[1]
-        v[1] = numpy.exp(v[2]);
+        v[1] = numpy.exp(v[2])
         v[2] = x[0] * v[1]
         v[1] = -1.5 + v[2]
         v[2] = v[1] * v[1]
         v[0] += v[2]
         v[2] = 1.75 * x[1]
-        v[1] = numpy.exp(v[2]);
+        v[1] = numpy.exp(v[2])
         v[2] = x[0] * v[1]
         v[1] = -1.75 + v[2]
         v[2] = v[1] * v[1]
         v[0] += v[2]
         v[2] = 2. * x[1]
-        v[1] = numpy.exp(v[2]);
+        v[1] = numpy.exp(v[2])
         v[2] = x[0] * v[1]
         v[1] = -2. + v[2]
         v[2] = v[1] * v[1]
         v[0] += v[2]
         v[2] = 2.25 * x[1]
-        v[1] = numpy.exp(v[2]);
+        v[1] = numpy.exp(v[2])
         v[2] = x[0] * v[1]
         v[1] = -2.25 + v[2]
         v[2] = v[1] * v[1]
         v[0] += v[2]
         v[2] = 2.5 * x[1]
-        v[1] = numpy.exp(v[2]);
+        v[1] = numpy.exp(v[2])
         v[2] = x[0] * v[1]
         v[1] = -2.5 + v[2]
         v[2] = v[1] * v[1]
@@ -489,7 +489,7 @@ class gold(BenchmarkFunction):
         v[0] += x[1]
         v[1] = v[0] * v[0]
         v[0] = -14. * x[0]
-        v[0] += 19.;
+        v[0] += 19.
         v[2] = x[0] * x[0]
         v[3] = 3. * v[2]
         v[0] += v[3]
@@ -508,7 +508,7 @@ class gold(BenchmarkFunction):
         v[2] = v[3] + v[0]
         v[3] = v[2] * v[2]
         v[2] = -32. * x[0]
-        v[2] += 18.;
+        v[2] += 18.
         v[0] = x[0] * x[0]
         v[4] = 12. * v[0]
         v[2] += v[4]
@@ -537,13 +537,13 @@ class griewank(BenchmarkFunction):
         v[0] = x[1] * x[1]
         v[2] = 0.005 * v[0]
         v[1] += v[2]
-        v[2] = numpy.cos(x[0]);
-        v[0] = x[1] / 1.4142135623730951;
-        v[3] = numpy.cos(v[0]);
+        v[2] = numpy.cos(x[0])
+        v[0] = x[1] / 1.4142135623730951
+        v[3] = numpy.cos(v[0])
         v[0] = v[2] * v[3]
         v[2] = -v[0]
         v[1] += v[2]
-        v[1] += 1.;
+        v[1] += 1.
         return v[1]
 # new
 class hairy(BenchmarkFunction):
@@ -554,22 +554,22 @@ class hairy(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(3)
         v[0] = 7. * x[0]
-        v[1] = numpy.sin(v[0]);
+        v[1] = numpy.sin(v[0])
         v[0] = v[1] * v[1]
         v[1] = 7. * x[1]
-        v[2] = numpy.cos(v[1]);
+        v[2] = numpy.cos(v[1])
         v[1] = v[2] * v[2]
         v[2] = v[0] * v[1]
         v[0] = 30. * v[2]
         v[2] = x[0] - x[1]
         v[1] = v[2] * v[2]
         v[2] = 0.01 + v[1]
-        v[1] = numpy.sqrt(v[2]);
+        v[1] = numpy.sqrt(v[2])
         v[2] = 100. * v[1]
         v[0] += v[2]
         v[2] = x[0] * x[0]
         v[1] = 0.01 + v[2]
-        v[2] = numpy.sqrt(v[1]);
+        v[2] = numpy.sqrt(v[1])
         v[1] = 100. * v[2]
         v[0] += v[1]
         return v[0]
@@ -602,7 +602,7 @@ class himmelbg(BenchmarkFunction):
         v = numpy.zeros(4)
         v[0] = -x[0]
         v[1] = v[0] - x[1]
-        v[0] = numpy.exp(v[1]);
+        v[0] = numpy.exp(v[1])
         v[1] = x[0] * x[0]
         v[2] = 2. * v[1]
         v[1] = x[1] * x[1]
@@ -681,14 +681,14 @@ class hs005(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(3)
         v[0] = x[0] + x[1]
-        v[1] = numpy.sin(v[0]);
+        v[1] = numpy.sin(v[0])
         v[0] = x[0] - x[1]
         v[2] = v[0] * v[0]
         v[1] += v[2]
-        v[1] += 1.;
+        v[1] += 1.
         rv = v[1] + -1.5*x[0]
         rv += 2.5*x[1]
-        return rv;
+        return rv
 
 class hs3mod(BenchmarkFunction):
     @property
@@ -712,9 +712,9 @@ class humps(BenchmarkFunction):
         v[2] = 0.05 * v[0]
         v[1] += v[2]
         v[2] = 20. * x[0]
-        v[0] = numpy.sin(v[2]);
+        v[0] = numpy.sin(v[2])
         v[2] = 20. * x[1]
-        v[3] = numpy.sin(v[2]);
+        v[3] = numpy.sin(v[2])
         v[2] = v[0] * v[3]
         v[0] = v[2] * v[2]
         v[1] += v[0]
@@ -739,48 +739,48 @@ class levy3(BenchmarkFunction):
         v = numpy.zeros(4)
         v[0] = 2. * x[0]
         v[1] = 1. + v[0]
-        v[0] = numpy.cos(v[1]);
+        v[0] = numpy.cos(v[1])
         v[1] = 3. * x[0]
         v[2] = 2. + v[1]
-        v[1] = numpy.cos(v[2]);
+        v[1] = numpy.cos(v[2])
         v[2] = 2. * v[1]
         v[0] += v[2]
         v[2] = 4. * x[0]
         v[1] = 3. + v[2]
-        v[2] = numpy.cos(v[1]);
+        v[2] = numpy.cos(v[1])
         v[1] = 3. * v[2]
         v[0] += v[1]
         v[1] = 5. * x[0]
         v[2] = 4. + v[1]
-        v[1] = numpy.cos(v[2]);
+        v[1] = numpy.cos(v[2])
         v[2] = 4. * v[1]
         v[0] += v[2]
         v[2] = 6. * x[0]
         v[1] = 5. + v[2]
-        v[2] = numpy.cos(v[1]);
+        v[2] = numpy.cos(v[1])
         v[1] = 5. * v[2]
         v[0] += v[1]
         v[1] = 2. * x[1]
         v[2] = 1. + v[1]
-        v[1] = numpy.cos(v[2]);
+        v[1] = numpy.cos(v[2])
         v[2] = 3. * x[1]
         v[3] = 2. + v[2]
-        v[2] = numpy.cos(v[3]);
+        v[2] = numpy.cos(v[3])
         v[3] = 2. * v[2]
         v[1] += v[3]
         v[3] = 4. * x[1]
         v[2] = 3. + v[3]
-        v[3] = numpy.cos(v[2]);
+        v[3] = numpy.cos(v[2])
         v[2] = 3. * v[3]
         v[1] += v[2]
         v[2] = 5. * x[1]
         v[3] = 4. + v[2]
-        v[2] = numpy.cos(v[3]);
+        v[2] = numpy.cos(v[3])
         v[3] = 4. * v[2]
         v[1] += v[3]
         v[3] = 6. * x[1]
         v[2] = 5. + v[3]
-        v[3] = numpy.cos(v[2]);
+        v[3] = numpy.cos(v[2])
         v[2] = 5. * v[3]
         v[1] += v[2]
         v[2] = v[0] * v[1]
@@ -795,27 +795,27 @@ class loghairy(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(3)
         v[0] = 7. * x[0]
-        v[1] = numpy.sin(v[0]);
+        v[1] = numpy.sin(v[0])
         v[0] = v[1] * v[1]
         v[1] = 7. * x[1]
-        v[2] = numpy.cos(v[1]);
+        v[2] = numpy.cos(v[1])
         v[1] = v[2] * v[2]
         v[2] = v[0] * v[1]
         v[0] = 30. * v[2]
-        v[0] += 100.;
+        v[0] += 100.
         v[2] = x[0] - x[1]
         v[1] = v[2] * v[2]
         v[2] = 0.01 + v[1]
-        v[1] = numpy.sqrt(v[2]);
+        v[1] = numpy.sqrt(v[2])
         v[2] = 100. * v[1]
         v[0] += v[2]
         v[2] = x[0] * x[0]
         v[1] = 0.01 + v[2]
-        v[2] = numpy.sqrt(v[1]);
+        v[2] = numpy.sqrt(v[1])
         v[1] = 100. * v[2]
         v[0] += v[1]
-        v[1] = v[0] / 100.;
-        v[0] = numpy.log(v[1]);
+        v[1] = v[0] / 100.
+        v[0] = numpy.log(v[1])
         return v[0]
 
 
@@ -842,7 +842,7 @@ class maratosb(BenchmarkFunction):
         v[2] = v[0] * v[0]
         v[0] = 1.e+06 * v[2]
         rv = v[0] + x[0]
-        return rv;
+        return rv
 
 class mdhole(BenchmarkFunction):
     @property
@@ -879,8 +879,8 @@ class mexhat(BenchmarkFunction):
         v[1] = x[0] * x[0]
         v[2] = x[1] - v[1]
         v[1] = v[2] * v[2]
-        v[2] = v[1] / 10000.;
-        v[2] += -0.02;
+        v[2] = v[1] / 10000.
+        v[2] += -0.02
         v[1] = -1. + x[0]
         v[3] = v[1] * v[1]
         v[2] += v[3]
@@ -1019,7 +1019,7 @@ class s204(BenchmarkFunction):
         v[0] = x[1] * v[3]
         v[3] = 1.2537 * v[0]
         v[8] = v[2] + v[3]
-        v[8] += 0.13294;
+        v[8] += 0.13294
         v[8] = v[8] - 0.564255*x[0]
         v[8] += 0.392417*x[1]
         
@@ -1034,7 +1034,7 @@ class s204(BenchmarkFunction):
         v[3] = x[1] * v[4]
         v[4] = -0.682005 * v[3]
         v[9] = v[1] + v[4]
-        v[9] += -0.244378;
+        v[9] += -0.244378
         v[9] = v[9] - 0.404979*x[0]
         v[9] += 0.927589*x[1]
         
@@ -1049,7 +1049,7 @@ class s204(BenchmarkFunction):
         v[4] = x[1] * v[5]
         v[5] = 0.51141 * v[4]
         v[10] = v[0] + v[5]
-        v[10] += 0.325895;
+        v[10] += 0.325895
         v[10] = v[10] - 0.0735084*x[0]
         v[10] += 0.535493*x[1]
 
@@ -1234,7 +1234,7 @@ class s214(BenchmarkFunction):
         v[1] = -1. + x[0]
         v[2] = v[1] * v[1]
         v[1] = v[0] + v[2]
-        v[0] = pow(v[1], 0.25);
+        v[0] = pow(v[1], 0.25)
         return v[0]
 # new
 class s229(BenchmarkFunction):
@@ -1296,10 +1296,10 @@ class s308(BenchmarkFunction):
         v[1] = x[0] * x[1]
         v[0] += v[1]
         v[1] = v[0] * v[0]
-        v[0] = numpy.sin(x[0]);
+        v[0] = numpy.sin(x[0])
         v[2] = v[0] * v[0]
         v[1] += v[2]
-        v[2] = numpy.cos(x[1]);
+        v[2] = numpy.cos(x[1])
         v[0] = v[2] * v[2]
         v[1] += v[0]
 
@@ -1323,9 +1323,9 @@ class s309(BenchmarkFunction):
         v[0] = -3.9 + x[1]
         v[2] = v[0] * v[0]
         v[1] += v[2]
-        v[1] += 24.37;
+        v[1] += 24.37
         rv = v[1] + -51.93*x[0]
-        return rv;
+        return rv
 # new
 class s311(BenchmarkFunction):
     @property
@@ -1404,7 +1404,7 @@ class sineval(BenchmarkFunction):
 
     def _function(self,x):
         v = numpy.zeros(3)
-        v[0] = numpy.sin(x[0]);
+        v[0] = numpy.sin(x[0])
         v[1] = x[1] - v[0]
         v[0] = v[1] * v[1]
         v[1] = 1000. * v[0]
@@ -1440,7 +1440,7 @@ class st_e39(BenchmarkFunction):
         v = numpy.zeros(4)
         v[0] = -4. + x[0]
         v[1] = v[0] * v[0]
-        v[1] += 0.1;
+        v[1] += 0.1
         v[0] = -4. + x[1]
         v[2] = v[0] * v[0]
         v[1] += v[2]
@@ -1450,7 +1450,7 @@ class st_e39(BenchmarkFunction):
             v[2] = -1
         v[1] = -1. + x[0]
         v[0] = v[1] * v[1]
-        v[0] += 0.2;
+        v[0] += 0.2
         v[1] = -1. + x[1]
         v[3] = v[1] * v[1]
         v[0] += v[3]
@@ -1462,7 +1462,7 @@ class st_e39(BenchmarkFunction):
         v[2] += v[0]
         v[0] = -8. + x[0]
         v[3] = v[0] * v[0]
-        v[3] += 0.2;
+        v[3] += 0.2
         v[0] = -8. + x[1]
         v[1] = v[0] * v[0]
         v[3] += v[1]
@@ -1508,10 +1508,10 @@ class zangwil2(BenchmarkFunction):
         v[0] = v[2] * x[1]
         v[2] = -0.06666666666666667 * v[0]
         v[1] += v[2]
-        v[1] += 66.06666666666666;
+        v[1] += 66.06666666666666
         rv = v[1] + -3.7333333333333334*x[0]
         rv += -17.066666666666666*x[1]
-        return rv;
+        return rv
 
 class allinit(BenchmarkFunction):
     @property
@@ -1533,129 +1533,129 @@ class biggs3(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(4)
         v[0] = -0.1 * x[0]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = -1.0764003502856656 + v[1]
         v[1] = -0.1 * x[1]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[2] * v[2]
         v[2] = v[0] - v[1]
         v[0] = 2.0109601381069178 + v[2]
         v[2] = v[0] * v[0]
         v[0] = -0.2 * x[0]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = -1.490041229246583 + v[1]
         v[1] = -0.2 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[2] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 1.3479868923516647 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = -0.30000000000000004 * x[0]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = -1.3954655145790045 + v[0]
         v[0] = -0.30000000000000004 * x[1]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = x[2] * v[1]
         v[1] = v[3] - v[0]
         v[3] = 0.9035826357366061 + v[1]
         v[1] = v[3] * v[3]
         v[2] += v[1]
         v[1] = -0.4 * x[0]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = -1.1844314055759346 + v[3]
         v[3] = -0.4 * x[1]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = x[2] * v[0]
         v[0] = v[1] - v[3]
         v[1] = 0.6056895539839662 + v[0]
         v[0] = v[1] * v[1]
         v[2] += v[0]
         v[0] = -0.5 * x[0]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = -0.9788467744270443 + v[1]
         v[1] = -0.5 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[2] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 0.4060058497098381 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = -0.6000000000000001 * x[0]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = -0.8085717350789321 + v[0]
         v[0] = -0.6000000000000001 * x[1]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = x[2] * v[1]
         v[1] = v[3] - v[0]
         v[3] = 0.2721538598682374 + v[1]
         v[1] = v[3] * v[3]
         v[2] += v[1]
         v[1] = -0.7000000000000001 * x[0]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = -0.6744560818392907 + v[3]
         v[3] = -0.7000000000000001 * x[1]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = x[2] * v[0]
         v[0] = v[1] - v[3]
         v[1] = 0.18243018787565385 + v[0]
         v[0] = v[1] * v[1]
         v[2] += v[0]
         v[0] = -0.8 * x[0]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = -0.5699382629128076 + v[1]
         v[1] = -0.8 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[2] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 0.12228661193509861 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = -0.9 * x[0]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = -0.4879237780620434 + v[0]
         v[0] = -0.9 * x[1]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = x[2] * v[1]
         v[1] = v[3] - v[0]
         v[3] = 0.0819711673418777 + v[1]
         v[1] = v[3] * v[3]
         v[2] += v[1]
         v[1] = -x[0]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = -0.4225993581888325 + v[3]
         v[3] = -x[1]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = x[2] * v[0]
         v[0] = v[1] - v[3]
         v[1] = 0.05494691666620255 + v[0]
         v[0] = v[1] * v[1]
         v[2] += v[0]
         v[0] = -1.1 * x[0]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = -0.3696195949033336 + v[1]
         v[1] = -1.1 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[2] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 0.03683201970920533 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = -1.2000000000000002 * x[0]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = -0.3258527319974954 + v[0]
         v[0] = -1.2000000000000002 * x[1]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = x[2] * v[1]
         v[1] = v[3] - v[0]
         v[3] = 0.024689241147060066 + v[1]
         v[1] = v[3] * v[3]
         v[2] += v[1]
         v[1] = -1.3 * x[0]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = -0.28907018464926004 + v[3]
         v[3] = -1.3 * x[1]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = x[2] * v[0]
         v[0] = v[1] - v[3]
         v[1] = 0.01654969326228231 + v[0]
@@ -1724,7 +1724,7 @@ class denschne(BenchmarkFunction):
         v[2] = x[1] + v[1]
         v[1] = v[2] * v[2]
         v[0] += v[1]
-        v[1] = numpy.exp(x[2]);
+        v[1] = numpy.exp(x[2])
         v[2] = -1. + v[1]
         v[1] = v[2] * v[2]
         v[0] += v[1]
@@ -1819,14 +1819,14 @@ class growth(BenchmarkFunction):
         v[0] = 2.0794415416798357 * x[2]
         v[1] = x[1] + v[0]
         v[0] = 2.079442 * v[1]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = x[0] * v[1]
         v[1] = -8. + v[0]
         v[0] = v[1] * v[1]
         v[1] = 2.1972245773362196 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.197225 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -8.4305 + v[1]
         v[1] = v[2] * v[2]
@@ -1834,7 +1834,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.302585092994046 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.302585 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -9.5294 + v[1]
         v[1] = v[2] * v[2]
@@ -1842,7 +1842,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.3978952727983707 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.397895 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -10.4627 + v[1]
         v[1] = v[2] * v[2]
@@ -1850,7 +1850,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.4849066497880004 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.484907 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -12. + v[1]
         v[1] = v[2] * v[2]
@@ -1858,7 +1858,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.5649493574615367 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.564949 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -13.0205 + v[1]
         v[1] = v[2] * v[2]
@@ -1866,7 +1866,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.6390573296152584 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.639057 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -14.5949 + v[1]
         v[1] = v[2] * v[2]
@@ -1874,7 +1874,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.70805020110221 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.70805 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -16.1078 + v[1]
         v[1] = v[2] * v[2]
@@ -1882,7 +1882,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.772588722239781 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.772589 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -18.0596 + v[1]
         v[1] = v[2] * v[2]
@@ -1890,7 +1890,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.8903717578961645 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.890372 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -20.4569 + v[1]
         v[1] = v[2] * v[2]
@@ -1898,7 +1898,7 @@ class growth(BenchmarkFunction):
         v[1] = 2.995732273553991 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.995732 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -24.25 + v[1]
         v[1] = v[2] * v[2]
@@ -1906,7 +1906,7 @@ class growth(BenchmarkFunction):
         v[1] = 3.2188758248682006 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 3.218876 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -32.9863 + v[1]
         v[1] = v[2] * v[2]
@@ -1923,26 +1923,26 @@ class growthls(BenchmarkFunction):
         v[0] = 2.079441542 * x[2]
         v[1] = x[1] + v[0]
         v[0] = 2.079442 * v[1]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = x[0] * v[1]
         v[1] = -8. + v[0]
         v[0] = 2.079441542 * x[2]
         v[2] = x[1] + v[0]
         v[0] = 2.079442 * v[2]
-        v[2] = numpy.exp(v[0]);
+        v[2] = numpy.exp(v[0])
         v[0] = x[0] * v[2]
         v[2] = -8. + v[0]
         v[0] = v[1] * v[2]
         v[1] = 2.19722457733622 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.19722457733622 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -8.4305 + v[1]
         v[1] = 2.19722457733622 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.19722457733622 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -8.4305 + v[1]
         v[1] = v[2] * v[3]
@@ -1950,13 +1950,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.302585093 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.302585 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -9.5294 + v[1]
         v[1] = 2.302585093 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.302585 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -9.5294 + v[1]
         v[1] = v[2] * v[3]
@@ -1964,13 +1964,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.397895273 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.397895 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -10.4627 + v[1]
         v[1] = 2.397895273 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.397895 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -10.4627 + v[1]
         v[1] = v[2] * v[3]
@@ -1978,13 +1978,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.48490665 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.484907 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -12. + v[1]
         v[1] = 2.48490665 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.484907 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -12. + v[1]
         v[1] = v[2] * v[3]
@@ -1992,13 +1992,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.564949357 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.564949 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -13.0205 + v[1]
         v[1] = 2.564949357 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.564949 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -13.0205 + v[1]
         v[1] = v[2] * v[3]
@@ -2006,13 +2006,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.63905733 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.639057 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -14.5949 + v[1]
         v[1] = 2.63905733 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.639057 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -14.5949 + v[1]
         v[1] = v[2] * v[3]
@@ -2020,13 +2020,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.708050201 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.70805 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -16.1078 + v[1]
         v[1] = 2.708050201 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.70805 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -16.1078 + v[1]
         v[1] = v[2] * v[3]
@@ -2034,13 +2034,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.77258872223978 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.772589 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -18.0596 + v[1]
         v[1] = 2.77258872223978 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.772589 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -18.0596 + v[1]
         v[1] = v[2] * v[3]
@@ -2048,13 +2048,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.890371758 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.890372 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -20.4569 + v[1]
         v[1] = 2.890371758 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.890372 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -20.4569 + v[1]
         v[1] = v[2] * v[3]
@@ -2062,13 +2062,13 @@ class growthls(BenchmarkFunction):
         v[1] = 2.99573227355399 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 2.995732 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -24.25 + v[1]
         v[1] = 2.99573227355399 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 2.995732 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -24.25 + v[1]
         v[1] = v[2] * v[3]
@@ -2076,13 +2076,13 @@ class growthls(BenchmarkFunction):
         v[1] = 3.218875825 * x[2]
         v[2] = x[1] + v[1]
         v[1] = 3.218876 * v[2]
-        v[2] = numpy.exp(v[1]);
+        v[2] = numpy.exp(v[1])
         v[1] = x[0] * v[2]
         v[2] = -32.9863 + v[1]
         v[1] = 3.218875825 * x[2]
         v[3] = x[1] + v[1]
         v[1] = 3.218876 * v[3]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = -32.9863 + v[1]
         v[1] = v[2] * v[3]
@@ -2097,89 +2097,89 @@ class hatfldd(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(4)
         v[0] = 0.2 * x[2]
-        v[1] = numpy.exp(v[0]);
+        v[1] = numpy.exp(v[0])
         v[0] = 0.2 * x[1]
-        v[2] = numpy.exp(v[0]);
+        v[2] = numpy.exp(v[0])
         v[0] = x[0] * v[2]
         v[2] = v[1] - v[0]
         v[1] = 1.751 + v[2]
         v[2] = v[1] * v[1]
         v[1] = 0.3 * x[2]
-        v[0] = numpy.exp(v[1]);
+        v[0] = numpy.exp(v[1])
         v[1] = 0.3 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 1.561 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = 0.4 * x[2]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = 0.4 * x[1]
-        v[1] = numpy.exp(v[3]);
+        v[1] = numpy.exp(v[3])
         v[3] = x[0] * v[1]
         v[1] = v[0] - v[3]
         v[0] = 1.391 + v[1]
         v[1] = v[0] * v[0]
         v[2] += v[1]
         v[1] = 0.5 * x[2]
-        v[0] = numpy.exp(v[1]);
+        v[0] = numpy.exp(v[1])
         v[1] = 0.5 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 1.239 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = 0.6 * x[2]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = 0.6 * x[1]
-        v[1] = numpy.exp(v[3]);
+        v[1] = numpy.exp(v[3])
         v[3] = x[0] * v[1]
         v[1] = v[0] - v[3]
         v[0] = 1.103 + v[1]
         v[1] = v[0] * v[0]
         v[2] += v[1]
         v[1] = 0.7 * x[2]
-        v[0] = numpy.exp(v[1]);
+        v[0] = numpy.exp(v[1])
         v[1] = 0.7 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 0.981 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = 0.75 * x[2]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = 0.75 * x[1]
-        v[1] = numpy.exp(v[3]);
+        v[1] = numpy.exp(v[3])
         v[3] = x[0] * v[1]
         v[1] = v[0] - v[3]
         v[0] = 0.925 + v[1]
         v[1] = v[0] * v[0]
         v[2] += v[1]
         v[1] = 0.8 * x[2]
-        v[0] = numpy.exp(v[1]);
+        v[0] = numpy.exp(v[1])
         v[1] = 0.8 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 0.8721 + v[3]
         v[3] = v[0] * v[0]
         v[2] += v[3]
         v[3] = 0.85 * x[2]
-        v[0] = numpy.exp(v[3]);
+        v[0] = numpy.exp(v[3])
         v[3] = 0.85 * x[1]
-        v[1] = numpy.exp(v[3]);
+        v[1] = numpy.exp(v[3])
         v[3] = x[0] * v[1]
         v[1] = v[0] - v[3]
         v[0] = 0.8221 + v[1]
         v[1] = v[0] * v[0]
         v[2] += v[1]
         v[1] = 0.9 * x[2]
-        v[0] = numpy.exp(v[1]);
+        v[0] = numpy.exp(v[1])
         v[1] = 0.9 * x[1]
-        v[3] = numpy.exp(v[1]);
+        v[3] = numpy.exp(v[1])
         v[1] = x[0] * v[3]
         v[3] = v[0] - v[1]
         v[0] = 0.7748 + v[3]
@@ -2257,7 +2257,7 @@ class s243(BenchmarkFunction):
         v[2] = x[2] * v[1]
         v[1] = 0.87584 * v[2]
         v[7] += v[1]
-        v[7] += 0.14272;
+        v[7] += 0.14272
         v[7] = v[7] - 0.564255*x[0]
         v[7] += 0.392417*x[1]
         v[7] -= 0.404979*x[2]
@@ -2285,7 +2285,7 @@ class s243(BenchmarkFunction):
         v[3] = x[2] * v[2]
         v[2] = -0.675975 * v[3]
         v[8] += v[2]
-        v[8] += -0.184918;
+        v[8] += -0.184918
         v[8] = v[8] + 0.927589*x[0]
         v[8] -= 0.0735084*x[1]
         v[8] += 0.535493*x[2]
@@ -2313,7 +2313,7 @@ class s243(BenchmarkFunction):
         v[4] = x[2] * v[3]
         v[3] = -0.239524 * v[4]
         v[9] += v[3]
-        v[9] += -0.521869;
+        v[9] += -0.521869
         v[9] = v[9] + 0.658799*x[0]
         v[9] -= 0.636666*x[1]
         v[9] -= 0.681091*x[2]
@@ -2361,7 +2361,7 @@ class s246(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(3)
         v[0] = x[0] + x[1]
-        v[1] = v[0] / 2.;
+        v[1] = v[0] / 2.
         v[0] = v[1] * v[1]
         v[1] = x[2] - v[0]
         v[0] = v[1] * v[1]
@@ -2429,14 +2429,14 @@ class allinitu(BenchmarkFunction):
         v[1] = x[2] + x[3]
         v[2] = v[1] * v[1]
         v[0] += v[2]
-        v[2] = numpy.sin(x[2]);
+        v[2] = numpy.sin(x[2])
         v[1] = v[2] * v[2]
         v[0] += v[1]
         v[1] = x[0] * x[0]
         v[2] = x[1] * x[1]
         v[3] = v[1] * v[2]
         v[0] += v[3]
-        v[3] = numpy.sin(x[2]);
+        v[3] = numpy.sin(x[2])
         v[1] = v[3] * v[3]
         v[0] += v[1]
         v[1] = -1. + x[3]
@@ -2452,7 +2452,7 @@ class allinitu(BenchmarkFunction):
         v[1] = v[3] * v[3]
         v[0] += v[1]
         v[1] = -4. + x[0]
-        v[3] = numpy.sin(x[3]);
+        v[3] = numpy.sin(x[3])
         v[2] = v[3] * v[3]
         v[1] += v[2]
         v[2] = x[1] * x[1]
@@ -2461,13 +2461,13 @@ class allinitu(BenchmarkFunction):
         v[1] += v[4]
         v[4] = v[1] * v[1]
         v[0] += v[4]
-        v[4] = numpy.sin(x[3]);
+        v[4] = numpy.sin(x[3])
         v[1] = pow(v[4], 4)
         v[0] += v[1]
-        v[0] += -4.;
+        v[0] += -4.
         rv = v[0] + x[2]
         rv += x[3]
-        return rv;
+        return rv
 
 # needs more precise floats
 class brownden(BenchmarkFunction):
@@ -2605,7 +2605,7 @@ class _kow(BenchmarkFunction):
         v[1] = 16. + v[0]
         v[0] = x[0] * v[1]
         v[1] = 4. * x[2]
-        v[1] += 16.;
+        v[1] += 16.
         v[1] += x[3]
         if not (v[1] == 0.):
             v[2] = v[0] / v[1]
@@ -2617,7 +2617,7 @@ class _kow(BenchmarkFunction):
         v[1] = 4. + v[0]
         v[0] = x[0] * v[1]
         v[1] = 2. * x[2]
-        v[1] += 4.;
+        v[1] += 4.
         v[1] += x[3]
         if not (v[1] == 0.):
             v[3] = v[0] / v[1]
@@ -2641,7 +2641,7 @@ class _kow(BenchmarkFunction):
         v[0] = 0.25 + v[1]
         v[1] = x[0] * v[0]
         v[0] = 0.5 * x[2]
-        v[0] += 0.25;
+        v[0] += 0.25
         v[0] += x[3]
         if not (v[0] == 0):
             v[3] = v[1] / v[0]
@@ -2654,7 +2654,7 @@ class _kow(BenchmarkFunction):
         v[1] = 0.0625 + v[3]
         v[3] = x[0] * v[1]
         v[1] = 0.25 * x[2]
-        v[1] += 0.0625;
+        v[1] += 0.0625
         v[1] += x[3]
         if not (v[1] == 0):
             v[0] = v[3] / v[1]
@@ -2667,7 +2667,7 @@ class _kow(BenchmarkFunction):
         v[3] = 0.027889000000000004 + v[0]
         v[0] = x[0] * v[3]
         v[3] = 0.167 * x[2]
-        v[3] += 0.027889000000000004;
+        v[3] += 0.027889000000000004
         v[3] += x[3]
         if not (v[3] == 0):
             v[1] = v[0] / v[3]
@@ -2680,7 +2680,7 @@ class _kow(BenchmarkFunction):
         v[0] = 0.015625 + v[1]
         v[1] = x[0] * v[0]
         v[0] = 0.125 * x[2]
-        v[0] += 0.015625;
+        v[0] += 0.015625
         v[0] += x[3]
         if not (v[0] == 0):
             v[3] = v[1] / v[0]
@@ -2693,7 +2693,7 @@ class _kow(BenchmarkFunction):
         v[1] = 0.010000000000000002 + v[3]
         v[3] = x[0] * v[1]
         v[1] = 0.1 * x[2]
-        v[1] += 0.010000000000000002;
+        v[1] += 0.010000000000000002
         v[1] += x[3]
         if not (v[1] == 0):
             v[0] = v[3] / v[1]
@@ -2706,7 +2706,7 @@ class _kow(BenchmarkFunction):
         v[3] = 0.00693889 + v[0]
         v[0] = x[0] * v[3]
         v[3] = 0.0833 * x[2]
-        v[3] += 0.00693889;
+        v[3] += 0.00693889
         v[3] += x[3]
         if not (v[3] == 0):
             v[1] = v[0] / v[3]
@@ -2719,7 +2719,7 @@ class _kow(BenchmarkFunction):
         v[0] = 0.00509796 + v[1]
         v[1] = x[0] * v[0]
         v[0] = 0.0714 * x[2]
-        v[0] += 0.00509796;
+        v[0] += 0.00509796
         v[0] += x[3]
         if not (v[0] == 0):
             v[3] = v[1] / v[0]
@@ -2732,7 +2732,7 @@ class _kow(BenchmarkFunction):
         v[1] = 0.00390625 + v[3]
         v[3] = x[0] * v[1]
         v[1] = 0.0625 * x[2]
-        v[1] += 0.00390625;
+        v[1] += 0.00390625
         v[1] += x[3]
         if not (v[1] == 0):
             v[0] = v[3] / v[1]
@@ -2746,7 +2746,8 @@ class _kow(BenchmarkFunction):
 class kowosb(_kow):
     @property
     def domain(self):
-        return [[-9.8071930634, 9.17352624294], [-9.8087176971, 9.17215407261], [-9.8769435657, 9.11075079087], [-9.8639376421, 9.12245612211]]
+        return [[-9.8071930634, 9.17352624294], [-9.8087176971, 9.17215407261],
+                [-9.8769435657, 9.11075079087], [-9.8639376421, 9.12245612211]]
 
 # needs more precise floats
 class palmer1(BenchmarkFunction):
@@ -2873,17 +2874,17 @@ class pspdoc(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(4)
         v[0] = x[0] * x[0]
-        v[0] += 1.;
+        v[0] += 1.
         v[1] = x[1] - x[2]
         v[2] = v[1] * v[1]
         v[0] += v[2]
-        v[2] = numpy.sqrt(v[0]);
+        v[2] = numpy.sqrt(v[0])
         v[0] = x[1] * x[1]
-        v[0] += 1.;
+        v[0] += 1.
         v[1] = x[2] - x[3]
         v[3] = v[1] * v[1]
         v[0] += v[3]
-        v[3] = numpy.sqrt(v[0]);
+        v[3] = numpy.sqrt(v[0])
         v[0] = v[2] + v[3]
         return v[0]
 # new
@@ -3021,7 +3022,7 @@ class s261(BenchmarkFunction):
 
     def _function(self,x):
         v = numpy.zeros(3)
-        v[0] = numpy.exp(x[0]);
+        v[0] = numpy.exp(x[0])
         v[1] = v[0] - x[1]
         v[0] = pow(v[1], 4)
         v[1] = x[1] - x[2]
@@ -3029,7 +3030,7 @@ class s261(BenchmarkFunction):
         v[1] = 100. * v[2]
         v[0] += v[1]
         v[1] = x[2] - x[3]
-        v[2] = numpy.tan(v[1]);
+        v[2] = numpy.tan(v[1])
         v[1] = pow(v[2], 4)
         v[0] += v[1]
         v[1] = pow(x[0], 8)
@@ -3236,10 +3237,10 @@ class genhumps(BenchmarkFunction):
     def _function(self,x):
         v = numpy.zeros(4)
         v[0] = 2. * x[0]
-        v[1] = numpy.sin(v[0]);
+        v[1] = numpy.sin(v[0])
         v[0] = v[1] * v[1]
         v[1] = 2. * x[1]
-        v[2] = numpy.sin(v[1]);
+        v[2] = numpy.sin(v[1])
         v[1] = v[2] * v[2]
         v[2] = v[0] * v[1]
         v[0] = x[0] * x[0]
@@ -3249,10 +3250,10 @@ class genhumps(BenchmarkFunction):
         v[0] = 0.05 * v[1]
         v[2] += v[0]
         v[0] = 2. * x[1]
-        v[1] = numpy.sin(v[0]);
+        v[1] = numpy.sin(v[0])
         v[0] = v[1] * v[1]
         v[1] = 2. * x[2]
-        v[3] = numpy.sin(v[1]);
+        v[3] = numpy.sin(v[1])
         v[1] = v[3] * v[3]
         v[3] = v[0] * v[1]
         v[2] += v[3]
@@ -3263,10 +3264,10 @@ class genhumps(BenchmarkFunction):
         v[3] = 0.05 * v[0]
         v[2] += v[3]
         v[3] = 2. * x[2]
-        v[0] = numpy.sin(v[3]);
+        v[0] = numpy.sin(v[3])
         v[3] = v[0] * v[0]
         v[0] = 2. * x[3]
-        v[1] = numpy.sin(v[0]);
+        v[1] = numpy.sin(v[0])
         v[0] = v[1] * v[1]
         v[1] = v[3] * v[0]
         v[2] += v[1]
@@ -3277,10 +3278,10 @@ class genhumps(BenchmarkFunction):
         v[1] = 0.05 * v[3]
         v[2] += v[1]
         v[1] = 2. * x[3]
-        v[3] = numpy.sin(v[1]);
+        v[3] = numpy.sin(v[1])
         v[1] = v[3] * v[3]
         v[3] = 2. * x[4]
-        v[0] = numpy.sin(v[3]);
+        v[0] = numpy.sin(v[3])
         v[3] = v[0] * v[0]
         v[0] = v[1] * v[3]
         v[2] += v[0]
@@ -3392,7 +3393,7 @@ class s266(BenchmarkFunction):
         v[2] = x[4] * v[1]
         v[1] = 1.173295 * v[2]
         v[14] += v[1]
-        v[14] += 0.0426149;
+        v[14] += 0.0426149
         v[14] = v[14] - 0.564255*x[0]
         v[14] += 0.392417*x[1]
         v[14] -= 0.404979*x[2]
@@ -3458,7 +3459,7 @@ class s266(BenchmarkFunction):
         v[3] = x[4] * v[2]
         v[2] = 1.42024 * v[3]
         v[15] += v[2]
-        v[15] += 0.0352053;
+        v[15] += 0.0352053
         v[15] = v[15] + 0.535493*x[0]
         v[15] += 0.658799*x[1]
         v[15] -= 0.636666*x[2]
@@ -3524,7 +3525,7 @@ class s266(BenchmarkFunction):
         v[4] = x[4] * v[3]
         v[3] = 0.56444 * v[4]
         v[16] += v[3]
-        v[16] += 0.0878058;
+        v[16] += 0.0878058
         v[16] = v[16] + 0.586387*x[0]
         v[16] += 0.289826*x[1]
         v[16] += 0.854402*x[2]
@@ -3590,7 +3591,7 @@ class s266(BenchmarkFunction):
         v[5] = x[4] * v[4]
         v[4] = 1.51143 * v[5]
         v[17] += v[4]
-        v[17] += 0.0330812;
+        v[17] += 0.0330812
         v[17] = v[17] + 0.608734*x[0]
         v[17] += 0.984915*x[1]
         v[17] += 0.375699*x[2]
@@ -3656,7 +3657,7 @@ class s266(BenchmarkFunction):
         v[6] = x[4] * v[5]
         v[5] = 0.860695 * v[6]
         v[18] += v[5]
-        v[18] += 0.0580924;
+        v[18] += 0.0580924
         v[18] = v[18] + 0.774227*x[0]
         v[18] += 0.325421*x[1]
         v[18] -= 0.151719*x[2]
@@ -3722,7 +3723,7 @@ class s266(BenchmarkFunction):
         v[7] = x[4] * v[6]
         v[6] = 0.0769585 * v[7]
         v[19] += v[6]
-        v[19] += 0.649704;
+        v[19] += 0.649704
         v[19] = v[19] - 0.435033*x[0]
         v[19] -= 0.688583*x[1]
         v[19] += 0.222278*x[2]
@@ -3788,7 +3789,7 @@ class s266(BenchmarkFunction):
         v[8] = x[4] * v[7]
         v[7] = 0.1452885 * v[8]
         v[20] += v[7]
-        v[20] += 0.344144;
+        v[20] += 0.344144
         v[20] = v[20] + 0.759468*x[0]
         v[20] -= 0.627795*x[1]
         v[20] += 0.0403142*x[2]
@@ -3854,7 +3855,7 @@ class s266(BenchmarkFunction):
         v[9] = x[4] * v[8]
         v[8] = -0.079689 * v[9]
         v[21] += v[8]
-        v[21] += -0.627443;
+        v[21] += -0.627443
         v[21] = v[21] - 0.152448*x[0]
         v[21] -= 0.546437*x[1]
         v[21] += 0.484134*x[2]
@@ -3920,7 +3921,7 @@ class s266(BenchmarkFunction):
         v[10] = x[4] * v[9]
         v[9] = 27.3455 * v[10]
         v[22] += v[9]
-        v[22] += 0.001828;
+        v[22] += 0.001828
         v[22] = v[22] - 0.821772*x[0]
         v[22] -= 0.53412*x[1]
         v[22] -= 0.798498*x[2]
@@ -3986,7 +3987,7 @@ class s266(BenchmarkFunction):
         v[11] = x[4] * v[10]
         v[10] = -0.2224365 * v[11]
         v[23] += v[10]
-        v[23] += -0.224783;
+        v[23] += -0.224783
         v[23] = v[23] + 0.819831*x[0]
         v[23] -= 0.910632*x[1]
         v[23] -= 0.480344*x[2]
@@ -4117,7 +4118,7 @@ class heart6ls(BenchmarkFunction):
         v[2] = 1.826 + v[1]
         v[1] = v[2] * v[2]
         v[2] = x[4] * x[0]
-        v[2] += 0.754;
+        v[2] += 0.754
         v[0] = -0.816 - x[0]
         v[3] = x[5] * v[0]
         v[2] += v[3]
@@ -4154,7 +4155,7 @@ class heart6ls(BenchmarkFunction):
         v[0] = x[4] * x[4]
         v[3] = v[2] - v[0]
         v[2] = x[1] * v[3]
-        v[2] += 3.259;
+        v[2] += 3.259
         v[3] = 2. * x[0]
         v[0] = v[3] * x[2]
         v[3] = v[0] * x[4]
@@ -4178,7 +4179,7 @@ class heart6ls(BenchmarkFunction):
         v[4] = -3. * v[0]
         v[0] = v[2] + v[4]
         v[2] = v[3] * v[0]
-        v[2] += 14.023;
+        v[2] += 14.023
         v[3] = x[1] * x[4]
         v[0] = x[4] * x[4]
         v[4] = x[2] * x[2]
