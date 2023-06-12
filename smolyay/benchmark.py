@@ -29,7 +29,7 @@ class BenchmarkFunction(abc.ABC):
         """
         if self.dimension > 1:
             oob = any(
-                xi < bound[0]-1e-10 or xi > bound[1]+1e-10 for xi,bound in
+                xi < bound[0] or xi > bound[1] for xi,bound in
                 zip(x,self.domain))
         else:
             oob = x < self.domain[0][0] or x > self.domain[0][1]
