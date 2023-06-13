@@ -2774,12 +2774,7 @@ class palmer1(BenchmarkFunction):
                           numpy.multiply(term2,x[0]))**2)
 
 # needs more precise floats
-class palmer3(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[1e-06, 10.0375049888], [1e-06, 10.0034428969],
-                [1e-06, 14.6439962785], [7.3225711014, 27.3225711014]]
-
+class _palmer(BenchmarkFunction):
     def _function(self,x):
         term1 = [64.87939,50.46046,28.2034,13.4575,4.6547,0.59447,0,0.2177,
                  2.3029,5.5191,8.5519,9.8919,8.5519,5.5191,2.3029,0.2177,
@@ -2793,27 +2788,18 @@ class palmer3(BenchmarkFunction):
         return numpy.sum((term1 - x[0]/(term2/x[2] + x[1]) -
                           numpy.multiply(term2,x[3]))**2)
 
+class palmer3(_palmer):
+    @property
+    def domain(self):
+        return [[1e-06, 10.0375049888], [1e-06, 10.0034428969],
+                [1e-06, 14.6439962785], [7.3225711014, 27.3225711014]]
 
-# needs more precise floats
-class palmer4(BenchmarkFunction):
+
+class palmer4(_palmer):
     @property
     def domain(self):
         return [[1e-05, 19.3292787916], [1e-05, 10.8767116668],
                 [1e-05, 10.0158603779], [8.2655580306, 28.2655580306]]
-
-    def _function(self,x):
-        term1 = [67.27625,52.8537,30.2718,14.9888,5.56750,0.92603,0,0.085108,
-                 1.867422,5.014768,8.263520,9.8046208,8.263520,5.014768,
-                 1.867422,0.085108,0,0.92603,5.5675,14.9888,30.2718,52.8537,
-                 67.27625]
-        term2 = [2.749172911969,2.467400073616,1.949550365169,1.4926241929,
-                 1.096623651204,0.761544202225,0.549257372161,0.487388289424,
-                 0.274155912801,0.121847072356,0.030461768089,0,0.030461768089,
-                 0.121847072356,0.274155912801,0.487388289424,0.549257372161,
-                 0.761544202225,1.096623651204,1.4926241929,1.949550365169,
-                 2.467400073616,2.749172911969]
-        return numpy.sum((term1 - x[0]/(term2/x[2] + x[1]) -
-                          numpy.multiply(term2,x[3]))**2)
 
 # needs more precise floats
 class palmer5d(BenchmarkFunction):
