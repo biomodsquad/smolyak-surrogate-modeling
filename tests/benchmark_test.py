@@ -103,6 +103,21 @@ def test_call_error_3D(test_class_3):
     with pytest.raises(ValueError):
         test_class_3([5,-2,24])
 
+@pytest.mark.filterwarnings("error")
+def test_call_no_error_multi_input(test_class_1,test_class_3):
+    """Test valid inputs for call function give no errors"""
+    x_1d = numpy.linspace(test_class_1.lower_bounds,test_class_1.upper_bounds)
+    y_1d = test_class_1(x_1d)
+    assert len(y_1d) == len(x_1d)
+
+def test_call_error_1D_multi_input(test_class_1):
+    """Test if there is an error for inputs out of bounds for 1D functions"""
+    with pytest.raises(ValueError):
+        test_class_1([0.5, 0.6, 1.7, 0, 9.2])
+    with pytest.raises(ValueError):
+        test_class_1([20, 5, 6, 2])
+
+
 @pytest.mark.parametrize("fun",functions)
 def test_functions_domain_match_dimension(fun):
     """Test that all domains are the correct shape"""

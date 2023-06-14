@@ -32,7 +32,9 @@ class BenchmarkFunction(abc.ABC):
                 xi < bound[0] or xi > bound[1] for xi,bound in
                 zip(x,self.domain))
         else:
-            oob = x < self.domain[0][0] or x > self.domain[0][1]
+            x = numpy.array(x)
+            oob = (numpy.any(x < self.domain[0][0]) or 
+                    numpy.any(x > self.domain[0][1]))
         if oob:
             raise ValueError("Input out domain of function.")
         return self._function(x)
