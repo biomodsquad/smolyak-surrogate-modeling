@@ -17,7 +17,7 @@ class TestClass1D(BenchmarkFunction):
     def domain(self):
         return [[0.4,10]]
     def _function(self,x):
-        return 4*0.5*((2/x)**12 - (2/x)**6)
+        return numpy.squeeze(4*0.5*((2/x)**12 - (2/x)**6))
 
 class TestClass3D(BenchmarkFunction):
     """A test class for testing BenchmarkFunction objects with >1 dimensions"""
@@ -25,7 +25,7 @@ class TestClass3D(BenchmarkFunction):
     def domain(self):
         return [[0,10],[-5,-1],[11,13]]
     def _function(self,x):
-        return x[0]**0.5 + x[1]*3 - x[2]/3 + x[0]/x[1]
+        return x[...,0]**0.5 + x[...,1]*3 - x[...,2]/3 + x[...,0]/x[...,1]
 
 """List of non-abstract class objects used as benchmark functions"""
 functions = []
@@ -72,14 +72,19 @@ def test_dimension(test_class_1,test_class_3):
     assert test_class_3.dimension == 3
 
 @pytest.mark.filterwarnings("error")
-def test_call_no_error(test_class_1,test_class_3):
-    """Test valid inputs for call function give no errors"""
+def test_call_no_error_1(test_class_1,test_class_3):
+    """Test valid inputs of call give no errors for 1D functions"""
     x_1d = numpy.linspace(test_class_1.lower_bounds,test_class_1.upper_bounds)
-    x_3d = numpy.linspace(test_class_3.lower_bounds,test_class_3.upper_bounds)
     for x in x_1d:
         test_class_1(x)
+
+@pytest.mark.filterwarnings("error")
+def test_call_no_error_3D(test_class_3):
+    """Test valid inputs of call give no errors for >1D functions"""
+    x_3d = numpy.linspace(test_class_3.lower_bounds,test_class_3.upper_bounds)
     for x in x_3d:
         test_class_3(x)
+
 
 def test_call_error_1D(test_class_1):
     """Test if there is an error for inputs out of bounds for 1D functions"""
@@ -104,11 +109,32 @@ def test_call_error_3D(test_class_3):
         test_class_3([5,-2,24])
 
 @pytest.mark.filterwarnings("error")
-def test_call_no_error_multi_input(test_class_1,test_class_3):
-    """Test valid inputs for call function give no errors"""
+def test_call_no_error_multi_input_1D(test_class_1):
+    """Test multiple inputs of call give no errors for 1D functions"""
     x_1d = numpy.linspace(test_class_1.lower_bounds,test_class_1.upper_bounds)
-    y_1d = test_class_1(x_1d)
-    assert len(y_1d) == len(x_1d)
+    y_1d_multi = test_class_1(x_1d)
+    y_1d = [test_class_1(x) for x in x_1d]
+    y_1d_fun = [test_class_1._function(x) for x in x_1d]
+    y_1d_multi_fun = test_class_1._function(x_1d)
+    assert len(y_1d_multi) == len(x_1d)
+    assert numpy.array_equiv(y_1d,y_1d_multi)
+    assert numpy.array_equiv(y_1d_fun,y_1d_multi_fun)
+    assert numpy.array_equiv(y_1d_multi,y_1d_multi_fun)
+
+@pytest.mark.filterwarnings("error")
+def test_call_no_error_multi_input_3D(test_class_3):
+    """Test multiple inputs of call give no errors for >1D functions"""
+    x_3d = numpy.linspace(test_class_3.lower_bounds,test_class_3.upper_bounds)
+    y_3d_multi = test_class_3(x_3d)
+    y_3d = [test_class_3(x) for x in x_3d]
+    y_3d_fun = numpy.squeeze([test_class_3._function(x) for x in x_3d])
+    y_3d_multi_fun = test_class_3._function(x_3d)
+    assert len(y_3d_multi) == len(x_3d)
+    assert numpy.array_equiv(y_3d,y_3d_multi)
+    assert numpy.array_equiv(y_3d_fun,y_3d_multi_fun)
+    assert numpy.array_equiv(y_3d_multi,y_3d_multi_fun)
+
+
 
 def test_call_error_1D_multi_input(test_class_1):
     """Test if there is an error for inputs out of bounds for 1D functions"""
@@ -117,6 +143,20 @@ def test_call_error_1D_multi_input(test_class_1):
     with pytest.raises(ValueError):
         test_class_1([20, 5, 6, 2])
 
+def test_call_error_3D_multi_input(test_class_3):
+    """Test if there is an error for inputs out of bounds for >1D functions"""
+    with pytest.raises(ValueError):
+        test_class_3([[-2,-2,12],[3,-1,11.5],[4,-4,11.1],[1,-4.4,12.7]])
+    with pytest.raises(ValueError):
+        test_class_3([[1,-1.1,11.3],[9,-1.2,11.4],[11,-2,12]])
+    with pytest.raises(ValueError):
+        test_class_3([[1,-1,11.5],[5,-10,12],[2,-2,13],[3,-3,12]])
+    with pytest.raises(ValueError):
+        test_class_3([[5,4,12],[3,6,12]])
+    with pytest.raises(ValueError):
+        test_class_3([[0,-1,11],[5,-2,6]])
+    with pytest.raises(ValueError):
+        test_class_3([[5,-2,24],[1,-2,11]])
 
 @pytest.mark.parametrize("fun",functions)
 def test_functions_domain_match_dimension(fun):
@@ -135,9 +175,15 @@ def test_functions_good_bounds(fun):
 @pytest.mark.filterwarnings("error")
 def test_functions_call(fun):
     """Test all functions do not raise error or warning for inputs in bounds"""
-    inputs = numpy.linspace(fun.lower_bounds,fun.upper_bounds)
-    for i in inputs:
-        fun(i)
+    x_list = numpy.linspace(fun.lower_bounds,fun.upper_bounds)
+    y_call = [fun(i) for i in x_list]
+    y_call_multi = fun(x_list)
+    y_fun = numpy.squeeze([fun._function(i) for i in x_list])
+    y_fun_multi = fun._function(x_list)
+    assert numpy.array_equiv(y_call,y_call_multi)
+    assert numpy.array_equiv(y_fun,y_fun_multi)
+    assert numpy.array_equiv(y_call_multi,y_fun_multi)
+
 
 @pytest.mark.parametrize("fun",functions)
 def test_functions_call_error_lower(fun):
