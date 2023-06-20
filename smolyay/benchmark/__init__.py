@@ -13,6 +13,7 @@ from .cube import cube
 from .denschn import (denschna, denschnb, denschnc, denschnd, denschne)
 from .eg1 import eg1
 from .engval2 import engval2
+from .esfl import esfl
 from .ex import (ex4_1_5, ex8_1_1, ex8_1_3, ex8_1_4, ex8_1_5, ex8_1_6)
 from .expfit import expfit
 from .fermat import (fermat_vareps, fermat2_vareps)
