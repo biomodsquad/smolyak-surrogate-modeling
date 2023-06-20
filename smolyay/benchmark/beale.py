@@ -2,11 +2,7 @@ import numpy
 
 from .benchmark import BenchmarkFunction
 
-class beale(BenchmarkFunction):
-    @property
-    def domain(self):
-        return ([[-7.0000000008, 11.69999999928],
-                          [-9.5000000002,9.44999999982]])
+class _beale(BenchmarkFunction):
 
     def _function(self,x):
         v = numpy.zeros((x[...,0].size,3))
@@ -27,3 +23,10 @@ class beale(BenchmarkFunction):
         v[...,0] = v[...,2] * v[...,2]
         v[...,1] += v[...,0]
         return v[...,1]
+
+
+class beale(_beale):
+    @property
+    def domain(self):
+        return ([[-7.0000000008, 11.69999999928],
+                          [-9.5000000002,9.44999999982]])

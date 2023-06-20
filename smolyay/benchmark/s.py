@@ -1,8 +1,10 @@
 import numpy
 
+from .beale import _beale
 from .benchmark import BenchmarkFunction
 from .box import _box
 from .camel import _camel
+from .cube import _cube
 from .kow import _kow
 from .osborne import _osborne
 from .powell import _powell
@@ -52,31 +54,10 @@ class s202(BenchmarkFunction):
 
 
 
-class s205(BenchmarkFunction):
+class s205(_beale):
     @property
     def domain(self):
         return [[-7.0000000003, 11.69999999973], [-9.5000000001, 9.44999999991]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = 1. - x[...,1]
-        v[...,1] = x[...,0] * v[...,0]
-        v[...,0] = 1.5 - v[...,1]
-        v[...,1] = v[...,0] * v[...,0]
-        v[...,0] = x[...,1] * x[...,1]
-        v[...,2] = 1. - v[...,0]
-        v[...,0] = x[...,0] * v[...,2]
-        v[...,2] = 2.25 - v[...,0]
-        v[...,0] = v[...,2] * v[...,2]
-        v[...,1] += v[...,0]
-        v[...,0] = pow(x[...,1], 3)
-        v[...,2] = 1. - v[...,0]
-        v[...,0] = x[...,0] * v[...,2]
-        v[...,2] = 2.625 - v[...,0]
-        v[...,0] = v[...,2] * v[...,2]
-        v[...,1] += v[...,0]
-
-        return v[...,1]
 
 class s206(BenchmarkFunction):
     @property
@@ -157,21 +138,10 @@ class s210(BenchmarkFunction):
         v[...,0] = v[...,1] + v[...,2]
         return v[...,0]
 
-class s211(BenchmarkFunction):
+class s211(_cube):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = pow(x[...,0], 3)
-        v[...,1] = x[...,1] - v[...,0]
-        v[...,0] = v[...,1] * v[...,1]
-        v[...,1] = 100. * v[...,0]
-        v[...,0] = 1. - x[...,0]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,0] = v[...,1] + v[...,2]
-        return v[...,0]
 
 class s212(BenchmarkFunction):
     @property
