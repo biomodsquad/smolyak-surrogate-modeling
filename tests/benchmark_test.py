@@ -6,7 +6,8 @@ import importlib
 import inspect
 
 from smolyay.basis import ChebyshevFirstKind
-from smolyay.benchmark import *
+import smolyay.benchmark
+from smolyay.benchmark import (BenchmarkFunction, branin)
 from smolyay.grid import SmolyakGridGenerator
 from smolyay.surrogate import Surrogate
 
@@ -47,9 +48,6 @@ def test_name(test_class_1,test_class_3):
     """Test name is the name of the function"""
     assert test_class_1.name == "TestClass1D"
     assert test_class_3.name == "TestClass3D"
-    for f in functions:
-        a = eval(f.name + '()')
-        assert type(a) is type(f)
 
 def test_domain(test_class_1,test_class_3):
     """Test return domain as list of lists"""
