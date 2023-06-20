@@ -91,23 +91,6 @@ class hs3mod(BenchmarkFunction):
         rv = v[...,0] + x[...,1]
         return rv
 
-class hs5(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[-1.5, 4.0], [-3.0, 3.0]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = x[...,0] + x[...,1]
-        v[...,1] = numpy.sin(v[...,0])
-        v[...,0] = x[...,0] - x[...,1]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,1] += v[...,2]
-        v[...,1] += 1.
-        rv = v[...,1] + -1.5*x[...,0]
-        rv += 2.5*x[...,1]
-        return rv
-
 class hs038(BenchmarkFunction):
     @property
     def domain(self):

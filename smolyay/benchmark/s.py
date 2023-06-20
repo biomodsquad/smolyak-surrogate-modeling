@@ -3180,18 +3180,3 @@ class s370(BenchmarkFunction):
         v[...,1] = v[...,2] * v[...,2]
         v[...,0] += v[...,1]
         return v[...,0]
-
-class s386(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[-5.0, 13.5], [-4.0, 14.4]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = -5. + x[...,0]
-        v[...,1] = v[...,0] * v[...,0]
-        v[...,0] = 4. * v[...,1]
-        v[...,1] = -6. + x[...,1]
-        v[...,2] = v[...,1] * v[...,1]
-        v[...,1] = v[...,0] + v[...,2]
-        return v[...,1]
