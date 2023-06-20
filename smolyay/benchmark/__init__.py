@@ -35,7 +35,7 @@ from .loghairy import loghairy
 from .logros import logros
 from .maratosb import maratosb
 from .mdhole import mdhole
-from .median_vareps import median_vareps
+from .median import median_vareps
 from .mexhat import mexhat
 from .nasty import nasty
 from .osborne import (osborne1, osbornea)
