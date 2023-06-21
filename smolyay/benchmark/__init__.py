@@ -26,7 +26,7 @@ from .hart6 import hart6
 from .hatfld import (hatflda, hatfldb, hatfldc, hatfldd)
 from .heart import heart6ls
 from .himmel import (himmelbb, himmelbf, himmelbg, himmelp1)
-from .hs import (hs001, hs002, hs003, hs004, hs005, hs038, hs045, hs3mod, hs5)
+from .hs import (hs001, hs002, hs003, hs004, hs005, hs038, hs045, hs3mod)
 from .humps import humps
 from .jensmp import jensmp
 from .kow import (kowalik, kowosb)
@@ -43,20 +43,19 @@ from .palmer import (palmer1, palmer2a, palmer3, palmer4, palmer5c, palmer5d,
                      palmer6a, palmer8a)
 from .powell import powell
 from .price import price
-from .prob09 import prob09
 from .pspdoc import pspdoc
 from .rosenbr import rosenbr
 from .s import (s201, s202, s205, s206, s207, s208, s209, s210, s211, s212,
                 s213, s214, s229, s240, s242, s244, s245, s246, s256, s257,
                 s258, s259, s260, s261, s266, s267, s271, s272, s273, s274,
                 s275, s276, s290, s294, s308, s309, s311, s312, s328, s333,
-                s350, s351, s352, s358, s370, s386)
+                s350, s351, s352, s358, s370)
 from .schwefel import schwefel
 from .shekel import shekel
 from .sim import (sim2bqp, simbqp)
 from .sineval import sineval
 from .sisser import sisser
-from .st import (st_bsj3, st_cqpjk2, st_e39)
+from .st import (st_bsj3, st_cqpjk2)
 from .tre import tre
 from .yfit import yfit
 from .zangwil2 import zangwil2

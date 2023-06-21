@@ -2,6 +2,18 @@ import numpy
 
 from .benchmark import BenchmarkFunction
 
+class _rosenbrock(BenchmarkFunction):
+    def _function(self,x):
+        v = numpy.zeros((x[...,0].size,3))
+        v[...,0] = x[...,0] * x[...,0]
+        v[...,1] = x[...,1] - v[...,0]
+        v[...,0] = v[...,1] * v[...,1]
+        v[...,1] = 100. * v[...,0]
+        v[...,0] = 1. - x[...,0]
+        v[...,2] = v[...,0] * v[...,0]
+        v[...,0] = v[...,1] + v[...,2]
+        return v[...,0]
+
 class rosenbr(BenchmarkFunction):
     @property
     def domain(self):

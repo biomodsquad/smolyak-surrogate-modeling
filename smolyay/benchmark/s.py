@@ -8,6 +8,7 @@ from .cube import _cube
 from .kow import _kow
 from .osborne import _osborne
 from .powell import _powell
+from .rosenbr import _rosenbrock
 
 
 class s201(BenchmarkFunction):
@@ -90,21 +91,10 @@ class s207(BenchmarkFunction):
         v[...,1] = v[...,0] + v[...,2]
         return v[...,1]
 
-class s208(BenchmarkFunction):
+class s208(_rosenbrock):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0000000001, 9.89999999991]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,1] = x[...,1] - v[...,0]
-        v[...,0] = v[...,1] * v[...,1]
-        v[...,1] = 100. * v[...,0]
-        v[...,0] = 1. - x[...,0]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,0] = v[...,1] + v[...,2]
-        return v[...,0]
 
 class s209(BenchmarkFunction):
     @property
@@ -199,21 +189,10 @@ class s214(BenchmarkFunction):
         v[...,0] = pow(v[...,1], 0.25)
         return v[...,0]
 
-class s229(BenchmarkFunction):
+class s229(_rosenbrock):
     @property
     def domain(self):
         return [[-2.0, 2.0], [-2.0, 2.0]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,1] = x[...,1] - v[...,0]
-        v[...,0] = v[...,1] * v[...,1]
-        v[...,1] = 100. * v[...,0]
-        v[...,0] = 1. - x[...,0]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,0] = v[...,1] + v[...,2]
-        return v[...,0]
 
 class s240(BenchmarkFunction):
     @property

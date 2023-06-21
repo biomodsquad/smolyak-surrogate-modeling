@@ -1,38 +1,17 @@
 import numpy
 
 from .benchmark import BenchmarkFunction
+from .rosenbr import _rosenbrock
 
-class hs001(BenchmarkFunction):
+class hs001(_rosenbrock):
     @property
     def domain(self):
         return [[-9.0000000086, 10.9999999914], [-1.5, 10.9999999828]]
 
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,1] = x[...,1] - v[...,0]
-        v[...,0] = v[...,1] * v[...,1]
-        v[...,1] = 100. * v[...,0]
-        v[...,0] = 1. - x[...,0]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,0] = v[...,1] + v[...,2]
-        return v[...,0]
-
-class hs002(BenchmarkFunction):
+class hs002(_rosenbrock):
     @property
     def domain(self):
         return [[-8.7756292513, 11.2243707487], [1.5, 11.5]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,1] = x[...,1] - v[...,0]
-        v[...,0] = v[...,1] * v[...,1]
-        v[...,1] = 100. * v[...,0]
-        v[...,0] = 1. - x[...,0]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,0] = v[...,1] + v[...,2]
-        return v[...,0]
 
 class hs003(BenchmarkFunction):
     @property
