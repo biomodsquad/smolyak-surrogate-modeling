@@ -2,7 +2,7 @@ from .aircrftb import aircrftb
 from .allinit import (allinit, allinitu)
 from .beale import beale
 from .benchmark import BenchmarkFunction
-from .biggs import (biggs3, biggs6)
+from .biggs import (biggs3, biggs5, biggs6)
 from .box import (box2, box3)
 from .branin import branin
 from .brown import (brownden)
