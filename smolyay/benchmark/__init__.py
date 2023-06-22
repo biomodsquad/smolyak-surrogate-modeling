@@ -31,6 +31,7 @@ from .humps import humps
 from .jensmp import jensmp
 from .kow import (kowalik, kowosb)
 from .least import least
+from .levy3 import levy3
 from .loghairy import loghairy
 from .logros import logros
 from .maratosb import maratosb
