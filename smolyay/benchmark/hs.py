@@ -2,6 +2,7 @@ import numpy
 
 from .benchmark import BenchmarkFunction
 from .rosenbr import _rosenbrock
+from .wood import _wood
 
 class hs001(_rosenbrock):
     @property
@@ -70,43 +71,11 @@ class hs3mod(BenchmarkFunction):
         rv = v[...,0] + x[...,1]
         return rv
 
-class hs038(BenchmarkFunction):
+class hs038(_wood):
     @property
     def domain(self):
         return [[-10.0, 10.0], [-9.0, 11.0], [-9.0000000001, 10.9999999999],
                 [-9.0000000001, 10.9999999999]]
-
-    def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,1] = x[...,1] - v[...,0]
-        v[...,0] = v[...,1] * v[...,1]
-        v[...,1] = 100. * v[...,0]
-        v[...,0] = 1. - x[...,0]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,1] += v[...,2]
-        v[...,2] = x[...,2] * x[...,2]
-        v[...,0] = x[...,3] - v[...,2]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,0] = 90. * v[...,2]
-        v[...,1] += v[...,0]
-        v[...,0] = 1. - x[...,2]
-        v[...,2] = v[...,0] * v[...,0]
-        v[...,1] += v[...,2]
-        v[...,2] = -1. + x[...,1]
-        v[...,0] = v[...,2] * v[...,2]
-        v[...,2] = 10.1 * v[...,0]
-        v[...,1] += v[...,2]
-        v[...,2] = -1. + x[...,3]
-        v[...,0] = v[...,2] * v[...,2]
-        v[...,2] = 10.1 * v[...,0]
-        v[...,1] += v[...,2]
-        v[...,2] = -1. + x[...,1]
-        v[...,0] = 19.8 * v[...,2]
-        v[...,2] = -1. + x[...,3]
-        v[...,3] = v[...,0] * v[...,2]
-        v[...,1] += v[...,3]
-        return v[...,1]
 
 class hs045(BenchmarkFunction):
     @property
