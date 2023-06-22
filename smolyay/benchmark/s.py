@@ -9,7 +9,7 @@ from .kow import _kow
 from .osborne import _osborne
 from .powell import _powell
 from .rosenbr import _rosenbrock
-from .wood import _wood
+from .hs import _wood
 
 
 class s201(BenchmarkFunction):
