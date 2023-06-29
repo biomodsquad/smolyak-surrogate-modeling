@@ -180,6 +180,18 @@ def test_surrogate_1():
     assert numpy.allclose(surrogate_values, exact_values)
 
 
+def test_surrogate_1_multi_input():
+    """Test if surrogate generates exact results when call has >1 input."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
+    surrogate.train(function_1)
+    # random points in the domain
+    points = [(0.649, -0.9), (-0.885, 1)]
+    surrogate_values = [surrogate(x) for x in points]
+    surrogate_values_multi = surrogate(points)
+    assert numpy.allclose(surrogate_values, surrogate_values_multi)
+
+
 def test_surrogate_0_shifted():
     """Test if surrogate generates exact results for a shifted function 0."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))

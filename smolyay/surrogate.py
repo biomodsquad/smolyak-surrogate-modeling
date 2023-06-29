@@ -243,24 +243,28 @@ class Surrogate:
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
-        x = numpy.array(x, copy=False, ndmin=1)
-        if x.shape != (self.dimension, ):
+        x = numpy.array(x, copy=False, ndmin=2)
+        if x.shape[-1] != self.dimension:
             raise IndexError('Input must match dimension of domain.')
-        if not (numpy.all(x >= self._domain[:, 0])
-                and numpy.all(x <= self._domain[:, 1])):
+        if self.dimension > 1:
+            oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
+                    for xi,bound in zip(x.transpose(),self.domain))
+        else:
+            oob = (numpy.any(x < self.domain[0]) or 
+                    numpy.any(x > self.domain[1]))
+        if oob:
             raise ValueError('x must lie in domain of surrogate')
         # transform point into basis domain and evaluate
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
         value = 0
         for coeff, basis in zip(self._coefficients, self.grid.basis_functions):
             if self.dimension > 1:
-                term = numpy.product(
-                    [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled)])
+                term = numpy.prod(
+                    [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled.transpose())],axis=0)
             else:
                 term = basis(x_scaled[0])
             value += coeff*term
-
-        return value
+        return numpy.squeeze(value)
 
     def train(self, function, linear_solver='lu'):
         """Fit surrogate's components (basis functions) to the function.
@@ -361,7 +365,16 @@ class Surrogate:
         if old.ndim != 2 or old.shape[1] != 2:
             raise TypeError('Domain should be a dim x 2 array')
 
-        return new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
+        new_x = new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
+        # clamp lower bound
+        flags = numpy.array(new_x < new[:, 0])
+        test = numpy.broadcast_to(new[:, 0],flags.shape)
+        new_x[flags] = test[flags]
+        # clamp upper bound
+        flags = numpy.array(new_x > new[:, 1])
+        test = numpy.broadcast_to(new[:, 1],flags.shape)
+        new_x[flags] = test[flags]
+        return new_x
 
     def _reset_grid(self):
         """Reset the grids, coefficients and points."""
