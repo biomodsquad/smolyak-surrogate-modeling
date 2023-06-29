@@ -67,6 +67,14 @@ def test_cheb_call_random_points():
         f = ChebyshevFirstKind(n)
         assert numpy.isclose(f(x),special.eval_chebyt(n,x))
 
+def test_cheb_call_random_points_multi_input():
+    """Test that chebyshev polynomial call handles multiple x inputs"""
+    numpy.random.seed(567)
+    ns = numpy.random.randint(20,size = 20)
+    xs = numpy.random.rand(20) * 2 - 1
+    for n in ns:
+        f = ChebyshevFirstKind(n)
+        assert numpy.isclose(f(xs),special.eval_chebyt(n,xs)).all()
 
 def test_cheb_derivative():
     """Test if the correct derivative is generated."""
@@ -76,10 +84,14 @@ def test_cheb_derivative():
     assert f0.derivative(1) == pytest.approx(0)
     assert f1.derivative(1) == pytest.approx(1)
     assert f2.derivative(1) == pytest.approx(4)
-
+    
     assert f0.derivative(-0.5) == pytest.approx(0)
     assert f1.derivative(-0.5) == pytest.approx(1)
     assert f2.derivative(-0.5) == pytest.approx(-2)
+
+    assert numpy.isclose(f0.derivative([1,-0.5]),[0,0]).all()
+    assert numpy.isclose(f1.derivative([1,-0.5]),[1,1]).all()
+    assert numpy.isclose(f2.derivative([1,-0.5]),[4,-2]).all()
 
 
 def test_cheb_2nd_derivative():
@@ -99,6 +111,11 @@ def test_cheb_2nd_derivative():
     assert u1.derivative(0.5) == pytest.approx(2)
     assert u2.derivative(0.5) == pytest.approx(4)
 
+    assert numpy.isclose(u0.derivative([1,-1,0.5]),[0,0,0]).all()
+    assert numpy.isclose(u1.derivative([1,-1,0.5]),[2,2,2]).all()
+    assert numpy.isclose(u2.derivative([1,-1,0.5]),[8,-8,4]).all()
+
+
 
 def test_cheb_call_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
@@ -107,6 +124,9 @@ def test_cheb_call_invalid_input():
         f(2)
     with pytest.raises(ValueError):
         f(-2)
+    with pytest.raises(ValueError):
+        f([0.5,0.7,3,0.8])
+
 
 def test_cheb_derivative_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
@@ -170,6 +190,16 @@ def test_cheb_2nd_call_random_points():
         f = ChebyshevSecondKind(n)
         assert numpy.isclose(f(x),special.eval_chebyu(n,x))
 
+def test_cheb_2nd_call_random_points_multi_input():
+    """Test that chebyshev polynomial call handles multiple x inputs"""
+    numpy.random.seed(567)
+    ns = numpy.random.randint(20,size = 20)
+    xs = numpy.random.rand(20) * 2 - 1
+    for n in ns:
+        f = ChebyshevSecondKind(n)
+        assert numpy.isclose(f(xs),special.eval_chebyu(n,xs)).all()
+
+
 def test_cheb_2nd_call_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
     f = ChebyshevSecondKind(4)
@@ -177,15 +207,19 @@ def test_cheb_2nd_call_invalid_input():
         f(2)
     with pytest.raises(ValueError):
         f(-2)
+    with pytest.raises(ValueError):
+        f([0.5,0.7,3,0.8])
 
 
 def test_cheb_2nd_derivative_invalid_input():
     """Test call raises error if input is outside domain [-1,1]"""
     f = ChebyshevSecondKind(4)
     with pytest.raises(ValueError):
-        f(2)
+        f.derivative(2)
     with pytest.raises(ValueError):
-        f(-2)
+        f.derivative(-2)
+    with pytest.raises(ValueError):
+        f.derivative([0.5,0.7,3,0.8])
 
 
 def test_set_initialize_empty():

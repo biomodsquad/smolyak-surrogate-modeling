@@ -1,7 +1,9 @@
 import abc
 import math
+import warnings
 
 import numpy
+import scipy.special
 
 class BasisFunction(abc.ABC):
     """Basis function for interpolating data.
@@ -130,19 +132,10 @@ class ChebyshevFirstKind(BasisFunction):
             if input is outside the domain [-1,1]
 
         """
-        if x > 1 or x < -1:
+        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
             raise ValueError("Input is outside the domain [-1,1]")
 
-        if self._n == 0:
-            return 1
-        elif self._n == 1:
-            return x
-        else:
-            k_lim = self._n//2
-            answer = 0
-            for k in range(0,k_lim+1):
-                answer += math.comb(self._n,2*k)*((x**2 - 1)**k)*(x**(self._n-2*k))
-            return answer
+        return scipy.special.eval_chebyt(self._n,x)
 
     def derivative(self, x):
         """Evaluate the derivative of ChebyshevFirstKind.
@@ -169,7 +162,7 @@ class ChebyshevFirstKind(BasisFunction):
         ValueError
             if input is outside the domain [-1,1].
         """
-        if x > 1 or x < -1:
+        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
             raise ValueError("Input is outside the domain [-1,1]")
         if self._derivative_polynomial is None:
             self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
@@ -308,18 +301,9 @@ class ChebyshevSecondKind(BasisFunction):
             if input is outside the domain [-1,1]
 
         """
-        if x > 1 or x < -1:
+        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
             raise ValueError("Input is outside the domain [-1,1]")
-        if self._n == 0:
-            return 1
-        elif self._n == 1:
-            return 2*x
-        else:
-            k_lim = self._n//2
-            answer = 0
-            for k in range(0,k_lim+1):
-                answer += math.comb(self._n+1,2*k+1)*((x**2 - 1)**k)*(x**(self._n-2*k))
-            return answer
+        return scipy.special.eval_chebyu(self._n,x)
 
     def derivative(self, x):
         r"""Evaluate the derivative of Chebyshev Second Kind.
@@ -352,17 +336,23 @@ class ChebyshevSecondKind(BasisFunction):
         ValueError
             if input is outside the domain [-1,1].
         """
-        if x > 1 or x < -1:
+        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
             raise ValueError("Input is outside the domain [-1,1]")
-        if x == 1:
-            return self._n*(self._n+1)*(self._n+2)/3
-        elif x == -1:
-            return ((-1)**(self._n+1))*self._n*(self._n+1)*(self._n+2)/3
+        if self._derivative_polynomial is None:
+            self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
+        x = numpy.array(x, copy=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore",RuntimeWarning)
+            y = numpy.where(numpy.logical_not(numpy.logical_or(x == 1,x == -1)),
+                            ((self._n+1)*self._derivative_polynomial(x) -
+                             x*self(x))/(x**2-1),
+                            self._n*(self._n+1)*(self._n+2)/3)
+            y = numpy.where(x == -1,((-1)**(self._n+1))*
+                            self._n*(self._n+1)*(self._n+2)/3,y)
+        if y.shape == ():
+            return y[()]
         else:
-            if self._derivative_polynomial is None:
-                self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
-            return ((self._n+1)*self._derivative_polynomial(x) -
-                    x*self(x))/(x**2-1)
+            return numpy.squeeze(y)
 
     @classmethod
     def make_nested_set(cls, exactness):
