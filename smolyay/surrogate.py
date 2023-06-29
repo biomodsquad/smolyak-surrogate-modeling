@@ -365,16 +365,7 @@ class Surrogate:
         if old.ndim != 2 or old.shape[1] != 2:
             raise TypeError('Domain should be a dim x 2 array')
 
-        new_x = new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
-        # clamp lower bound
-        flags = numpy.array(new_x < new[:, 0])
-        test = numpy.broadcast_to(new[:, 0],flags.shape)
-        new_x[flags] = test[flags]
-        # clamp upper bound
-        flags = numpy.array(new_x > new[:, 1])
-        test = numpy.broadcast_to(new[:, 1],flags.shape)
-        new_x[flags] = test[flags]
-        return new_x
+        return new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
 
     def _reset_grid(self):
         """Reset the grids, coefficients and points."""
@@ -476,14 +467,14 @@ class GradientSurrogate(Surrogate):
         Raises
         ------
         IndexError
-            Data should be of length of the grid points x dimension.
+            Data should have size length of the grid points x dimension.
         """
         self._data = numpy.array(data, ndmin=1)
         expected_data_shape = ((len(self.grid.points), self.dimension)
                                if self.dimension > 1 else (
                                        len(self.grid.points),))
         if self._data.shape != expected_data_shape:
-            raise IndexError("Data must be of size of number"
+            raise IndexError("Data must have size of number"
                              "of grid points x dimension.")
         points, basis_functions = self.grid.points, self.grid.basis_functions
         # create basis matrix with appropriate size
