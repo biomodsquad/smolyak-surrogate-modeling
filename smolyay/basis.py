@@ -346,9 +346,7 @@ class ChebyshevSecondKind(BasisFunction):
             y = numpy.where(numpy.logical_not(numpy.logical_or(x == 1,x == -1)),
                             ((self._n+1)*self._derivative_polynomial(x) -
                              x*self(x))/(x**2-1),
-                            self._n*(self._n+1)*(self._n+2)/3)
-            y = numpy.where(x == -1,((-1)**(self._n+1))*
-                            self._n*(self._n+1)*(self._n+2)/3,y)
+                            self(x)*((self._n+1)**2 -1)/(3*x))
         if y.shape == ():
             return y[()]
         else:
