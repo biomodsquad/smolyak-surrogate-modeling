@@ -321,6 +321,12 @@ class ChebyshevSecondKind(BasisFunction):
             \lim_{x \to 1} U_n'(x) = \frac{n(n+1)(n+2)}{3}
             \lim_{x \to -1} U_n'(x) = (-1)^{n+1} \frac{n(n+1)(n+2)}{3}
 
+        derivative can be found using L'Hôpital's rule, 
+
+        ..math::
+            \lim_{x \to 1} U_n'(x) = \frac{U_n'(x)((n+1)(n+1)-1)}{3x}
+            \lim_{x \to -1} U_n'(x) = \frac{U_n'(x)((n+1)(n+1)-1)}{3x}
+
         Parameters
         ----------
         x: float
