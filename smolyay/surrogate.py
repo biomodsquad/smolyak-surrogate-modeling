@@ -192,13 +192,18 @@ class Surrogate:
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
-        x = numpy.array(x, copy=False, ndmin=1)
-        if x.shape != (self.dimension, ):
+        x = numpy.array(x, copy=False, ndmin=2)
+        if x.shape[-1] != self.dimension:
             raise IndexError('Input must match dimension of domain.')
-        if not (numpy.all(x >= self._domain[:, 0])
-                and numpy.all(x <= self._domain[:, 1])):
+        if self.dimension > 1:
+            oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
+                    for xi,bound in zip(x.transpose(),self.domain))
+        else:
+            oob = (numpy.any(x < self.domain[0]) or 
+                    numpy.any(x > self.domain[1]))
+        if oob:
             raise ValueError('x must lie in domain of surrogate')
-
+        
         gradient = []
         # transform point into basis domain
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
@@ -210,12 +215,13 @@ class Surrogate:
                 if self.dimension > 1:
                     term = numpy.prod(
                         [f.derivative(x) if dim == ni else f(x) for dim, (x, f)
-                         in enumerate(zip(x_scaled, basis))])
+                         in enumerate(zip(x_scaled.transpose(), basis))],
+                        axis=0)
                 else:
                     term = basis.derivative(x_scaled[0])
                 value += coeff*term
-            gradient.append(value)
-
+            gradient.append(numpy.squeeze(value))
+        gradient = numpy.array(gradient,copy=False).transpose()
         return gradient[0] if self.dimension == 1 else gradient
 
     def __call__(self, x):

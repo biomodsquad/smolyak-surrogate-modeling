@@ -255,6 +255,18 @@ def test_gradient_surrogate_3():
     assert numpy.allclose(surrogate_gradient_values, exact_values)
 
 
+def test_gradient_surrogate_3_multi_input():
+    """Test if surrogate generates exact results if gradient has >1 input."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([(-2, 2), (-2, 2)], grid_gen)
+    surrogate.train(function_3)
+    # random points in the domain
+    points = [(0.649, -0.9), (-0.885, 1)]
+    surrogate_gradient_values = [surrogate.gradient(x) for x in points]
+    gradient_values_multi = surrogate.gradient(points)
+    assert numpy.allclose(surrogate_gradient_values, gradient_values_multi)
+
+
 def test_gradient_surrogate_4():
     """Test if surrogate generates exact results for test for Chebyshevs."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
