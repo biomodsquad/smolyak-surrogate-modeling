@@ -5,10 +5,6 @@ import numpy
 class BenchmarkFunction(abc.ABC):
     """Benchmark Function
 
-    Implementation of benchmark problems used for optimization, testing, and 
-    analysis of surrogate function solvers. These benchmark problems come from
-    https://sahinidis.coe.gatech.edu/dfo
-
     These functions operate on a defined `domain` they can be evaluated on,
     and the upper and lower bounds of this domain can be the domain in which
     solutions exist or can be arbitrary.

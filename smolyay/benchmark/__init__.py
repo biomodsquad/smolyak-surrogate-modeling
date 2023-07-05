@@ -1,3 +1,11 @@
+'''Benchmark Module
+This module contains benchmark problems used for optimization, testing, and 
+analysis of surrogate function solvers. The benchmark functions come from 
+the princetonLib and globalLib collections of models.
+
+The original implementation of these benchmark problems were written in C
+code that can be found at https://sahinidis.coe.gatech.edu/dfo
+'''
 from .aircrftb import aircrftb
 from .allinit import (allinit, allinitu)
 from .beale import beale
