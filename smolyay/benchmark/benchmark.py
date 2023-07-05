@@ -36,7 +36,7 @@ class BenchmarkFunction(abc.ABC):
     
     @property
     def name(self):
-        """Name of the function"""
+        """str: Name of the function"""
         return type(self).__name__
 
     @property
