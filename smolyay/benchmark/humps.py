@@ -8,7 +8,7 @@ class humps(BenchmarkFunction):
         return [[-10.0000000029, 8.99999999739], [-10.000000004, 8.9999999964]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 0.05 * v[...,0]
         v[...,0] = x[...,1] * x[...,1]

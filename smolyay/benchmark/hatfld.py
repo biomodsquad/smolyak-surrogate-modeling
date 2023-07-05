@@ -10,7 +10,7 @@ class hatfldd(BenchmarkFunction):
                 [-10.7584301644, 8.31741285204]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.2 * x[...,2]
         v[...,1] = numpy.exp(v[...,0])
         v[...,0] = 0.2 * x[...,1]
@@ -104,7 +104,7 @@ class hatfldd(BenchmarkFunction):
 
 class _hatfld(BenchmarkFunction):
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -1. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = numpy.sqrt(x[...,1])
@@ -139,7 +139,7 @@ class hatfldc(BenchmarkFunction):
         return [[0, 10], [0, 10], [0, 10], [-8.9999999978, 11.0000000022]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -1. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = x[...,1] * x[...,1]

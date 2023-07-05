@@ -8,7 +8,7 @@ class denschna(BenchmarkFunction):
         return [[-20, 9], [-20, 9]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = pow(x[...,0], 4.)
         v[...,1] = x[...,0] + x[...,1]
         v[...,2] = v[...,1] * v[...,1]
@@ -25,7 +25,7 @@ class denschnb(BenchmarkFunction):
         return [[-8.0, 10.8], [-11.0, 8.1]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -2. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = -2. + x[...,0]
@@ -43,7 +43,7 @@ class denschnc(BenchmarkFunction):
         return [[-9.0, 9.9], [-9.0, 9.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,0] += -2.
         v[...,1] = x[...,1] * x[...,1]
@@ -64,7 +64,7 @@ class denschnf(BenchmarkFunction):
         return [[-10000.0, 10000.0], [-10000.0, 10000.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] + x[...,1]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 2. * v[...,1]
@@ -89,7 +89,7 @@ class denschnd(BenchmarkFunction):
         return [[-10.0002179404, 8.99980385364], [-9.9733994128, 9.02394052848], [-10.0001458391, 8.99986874481]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = pow(x[...,1], 3)
         v[...,2] = v[...,0] + v[...,1]
@@ -119,7 +119,7 @@ class denschne(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,2] = x[...,1] + v[...,1]

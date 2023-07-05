@@ -18,7 +18,7 @@ class s201(BenchmarkFunction):
         return [[-5.0, 13.5], [-4.0, 14.4]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -5. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 4. * v[...,1]
@@ -33,7 +33,7 @@ class s202(BenchmarkFunction):
         return [[-4.9999999725, 13.50000002475], [-6.0000000005, 12.59999999955]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -13. + x[...,0]
         v[...,1] = -2. * x[...,1]
         v[...,0] += v[...,1]
@@ -67,7 +67,7 @@ class s206(BenchmarkFunction):
         return [[-9.0, 9.9], [-9.0, 9.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -83,7 +83,7 @@ class s207(BenchmarkFunction):
         return [[-9.0000000009, 9.89999999919], [-9.0000000021, 9.89999999811]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -103,7 +103,7 @@ class s209(BenchmarkFunction):
         return [[-9.0, 9.9], [-9.0, 9.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -119,7 +119,7 @@ class s210(BenchmarkFunction):
         return [[-9.0000000407, 9.89999996337], [-9.0000000813, 9.89999992683]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -140,7 +140,7 @@ class s212(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,6))
+        v = numpy.zeros(list(x.shape[:-1]) + [6])
         v[...,0] = x[...,0] + x[...,1]
         v[...,1] = 4. * v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -164,7 +164,7 @@ class s213(BenchmarkFunction):
         return [[-8.9315761266, 9.96158148606], [-8.9315761266, 9.96158148606]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] - x[...,1]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 10. * v[...,1]
@@ -180,7 +180,7 @@ class s214(BenchmarkFunction):
         return [[-9.0, 9.9], [-9.0, 9.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] - x[...,1]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 10. * v[...,1]
@@ -201,7 +201,7 @@ class s240(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] - x[...,1]
         v[...,1] = v[...,0] + x[...,2]
         v[...,0] = v[...,1] * v[...,1]
@@ -227,7 +227,7 @@ class s244(BenchmarkFunction):
         return [[0, 10], [0, 10], [0, 10]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.1 * x[...,0]
         v[...,1] = -v[...,0]
         v[...,0] = numpy.exp(v[...,1])
@@ -352,7 +352,7 @@ class s246(BenchmarkFunction):
                 [-9.0000000004, 9.89999999964]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] + x[...,1]
         v[...,1] = v[...,0] / 2.
         v[...,0] = v[...,1] * v[...,1]
@@ -380,7 +380,7 @@ class s257(BenchmarkFunction):
         return [[0, 11], [-9, 11], [0, 11], [-9, 11]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = v[...,0] - x[...,1]
         v[...,0] = v[...,1] * v[...,1]
@@ -423,7 +423,7 @@ class s259(BenchmarkFunction):
         return [[-8.5641580904, 11.4358419096], [-7.936840288, 12.063159712], [-9.9310254894, 10.0689745106], [-10.0999682161, 0.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -459,7 +459,7 @@ class s260(BenchmarkFunction):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-8.9999999999, 9.90000000009]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -497,7 +497,7 @@ class s261(BenchmarkFunction):
         return [[-9.9909450357, 9.00814946787], [-8.991563976, 9.9075924216], [-9.0016688312, 9.89849805192], [-9.0000000002, 9.89999999982]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = numpy.exp(x[...,0])
         v[...,1] = v[...,0] - x[...,1]
         v[...,0] = pow(v[...,1], 4)
@@ -1212,7 +1212,7 @@ class s267(BenchmarkFunction):
                 [-5.2928287845, 14.7071712155], [-8.2232796262, 0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.1 * x[...,0]
         v[...,1] = -v[...,0]
         v[...,0] = numpy.exp(v[...,1])
@@ -1404,7 +1404,7 @@ class s271(BenchmarkFunction):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -1. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 150. * v[...,1]
@@ -1437,7 +1437,7 @@ class s272(BenchmarkFunction):
                 [0, 10.9999998493], [0, 14.9999995532], [0, 12.99999966]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.1 * x[...,0]
         v[...,1] = -v[...,0]
         v[...,0] = numpy.exp(v[...,1])
@@ -1664,7 +1664,7 @@ class s273(BenchmarkFunction):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -1. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 150. * v[...,1]
@@ -1722,7 +1722,7 @@ class s274(BenchmarkFunction):
         return [[-10.0000000052, 8.99999999532],[-10.0000000026, 8.99999999766]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.5 * x[...,1]
         v[...,1] = x[...,0] + v[...,0]
         v[...,0] = x[...,0] * v[...,1]
@@ -1739,7 +1739,7 @@ class s275(BenchmarkFunction):
         return [[-9.9999927549, 9.00000652059], [-10.000081616, 8.9999265456], [-9.999803482, 9.0001768662], [-10.0001277807, 8.99988499737]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 0.5 * x[...,1]
         v[...,0] += x[...,0]
         v[...,1] = 0.3333333333333333 * x[...,2]
@@ -1782,7 +1782,7 @@ class s276(BenchmarkFunction):
         return [[-10.0013714286, 9.9986285714], [-9.96, 10.04], [-10.2742857143, 9.7257142857], [-9.28, 10.72], [-10.8, 0.0], [-9.6832, 10.3168]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 0.5 * x[...,1]
         v[...,0] += x[...,0]
         v[...,1] = 0.3333333333333333 * x[...,2]
@@ -1867,7 +1867,7 @@ class s290(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 2. * x[...,1]
         v[...,2] = x[...,1] * v[...,1]
@@ -1882,7 +1882,7 @@ class s294(BenchmarkFunction):
                 [-9.1013488151, 10.8986511849], [-9.192426048, 10.807573952]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -1930,7 +1930,7 @@ class s308(BenchmarkFunction):
         return [[-9.8445627595, 9.13989351645], [-10.6945637774, 8.37489260034]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,0] += v[...,1]
@@ -1952,7 +1952,7 @@ class s309(BenchmarkFunction):
         return [[-6.517315694, 12.1344158754], [-6.1, 12.51]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = pow(x[...,0], 4)
         v[...,1] = 1.41 * v[...,0]
         v[...,0] = pow(x[...,0], 3)
@@ -1974,7 +1974,7 @@ class s311(BenchmarkFunction):
         return [[-7.0, 11.7], [-8.0, 10.8]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = v[...,0] + x[...,1]
         v[...,0] = -11. + v[...,1]
@@ -1992,7 +1992,7 @@ class s312(BenchmarkFunction):
         return [[-31.0266522627, -9.92398703643], [-46.7600087813, -24.08400790317]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 12. * x[...,1]
         v[...,2] = v[...,0] + v[...,1]
@@ -2018,7 +2018,7 @@ class s328(BenchmarkFunction):
         return [[1, 2.7], [1, 2.7]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 0.1 * v[...,0]
         v[...,0] = x[...,1] * x[...,1]
@@ -2046,7 +2046,7 @@ class s333(BenchmarkFunction):
         return [[79.901992908, 89.9117936172], [-1, 0.9], [-1, 0.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 4. * x[...,1]
         v[...,1] = -v[...,0]
         v[...,0] = numpy.exp(v[...,1])
@@ -2132,7 +2132,7 @@ class s351(BenchmarkFunction):
         return [[-7.3, 11.43], [80, 90], [1359, 1490], [0, 18]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = -7.391 + v[...,0]
         v[...,0] = v[...,1] / 7.391
@@ -2245,7 +2245,7 @@ class s352(BenchmarkFunction):
                 [-9.4196803043, 9.52228772613]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 0.2 * x[...,1]
         v[...,1] = x[...,0] + v[...,0]
         v[...,0] = -1.2214027581601699 + v[...,1]
@@ -2458,7 +2458,7 @@ class s370(BenchmarkFunction):
         return [[-10.0157250871, 8.98584742161], [-8.9875651305, 9.91119138255], [-10.2329916267, 8.79030753597], [-8.7395699127, 10.13438707857], [-11.5137289215, 7.63764397065], [-9.0070035692, 9.89369678772]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,0] * x[...,0]
         v[...,2] = x[...,1] - v[...,1]

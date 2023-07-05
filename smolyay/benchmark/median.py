@@ -8,7 +8,7 @@ class median_vareps(BenchmarkFunction):
         return [[1e-08, 10.00000001], [-9.499789331, 10.500210669]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = -0.6092090562543065 + x[...,1]
         v[...,2] = v[...,1] * v[...,1]

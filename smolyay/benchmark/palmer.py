@@ -9,7 +9,7 @@ class palmer1(BenchmarkFunction):
                 [1e-05, 11.5013647921], [1e-05, 10.0931561774]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 3.2003886153690004 * x[...,0]
         v[...,1] = 3.2003886153690004 / x[...,3]
         v[...,2] = x[...,2] + v[...,1]
@@ -265,7 +265,7 @@ class palmer2a(BenchmarkFunction):
                 [-10.081937131,9.918062869]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 3.046173318241 * x[...,1]
         v[...,0] += x[...,0]
         v[...,1] = 9.279171884763384 * x[...,2]
@@ -542,7 +542,7 @@ class palmer3(BenchmarkFunction):
         return [[1e-06, 10.0375049888], [1e-06, 10.0034428969],
                 [1e-06, 14.6439962785], [7.3225711014, 27.3225711014]]
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2.749172911969 * x[...,0]
         v[...,1] = 2.749172911969 / x[...,3]
         v[...,2] = x[...,2] + v[...,1]
@@ -732,7 +732,7 @@ class palmer4(BenchmarkFunction):
                 [1e-05, 10.0158603779], [8.2655580306, 28.2655580306]]
     
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2.749172911969 * x[...,0]
         v[...,1] = 2.749172911969 / x[...,3]
         v[...,2] = x[...,2] + v[...,1]
@@ -926,7 +926,7 @@ class palmer5c(BenchmarkFunction):
                 [-10.1772297675, 8.84049320925]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -x[...,1]
         v[...,0] += x[...,0]
         v[...,0] += x[...,2]
@@ -1089,7 +1089,7 @@ class palmer5d(BenchmarkFunction):
                 [41.6401308813, 55.47611779317], [-9.304685674, 9.6257828934]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         
         v[...,0] = 83.57418 - x[...,0]
         v[...,1] = v[...,0] * v[...,0]
@@ -1203,7 +1203,7 @@ class palmer6a(BenchmarkFunction):
                 [1e-05, 10.7437425261]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = numpy.where(x[...,5]== 0,x[...,4],x[...,4] / x[...,5])
         v[...,1] = x[...,0] + v[...,0]
         v[...,0] = 10.678659 - v[...,1]
@@ -1363,7 +1363,7 @@ class palmer8a(BenchmarkFunction):
                 [2.8287670723, 22.8287670723], [-9.0495003432, 10.9504996568]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = numpy.where(x[...,5]== 0,x[...,4],x[...,4] / x[...,5])
         v[...,1] = x[...,0] + v[...,0]
         v[...,0] = 4.757534 - v[...,1]

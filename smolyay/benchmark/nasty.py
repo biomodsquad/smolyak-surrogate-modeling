@@ -8,7 +8,7 @@ class nasty(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 5.e+09 * x[...,0]
         v[...,1] = 1.e+10 * x[...,0]
         v[...,2] = v[...,0] * v[...,1]

@@ -8,7 +8,7 @@ class cliff(BenchmarkFunction):
         return [[-7, 11.7], [-6.8502133863, 11.83480795233]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 0.01 * x[...,0]
         v[...,1] = -0.03 + v[...,0]
         v[...,0] = v[...,1] * v[...,1]

@@ -8,7 +8,7 @@ class kowalik(BenchmarkFunction):
         return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 4. * x[...,1]
         v[...,1] = 16. + v[...,0]
         v[...,0] = x[...,0] * v[...,1]
@@ -120,7 +120,7 @@ class kowalik(BenchmarkFunction):
 
 class _kow(BenchmarkFunction):
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 4. * x[...,1]
         v[...,1] = 16. + v[...,0]
         v[...,0] = x[...,0] * v[...,1]

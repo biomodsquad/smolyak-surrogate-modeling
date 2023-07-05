@@ -13,7 +13,7 @@ class heart6ls(BenchmarkFunction):
                 [-9.2029016565, 9.71738850915]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,6))
+        v = numpy.zeros(list(x.shape[:-1]) + [6])
         v[...,0] = x[...,2] * x[...,0]
         v[...,1] = -0.816 - x[...,0]
         v[...,2] = x[...,3] * v[...,1]

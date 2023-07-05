@@ -8,7 +8,7 @@ class sim2bqp(BenchmarkFunction):
         return [[-10, 9], [0, 0.45]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -x[...,0]
         v[...,1] = v[...,0] + x[...,1]
         v[...,0] = v[...,1] * v[...,1]
@@ -24,7 +24,7 @@ class simbqp(BenchmarkFunction):
         return [[-10, 9], [0, 0.45]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -x[...,0]
         v[...,1] = v[...,0] + x[...,1]
         v[...,0] = v[...,1] * v[...,1]

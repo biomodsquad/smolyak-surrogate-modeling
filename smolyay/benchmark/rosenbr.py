@@ -4,7 +4,7 @@ from .benchmark import BenchmarkFunction
 
 class _rosenbrock(BenchmarkFunction):
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -20,7 +20,7 @@ class rosenbr(BenchmarkFunction):
         return [[-10.0, 5.0], [-10.0, 10.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,7))
+        v = numpy.zeros(list(x.shape[:-1]) + [7])
         v[...,0] = x[...,0] * x[...,0]
         v[...,5] = -10. * v[...,0]
         v[...,5] = v[...,5] + 10.*x[...,1]

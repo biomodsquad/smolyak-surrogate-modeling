@@ -8,7 +8,7 @@ class eg1(BenchmarkFunction):
         return [[-10.2302657121, 9.7697342879], [-1, 1], [1, 2]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,2]
         v[...,2] = pow(v[...,1], 4.)

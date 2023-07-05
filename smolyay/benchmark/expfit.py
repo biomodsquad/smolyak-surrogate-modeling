@@ -8,7 +8,7 @@ class expfit(BenchmarkFunction):
         return [[-9.5210154534, 9.43108609194], [-9.3116998055, 9.61947017505]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 0.25 * x[...,1]
         v[...,1] = numpy.exp(v[...,0])
         v[...,0] = x[...,0] * v[...,1]

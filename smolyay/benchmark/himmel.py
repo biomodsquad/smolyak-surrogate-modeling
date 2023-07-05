@@ -8,7 +8,7 @@ class himmelbb(BenchmarkFunction):
         return [[-9.7002462348, 9.26977838868], [-9.29902796, 9.630874836]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,1]
         v[...,1] = 1. - x[...,0]
         v[...,2] = v[...,0] * v[...,1]
@@ -27,7 +27,7 @@ class himmelbg(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -x[...,0]
         v[...,1] = v[...,0] - x[...,1]
         v[...,0] = numpy.exp(v[...,1])
@@ -46,7 +46,7 @@ class himmelp1(BenchmarkFunction):
         return [[0, 95], [0, 75]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = -0.1269366345 * v[...,0]
         v[...,0] = pow(x[...,0], 3.)
@@ -116,7 +116,7 @@ class himmelbf(BenchmarkFunction):
         return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = v[...,0] / 7.391
         v[...,0] = -1. + v[...,1]

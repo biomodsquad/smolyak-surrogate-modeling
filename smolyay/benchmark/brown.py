@@ -10,7 +10,7 @@ class brownden(BenchmarkFunction):
                 [-10.4034394882, 8.63690446062],
                 [-9.7632212255, 9.21310089705]]
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.2 * x[...,1]
         v[...,1] = x[...,0] + v[...,0]
         v[...,0] = -1.2214027581601699 + v[...,1]

@@ -8,7 +8,7 @@ class chi(BenchmarkFunction):
         return [[-30, 30], [-30, 30]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 1.5707963267948966 * x[...,0]
         v[...,2] = numpy.cos(v[...,1])

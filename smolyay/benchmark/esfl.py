@@ -8,7 +8,7 @@ class esfl(BenchmarkFunction):
         return [[-9.5195173415, 9.43243439265], [-9.5099228378, 9.44106944598]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.171747132 + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 0.570083725 + x[...,1]

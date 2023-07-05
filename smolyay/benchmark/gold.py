@@ -8,7 +8,7 @@ class gold(BenchmarkFunction):
         return [[-2.0, 2.0], [-2.0, 2.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = 1. + x[...,0]
         v[...,0] += x[...,1]
         v[...,1] = v[...,0] * v[...,0]

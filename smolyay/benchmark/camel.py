@@ -4,7 +4,7 @@ from .benchmark import BenchmarkFunction
 
 class _camel(BenchmarkFunction):
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 4. * v[...,0]
         v[...,0] = pow(x[...,0], 4.)

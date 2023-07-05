@@ -8,7 +8,7 @@ class mexhat(BenchmarkFunction):
         return [[-9.1417744688, 9.77240297808], [-9.2634512042, 9.66289391622]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -1. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = -2. * v[...,1]

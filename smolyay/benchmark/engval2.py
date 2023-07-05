@@ -8,7 +8,7 @@ class engval2(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0], [-9.0, 9.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,0] += v[...,1]

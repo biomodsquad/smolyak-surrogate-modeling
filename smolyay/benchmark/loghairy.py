@@ -8,7 +8,7 @@ class loghairy(BenchmarkFunction):
         return [[-9.9999999999, 9.00000000009], [-9.9999999974, 9.00000000234]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 7. * x[...,0]
         v[...,1] = numpy.sin(v[...,0])
         v[...,0] = v[...,1] * v[...,1]

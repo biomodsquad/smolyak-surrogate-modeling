@@ -9,7 +9,7 @@ class least(BenchmarkFunction):
                 [-159.3518936954, -125.41670432586],[-5, 4.5]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -5. * x[...,2]
         v[...,1] = numpy.exp(v[...,0])
         v[...,0] = v[...,1] * x[...,1]

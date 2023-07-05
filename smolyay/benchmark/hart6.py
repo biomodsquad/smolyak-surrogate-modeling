@@ -8,7 +8,7 @@ class hart6(BenchmarkFunction):
         return [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -0.1312 + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 10. * v[...,1]

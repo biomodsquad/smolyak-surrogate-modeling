@@ -8,7 +8,7 @@ class st_cqpjk2(BenchmarkFunction):
         return [[0, 0.9], [0, 0.9], [0, 0.9]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 9. * x[...,0]
         v[...,1] = v[...,0] * x[...,0]
         v[...,0] = 9. * x[...,1]
@@ -28,7 +28,7 @@ class st_bsj3(BenchmarkFunction):
         return [[0, 99], [0, 99], [0, 99], [0, 99], [0, 99], [0, 99]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = -1.5 * v[...,0]
         v[...,0] = x[...,1] * x[...,1]

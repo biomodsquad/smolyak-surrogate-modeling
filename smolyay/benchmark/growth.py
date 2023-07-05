@@ -8,7 +8,7 @@ class growth(BenchmarkFunction):
         return [[-8.53967303, 10.314294273], [-9.5571937886, 9.39852559026], [-9.836246351, 9.1473782841]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 2.0794415416798357 * x[...,2]
         v[...,1] = x[...,1] + v[...,0]
         v[...,0] = 2.079442 * v[...,1]
@@ -112,7 +112,7 @@ class growthls(BenchmarkFunction):
         return [[-8.53967303, 10.314294273], [-9.5571937886, 9.39852559026], [-9.836246351, 9.1473782841]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2.079441542 * x[...,2]
         v[...,1] = x[...,1] + v[...,0]
         v[...,0] = 2.079442 * v[...,1]

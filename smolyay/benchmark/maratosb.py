@@ -8,7 +8,7 @@ class maratosb(BenchmarkFunction):
         return [[-11.000000125, 8.0999998875], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,2] = v[...,0] + v[...,1]

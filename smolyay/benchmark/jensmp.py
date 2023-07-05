@@ -8,7 +8,7 @@ class jensmp(BenchmarkFunction):
         return [[0.1, 0.9], [0.1, 0.9]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = numpy.exp(x[...,0])
         v[...,1] = numpy.exp(x[...,1])
         v[...,2] = v[...,0] + v[...,1]

@@ -9,7 +9,7 @@ class yfit(BenchmarkFunction):
                 [-10.0035439984, 9.9964560016], [0, 10010]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = numpy.tan(x[...,0])
         v[...,1] = x[...,2] * v[...,0]
         v[...,0] = -21.158931 + v[...,1]

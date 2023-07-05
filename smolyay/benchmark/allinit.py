@@ -8,7 +8,7 @@ class allinit(BenchmarkFunction):
         return [[-11.1426691153, 8.8573308847], [1, 11.2456257795],[-1e10, 1]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,0] += v[...,1]
@@ -53,7 +53,7 @@ class allinitu(BenchmarkFunction):
                 [-10.8111130846, 8.26999822386]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,0] += v[...,1]

@@ -8,7 +8,7 @@ class mdhole(BenchmarkFunction):
         return [[0, 10], [-10, 10]]
         
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -x[...,1]
         v[...,1] = numpy.sin(x[...,0])
         v[...,2] = v[...,0] + v[...,1]

@@ -8,7 +8,7 @@ class tre(BenchmarkFunction):
         return [[-5.0, 5.0], [-5.0, 5.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = pow(x[...,0], 4)
         v[...,1] = pow(x[...,0], 3)
         v[...,2] = 4. * v[...,1]

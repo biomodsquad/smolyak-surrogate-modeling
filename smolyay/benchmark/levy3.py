@@ -8,7 +8,7 @@ class levy3(BenchmarkFunction):
         return [[-10.0, 10.0], [-10.0, 10.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2. * x[...,0]
         v[...,1] = 1. + v[...,0]
         v[...,0] = numpy.cos(v[...,1])

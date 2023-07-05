@@ -9,7 +9,7 @@ class fermat_vareps(BenchmarkFunction):
                 [-8.8452994616, 11.1547005384], [1e-08, 10.00000001]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,2] = x[...,2] * x[...,2]
@@ -42,7 +42,7 @@ class fermat2_vareps(BenchmarkFunction):
         return [[-8, 12], [-9.00000002, 10.99999998], [1e-08, 10.00000001]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] * x[...,1]
         v[...,2] = x[...,2] * x[...,2]

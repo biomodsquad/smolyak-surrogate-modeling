@@ -9,7 +9,7 @@ class ex4_1_5(BenchmarkFunction):
         return [[-5.0, 10.0], [-10.0, 0.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 2. * v[...,0]
         v[...,0] = pow(x[...,0], 4)
@@ -33,7 +33,7 @@ class ex8_1_1(BenchmarkFunction):
         return [[-1.0, 2.0], [-1.0, 1.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = numpy.cos(x[...,0])
         v[...,1] = numpy.sin(x[...,1])
         v[...,2] = v[...,0] * v[...,1]
@@ -50,7 +50,7 @@ class ex8_1_3(BenchmarkFunction):
         return [[-10.6, 8.46], [-10.4, 8.64]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,5))
+        v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = 1. + x[...,0]
         v[...,0] += x[...,1]
         v[...,1] = v[...,0] * v[...,0]
@@ -98,7 +98,7 @@ class ex8_1_4(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 12. * v[...,0]
         v[...,0] = pow(x[...,0], 4)
@@ -127,7 +127,7 @@ class ex8_1_6(BenchmarkFunction):
         return [[-6.0000519964, 12.59995320324], [-6.0000519964, 12.59995320324]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -4. + x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,1] += 0.1

@@ -8,7 +8,7 @@ class price(BenchmarkFunction):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = pow(x[...,0], 3)
         v[...,1] = 2. * v[...,0]
         v[...,0] = v[...,1] * x[...,1]

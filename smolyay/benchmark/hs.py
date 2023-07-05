@@ -5,7 +5,7 @@ from .rosenbr import _rosenbrock
 
 class _wood(BenchmarkFunction):
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = x[...,1] - v[...,0]
         v[...,0] = v[...,1] * v[...,1]
@@ -53,7 +53,7 @@ class hs003(BenchmarkFunction):
         return [[-10, 10], [0, 10]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,2))
+        v = numpy.zeros(list(x.shape[:-1]) + [2])
         v[...,0] = x[...,1] - x[...,0]
         v[...,1] = v[...,0] * v[...,0]
         v[...,0] = 1.e-05 * v[...,1]
@@ -66,7 +66,7 @@ class hs004(BenchmarkFunction):
         return [[1, 11], [0, 10]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,2))
+        v = numpy.zeros(list(x.shape[:-1]) + [2])
         v[...,0] = 1. + x[...,0]
         v[...,1] = pow(v[...,0], 3.)
         v[...,0] = 0.3333333333333333 * v[...,1]
@@ -80,7 +80,7 @@ class hs005(BenchmarkFunction):
         return [[-1.5, 4.0], [-3.0, 3.0]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] + x[...,1]
         v[...,1] = numpy.sin(v[...,0])
         v[...,0] = x[...,0] - x[...,1]
@@ -97,7 +97,7 @@ class hs3mod(BenchmarkFunction):
         return [[-10, 10], [0, 10]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,2))
+        v = numpy.zeros(list(x.shape[:-1]) + [2])
         v[...,0] = -x[...,0]
         v[...,1] = v[...,0] + x[...,1]
         v[...,0] = v[...,1] * v[...,1]
@@ -116,7 +116,7 @@ class hs045(BenchmarkFunction):
         return [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,2))
+        v = numpy.zeros(list(x.shape[:-1]) + [2])
         v[...,0] = x[...,0] * x[...,1]
         v[...,1] = v[...,0] * x[...,2]
         v[...,0] = v[...,1] * x[...,3]

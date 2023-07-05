@@ -5,7 +5,7 @@ from .benchmark import BenchmarkFunction
 class _beale(BenchmarkFunction):
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 1. - x[...,1]
         v[...,1] = x[...,0] * v[...,0]
         v[...,0] = -1.5 + v[...,1]

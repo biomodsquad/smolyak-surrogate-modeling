@@ -8,7 +8,7 @@ class zangwil2(BenchmarkFunction):
         return [[-6.0, 12.6], [-1.0, 17.1]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,3))
+        v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
         v[...,1] = 1.0666666666666667 * v[...,0]
         v[...,0] = x[...,1] * x[...,1]

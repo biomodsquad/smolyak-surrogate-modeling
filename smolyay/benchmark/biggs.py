@@ -10,7 +10,7 @@ class biggs3(BenchmarkFunction):
                 [-5.0000001349, 13.49999987859]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -0.1 * x[...,0]
         v[...,1] = numpy.exp(v[...,0])
         v[...,0] = -1.0764003502856656 + v[...,1]
@@ -153,7 +153,7 @@ class biggs5(BenchmarkFunction):
 
     def _function(self,x):
         # based on biggs6 replacing 6th variable with constant 3
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -0.1 * x[...,0]
         v[...,1] = numpy.exp(v[...,0])
         v[...,0] = x[...,2] * v[...,1]
@@ -347,7 +347,7 @@ class biggs6(BenchmarkFunction):
                 [-14.6154272503, 4.84611547473]]
 
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -0.1 * x[...,0]
         v[...,1] = numpy.exp(v[...,0])
         v[...,0] = x[...,2] * v[...,1]

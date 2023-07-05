@@ -4,7 +4,7 @@ from .benchmark import BenchmarkFunction
 
 class _osborne(BenchmarkFunction):
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] + x[...,1]        
         v[...,0] += x[...,2]        
         v[...,1] = 0.844 - v[...,0]        
@@ -442,7 +442,7 @@ class osbornea(BenchmarkFunction):
         return [[-1.0, 1.0], [-1.0, 2.0], [-2.0, 1.0],
                 [-1.0, 1.0], [-1.0, 1.0]]
     def _function(self,x):
-        v = numpy.zeros((x[...,0].size,4))
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.844 - x[...,0]
         v[...,1] = v[...,0] - x[...,1]
         v[...,0] = v[...,1] - x[...,2]
