@@ -106,6 +106,24 @@ def test_call_error_3D(test_class_3):
     with pytest.raises(ValueError):
         test_class_3([5,-2,24])
 
+def test_call_shape_1D(test_class_1):
+   """Test that different sizes of inputs give excepted shape"""
+   x = 0.5
+   x_2array = numpy.array([0.5,0.6,0.7,0.8],ndmin=2)
+   x_3array = numpy.array([[0.5,0.6,0.7],[0.44,0.55,0.66]])
+   assert numpy.ndim(test_class_1(x)) == 0
+   assert len(test_class_1(x_2array)) == 4
+   assert x_3array.shape == test_class_1(x_3array).shape
+
+def test_call_shape_3D(test_class_3):
+   """Test that different sizes of inputs give excepted shape"""
+   x = [1,-2,11.1]
+   x_2array = numpy.array([[1,-2,11.1],[2,-2.5,11.2],[3,-2.6,11.3],[4,-2.7,11.4]],ndmin=2)
+   x_3array = numpy.array([[[1,-2,11.1],[2,-2.5,11.2],[3,-2.6,11.3],[4,-2.7,11.4]],[[5,-3,12.1],[6,-3.5,12.2],[7,-3.6,12.3],[8,-3.7,12.4]]])
+   assert numpy.ndim(test_class_3(x)) == 0
+   assert len(test_class_3(x_2array)) == 4
+   assert x_3array.shape[:-1] == test_class_3(x_3array).shape
+
 @pytest.mark.filterwarnings("error")
 def test_call_no_error_multi_input_1D(test_class_1):
     """Test multiple inputs of call give no errors for 1D functions"""
