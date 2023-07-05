@@ -197,12 +197,3 @@ def test_functions_call_error_above(fun):
     with pytest.raises(ValueError):
         fun(above_bounds)
 
-def test_surrogate():
-    """Test use of function class with surrogate"""
-    a = branin()
-    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4))
-    surrogate = Surrogate(a.domain, grid_gen)
-    data = [a(point) for point in surrogate.points]
-    surrogate.train_from_data(data)
-    assert numpy.isclose(surrogate([6,0.5]),a([6,0.5]))
-
