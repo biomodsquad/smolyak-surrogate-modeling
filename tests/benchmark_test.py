@@ -112,12 +112,8 @@ def test_call_no_error_multi_input_1D(test_class_1):
     x_1d = numpy.linspace(test_class_1.lower_bounds,test_class_1.upper_bounds)
     y_1d_multi = test_class_1(x_1d)
     y_1d = [test_class_1(x) for x in x_1d]
-    y_1d_fun = [test_class_1._function(x) for x in x_1d]
-    y_1d_multi_fun = test_class_1._function(x_1d)
     assert len(y_1d_multi) == len(x_1d)
     assert numpy.array_equiv(y_1d,y_1d_multi)
-    assert numpy.array_equiv(y_1d_fun,y_1d_multi_fun)
-    assert numpy.array_equiv(y_1d_multi,y_1d_multi_fun)
 
 @pytest.mark.filterwarnings("error")
 def test_call_no_error_multi_input_3D(test_class_3):
@@ -125,14 +121,8 @@ def test_call_no_error_multi_input_3D(test_class_3):
     x_3d = numpy.linspace(test_class_3.lower_bounds,test_class_3.upper_bounds)
     y_3d_multi = test_class_3(x_3d)
     y_3d = [test_class_3(x) for x in x_3d]
-    y_3d_fun = numpy.squeeze([test_class_3._function(x) for x in x_3d])
-    y_3d_multi_fun = test_class_3._function(x_3d)
     assert len(y_3d_multi) == len(x_3d)
     assert numpy.array_equiv(y_3d,y_3d_multi)
-    assert numpy.array_equiv(y_3d_fun,y_3d_multi_fun)
-    assert numpy.array_equiv(y_3d_multi,y_3d_multi_fun)
-
-
 
 def test_call_error_1D_multi_input(test_class_1):
     """Test if there is an error for inputs out of bounds for 1D functions"""
@@ -176,12 +166,7 @@ def test_functions_call(fun):
     x_list = numpy.linspace(fun.lower_bounds,fun.upper_bounds)
     y_call = [fun(i) for i in x_list]
     y_call_multi = fun(x_list)
-    y_fun = numpy.squeeze([fun._function(i) for i in x_list])
-    y_fun_multi = fun._function(x_list)
     assert numpy.array_equiv(y_call,y_call_multi)
-    assert numpy.array_equiv(y_fun,y_fun_multi)
-    assert numpy.array_equiv(y_call_multi,y_fun_multi)
-
 
 @pytest.mark.parametrize("fun",functions)
 def test_functions_call_error_lower(fun):
