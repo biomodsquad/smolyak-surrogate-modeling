@@ -216,6 +216,17 @@ def test_surrogate_2(linear_solver):
     assert numpy.isclose(surrogate(point), function_2(point))
 
 
+@pytest.mark.parametrize('linear_solver', ['lu', 'lstsq', 'inv'])
+def test_surrogate_2_multi(linear_solver):
+    """Test if surrogate generates exact results for 1D function and >1 input"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate((-10, 10), grid_gen)
+    surrogate.train(function_2, linear_solver)
+    # random point in the domain
+    point = numpy.array([0.367, 0.4, 0.742, 0.99])
+    assert numpy.allclose(surrogate(point), function_2(point))
+
+
 def test_train_from_data():
     """Test if train_from_data_works."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(4))
@@ -275,6 +286,18 @@ def test_gradient_surrogate_4():
     # random points in the domain
     points = -0.7, 0.45
     surrogate_gradient_values = [surrogate.gradient(x) for x in points]
+    exact_values = [function_4(x) for x in points]
+    assert numpy.allclose(surrogate_gradient_values, exact_values)
+
+
+def test_gradient_surrogate_4_multi_input():
+    """Test if surrogate generates exact results for 1D with multiple inputs"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([-2, 2], grid_gen)
+    surrogate.train(function_4)
+    # random points in the domain
+    points = -0.7, 0.45
+    surrogate_gradient_values = surrogate.gradient(points)
     exact_values = [function_4(x) for x in points]
     assert numpy.allclose(surrogate_gradient_values, exact_values)
 

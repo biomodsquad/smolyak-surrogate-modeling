@@ -193,7 +193,9 @@ class Surrogate:
         if self._coefficients is None:
             raise ValueError('Function needs training!')
         x = numpy.array(x, copy=False, ndmin=2)
-        if x.shape[-1] != self.dimension:
+        if self.dimension == 1 and x.shape[-1] > 1:
+            x = numpy.reshape(x,list(x.shape)+[1])
+        elif x.shape[-1] != self.dimension:
             raise IndexError('Input must match dimension of domain.')
         if self.dimension > 1:
             oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
@@ -203,7 +205,8 @@ class Surrogate:
                     numpy.any(x > self.domain[1]))
         if oob:
             raise ValueError('x must lie in domain of surrogate')
-        
+        print(x)
+        print(x.shape)
         gradient = []
         # transform point into basis domain
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
@@ -215,14 +218,15 @@ class Surrogate:
                 if self.dimension > 1:
                     term = numpy.prod(
                         [f.derivative(x) if dim == ni else f(x) for dim, (x, f)
-                         in enumerate(zip(x_scaled.transpose(), basis))],
+                         in enumerate(zip(x_scaled.transpose(), basis))], 
                         axis=0)
                 else:
-                    term = basis.derivative(x_scaled[0])
+                    term = basis.derivative(x_scaled)
+                
                 value += coeff*term
             gradient.append(numpy.squeeze(value))
         gradient = numpy.array(gradient,copy=False).transpose()
-        return gradient[0] if self.dimension == 1 else gradient
+        return numpy.squeeze(gradient)
 
     def __call__(self, x):
         """Evaluate surrogate at a given input.
@@ -250,7 +254,9 @@ class Surrogate:
         if self._coefficients is None:
             raise ValueError('Function needs training!')
         x = numpy.array(x, copy=False, ndmin=2)
-        if x.shape[-1] != self.dimension:
+        if self.dimension == 1 and x.shape[-1] > 1:
+            x = numpy.reshape(x,list(x.shape)+[1])
+        elif x.shape[-1] != self.dimension:
             raise IndexError('Input must match dimension of domain.')
         if self.dimension > 1:
             oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
