@@ -322,14 +322,14 @@ class Surrogate:
 
         # make basis matrix
         points, basis_functions = self.grid.points, self.grid.basis_functions
+        points = numpy.array(points)
         basis_matrix = numpy.zeros((len(points), len(points)))
-        for i, point in enumerate(points):
-            for j, basis in enumerate(basis_functions):
-                if self.dimension > 1:
-                    value = numpy.prod([f(x) for x, f in zip(point, basis)])
-                else:
-                    value = basis(point)
-                basis_matrix[i, j] = value
+        for j, basis in enumerate(basis_functions):
+            if self.dimension > 1:
+                value = numpy.prod([f(x) for x, f in zip(points.T, basis)],axis=0)
+            else:
+                value = basis(points)
+            basis_matrix[:,j]= value
 
         if linear_solver == 'lu':
             self._coefficients = numpy.linalg.solve(
