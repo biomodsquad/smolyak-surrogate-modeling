@@ -124,6 +124,20 @@ def test_call_shape_3D(test_class_3):
    assert len(test_class_3(x_2array)) == 4
    assert x_3array.shape[:-1] == test_class_3(x_3array).shape
 
+def test_class_dimension_error(test_class_3):
+    """Test that invalid input size gives error"""
+    x = [1,11.1]
+    x_2array = numpy.array([[1,-2,11.1,4],[2,-2.5,11.2,4],[3,-2.6,11.3,4],
+                            [4,-2.7,11.4,4]],ndmin=2)
+    x_3array = numpy.array([[[1,11.1],[2,-2.5],[-2.6,11.3],[4,-2.7]],
+                            [[5,12.1],[6,12.2],[-3.6,12.3],[8,-3.7]]])
+    with pytest.raises(IndexError):
+        test_class_3(x)
+    with pytest.raises(IndexError):
+        test_class_3(x_2array)   
+    with pytest.raises(IndexError):
+        test_class_3(x_3array)
+
 @pytest.mark.filterwarnings("error")
 def test_call_no_error_multi_input_1D(test_class_1):
     """Test multiple inputs of call give no errors for 1D functions"""

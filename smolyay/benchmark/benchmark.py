@@ -20,17 +20,21 @@ class BenchmarkFunction(abc.ABC):
 
         Raises
         ------
+        IndexError
+            If the shape of the input does not match dimension of domain
         ValueError
             If the input is outside the function domain.
         """
         x = numpy.array(x, copy=False,ndmin=2)
-        if self.dimension == 1 and x.shape[-1] > 1:
+        if self.dimension == 1 and x.ndim == 2 and x.shape[0] == 1 and x.shape[1] > 1:
+            x = x.T
+        elif self.dimension == 1 and x.shape[-1] > 1:
             x = numpy.reshape(x,list(x.shape)+[1])
-
-        oob = any(numpy.any(x[..., i] < self.domain[i][0]) or 
-                  numpy.any(x[..., i] > self.domain[i][1]) 
-                  for i in range(self.dimension))
-        if oob:
+        if x.shape[-1] != self.dimension:
+            raise IndexError("Input must match dimension of domain")
+        if any(numpy.any(x[..., i] < self.domain[i][0]) or 
+               numpy.any(x[..., i] > self.domain[i][1]) 
+               for i in range(self.dimension)):
             raise ValueError("Input out domain of function.")
         return numpy.squeeze(self._function(x))
     
