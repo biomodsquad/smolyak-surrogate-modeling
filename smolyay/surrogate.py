@@ -193,7 +193,9 @@ class Surrogate:
         if self._coefficients is None:
             raise ValueError('Function needs training!')
         x = numpy.array(x, copy=False, ndmin=2)
-        if self.dimension == 1 and x.shape[-1] > 1:
+        if self.dimension == 1 and x.ndim == 2 and x.shape[0] == 1 and x.shape[1] > 1:
+            x = x.T
+        elif self.dimension == 1 and x.shape[-1] > 1:
             x = numpy.reshape(x,list(x.shape)+[1])
         elif x.shape[-1] != self.dimension:
             raise IndexError('Input must match dimension of domain.')
@@ -205,8 +207,6 @@ class Surrogate:
                     numpy.any(x > self.domain[1]))
         if oob:
             raise ValueError('x must lie in domain of surrogate')
-        print(x)
-        print(x.shape)
         gradient = []
         # transform point into basis domain
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
@@ -254,7 +254,9 @@ class Surrogate:
         if self._coefficients is None:
             raise ValueError('Function needs training!')
         x = numpy.array(x, copy=False, ndmin=2)
-        if self.dimension == 1 and x.shape[-1] > 1:
+        if self.dimension == 1 and x.ndim == 2 and x.shape[0] == 1 and x.shape[1] > 1:
+            x = x.T
+        elif self.dimension == 1 and x.shape[-1] > 1:
             x = numpy.reshape(x,list(x.shape)+[1])
         elif x.shape[-1] != self.dimension:
             raise IndexError('Input must match dimension of domain.')
@@ -274,7 +276,7 @@ class Surrogate:
                 term = numpy.prod(
                     [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled.transpose())],axis=0)
             else:
-                term = basis(x_scaled[0])
+                term = basis(x_scaled)
             value += coeff*term
         return numpy.squeeze(value)
 
