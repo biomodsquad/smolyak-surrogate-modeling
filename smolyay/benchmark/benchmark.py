@@ -25,11 +25,13 @@ class BenchmarkFunction(abc.ABC):
         ValueError
             If the input is outside the function domain.
         """
-        x = numpy.array(x, copy=False,ndmin=2)
-        if self.dimension == 1 and x.ndim == 2 and x.shape[0] == 1 and x.shape[1] > 1:
-            x = x.T
-        elif self.dimension == 1 and x.shape[-1] > 1:
-            x = numpy.reshape(x,list(x.shape)+[1])
+        x = numpy.array(x, copy=False, ndmin=2)
+        if self.dimension == 1:
+            if x.ndim == 2 and x.shape[0] == 1 and x.shape[1]  > 1:
+                # the cast to 2d puts these in wrong order, so transpose
+                x = x.T
+            else:
+                x = x[..., numpy.newaxis]
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if any(numpy.any(x[..., i] < self.domain[i][0]) or 
