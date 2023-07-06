@@ -491,22 +491,22 @@ class GradientSurrogate(Surrogate):
             raise IndexError("Data must have size of number"
                              "of grid points x dimension.")
         points, basis_functions = self.grid.points, self.grid.basis_functions
+        points = numpy.array(points)
+        num_points = len(points)
         # create basis matrix with appropriate size
         basis_matrix = numpy.zeros((self.dimension * len(points), len(points)))
         # evalaute each term
-        count = 0
-        for i, point in enumerate(points):
-            for ni in range(self.dimension):
-                for j, basis in enumerate(basis_functions):
-                    if self.dimension > 1:
-                        value = numpy.prod([f.derivative(x) if dim == ni
-                                            else f(x) for dim, (x, f)
-                                            in enumerate(zip(
-                                                 point, basis))])
-                    else:
-                        value = basis.derivative(point)
-                    basis_matrix[count, j] = value
-                count += 1
+        for ni in range(self.dimension):
+            for j, basis in enumerate(basis_functions):
+                if self.dimension > 1:
+                    value = numpy.prod([f.derivative(x) if dim == ni
+                                        else f(x) for dim, (x, f)
+                                        in enumerate(zip(
+                                            points.T, basis))],axis=0)
+                else:
+                    value = basis.derivative(points)
+                basis_matrix[ni + self.dimension*numpy.array(range(num_points)), 
+                              j] = value
         data = numpy.reshape(self._data,
                              (self.dimension*len(self.grid.points), ))
         self._coefficients = numpy.linalg.lstsq(basis_matrix,
