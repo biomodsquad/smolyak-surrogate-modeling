@@ -203,7 +203,7 @@ class Surrogate:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
             oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
-                    for xi,bound in zip(x.transpose(),self.domain))
+                    for xi,bound in zip(x.T,self.domain))
         else:
             oob = (numpy.any(x < self.domain[0]) or 
                     numpy.any(x > self.domain[1]))
@@ -220,7 +220,7 @@ class Surrogate:
                 if self.dimension > 1:
                     term = numpy.prod(
                         [f.derivative(x) if dim == ni else f(x) for dim, (x, f)
-                         in enumerate(zip(x_scaled.transpose(), basis))], 
+                         in enumerate(zip(x_scaled.T, basis))], 
                         axis=0)
                 else:
                     term = basis.derivative(x_scaled)
@@ -266,7 +266,7 @@ class Surrogate:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
             oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
-                    for xi,bound in zip(x.transpose(),self.domain))
+                    for xi,bound in zip(x.T,self.domain))
         else:
             oob = (numpy.any(x < self.domain[0]) or 
                     numpy.any(x > self.domain[1]))
@@ -278,7 +278,7 @@ class Surrogate:
         for coeff, basis in zip(self._coefficients, self.grid.basis_functions):
             if self.dimension > 1:
                 term = numpy.prod(
-                    [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled.transpose())],axis=0)
+                    [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled.T)],axis=0)
             else:
                 term = basis(x_scaled)
             value += coeff*term
