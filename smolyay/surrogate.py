@@ -366,7 +366,7 @@ class Surrogate:
         if len(new_x.shape) == 1:
             numpy.clip(new_x, new[:,0], new[:,1],out=new_x)
         else:
-            for i in range(len(new)):
+            for i in range(new.shape[0]):
                 numpy.clip(new_x[:,i], new[i,0], new[i,1],out=new_x[:,i])
         return new_x
 
