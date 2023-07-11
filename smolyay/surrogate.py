@@ -219,9 +219,9 @@ class Surrogate:
                                     self.grid.basis_functions):
                 if self.dimension > 1:
                     term = numpy.prod(
-                        [f.derivative(x) if dim == ni else f(x) for dim, (x, f)
-                         in enumerate(zip(x_scaled.T, basis))], 
-                        axis=0)
+                            [basis[dim].derivative(x_scaled[:,dim]) 
+                             if dim == ni else basis[dim](x_scaled[:,dim]) 
+                             for dim in range(len(basis))], axis=0)
                 else:
                     term = basis.derivative(x_scaled)
                 
@@ -278,7 +278,8 @@ class Surrogate:
         for coeff, basis in zip(self._coefficients, self.grid.basis_functions):
             if self.dimension > 1:
                 term = numpy.prod(
-                    [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled.T)],axis=0)
+                        [basis[i](x_scaled[:,i]) for i in range(len(basis))],
+                        axis=0)
             else:
                 term = basis(x_scaled)
             value += coeff*term
@@ -330,7 +331,7 @@ class Surrogate:
         basis_matrix = numpy.zeros((len(points), len(points)))
         for j, basis in enumerate(basis_functions):
             if self.dimension > 1:
-                value = numpy.prod([f(x) for x, f in zip(points.T, basis)],axis=0)
+                value = numpy.prod([basis[i](points[:,i]) for i in range(len(basis))],axis=0)
             else:
                 value = basis(points)
             basis_matrix[:,j]= value
@@ -510,10 +511,10 @@ class GradientSurrogate(Surrogate):
         for ni in range(self.dimension):
             for j, basis in enumerate(basis_functions):
                 if self.dimension > 1:
-                    value = numpy.prod([f.derivative(x) if dim == ni
-                                        else f(x) for dim, (x, f)
-                                        in enumerate(zip(
-                                            points.T, basis))],axis=0)
+                    value = numpy.prod(
+                            [basis[dim].derivative(points[:,dim]) 
+                             if dim == ni else basis[dim](points[:,dim]) 
+                             for dim in range(len(basis))],axis=0)
                 else:
                     value = basis.derivative(points)
                 basis_matrix[ni + self.dimension*numpy.array(range(num_points)), 
