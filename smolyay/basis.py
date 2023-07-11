@@ -1,6 +1,5 @@
 import abc
 import math
-import warnings
 
 import numpy
 import scipy.special
@@ -316,16 +315,10 @@ class ChebyshevSecondKind(BasisFunction):
             U_n'(x) = \frac{(n+1)T_{n+1}(x)-xU_n(x)}{x^{2}-1}
 
         The above equation does not converge for :math:x={-1, 1}.
-
+        Derivative can be found using L'Hôpital's rule.
         ..math::
             \lim_{x \to 1} U_n'(x) = \frac{n(n+1)(n+2)}{3}
             \lim_{x \to -1} U_n'(x) = (-1)^{n+1} \frac{n(n+1)(n+2)}{3}
-
-        derivative can be found using L'Hôpital's rule, 
-
-        ..math::
-            \lim_{x \to 1} U_n'(x) = \frac{U_n'(x)((n+1)(n+1)-1)}{3x}
-            \lim_{x \to -1} U_n'(x) = \frac{U_n'(x)((n+1)(n+1)-1)}{3x}
 
         Parameters
         ----------
@@ -347,12 +340,14 @@ class ChebyshevSecondKind(BasisFunction):
         if self._derivative_polynomial is None:
             self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
         x = numpy.array(x, copy=False)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore",RuntimeWarning)
-            y = numpy.where(numpy.logical_not(numpy.logical_or(x == 1,x == -1)),
-                            ((self._n+1)*self._derivative_polynomial(x) -
-                             x*self(x))/(x**2-1),
-                            self(x)*((self._n+1)**2 -1)/(3*x))
+        y = numpy.zeros(x.shape)
+        flag1 = numpy.logical_not(numpy.logical_or(x == 1,x == -1))
+        flag2 = x == 1
+        flag3 = x == -1
+        y[flag1] =  ((self._n+1)*self._derivative_polynomial(x[flag1]) -
+                     x[flag1]*self(x[flag1]))/(x[flag1]**2-1)
+        y[flag2] = self._n*(self._n + 1)*(self._n + 2)/3
+        y[flag3] = ((-1)**(self._n+1))*self._n*(self._n + 1)*(self._n + 2)/3
         if y.shape == ():
             return y[()]
         else:
