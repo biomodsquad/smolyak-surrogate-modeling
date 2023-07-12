@@ -227,7 +227,7 @@ class Surrogate:
                     term = basis.derivative(x_scaled)
                 
                 value += coeff*term
-            gradient[...,ni] = numpy.squeeze(value)
+            gradient[...,ni] = numpy.reshape(value,gradient.shape[:-1])
         return numpy.squeeze(gradient)
 
     def __call__(self, x):
