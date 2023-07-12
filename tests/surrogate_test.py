@@ -192,6 +192,21 @@ def test_surrogate_1_multi_input():
     assert numpy.allclose(surrogate_values, surrogate_values_multi)
 
 
+def test_surrogate_1_multi_grid():
+    """Test if surrogate generates exact results if call has >1 input."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
+    surrogate.train(function_1)
+    # random points in the domain
+    points = numpy.random.rand(3,4,2)*2 - 1
+    exact_values = numpy.zeros(points.shape[:-1])
+    for i in range(points.shape[0]):
+        for j in range(points.shape[1]):
+            exact_values[i,j] = function_1(tuple(points[i,j]))
+    surrogate_values_multi = surrogate(points)
+    assert numpy.allclose(exact_values, surrogate_values_multi)
+
+
 def test_surrogate_0_shifted():
     """Test if surrogate generates exact results for a shifted function 0."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
@@ -224,6 +239,17 @@ def test_surrogate_2_multi(linear_solver):
     surrogate.train(function_2, linear_solver)
     # random point in the domain
     point = numpy.array([0.367, 0.4, 0.742, 0.99])
+    assert numpy.allclose(surrogate(point), function_2(point))
+
+
+@pytest.mark.parametrize('linear_solver', ['lu', 'lstsq', 'inv'])
+def test_surrogate_2_multi_grid(linear_solver):
+    """Test if surrogate generates exact results for 1D function and >1 input"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate((-10, 10), grid_gen)
+    surrogate.train(function_2, linear_solver)
+    # random point in the domain
+    point = numpy.random.rand(3,4)
     assert numpy.allclose(surrogate(point), function_2(point))
 
 
@@ -314,6 +340,22 @@ def test_gradient_surrogate_4_multi_input():
     points = -0.7, 0.45
     surrogate_gradient_values = surrogate.gradient(points)
     exact_values = [function_4(x) for x in points]
+    assert numpy.allclose(surrogate_gradient_values, exact_values)
+
+
+def test_gradient_surrogate_4_multi_grid():
+    """Test if surrogate generates exact results for 1D with multiple inputs"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([-2, 2], grid_gen)
+    surrogate.train(function_4)
+    # random points in the domain
+    points = numpy.random.rand(3,4)
+    surrogate_gradient_values = surrogate.gradient(points)
+    exact_values = numpy.zeros(points.shape)
+    for i in range(points.shape[0]):
+        for j in range(points.shape[1]):
+            exact_values[i,j] = function_4(points[i,j])
+    surrogate_gradient_values = surrogate.gradient(points)
     assert numpy.allclose(surrogate_gradient_values, exact_values)
 
 
