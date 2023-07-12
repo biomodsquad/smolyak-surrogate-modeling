@@ -131,7 +131,7 @@ class ChebyshevFirstKind(BasisFunction):
             if input is outside the domain [-1,1]
 
         """
-        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
 
         return scipy.special.eval_chebyt(self._n,x)
