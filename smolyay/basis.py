@@ -341,9 +341,9 @@ class ChebyshevSecondKind(BasisFunction):
             self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
         x = numpy.asarray(x)
         y = numpy.zeros(x.shape)
-        flag1 = numpy.logical_not(numpy.logical_or(x == 1,x == -1))
         flag2 = x == 1
         flag3 = x == -1
+        flag1 = ~(flag2 | flag3)
         y[flag1] =  ((self._n+1)*self._derivative_polynomial(x[flag1]) -
                      x[flag1]*self(x[flag1]))/(x[flag1]**2-1)
         y[flag2] = self._n*(self._n + 1)*(self._n + 2)/3
