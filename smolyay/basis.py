@@ -161,7 +161,7 @@ class ChebyshevFirstKind(BasisFunction):
         ValueError
             if input is outside the domain [-1,1].
         """
-        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
         if self._derivative_polynomial is None:
             self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
@@ -300,7 +300,7 @@ class ChebyshevSecondKind(BasisFunction):
             if input is outside the domain [-1,1]
 
         """
-        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
         return scipy.special.eval_chebyu(self._n,x)
 
@@ -335,7 +335,7 @@ class ChebyshevSecondKind(BasisFunction):
         ValueError
             if input is outside the domain [-1,1].
         """
-        if numpy.any([numpy.greater(x,1),numpy.less(x,-1)]):
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
         if self._derivative_polynomial is None:
             self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
