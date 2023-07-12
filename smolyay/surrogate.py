@@ -228,7 +228,8 @@ class Surrogate:
                 
                 value += coeff*term
             gradient.append(numpy.squeeze(value))
-        gradient = numpy.array(gradient,copy=False).transpose()
+        gradient = numpy.array(gradient,copy=False)
+        gradient = numpy.moveaxis(gradient, 0, -1)
         return numpy.squeeze(gradient)
 
     def __call__(self, x):
