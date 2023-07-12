@@ -210,10 +210,10 @@ class Surrogate:
                     numpy.any(x > self.domain[1]))
         if oob:
             raise ValueError('x must lie in domain of surrogate')
-        gradient = []
         # transform point into basis domain
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
         # evaluate the gradient
+        gradient = numpy.zeros(x_scaled.shape)
         for ni in range(self.dimension):
             value = 0
             for coeff, basis in zip(self.coefficients,
@@ -227,9 +227,7 @@ class Surrogate:
                     term = basis.derivative(x_scaled)
                 
                 value += coeff*term
-            gradient.append(numpy.squeeze(value))
-        gradient = numpy.array(gradient,copy=False)
-        gradient = numpy.moveaxis(gradient, 0, -1)
+            gradient[...,ni] = numpy.squeeze(value)
         return numpy.squeeze(gradient)
 
     def __call__(self, x):
