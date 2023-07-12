@@ -339,7 +339,7 @@ class ChebyshevSecondKind(BasisFunction):
             raise ValueError("Input is outside the domain [-1,1]")
         if self._derivative_polynomial is None:
             self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
-        x = numpy.array(x, copy=False)
+        x = numpy.asarray(x)
         y = numpy.zeros(x.shape)
         flag1 = numpy.logical_not(numpy.logical_or(x == 1,x == -1))
         flag2 = x == 1
