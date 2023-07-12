@@ -518,8 +518,7 @@ class GradientSurrogate(Surrogate):
                              for dim in range(len(basis))],axis=0)
                 else:
                     value = basis.derivative(points)
-                basis_matrix[ni + self.dimension*numpy.array(range(num_points)), 
-                              j] = value
+                basis_matrix[ni::self.dimension, j] = value
         data = numpy.reshape(self._data,
                              (self.dimension*len(self.grid.points), ))
         self._coefficients = numpy.linalg.lstsq(basis_matrix,
