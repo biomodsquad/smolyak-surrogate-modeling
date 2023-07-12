@@ -202,8 +202,9 @@ class Surrogate:
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
-            oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
-                    for xi,bound in zip(x.T,self.domain))
+            oob = any(numpy.any(x[..., i] < self.domain[i][0]) or 
+                    numpy.any(x[..., i] > self.domain[i][1]) 
+                    for i in range(self.dimension))
         else:
             oob = (numpy.any(x < self.domain[0]) or 
                     numpy.any(x > self.domain[1]))
@@ -265,8 +266,9 @@ class Surrogate:
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
-            oob = any(numpy.any(xi < bound[0]) or numpy.any(xi > bound[1]) 
-                    for xi,bound in zip(x.T,self.domain))
+            oob = any(numpy.any(x[..., i] < self.domain[i][0]) or 
+                    numpy.any(x[..., i] > self.domain[i][1]) 
+                    for i in range(self.dimension))
         else:
             oob = (numpy.any(x < self.domain[0]) or 
                     numpy.any(x > self.domain[1]))
