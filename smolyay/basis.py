@@ -349,9 +349,9 @@ class ChebyshevSecondKind(BasisFunction):
         y[flag2] = self._n*(self._n + 1)*(self._n + 2)/3
         y[flag3] = ((-1)**(self._n+1))*self._n*(self._n + 1)*(self._n + 2)/3
         if y.shape == ():
-            return y[()]
+            return y.item()
         else:
-            return numpy.squeeze(y)
+            return y
 
     @classmethod
     def make_nested_set(cls, exactness):
