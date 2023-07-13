@@ -207,6 +207,26 @@ def test_surrogate_1_multi_grid():
     assert numpy.allclose(exact_values, surrogate_values_multi)
 
 
+def test_surrogate_2D_multi_shape():
+    """Test if surrogate call generates the correct shape for 1 dimension."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1),(-1, 1)], grid_gen)
+    surrogate.train(function_1)
+    # random points in the domain
+    point_scalar = [1, 1]
+    point_nested_list = [[1, 1]]
+    points_list = [[1, 1], [0.5, 0.5]]
+    point_grid = numpy.ones((1,1,1,2))
+    points_grid_1 = numpy.ones((4,3,2,2))
+    points_grid_2 = numpy.ones((4,3,5,2))
+    assert numpy.isscalar(surrogate(point_scalar))
+    assert surrogate(point_nested_list).shape == (1,)
+    assert surrogate(points_list).shape == numpy.shape(points_list)[:-1]
+    assert surrogate(point_grid).shape == (1,1,1)
+    assert surrogate(points_grid_1).shape == (4,3,2)
+    assert surrogate(points_grid_2).shape == (4,3,5)
+
+
 def test_surrogate_0_shifted():
     """Test if surrogate generates exact results for a shifted function 0."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
@@ -251,6 +271,30 @@ def test_surrogate_2_multi_grid(linear_solver):
     # random point in the domain
     point = numpy.random.rand(3,4)
     assert numpy.allclose(surrogate(point), function_2(point))
+
+
+def test_surrogate_1D_multi_shape():
+    """Test if surrogate call generates the correct shape for 1 dimension."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate((-10, 10), grid_gen)
+    surrogate.train(function_2)
+    # random points in the domain
+    point_scalar = 1
+    point_list_scalar = [1]
+    point_nested_list_scalar = [[1]]
+    points_list = [1,2]
+    points_nested_list = [[1],[2]]
+    point_grid = numpy.ones((1,1,1,1))
+    points_grid_1 = numpy.ones((1,2,3,4))
+    points_grid_2 = numpy.ones((4,3,2,1))
+    assert numpy.isscalar(surrogate(point_scalar))
+    assert surrogate(point_list_scalar).shape == numpy.shape(point_list_scalar)
+    assert surrogate(point_nested_list_scalar).shape == (1,)
+    assert surrogate(points_list).shape == numpy.shape(points_list)
+    assert surrogate(points_nested_list).shape == (2,)
+    assert surrogate(point_grid).shape == (1,1,1)
+    assert surrogate(points_grid_1).shape == (1,2,3,4)
+    assert surrogate(points_grid_2).shape == (4,3,2)
 
 
 def test_train_from_data():

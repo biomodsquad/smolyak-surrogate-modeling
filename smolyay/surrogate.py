@@ -255,13 +255,20 @@ class Surrogate:
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
+        input_shape = numpy.shape(x)
         x = numpy.array(x, copy=False, ndmin=2)
         if self.dimension == 1:
             if x.ndim == 2 and x.shape[0] == 1 and x.shape[1]  > 1:
                 # the cast to 2d puts these in wrong order, so transpose
                 x = x.T
-            else:
+            elif x.shape[-1] > 1:
                 x = x[..., numpy.newaxis]
+            elif input_shape == x.shape:
+                input_shape = input_shape[:-1]
+            output_scalar = input_shape == ()
+        else:
+            output_scalar = input_shape[:-1] == ()
+            input_shape = input_shape[:-1]
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
@@ -284,7 +291,11 @@ class Surrogate:
             else:
                 term = basis(x_scaled)
             value += coeff*term
-        return numpy.squeeze(value)
+        if output_scalar:
+            value = value.item()
+        else:
+            value = numpy.reshape(value,input_shape)
+        return value
 
     def train(self, function, linear_solver='lu'):
         """Fit surrogate's components (basis functions) to the function.
@@ -391,7 +402,7 @@ class Surrogate:
             numpy.clip(new_x, new[:,0], new[:,1],out=new_x)
         else:
             for i in range(new.shape[0]):
-                numpy.clip(new_x[:,i], new[i,0], new[i,1],out=new_x[:,i])
+                numpy.clip(new_x[...,i], new[i,0], new[i,1],out=new_x[...,i])
         return new_x
 
     def _reset_grid(self):
