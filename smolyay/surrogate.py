@@ -205,7 +205,7 @@ class Surrogate:
             output_scalar = input_shape == ()
         else:
             output_scalar = input_shape == ()
-            input_shape = input_shape
+
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
