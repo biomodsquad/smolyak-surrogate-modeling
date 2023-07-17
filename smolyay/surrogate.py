@@ -192,13 +192,20 @@ class Surrogate:
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
+        input_shape = numpy.shape(x)
         x = numpy.array(x, copy=False, ndmin=2)
         if self.dimension == 1:
             if x.ndim == 2 and x.shape[0] == 1 and x.shape[1]  > 1:
                 # the cast to 2d puts these in wrong order, so transpose
                 x = x.T
-            else:
+            elif x.shape[-1] > 1:
                 x = x[..., numpy.newaxis]
+            elif input_shape == x.shape:
+                input_shape = input_shape[:-1]
+            output_scalar = input_shape == ()
+        else:
+            output_scalar = input_shape == ()
+            input_shape = input_shape
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
@@ -228,7 +235,12 @@ class Surrogate:
                 
                 value += coeff*term
             gradient[...,ni] = numpy.reshape(value,gradient.shape[:-1])
-        return numpy.squeeze(gradient)
+
+        if output_scalar:
+            gradient = gradient.item()
+        else:
+            gradient = numpy.reshape(gradient,input_shape)
+        return gradient
 
     def __call__(self, x):
         """Evaluate surrogate at a given input.

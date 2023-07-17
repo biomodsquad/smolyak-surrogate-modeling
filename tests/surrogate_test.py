@@ -208,7 +208,7 @@ def test_surrogate_1_multi_grid():
 
 
 def test_surrogate_2D_multi_shape():
-    """Test if surrogate call generates the correct shape for 1 dimension."""
+    """Test if surrogate call generates the correct shape for 2 dimensions."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = Surrogate([(-1, 1),(-1, 1)], grid_gen)
     surrogate.train(function_1)
@@ -363,6 +363,26 @@ def test_gradient_surrogate_3_multi_grid():
     assert numpy.allclose(exact_values, gradient_values_multi)
 
 
+def test_gradient_surrogate_2D_multi_shape():
+    """Test if surrogate gradient generates correct shape for 2 dimensions."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([(-2, 2),(-2, 2)], grid_gen)
+    surrogate.train(function_3)
+    # random points in the domain
+    point_scalar = [1, 1]
+    point_nested_list = [[1, 1]]
+    points_list = [[1, 1], [0.5, 0.5]]
+    point_grid = numpy.ones((1,1,1,2))
+    points_grid_1 = numpy.ones((4,3,2,2))
+    points_grid_2 = numpy.ones((4,3,5,2))
+    assert surrogate.gradient(point_scalar).shape == numpy.shape(point_scalar)
+    assert surrogate.gradient(point_nested_list).shape == numpy.shape(point_nested_list)
+    assert surrogate.gradient(points_list).shape == numpy.shape(points_list)
+    assert surrogate.gradient(point_grid).shape == (1,1,1,2)
+    assert surrogate.gradient(points_grid_1).shape == (4,3,2,2)
+    assert surrogate.gradient(points_grid_2).shape == (4,3,5,2)
+
+
 def test_gradient_surrogate_4():
     """Test if surrogate generates exact results for test for Chebyshevs."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
@@ -401,6 +421,30 @@ def test_gradient_surrogate_4_multi_grid():
             exact_values[i,j] = function_4(points[i,j])
     surrogate_gradient_values = surrogate.gradient(points)
     assert numpy.allclose(surrogate_gradient_values, exact_values)
+
+
+def test_gradient_surrogate_1D_multi_shape():
+    """Test if surrogate gradient generates correct shape for 1 dimension."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate((-2, 2), grid_gen)
+    surrogate.train(function_4)
+    # random points in the domain
+    point_scalar = 1
+    point_list_scalar = [1]
+    point_nested_list_scalar = [[1]]
+    points_list = [1,2]
+    points_nested_list = [[1],[2]]
+    point_grid = numpy.ones((1,1,1,1))
+    points_grid_1 = numpy.ones((1,2,3,4))
+    points_grid_2 = numpy.ones((4,3,2,1))
+    assert numpy.isscalar(surrogate.gradient(point_scalar))
+    assert surrogate.gradient(point_list_scalar).shape == numpy.shape(point_list_scalar)
+    assert surrogate.gradient(point_nested_list_scalar).shape == (1,)
+    assert surrogate.gradient(points_list).shape == numpy.shape(points_list)
+    assert surrogate.gradient(points_nested_list).shape == (2,)
+    assert surrogate.gradient(point_grid).shape == (1,1,1)
+    assert surrogate.gradient(points_grid_1).shape == (1,2,3,4)
+    assert surrogate.gradient(points_grid_2).shape == (4,3,2)
 
 
 def test_error_solver():
