@@ -200,8 +200,6 @@ class Surrogate:
                 x = x.T
             elif x.shape[-1] > 1:
                 x = x[..., numpy.newaxis]
-            elif input_shape == x.shape:
-                input_shape = input_shape[:-1]
 
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
@@ -233,10 +231,14 @@ class Surrogate:
                 value += coeff*term
             gradient[...,ni] = numpy.reshape(value, gradient.shape[:-1])
 
-        if input_shape == ():
+        if len(input_shape) == 0:
             gradient = gradient.item()
         else:
-            gradient = numpy.reshape(gradient, input_shape)
+            if (self.dimension == 1 and len(input_shape) > 1 and input_shape[-1] == 1):
+                output_shape = input_shape[:-1]
+            else:
+                output_shape = input_shape
+            gradient = numpy.reshape(gradient, output_shape)
         return gradient
 
     def __call__(self, x):
@@ -298,10 +300,12 @@ class Surrogate:
 
         if (self.dimension == 1 and input_shape == ()) or (self.dimension > 1 and len(input_shape) == 1):
             value = value.item()
-        elif (self.dimension == 1 and (len(input_shape) == 1 or input_shape[-1] != 1)):
-            value = numpy.reshape(value, input_shape)
         else:
-            value = numpy.reshape(value, input_shape[:-1])
+            if (self.dimension == 1 and (len(input_shape) == 1 or input_shape[-1] >  1)):
+                output_shape = input_shape
+            else:
+                output_shape = x.shape[:-1]
+            value = numpy.reshape(value, output_shape)
         return value
 
     def train(self, function, linear_solver='lu'):
