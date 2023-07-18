@@ -195,7 +195,7 @@ class Surrogate:
         input_shape = numpy.shape(x)
         x = numpy.array(x, copy=False, ndmin=2)
         if self.dimension == 1:
-            if x.ndim == 2 and x.shape[0] == 1 and x.shape[1]  > 1:
+            if len(input_shape) <= 1:
                 # the cast to 2d puts these in wrong order, so transpose
                 x = x.T
             elif x.shape[-1] > 1:
@@ -267,7 +267,7 @@ class Surrogate:
         input_shape = numpy.shape(x)
         x = numpy.array(x, copy=False, ndmin=2)
         if self.dimension == 1:
-            if x.ndim == 2 and x.shape[0] == 1 and x.shape[1]  > 1:
+            if len(input_shape) <= 1:
                 # the cast to 2d puts these in wrong order, so transpose
                 x = x.T
             elif x.shape[-1] > 1:
