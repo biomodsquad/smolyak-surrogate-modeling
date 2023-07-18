@@ -348,7 +348,7 @@ class ChebyshevSecondKind(BasisFunction):
                      x[flag1]*self(x[flag1]))/(x[flag1]**2-1)
         y[flag2] = self._n*(self._n + 1)*(self._n + 2)/3
         y[flag3] = ((-1)**(self._n+1))*self._n*(self._n + 1)*(self._n + 2)/3
-        if y.shape == ():
+        if y.ndim == 0:
             y = y.item()
         return y
 
