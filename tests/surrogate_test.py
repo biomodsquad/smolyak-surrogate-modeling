@@ -198,6 +198,7 @@ def test_surrogate_1_multi_grid():
     surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
     surrogate.train(function_1)
     # random points in the domain
+    numpy.random.seed(567)
     points = numpy.random.rand(3,4,2)*2 - 1
     exact_values = numpy.zeros(points.shape[:-1])
     for i in range(points.shape[0]):
@@ -269,6 +270,7 @@ def test_surrogate_2_multi_grid(linear_solver):
     surrogate = Surrogate((-10, 10), grid_gen)
     surrogate.train(function_2, linear_solver)
     # random point in the domain
+    numpy.random.seed(567)
     point = numpy.random.rand(3,4)
     assert numpy.allclose(surrogate(point), function_2(point))
 
@@ -353,7 +355,8 @@ def test_gradient_surrogate_3_multi_grid():
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = GradientSurrogate([(-2, 2), (-2, 2)], grid_gen)
     surrogate.train(function_3)
-    # random points in the domain
+    # random points in the domaini
+    numpy.random.seed(567)
     points = numpy.random.rand(3,4,2)*4 - 2
     exact_values = numpy.zeros(points.shape)
     for i in range(points.shape[0]):
@@ -413,6 +416,7 @@ def test_gradient_surrogate_4_multi_grid():
     surrogate = GradientSurrogate([-2, 2], grid_gen)
     surrogate.train(function_4)
     # random points in the domain
+    numpy.random.seed(567)
     points = numpy.random.rand(3,4)
     surrogate_gradient_values = surrogate.gradient(points)
     exact_values = numpy.zeros(points.shape)
