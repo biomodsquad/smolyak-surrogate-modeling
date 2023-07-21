@@ -349,8 +349,7 @@ class Surrogate:
             raise IndexError("Data must be same length as grid points.")
 
         # make basis matrix
-        points, basis_functions = self.grid.points, self.grid.basis_functions
-        points = numpy.array(points)
+        points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
         basis_matrix = numpy.zeros((len(points), len(points)))
         for j, basis in enumerate(basis_functions):
             if self.dimension > 1:
