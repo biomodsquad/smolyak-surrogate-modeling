@@ -524,8 +524,7 @@ class GradientSurrogate(Surrogate):
         if self._data.shape != expected_data_shape:
             raise IndexError("Data must have size of number"
                              "of grid points x dimension.")
-        points, basis_functions = self.grid.points, self.grid.basis_functions
-        points = numpy.array(points)
+        points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
         num_points = len(points)
         # create basis matrix with appropriate size
         basis_matrix = numpy.zeros((self.dimension * len(points), len(points)))
