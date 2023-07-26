@@ -192,31 +192,54 @@ class Surrogate:
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
-        x = numpy.array(x, copy=False, ndmin=1)
-        if x.shape != (self.dimension, ):
-            raise IndexError('Input must match dimension of domain.')
-        if not (numpy.all(x >= self._domain[:, 0])
-                and numpy.all(x <= self._domain[:, 1])):
-            raise ValueError('x must lie in domain of surrogate')
+        input_shape = numpy.shape(x)
+        x = numpy.array(x, copy=False, ndmin=2)
+        if self.dimension == 1:
+            if len(input_shape) <= 1:
+                # the cast to 2d puts these in wrong order, so transpose
+                x = x.T
+            elif x.shape[-1] > 1:
+                x = x[..., numpy.newaxis]
 
-        gradient = []
+        if x.shape[-1] != self.dimension:
+            raise IndexError("Input must match dimension of domain")
+        if self.dimension > 1:
+            oob = any(numpy.any(x[..., i] < self.domain[i][0]) or 
+                    numpy.any(x[..., i] > self.domain[i][1]) 
+                    for i in range(self.dimension))
+        else:
+            oob = (numpy.any(x < self.domain[0]) or 
+                    numpy.any(x > self.domain[1]))
+        if oob:
+            raise ValueError('x must lie in domain of surrogate')
         # transform point into basis domain
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
         # evaluate the gradient
+        gradient = numpy.zeros(x_scaled.shape)
         for ni in range(self.dimension):
             value = 0
             for coeff, basis in zip(self.coefficients,
                                     self.grid.basis_functions):
                 if self.dimension > 1:
                     term = numpy.prod(
-                        [f.derivative(x) if dim == ni else f(x) for dim, (x, f)
-                         in enumerate(zip(x_scaled, basis))])
+                            [basis[dim].derivative(x_scaled[...,dim]) 
+                             if dim == ni else basis[dim](x_scaled[...,dim]) 
+                             for dim in range(len(basis))], axis=0)
                 else:
-                    term = basis.derivative(x_scaled[0])
+                    term = basis.derivative(x_scaled)
+                
                 value += coeff*term
-            gradient.append(value)
+            gradient[...,ni] = numpy.reshape(value, gradient.shape[:-1])
 
-        return gradient[0] if self.dimension == 1 else gradient
+        if len(input_shape) == 0:
+            gradient = gradient.item()
+        else:
+            if (self.dimension == 1 and len(input_shape) > 1 and input_shape[-1] == 1):
+                output_shape = input_shape[:-1]
+            else:
+                output_shape = input_shape
+            gradient = numpy.reshape(gradient, output_shape)
+        return gradient
 
     def __call__(self, x):
         """Evaluate surrogate at a given input.
@@ -243,23 +266,46 @@ class Surrogate:
         """
         if self._coefficients is None:
             raise ValueError('Function needs training!')
-        x = numpy.array(x, copy=False, ndmin=1)
-        if x.shape != (self.dimension, ):
-            raise IndexError('Input must match dimension of domain.')
-        if not (numpy.all(x >= self._domain[:, 0])
-                and numpy.all(x <= self._domain[:, 1])):
+        input_shape = numpy.shape(x)
+        x = numpy.array(x, copy=False, ndmin=2)
+        if self.dimension == 1:
+            if len(input_shape) <= 1:
+                # the cast to 2d puts these in wrong order, so transpose
+                x = x.T
+            elif x.shape[-1] > 1:
+                x = x[..., numpy.newaxis]
+        
+        if x.shape[-1] != self.dimension:
+            raise IndexError("Input must match dimension of domain")
+        if self.dimension > 1:
+            oob = any(numpy.any(x[..., i] < self.domain[i][0]) or 
+                    numpy.any(x[..., i] > self.domain[i][1]) 
+                    for i in range(self.dimension))
+        else:
+            oob = (numpy.any(x < self.domain[0]) or 
+                    numpy.any(x > self.domain[1]))
+        if oob:
             raise ValueError('x must lie in domain of surrogate')
         # transform point into basis domain and evaluate
         x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
         value = 0
         for coeff, basis in zip(self._coefficients, self.grid.basis_functions):
             if self.dimension > 1:
-                term = numpy.product(
-                    [basis_i(x_i) for basis_i, x_i in zip(basis, x_scaled)])
+                term = numpy.prod(
+                        [basis[i](x_scaled[...,i]) for i in range(len(basis))],
+                        axis=0)
             else:
-                term = basis(x_scaled[0])
+                term = basis(x_scaled)
             value += coeff*term
 
+        if (self.dimension == 1 and input_shape == ()) or (self.dimension > 1 and len(input_shape) == 1):
+            value = value.item()
+        else:
+            if (self.dimension == 1 and (len(input_shape) == 1 or input_shape[-1] >  1)):
+                output_shape = input_shape
+            else:
+                output_shape = x.shape[:-1]
+            value = numpy.reshape(value, output_shape)
         return value
 
     def train(self, function, linear_solver='lu'):
@@ -303,15 +349,14 @@ class Surrogate:
             raise IndexError("Data must be same length as grid points.")
 
         # make basis matrix
-        points, basis_functions = self.grid.points, self.grid.basis_functions
+        points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
         basis_matrix = numpy.zeros((len(points), len(points)))
-        for i, point in enumerate(points):
-            for j, basis in enumerate(basis_functions):
-                if self.dimension > 1:
-                    value = numpy.prod([f(x) for x, f in zip(point, basis)])
-                else:
-                    value = basis(point)
-                basis_matrix[i, j] = value
+        for j, basis in enumerate(basis_functions):
+            if self.dimension > 1:
+                value = numpy.prod([basis[i](points[...,i]) for i in range(len(basis))],axis=0)
+            else:
+                value = basis(points)
+            basis_matrix[:,j]= value
 
         if linear_solver == 'lu':
             self._coefficients = numpy.linalg.solve(
@@ -367,7 +412,7 @@ class Surrogate:
             numpy.clip(new_x, new[:,0], new[:,1],out=new_x)
         else:
             for i in range(new.shape[0]):
-                numpy.clip(new_x[:,i], new[i,0], new[i,1],out=new_x[:,i])
+                numpy.clip(new_x[...,i], new[i,0], new[i,1],out=new_x[...,i])
         return new_x
 
     def _reset_grid(self):
@@ -470,32 +515,30 @@ class GradientSurrogate(Surrogate):
         Raises
         ------
         IndexError
-            Data should be of length of the grid points x dimension.
+            Data should have size length of the grid points x dimension.
         """
         self._data = numpy.array(data, ndmin=1)
         expected_data_shape = ((len(self.grid.points), self.dimension)
                                if self.dimension > 1 else (
                                        len(self.grid.points),))
         if self._data.shape != expected_data_shape:
-            raise IndexError("Data must be of size of number"
+            raise IndexError("Data must have size of number"
                              "of grid points x dimension.")
-        points, basis_functions = self.grid.points, self.grid.basis_functions
+        points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
+        num_points = len(points)
         # create basis matrix with appropriate size
         basis_matrix = numpy.zeros((self.dimension * len(points), len(points)))
         # evalaute each term
-        count = 0
-        for i, point in enumerate(points):
-            for ni in range(self.dimension):
-                for j, basis in enumerate(basis_functions):
-                    if self.dimension > 1:
-                        value = numpy.prod([f.derivative(x) if dim == ni
-                                            else f(x) for dim, (x, f)
-                                            in enumerate(zip(
-                                                 point, basis))])
-                    else:
-                        value = basis.derivative(point)
-                    basis_matrix[count, j] = value
-                count += 1
+        for ni in range(self.dimension):
+            for j, basis in enumerate(basis_functions):
+                if self.dimension > 1:
+                    value = numpy.prod(
+                            [basis[dim].derivative(points[...,dim]) 
+                             if dim == ni else basis[dim](points[...,dim]) 
+                             for dim in range(len(basis))],axis=0)
+                else:
+                    value = basis.derivative(points)
+                basis_matrix[ni::self.dimension, j] = value
         data = numpy.reshape(self._data,
                              (self.dimension*len(self.grid.points), ))
         self._coefficients = numpy.linalg.lstsq(basis_matrix,

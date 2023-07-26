@@ -180,6 +180,40 @@ def test_surrogate_1():
     assert numpy.allclose(surrogate_values, exact_values)
 
 
+def test_surrogate_1_multi_input():
+    """Test if surrogate generates exact results when call has >1 input."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen)
+    surrogate.train(function_1)
+    # random points in the domain
+    numpy.random.seed(567)
+    points_1 = [(0.649, -0.9), (-0.885, 1)]
+    points_2 = numpy.random.rand(3, 4, 2)*2 - 1
+    exact_values_1 = [function_1(x) for x in points_1]
+    exact_values_2 = numpy.zeros(points_2.shape[:-1])
+    for i in range(points_2.shape[0]):
+        for j in range(points_2.shape[1]):
+            exact_values_2[i,j] = function_1(tuple(points_2[i,j]))
+    surrogate_values_1 = surrogate(points_1)
+    surrogate_values_2 = surrogate(points_2)
+    assert numpy.allclose(exact_values_1, surrogate_values_1)
+    assert numpy.allclose(exact_values_2, surrogate_values_2)
+
+
+def test_surrogate_2D_multi_shape():
+    """Test if surrogate call generates the correct shape for 2 dimensions."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate([(-1, 1),(-1, 1)], grid_gen)
+    surrogate.train(function_1)
+    # arrays of various shapes with points in the domain
+    assert numpy.isscalar(surrogate([1, 1]))
+    assert surrogate([[1, 1]]).shape == (1,)
+    assert surrogate([[1, 1], [0.5, 0.5]]).shape == (2,)
+    assert surrogate(numpy.ones((1, 1, 1, 2))).shape == (1, 1, 1)
+    assert surrogate(numpy.ones((4, 3, 2, 2))).shape == (4, 3, 2)
+    assert surrogate(numpy.ones((4, 3, 5, 2))).shape == (4, 3, 5)
+
+
 def test_surrogate_0_shifted():
     """Test if surrogate generates exact results for a shifted function 0."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
@@ -202,6 +236,36 @@ def test_surrogate_2(linear_solver):
     # random point in the domain
     point = 0.367
     assert numpy.isclose(surrogate(point), function_2(point))
+
+
+@pytest.mark.parametrize('linear_solver', ['lu', 'lstsq', 'inv'])
+def test_surrogate_2_multi_input(linear_solver):
+    """Test if surrogate generates exact results for 1D function and >1 input"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate((-10, 10), grid_gen)
+    surrogate.train(function_2, linear_solver)
+    # random point in the domain
+    numpy.random.seed(567)
+    points_1 = numpy.array([0.367, 0.4, 0.742, 0.99])
+    points_2 = numpy.random.rand(3, 4)
+    assert numpy.allclose(surrogate(points_1), function_2(points_1))
+    assert numpy.allclose(surrogate(points_2), function_2(points_2))
+
+
+def test_surrogate_1D_multi_shape():
+    """Test if surrogate call generates the correct shape for 1 dimension."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = Surrogate((-10, 10), grid_gen)
+    surrogate.train(function_2)
+    # arrays of various shapes with points in the domain
+    assert numpy.isscalar(surrogate(1))
+    assert surrogate([1]).shape == (1,)
+    assert surrogate([[1]]).shape == (1,)
+    assert surrogate([1, 2]).shape == (2,)
+    assert surrogate([[1], [2]]).shape == (2,)
+    assert surrogate(numpy.ones((1, 1, 1, 1))).shape == (1, 1, 1)
+    assert surrogate(numpy.ones((1, 2, 3, 4))).shape == (1, 2, 3, 4)
+    assert surrogate(numpy.ones((4, 3, 2, 1))).shape == (4, 3, 2)
 
 
 def test_train_from_data():
@@ -243,6 +307,40 @@ def test_gradient_surrogate_3():
     assert numpy.allclose(surrogate_gradient_values, exact_values)
 
 
+def test_gradient_surrogate_3_multi_input():
+    """Test if surrogate generates exact results if gradient has >1 input."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([(-2, 2), (-2, 2)], grid_gen)
+    surrogate.train(function_3)
+    # random points in the domain
+    numpy.random.seed(567)
+    points_1 = [(0.649, -0.9), (-0.885, 1)]
+    points_2 = numpy.random.rand(3, 4, 2)*4 - 2
+    exact_values_1 = [function_3(x) for x in points_1]
+    exact_values_2 = numpy.zeros(points_2.shape)
+    for i in range(points_2.shape[0]):
+        for j in range(points_2.shape[1]):
+            exact_values_2[i,j] = function_3(tuple(points_2[i,j]))
+    surrogate_gradient_values_1 = surrogate.gradient(points_1)
+    surrogate_gradient_values_2 = surrogate.gradient(points_2)
+    assert numpy.allclose(exact_values_1, surrogate_gradient_values_1)
+    assert numpy.allclose(exact_values_2, surrogate_gradient_values_2)
+
+
+def test_gradient_surrogate_2D_multi_shape():
+    """Test if surrogate gradient generates correct shape for 2 dimensions."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([(-2, 2),(-2, 2)], grid_gen)
+    surrogate.train(function_3)
+    # arrays of various shapes with points in the domain
+    assert surrogate.gradient([1, 1]).shape == (2,)
+    assert surrogate.gradient([[1, 1]]).shape == (1, 2)
+    assert surrogate.gradient([[1, 1], [0.5, 0.5]]).shape == (2, 2)
+    assert surrogate.gradient(numpy.ones((1, 1, 1, 2))).shape == (1, 1, 1, 2)
+    assert surrogate.gradient(numpy.ones((4, 3, 2, 2))).shape == (4, 3, 2, 2)
+    assert surrogate.gradient(numpy.ones((4, 3, 5, 2))).shape == (4, 3, 5, 2)
+
+
 def test_gradient_surrogate_4():
     """Test if surrogate generates exact results for test for Chebyshevs."""
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
@@ -253,6 +351,42 @@ def test_gradient_surrogate_4():
     surrogate_gradient_values = [surrogate.gradient(x) for x in points]
     exact_values = [function_4(x) for x in points]
     assert numpy.allclose(surrogate_gradient_values, exact_values)
+
+
+def test_gradient_surrogate_4_multi_input():
+    """Test if surrogate generates exact results for 1D with multiple inputs"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate([-2, 2], grid_gen)
+    surrogate.train(function_4)
+    # random points in the domain
+    numpy.random.seed(567)
+    points_1 = -0.7, 0.45
+    points_2 = numpy.random.rand(3, 4)
+    exact_values_1 = [function_4(x) for x in points_1]
+    exact_values_2 = numpy.zeros(points_2.shape)
+    for i in range(points_2.shape[0]):
+        for j in range(points_2.shape[1]):
+            exact_values_2[i,j] = function_4(points_2[i,j])
+    surrogate_gradient_values_1 = surrogate.gradient(points_1)
+    surrogate_gradient_values_2 = surrogate.gradient(points_2)
+    assert numpy.allclose(surrogate_gradient_values_1, exact_values_1)
+    assert numpy.allclose(surrogate_gradient_values_2, exact_values_2)
+
+
+def test_gradient_surrogate_1D_multi_shape():
+    """Test if surrogate gradient generates correct shape for 1 dimension."""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    surrogate = GradientSurrogate((-2, 2), grid_gen)
+    surrogate.train(function_4)
+    # arrays of various shapes with points in the domain
+    assert numpy.isscalar(surrogate(1))
+    assert surrogate([1]).shape == (1,)
+    assert surrogate([[1]]).shape == (1,)
+    assert surrogate([1, 2]).shape == (2,)
+    assert surrogate([[1], [2]]).shape == (2,)
+    assert surrogate(numpy.ones((1, 1, 1, 1))).shape == (1, 1, 1)
+    assert surrogate(numpy.ones((1, 2, 3, 4))).shape == (1, 2, 3, 4)
+    assert surrogate(numpy.ones((4, 3, 2, 1))).shape == (4, 3, 2)
 
 
 def test_error_solver():
