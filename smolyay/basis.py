@@ -131,7 +131,7 @@ class ChebyshevFirstKind(BasisFunction):
             if input is outside the domain [-1,1]
 
         """
-        if x > 1 or x < -1:
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
 
         return scipy.special.eval_chebyt(self._n,x)
@@ -161,7 +161,7 @@ class ChebyshevFirstKind(BasisFunction):
         ValueError
             if input is outside the domain [-1,1].
         """
-        if x > 1 or x < -1:
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
         if self._derivative_polynomial is None:
             self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
@@ -392,7 +392,7 @@ class ChebyshevSecondKind(BasisFunction):
             if input is outside the domain [-1,1]
 
         """
-        if x > 1 or x < -1:
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
         return scipy.special.eval_chebyu(self._n,x)
 
@@ -407,7 +407,7 @@ class ChebyshevSecondKind(BasisFunction):
             U_n'(x) = \frac{(n+1)T_{n+1}(x)-xU_n(x)}{x^{2}-1}
 
         The above equation does not converge for :math:x={-1, 1}.
-
+        Derivative can be found using L'Hôpital's rule.
         ..math::
             \lim_{x \to 1} U_n'(x) = \frac{n(n+1)(n+2)}{3}
             \lim_{x \to -1} U_n'(x) = (-1)^{n+1} \frac{n(n+1)(n+2)}{3}
@@ -427,17 +427,22 @@ class ChebyshevSecondKind(BasisFunction):
         ValueError
             if input is outside the domain [-1,1].
         """
-        if x > 1 or x < -1:
+        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
-        if x == 1:
-            return self._n*(self._n+1)*(self._n+2)/3
-        elif x == -1:
-            return ((-1)**(self._n+1))*self._n*(self._n+1)*(self._n+2)/3
-        else:
-            if self._derivative_polynomial is None:
-                self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
-            return ((self._n+1)*self._derivative_polynomial(x) -
-                    x*self(x))/(x**2-1)
+        if self._derivative_polynomial is None:
+            self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
+        x = numpy.asarray(x)
+        y = numpy.zeros(x.shape)
+        flag2 = x == 1
+        flag3 = x == -1
+        flag1 = ~(flag2 | flag3)
+        y[flag1] =  ((self._n+1)*self._derivative_polynomial(x[flag1]) -
+                     x[flag1]*self(x[flag1]))/(x[flag1]**2-1)
+        y[flag2] = self._n*(self._n + 1)*(self._n + 2)/3
+        y[flag3] = ((-1)**(self._n+1))*self._n*(self._n + 1)*(self._n + 2)/3
+        if y.ndim == 0:
+            y = y.item()
+        return y
 
     @classmethod
     def make_nested_set(cls, exactness):
