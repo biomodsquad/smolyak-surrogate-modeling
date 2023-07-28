@@ -7,13 +7,23 @@ from smolyay.basis import (BasisFunction, ChebyshevFirstKind,
         ChebyshevSecondKind, BasisFunctionSet, NestedBasisFunctionSet)
 
 @pytest.fixture
-def expected_points_3_set():
+def expected_1st_kind():
     """extrema for exactness = 8"""
     return [0, -1.0, 1.0, -1/numpy.sqrt(2), 1/numpy.sqrt(2),
             -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
             -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
             numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
             numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
+
+@pytest.fixture
+def expected_2nd_kind():
+    """roots for 15th order Chebyshev polynomial of the second kind"""
+    return [0, 0, -1/numpy.sqrt(2), 1/numpy.sqrt(2),
+            -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
+            -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
+            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
+            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
+
 
 def test_cheb_initial_zero():
     """test degree of zero"""
@@ -276,55 +286,127 @@ def test_set_nested_change_levels_invalid():
     with pytest.raises(IndexError):
         f.levels = [[0],[1,2],[3,4]]
 
-def test_set_nested_change_levels(expected_points_3_set):
+def test_set_nested_change_levels(expected_1st_kind):
     """Check NestedBasisFunctionSet updates levels correctly"""
     levels = [[0],[1,2],[3,4],[5,6,7,8]]
     basis_functions = [ChebyshevFirstKind(i) for i in range(9)]
-    f = NestedBasisFunctionSet(expected_points_3_set,basis_functions,levels)
+    f = NestedBasisFunctionSet(expected_1st_kind,basis_functions,levels)
     f.levels = [[0],[1,2],[3,4]]
     assert f.levels == [[0],[1,2],[3,4]]
 
-def test_make_nested_function(expected_points_3_set):
+def test_make_nested_function(expected_1st_kind):
     """Check make_nested_set creates NestedBasisFunctionSet"""
     f = ChebyshevFirstKind.make_nested_set(3)
     assert numpy.allclose(
-            f.points,expected_points_3_set,atol=1e-10)
+            f.points,expected_1st_kind,atol=1e-10)
     assert f.levels == [[0],[1,2],[3,4],[5,6,7,8]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 9
-    for i in range(0,len(basis_functions)):
-        assert basis_functions[i].n == i
+    assert len(f.basis_functions) == 9
+    for i in range(len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
 
 def test_make_nested_empty():
     """Check make_nested_set makes empty NestedBasisFunctionSet"""
     f = ChebyshevFirstKind.make_nested_set(0)
     assert f.points == [0]
     assert f.levels == [[0]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 1
-    assert basis_functions[0].n == 0
+    assert len(f.basis_functions) == 1
+    assert f.basis_functions[0].n == 0
 
-def test_make_nested_function_cheb_2nd(expected_points_3_set):
+def test_make_nested_function_cheb_2nd(expected_2nd_kind):
     """Check make_nested_set creates NestedBasisFunctionSet"""
     f = ChebyshevSecondKind.make_nested_set(2)
-    expected_points = [0, 0, -1/numpy.sqrt(2), 1/numpy.sqrt(2),
-            -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
-            -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
-            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
-            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
-    assert numpy.allclose(f.points,expected_points,atol=1e-10)
+    assert numpy.allclose(f.points,expected_2nd_kind,atol=1e-10)
     assert f.levels == [[0,1],[2,3],[4,5,6,7]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 8
-    for i in range(0,len(basis_functions)):
-        assert basis_functions[i].n == i
+    assert len(f.basis_functions) == 8
+    for i in range(len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
 
 def test_make_nested_empty_cheb_2nd():
     """Check make_nested_set makes empty NestedBasisFunctionSet"""
     f = ChebyshevSecondKind.make_nested_set(0)
     assert f.points == [0,0]
     assert f.levels == [[0,1]]
+    assert len(f.basis_functions) == 2
+    for i in range(len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
+
+def test_slow_initial_zero_cheb_1st():
+    """Creates a slow NestedBasisFunctionSet at exactness 0"""
+    f = ChebyshevFirstKind.make_slow_nested_set(0)
+    assert f.points == [0]
+    assert f.levels == [[0]]
+    assert len(f.basis_functions) == 1
+    assert f.basis_functions[0].n == 0
+
+
+def test_slow_initial_three_cheb_1st(expected_1st_kind):
+    """Creates a slow NestedBasisFunctionSet at exactness 3"""
+    f = ChebyshevFirstKind.make_slow_nested_set(3)
+    assert numpy.allclose(
+            f.points,expected_1st_kind,atol=1e-10)
+    assert f.levels == [[0], [1, 2], [3, 4], [5, 6, 7, 8]]
+    assert len(f.basis_functions) == 9
+    for i in range(0,len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
+
+def test_slow_initial_four_cheb_1st(expected_1st_kind):
+    """Creates a slow NestedBasisFunctionSet at exactness 4"""
+    f = ChebyshevFirstKind.make_slow_nested_set(4)
+    assert numpy.allclose(
+            f.points,expected_1st_kind,atol=1e-10)
+    assert f.levels == [[0], [1, 2], [3, 4], [5, 6, 7, 8], []]
+    assert len(f.basis_functions) == 9
+    for i in range(len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
+
+def test_slow_custom_rule_cheb_1st():
+    """Creates a slower NestedBasisFunctionSet"""
+    f = ChebyshevFirstKind.make_slow_nested_set(4, lambda x : x+1)
+    assert f.levels == [[0], [1, 2], [], [3, 4], []]
+    assert len(f.basis_functions) == 5
+    assert numpy.allclose(f.points,
+                          [0, -1, 1, -1/numpy.sqrt(2), 1/numpy.sqrt(2)])
+
+
+def test_slow_nested_zero_cheb_2nd():
+    """Check make_slow_nested_set makes empty NestedBasisFunctionSet"""
+    f = ChebyshevSecondKind.make_slow_nested_set(0)
+    assert f.points == [0, 0]
+    assert f.levels == [[0, 1]]
     basis_functions = f.basis_functions
     assert len(basis_functions) == 2
-    assert basis_functions[0].n == 0
+    for i in range(len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
+
+
+def test_slow_nested_two_cheb_2nd(expected_2nd_kind):
+    """Check make_slow_nested_set creates NestedBasisFunctionSet"""
+    f = ChebyshevSecondKind.make_slow_nested_set(2)
+    assert numpy.allclose(f.points,expected_2nd_kind,atol=1e-10)
+    assert f.levels == [[0,1],[2,3],[4,5,6,7]]
+    basis_functions = f.basis_functions
+    assert len(basis_functions) == 8
+    for i in range(len(basis_functions)):
+        assert basis_functions[i].n == i
+
+def test_slow_nested_three_cheb_2nd(expected_2nd_kind):
+    """Check make_slow_nested_set creates NestedBasisFunctionSet"""
+    f = ChebyshevSecondKind.make_slow_nested_set(3)
+    assert numpy.allclose(f.points,expected_2nd_kind,atol=1e-10)
+    assert f.levels == [[0,1],[2,3],[4,5,6,7],[]]
+    basis_functions = f.basis_functions
+    assert len(basis_functions) == 8
+    for i in range(0,len(basis_functions)):
+        assert basis_functions[i].n == i
+
+def test_slow_nested_custom_rule_cheb_2nd():
+    """Creates a slower NestedBasisFunctionSet"""
+    f1 = ChebyshevSecondKind.make_slow_nested_set(2,lambda x : x + 1)
+    assert f1.levels == [[0, 1], [], [2, 3]]
+    assert numpy.allclose(f1.points,
+                          [0, 0, -1/numpy.sqrt(2), 1/numpy.sqrt(2)])
+    assert len(f1.basis_functions) == 4
+    for i in range(len(f1.basis_functions)):
+        assert f1.basis_functions[i].n == i
+
 
