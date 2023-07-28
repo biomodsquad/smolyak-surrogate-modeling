@@ -383,20 +383,18 @@ def test_slow_nested_two_cheb_2nd(expected_2nd_kind):
     f = ChebyshevSecondKind.make_slow_nested_set(2)
     assert numpy.allclose(f.points,expected_2nd_kind,atol=1e-10)
     assert f.levels == [[0,1],[2,3],[4,5,6,7]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 8
-    for i in range(len(basis_functions)):
-        assert basis_functions[i].n == i
+    assert len(f.basis_functions) == 8
+    for i in range(len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
 
 def test_slow_nested_three_cheb_2nd(expected_2nd_kind):
     """Check make_slow_nested_set creates NestedBasisFunctionSet"""
     f = ChebyshevSecondKind.make_slow_nested_set(3)
     assert numpy.allclose(f.points,expected_2nd_kind,atol=1e-10)
     assert f.levels == [[0,1],[2,3],[4,5,6,7],[]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 8
-    for i in range(0,len(basis_functions)):
-        assert basis_functions[i].n == i
+    assert len(f.basis_functions) == 8
+    for i in range(len(f.basis_functions)):
+        assert f.basis_functions[i].n == i
 
 def test_slow_nested_custom_rule_cheb_2nd():
     """Creates a slower NestedBasisFunctionSet"""
