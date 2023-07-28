@@ -373,8 +373,7 @@ def test_slow_nested_zero_cheb_2nd():
     f = ChebyshevSecondKind.make_slow_nested_set(0)
     assert f.points == [0, 0]
     assert f.levels == [[0, 1]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 2
+    assert len(f.basis_functions) == 2
     for i in range(len(f.basis_functions)):
         assert f.basis_functions[i].n == i
 
