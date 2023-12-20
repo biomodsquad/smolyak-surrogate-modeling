@@ -29,13 +29,13 @@ def test_cheb_initial_zero():
     """test degree of zero"""
     f = ChebyshevFirstKind(0)
     assert f.n == 0
-    assert f.points == [0]
+    assert numpy.allclose(f.points,[0])
 
 def test_cheb_initial_1():
     """test initial when degree is 1"""
     f = ChebyshevFirstKind(1)
     assert f.n == 1
-    assert f.points == [-1, 1]
+    assert numpy.allclose(f.points,[-1, 1])
 
 def test_cheb_initial_2():
     """test initial when degree is 2"""
