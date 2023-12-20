@@ -90,7 +90,7 @@ class ChebyshevFirstKind(BasisFunction):
         self._n = n
         self._derivative_polynomial = None
         if n > 0:
-            self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
+            self._points = -numpy.cos(numpy.pi*numpy.linspace(0,n,n+1)/n)
         else:
             self._points = [0]
 
@@ -217,7 +217,7 @@ class ChebyshevFirstKind(BasisFunction):
             basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
             levels.append(list(level_range))
             for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p).any():
+                if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
                     points.append(p)
         return NestedBasisFunctionSet(points, basis_functions, levels)
 
@@ -307,7 +307,7 @@ class ChebyshevFirstKind(BasisFunction):
                 basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
                 levels.append(list(level_range))
                 for p in basis_functions[end_level].points:
-                    if not numpy.isclose(points, p).any():
+                    if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
                         points.append(p)
             else:
                 levels.append([])
@@ -346,7 +346,7 @@ class ChebyshevSecondKind(BasisFunction):
         self._n = n
         self._derivative_polynomial = None
         if n > 1:
-            self._points = [-numpy.cos(k*numpy.pi/(n+1)) for k in range(1, n+1)]
+            self._points = -numpy.cos(numpy.pi*numpy.linspace(1,n,n)/(n+1))
         else:
             self._points = [0.]
 
@@ -488,7 +488,7 @@ class ChebyshevSecondKind(BasisFunction):
             basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
             levels.append(list(level_range))
             for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p).any():
+                if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
                     points.append(p)
         return NestedBasisFunctionSet(points,basis_functions,levels)
 
@@ -571,7 +571,7 @@ class ChebyshevSecondKind(BasisFunction):
                 basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
                 levels.append(list(level_range))
                 for p in basis_functions[end_level].points:
-                    if not numpy.isclose(points, p).any():
+                    if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
                         points.append(p)
             else:
                 levels.append([])
