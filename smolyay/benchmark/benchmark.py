@@ -37,7 +37,7 @@ class BenchmarkFunction(abc.ABC):
         if any(numpy.any(x[..., i] < self.domain[i][0]) or 
                numpy.any(x[..., i] > self.domain[i][1]) 
                for i in range(self.dimension)):
-            raise ValueError("Input out domain of function.")
+            raise ValueError("Input outside domain of function.")
         return numpy.squeeze(self._function(x))
     
     @property
