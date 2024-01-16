@@ -214,3 +214,11 @@ def test_functions_call_error_above(fun):
     with pytest.raises(ValueError):
         fun(above_bounds)
 
+@pytest.mark.parametrize("fun",functions)
+def test_functions_call_shape(fun):
+    """Test all functions give the correct shape"""
+    x_list = numpy.zeros((2,50,fun.dimension))
+    mid_point = numpy.divide(numpy.add(fun.lower_bounds,fun.upper_bounds),2)
+    x_list[0] = numpy.linspace(fun.lower_bounds,mid_point,50)
+    x_list[1] = numpy.linspace(mid_point,fun.upper_bounds,50)
+    assert fun(x_list).shape == (2,50)
