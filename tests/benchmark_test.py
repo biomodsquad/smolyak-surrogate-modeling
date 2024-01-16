@@ -219,7 +219,6 @@ def test_functions_call_shape(fun):
     """Test all functions give the correct shape"""
     x_list = numpy.zeros((2,50,fun.dimension))
     mid_point = numpy.divide(numpy.add(fun.lower_bounds,fun.upper_bounds),2)
-    x_list[0,:,:] = numpy.linspace(fun.lower_bounds,mid_point,50)
-    x_list[1,:,:] = numpy.linspace(mid_point,fun.upper_bounds,50)
-    print(fun.name)
+    x_list[0] = numpy.linspace(fun.lower_bounds,mid_point,50)
+    x_list[1] = numpy.linspace(mid_point,fun.upper_bounds,50)
     fun(x_list)
