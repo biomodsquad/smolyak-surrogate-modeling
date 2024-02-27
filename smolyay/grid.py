@@ -41,7 +41,7 @@ class IndexGridGenerator(abc.ABC):
         self._basis_set = basis_set
 
     @abc.abstractmethod
-    def __call__(self, dimension):
+    def __call__(self, *args):
         """Make grid points and their corresponding basis functions.
 
         Parameters
@@ -405,10 +405,21 @@ class AdaptiveSmolyakGridGenerator(IndexGridGenerator):
         :class:`NestedIndexGrid`
             Grid points (and their indexes),levels,
             and their corresponding functions.
+
+        Raises
+        ------
+        IndexError
+            smolyak_indexes cannot exceed number of levels
+        ValueError
+            smolyak_indexes has inconsistent dimensions
         """
         grid_points_indexes = None
         dimension = len(smolyak_indexes[0])
+        if len(self._basis_set.levels)+1 < numpy.max(smolyak_indexes):
+            raise IndexError('smolyak_indexes cannnot exceed number of levels')
 
+        if any(dimension != len(si) for si in smolyak_indexes):
+            raise ValueError('smolyak_indexes has inconsistent dimensions')
         for composition in smolyak_indexes:
             index_composition = numpy.array(composition) - 1
             # generate all combinations of
