@@ -41,13 +41,13 @@ class IndexGridGenerator(abc.ABC):
         self._basis_set = basis_set
 
     @abc.abstractmethod
-    def __call__(self, *args):
+    def __call__(self, dimension):
         """Make grid points and their corresponding basis functions.
 
         Parameters
         ----------
         dimension: int
-            Number of idependent variables.
+            Number of independent variables.
 
         Returns
         -------
@@ -340,15 +340,41 @@ class AdaptiveSmolyakGridGenerator(IndexGridGenerator):
     ------
     TypeError
         ``basis_set`` must be a :class:`NestedBasisFunctionSet`.
+    IndexError
+        smolyak_indexes cannot exceed number of levels
+    ValueError
+        smolyak_indexes has inconsistent number of dimensions
+
 
     """
 
-    def __init__(self, basis_set):
+    def __init__(self, basis_set,smolyak_indexes=None):
         super().__init__(basis_set)
         if not isinstance(self.basis_set, NestedBasisFunctionSet):
             raise TypeError('Basis set must be nested for Smolyak grid')
+        if len(self.basis_set.levels) < numpy.max(smolyak_indexes):
+            raise IndexError('Cannnot exceed number of levels')
+        if any(len(smolyak_indexes[0]) != len(si) 
+                for si in smolyak_indexes):
+            raise ValueError('Inconsistent dimensions')
+        self._smolyak_indexes = smolyak_indexes
 
-    def __call__(self, smolyak_indexes):
+    @property
+    def smolyak_indexes(self):
+        """list of lists: smolyak indexes"""
+        return self._smolyak_indexes
+
+    @smolyak_indexes.setter
+    def smolyak_indexes(self, smolyak_indexes):
+        if len(self.basis_set.levels) < numpy.max(smolyak_indexes):
+            raise IndexError('Cannnot exceed number of levels')
+        if any(len(smolyak_indexes[0]) != len(si) 
+                for si in smolyak_indexes):
+            raise ValueError('Inconsistent dimensions')
+        self._smolyak_indexes = smolyak_indexes
+
+
+    def __call__(self, dimension):
         """Make grid points and their corresponding basis functions.
 
         Depending on the dimensionality, a set of grid points are generated
@@ -359,8 +385,8 @@ class AdaptiveSmolyakGridGenerator(IndexGridGenerator):
 
         Parameters
         ----------
-        smolyak_indexes : array of size n x dimension
-            valid combinations of grid point indexes.
+        dimension: int
+            Number of independent variables.
 
         Returns
         -------
@@ -370,19 +396,14 @@ class AdaptiveSmolyakGridGenerator(IndexGridGenerator):
 
         Raises
         ------
-        IndexError
-            smolyak_indexes cannot exceed number of levels
         ValueError
-            smolyak_indexes has inconsistent dimensions
+            Wrong number of dimensions
         """
         grid_points_indexes = None
-        dimension = len(smolyak_indexes[0])
-        if len(self._basis_set.levels)+1 < numpy.max(smolyak_indexes):
-            raise IndexError('smolyak_indexes cannnot exceed number of levels')
-
-        if any(dimension != len(si) for si in smolyak_indexes):
-            raise ValueError('smolyak_indexes has inconsistent dimensions')
-        for composition in smolyak_indexes:
+        # check invalid input
+        if dimension != len(self.smolyak_indexes[0]):
+            raise ValueError('Wrong number of dimensions')
+        for composition in self.smolyak_indexes:
             index_composition = numpy.array(composition) - 1
             # generate all combinations of
             # the arrays along each dimension
