@@ -37,8 +37,8 @@ class Normalizer(abc.ABC):
     def original_data(self, value):
         value = numpy.array(value, ndmin=1)
         self._original_data = value
-        self._training_data = self.transform(self.original_data)
-
+        self.transform(value)
+        
     def fit(self, x):
         """Obtain the original training data
 
@@ -455,3 +455,95 @@ class SymmetricalLogNormalizer(Normalizer):
         unnormalized data
         """
         return numpy.sign(x) * self.linthresh * (-1 + numpy.power(10, numpy.abs(x)))
+    
+class SklearnNormalizer(Normalizer):
+    """Normalizer that uses a scalar or transformer from the sklearn package
+    
+    Given a scalar or transformer object from the sklearn package, this
+    implements the transform and inverse transform of that object as a
+    Normalizer object. The parameter ``scalar`` must have the methods
+    :meth:`transform`, :meth:`inverse_transform`, :meth:`fit`, and
+    :meth:`fit_transform`. 
+
+    Raises
+    ------
+    ValueError
+        the original data was never assigned"""
+        
+    def __init__(self, scalar):
+        super().__init__()
+        methods = ['transform','inverse_transform','fit']
+        if not all([callable(getattr(scalar,m,False)) for m in methods]):
+            raise TypeError('Object does not have the required methods')
+        self._scalar = scalar
+
+    @property
+    def scalar(self):
+        """Transformer"""
+        return self._scalar
+    
+    def fit(self, x):
+        """Obtain the original training data
+
+        Method for obtaining the original training data. To be overridden 
+        should a child class require the training data for calculations.
+
+        Parameters
+        ----------
+        x : numerical data
+            the training data
+
+        Returns
+        -------
+        Normalizer
+            the normalizer
+        """
+        x = numpy.array(x)
+        self._original_data = x
+        original_shape = x.shape
+        num_data = numpy.prod(x.shape)
+        x = x.reshape((num_data,1))
+        self.scalar.fit(x)
+        return self
+    
+    def transform(self, x):
+        """Normalization function
+
+        Parameters
+        ----------
+        x : numerical data
+            data to be transformed
+
+        Return
+        ------
+        normalized data
+        """
+        x = numpy.array(x)
+        self._original_data = x
+        original_shape = x.shape
+        num_data = numpy.prod(x.shape)
+        x = x.reshape((num_data,1))
+        y = self.scalar.transform(x)
+        y = y.reshape(original_shape)
+        return y
+
+    def inverse_transform(self, x):
+        """Inverse normalization function
+
+        Parameters
+        ----------
+        x : numerical data
+            normalized data to be transformed
+
+        Return
+        ------
+        unnormalized data
+        """
+        x = numpy.array(x)
+        self.original_data = x
+        original_shape = x.shape
+        num_data = numpy.prod(x.shape)
+        x = x.reshape((num_data,1))
+        y = self.scalar.inverse_transform(x)
+        y = y.reshape(original_shape)
+        return y

@@ -2,6 +2,7 @@ import pytest
 import warnings
 
 import numpy
+import sklearn.preprocessing
 
 from smolyay.normalize import (
     Normalizer,
@@ -9,6 +10,7 @@ from smolyay.normalize import (
     SymmetricalLogNormalizer,
     IntervalNormalizer,
     ZScoreNormalizer,
+    SklearnNormalizer,
 )
 
 
@@ -116,7 +118,7 @@ def test_zscore_check():
     """Test if the ZScoreNormalizer passes the check"""
     x = numpy.array([1, 2, 3, 4, 5],ndmin=2).transpose()
     normal = ZScoreNormalizer()
-    normal.original_data = x
+    normal.fit(x)
     assert normal.check_normalize(x)
 
 def test_zscore_attributes():
@@ -154,3 +156,100 @@ def test_zscore_transform_error():
         normal.inverse_transform([1, 2])
     with pytest.raises(ValueError):
         normal.check_normalize([1, 3])
+
+@pytest.mark.parametrize(
+    "scalar_class",
+    [
+        sklearn.preprocessing.StandardScaler,
+        sklearn.preprocessing.MaxAbsScaler,
+        sklearn.preprocessing.MinMaxScaler,
+        sklearn.preprocessing.PowerTransformer,
+        sklearn.preprocessing.RobustScaler,
+    ],
+)
+def test_sklearn_check(scalar_class):
+    """Test if SklearnNormalizer functions correctly"""
+    x = numpy.array([1,2,3,4,5])
+    scalar = scalar_class()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    assert normal.check_normalize(x)
+
+@pytest.mark.parametrize(
+    "scalar_class",
+    [
+        sklearn.preprocessing.StandardScaler,
+        sklearn.preprocessing.MaxAbsScaler,
+        sklearn.preprocessing.MinMaxScaler,
+        sklearn.preprocessing.PowerTransformer,
+        sklearn.preprocessing.RobustScaler,
+    ],
+)
+def test_sklearn_check_multidim(scalar_class):
+    """Test if SklearnNormalizer functions correctly"""
+    x = numpy.array([[1,2,3,4,5],[3,4,5,6,7],[5,2,5,9,0],[1,2,3,4,5]])
+    scalar = scalar_class()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    y = normal.transform(x)
+    new_x = normal.inverse_transform(y)
+    assert normal.check_normalize(x)
+    assert y.shape == x.shape
+    assert y.shape == new_x.shape
+    assert numpy.allclose(x,new_x)
+
+@pytest.mark.parametrize(
+    "scalar_class",
+    [
+        sklearn.preprocessing.StandardScaler,
+        sklearn.preprocessing.MaxAbsScaler,
+        sklearn.preprocessing.MinMaxScaler,
+        sklearn.preprocessing.PowerTransformer,
+        sklearn.preprocessing.RobustScaler,
+    ],
+)
+def test_sklearn_attributes(scalar_class):
+    """Test if the attributes of SklearnNormalizer are added"""
+    x = [1, 2, 3, 4, 5]
+    scalar = scalar_class()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    assert numpy.array_equal(normal.original_data,[1, 2, 3, 4, 5])
+    assert isinstance(normal.scalar,scalar_class)
+
+def test_sklearn_transform():
+    """Test that the SklearnNormalizer transform is correct"""
+    x = [1, 2, 3, 4, 5]
+    scalar = sklearn.preprocessing.MaxAbsScaler()
+    normal = SklearnNormalizer(scalar)
+    assert numpy.allclose(normal.fit_transform(x), [0.2,0.4,0.6,0.8,1])
+
+def test_sklearn_transform_multidim():
+    """Test if SklearnNormalizer functions correctly"""
+    x = numpy.array([[1,2,3,4,5],[3,4,5,6,7],[5,2,5,9,10],[1,2,3,4,5]])
+    true_y = x/10
+    scalar = sklearn.preprocessing.MaxAbsScaler()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    normal_y = normal.transform(x)
+    assert normal_y.shape == true_y.shape
+    assert numpy.array_equal(normal_y,true_y)
+
+def test_sklearn_inverse():
+    """Test that the SklearnNormalizer inverse transform is correct"""
+    x = [1, 2, 3, 4, 5]
+    scalar = sklearn.preprocessing.MaxAbsScaler()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    assert numpy.allclose(normal.inverse_transform(x), [5, 10, 15, 20, 25])
+
+def test_sklearn_inverse_multidim():
+    """Test if SklearnNormalizer functions correctly"""
+    x = numpy.array([[1,2,3,4,5],[3,4,5,6,7],[5,2,5,9,10],[1,2,3,4,5]])
+    true_y = x*10
+    scalar = sklearn.preprocessing.MaxAbsScaler()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    normal_y = normal.inverse_transform(x)
+    assert normal_y.shape == true_y.shape
+    assert numpy.array_equal(normal_y,true_y)
