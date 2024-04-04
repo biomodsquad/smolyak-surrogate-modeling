@@ -1,7 +1,7 @@
 import abc
 
 import numpy
-
+import sklearn.preprocessing
 
 class Normalizer(abc.ABC):
     r"""A transformation on the training data of a surrogate
@@ -38,6 +38,40 @@ class Normalizer(abc.ABC):
         value = numpy.array(value, ndmin=1)
         self._original_data = value
         self._training_data = self.transform(self.original_data)
+
+    def fit(self, x):
+        """Obtain the original training data
+
+        Method for obtaining the original training data. To be overridden 
+        should a child class require the training data for calculations.
+
+        Parameters
+        ----------
+        x : numerical data
+            the training data
+
+        Returns
+        -------
+        Normalizer
+            the normalizer
+        """
+        self.original_data = x
+        return self
+
+    def fit_transform(self,x):
+        """Preform a fit and transform the data
+
+        Parameters
+        ----------
+        x : numerical data
+            the original training data
+
+        Returns
+        -------
+        numerical data
+            transformed data
+        """
+        return self.fit(x).transform(x)
 
     @abc.abstractmethod
     def transform(self, x):
@@ -177,19 +211,16 @@ class IntervalNormalizer(Normalizer):
     @property
     def min_val(self):
         """float: min of original training data"""
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
-        if self._min_val is None:
+        if not self.original_data is None and self._min_val is None:
             self._min_val = numpy.min(self.original_data)
         return self._min_val
 
     @property
     def max_val(self):
         """float: max of original training data"""
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
-        if self._max_val is None:
+        if not self.original_data is None and self._max_val is None:
             self._max_val = numpy.max(self.original_data)
+
         return self._max_val
 
     def transform(self, x):
@@ -215,6 +246,7 @@ class IntervalNormalizer(Normalizer):
         """
         if self.original_data is None:
             raise ValueError("The original data was never given")
+        x = numpy.array(x)
         if self.min_val >= self.max_val:
             return x
         else:
@@ -243,6 +275,7 @@ class IntervalNormalizer(Normalizer):
         """
         if self.original_data is None:
             raise ValueError("The original data was never given")
+        x = numpy.array(x)
         if self.min_val >= self.max_val:
             return x
         else:
@@ -282,22 +315,18 @@ class ZScoreNormalizer(Normalizer):
     @property
     def mean_val(self):
         """float: mean of original training data"""
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
-        if self._mean_val is None:
+        if not self.original_data is None and self._mean_val is None:
             self._mean_val = numpy.mean(self.original_data)
         return self._mean_val
 
     @property
     def std_val(self):
         """float: std of original training data"""
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
-        if self._std_val is None:
+        if not self.original_data is None and self._std_val is None:
             try:
-                self._std_val = numpy.std(
+                self._std_val = float(numpy.std(
                     numpy.array(self.original_data, dtype=numpy.float128)
-                ).astype(numpy.float64)
+                ))
             except AttributeError:
                 self._std_val = numpy.std(self.original_data)
         return self._std_val
@@ -325,6 +354,7 @@ class ZScoreNormalizer(Normalizer):
         """
         if self.original_data is None:
             raise ValueError("The original data was never given")
+        x = numpy.array(x)
         return (x - self.mean_val) / (self.std_val)
 
     def inverse_transform(self, x):
@@ -350,6 +380,7 @@ class ZScoreNormalizer(Normalizer):
         """
         if self.original_data is None:
             raise ValueError("The original data was never given")
+        x = numpy.array(x)
         return x * self.std_val + self.mean_val
 
 
