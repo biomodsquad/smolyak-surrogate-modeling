@@ -16,7 +16,7 @@ def test_check_null():
     """Test if the NullNormalizer passes the check"""
     x = [1, 2, 3, 4, 5]
     normal = NullNormalizer()
-    assert normal.check_normalize_error(x) == 0
+    assert normal.check_normalize_error(x)
 
 def test_null_attributes():
     """Test if the attributes of NullNormalizer are added"""
@@ -43,12 +43,12 @@ def test_null_inverse():
     normal = NullNormalizer()
     assert numpy.allclose(normal.inverse_transform(x), [1, 2, 3, 4, 5])
 
-def test_check_interval():
+def test_interval_check():
     """Test if the IntervalNormalizer passes the check"""
-    x = [1, 2, 3, 4, 5]
+    x = numpy.array([1, 2, 3, 4, 5],ndmin=2).transpose()
     normal = IntervalNormalizer()
     normal.fit(x)
-    assert numpy.isclose(normal.check_normalize_error(x), 0)
+    assert normal.check_normalize_error(x)
 
 def test_interval_attributes():
     """Test if the attributes of IntervalNormalizer are added"""
@@ -82,11 +82,11 @@ def test_interval_transform_error():
     with pytest.raises(ValueError):
         normal.check_normalize_error([1, 3])
 
-def test_check_symlog():
+def test_symlog_check():
     """Test if the SymmetricalLogNormalizer passes the check"""
-    x = [1, 2, 3, 4, 5]
+    x = numpy.array(numpy.linspace(-10,10),ndmin=2).transpose()
     normal = SymmetricalLogNormalizer()
-    assert numpy.isclose(normal.check_normalize_error(x), 0)
+    assert normal.check_normalize_error(x)
 
 def test_symlog_attributes():
     """Test if the attributes of SymmetricalLogNormalizer are added"""
@@ -112,12 +112,12 @@ def test_symlog_inverse():
             [9, 99, 999, 9999, 99999])
 
 
-def test_check_zscore():
+def test_zscore_check():
     """Test if the ZScoreNormalizer passes the check"""
-    x = [1, 2, 3, 4, 5]
+    x = numpy.array([1, 2, 3, 4, 5],ndmin=2).transpose()
     normal = ZScoreNormalizer()
     normal.original_data = x
-    assert numpy.isclose(normal.check_normalize_error(x), 0)
+    assert normal.check_normalize_error(x)
 
 def test_zscore_attributes():
     """Test if the attributes of ZScoreNormalizer are added"""

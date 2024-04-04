@@ -103,26 +103,20 @@ class Normalizer(abc.ABC):
         """
         pass
 
-    def check_normalize_error(self, x, percent_diff=False):
+    def check_normalize(self, x):
         """Check error from normalizing process
         If defined correctly, performing :meth:`inverse_transform` on
         the output of :meth:`transform` should return the input of
         :meth:`transform`. As theory does not always align with practice,
-        this method checks how much the data changes from its initial
+        this method checks if the data changes from its initial
         value after the transform and inverse transform are done in
-        sequence. This error is returned as the root mean squared error
-        if `percent_changed` is false and as the percent difference from
-        the initial stat if `percent_diff` is true. If the data is
-        multiple values, the percent difference is equivalent to the
-        symmetrical mean absolute percentage error.
+        sequence. If the data doesn't change, it returns True. If it
+        does change, it returns False.
 
         Parameters
         ----------
         x : numerical data
             data to compare before and after transformation
-
-        percent_diff : bool
-            returns RMSE if false, symmape if true
 
         Returns
         --------
@@ -131,13 +125,7 @@ class Normalizer(abc.ABC):
         """
         x = numpy.array(x)
         new_x = self.inverse_transform(self.transform(x))
-        if percent_diff:
-            # if absolute difference is 0, then percent difference is 0.
-            abs_diff = numpy.abs(x - new_x)
-            abs_diff[abs_diff != 0] = abs_diff[abs_diff != 0] * 2 / (x + new_x)
-            return numpy.mean(abs_diff)
-        else:
-            return numpy.sqrt(numpy.mean((x - new_x) ** 2))
+        return numpy.allclose(x,new_x)
 
 
 class NullNormalizer(Normalizer):
