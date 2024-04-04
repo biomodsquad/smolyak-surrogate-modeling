@@ -16,7 +16,7 @@ def test_check_null():
     """Test if the NullNormalizer passes the check"""
     x = [1, 2, 3, 4, 5]
     normal = NullNormalizer()
-    assert normal.check_normalize_error(x)
+    assert normal.check_normalize(x)
 
 def test_null_attributes():
     """Test if the attributes of NullNormalizer are added"""
@@ -48,7 +48,7 @@ def test_interval_check():
     x = numpy.array([1, 2, 3, 4, 5],ndmin=2).transpose()
     normal = IntervalNormalizer()
     normal.fit(x)
-    assert normal.check_normalize_error(x)
+    assert normal.check_normalize(x)
 
 def test_interval_attributes():
     """Test if the attributes of IntervalNormalizer are added"""
@@ -80,13 +80,13 @@ def test_interval_transform_error():
     with pytest.raises(ValueError):
         normal.inverse_transform([1, 2])
     with pytest.raises(ValueError):
-        normal.check_normalize_error([1, 3])
+        normal.check_normalize([1, 3])
 
 def test_symlog_check():
     """Test if the SymmetricalLogNormalizer passes the check"""
     x = numpy.array(numpy.linspace(-10,10),ndmin=2).transpose()
     normal = SymmetricalLogNormalizer()
-    assert normal.check_normalize_error(x)
+    assert normal.check_normalize(x)
 
 def test_symlog_attributes():
     """Test if the attributes of SymmetricalLogNormalizer are added"""
@@ -117,7 +117,7 @@ def test_zscore_check():
     x = numpy.array([1, 2, 3, 4, 5],ndmin=2).transpose()
     normal = ZScoreNormalizer()
     normal.original_data = x
-    assert normal.check_normalize_error(x)
+    assert normal.check_normalize(x)
 
 def test_zscore_attributes():
     """Test if the attributes of ZScoreNormalizer are added"""
@@ -153,4 +153,4 @@ def test_zscore_transform_error():
     with pytest.raises(ValueError):
         normal.inverse_transform([1, 2])
     with pytest.raises(ValueError):
-        normal.check_normalize_error([1, 3])
+        normal.check_normalize([1, 3])
