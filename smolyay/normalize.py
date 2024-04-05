@@ -1,9 +1,9 @@
 import abc
 
 import numpy
-import sklearn.preprocessing
+import sklearn
 
-class Normalizer(abc.ABC):
+class Normalizer(abc.ABC,sklearn.base.TransformerMixin):
     r"""A transformation on the training data of a surrogate
 
     Prior to training a surrogate model, a transformation can be applied
@@ -76,22 +76,7 @@ class Normalizer(abc.ABC):
         """
         self.original_data = x
         return self
-
-    def fit_transform(self,x):
-        """Preform a fit and transform the data
-
-        Parameters
-        ----------
-        x : numerical data
-            the original training data
-
-        Returns
-        -------
-        numerical data
-            transformed data
-        """
-        return self.fit(x).transform(x)
-
+    
     @abc.abstractmethod
     def transform(self, x):
         """Normalization function
