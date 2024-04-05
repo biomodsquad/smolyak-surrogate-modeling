@@ -555,3 +555,15 @@ def test_norm_setter_gradient(change_norm):
         assert numpy.allclose(surrogate_values, exact_values, atol=0.5, rtol=0.3)
     else:
         assert numpy.allclose(surrogate_values, exact_values)
+
+def test_error_norm_type():
+    """Test norm's type"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    with pytest.raises(TypeError):
+        Surrogate([(-1, 1), (-1, 1)], grid_gen, "not a Normalizer")
+
+def test_error_gradient_norm_type():
+    """Test norm's type"""
+    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
+    with pytest.raises(TypeError):
+        GradientSurrogate([(-1, 1), (-1, 1)], grid_gen, "not a Normalizer")
