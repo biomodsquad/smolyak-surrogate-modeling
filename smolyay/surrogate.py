@@ -363,7 +363,7 @@ class Surrogate:
         ----------
         data: list
             function at grid points.
-        linear_slover: string
+        linear_solver: string
             Method of solving linear equations:
                 'lu': lower upper decomposition
                 'inv': solve for coefficients through x = A^{-1}B.
