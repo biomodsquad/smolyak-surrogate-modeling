@@ -143,6 +143,19 @@ def test_interval_transform_error():
     with pytest.raises(ValueError):
         normal.check_normalize([1, 3])
 
+def test_interval_refit():
+    """Test that min and max are recaluated if original_data is changed"""
+    x1 = [1, 2, 3, 4, 5]
+    x2 = [1,2,3,4,5,6]
+    min2 = numpy.min(x2)
+    max2 = numpy.max(x2)
+    normal = IntervalNormalizer()
+    normal.fit(x1)
+    normal.fit(x2)
+    assert numpy.array_equal(normal.original_data,x2)
+    assert normal.min_val == min2
+    assert normal.max_val == max2
+
 def test_symlog_attributes():
     """Test if the attributes of SymmetricalLogNormalizer are added"""
     x = [1, 2, 3, 4, 5]
@@ -192,7 +205,6 @@ def test_zscore_inverse():
     assert numpy.allclose(normal.inverse_transform(x), 
             [numpy.sqrt(2) + 3,2*numpy.sqrt(2)+3, 3*numpy.sqrt(2)+3, 
                 4*numpy.sqrt(2)+3, 5*numpy.sqrt(2)+3])
-    assert numpy.array_equal(normal.original_data,x)
 
 def test_zscore_transform_error():
     """Test if ZScoreNormalizer returns an error without original data"""
@@ -203,6 +215,19 @@ def test_zscore_transform_error():
         normal.inverse_transform([1, 2])
     with pytest.raises(ValueError):
         normal.check_normalize([1, 3])
+
+def test_zscore_refit():
+    """Test that mean and std are recaluated if original_data is changed"""
+    x1 = [1, 2, 3, 4, 5]
+    x2 = [1,2,3,4,5,6]
+    mean2 = numpy.mean(x2)
+    std2 = numpy.std(x2)
+    normal = ZScoreNormalizer()
+    normal.fit(x1)
+    normal.fit(x2)
+    assert numpy.array_equal(normal.original_data,x2)
+    assert normal.mean_val == mean2
+    assert normal.std_val == std2
 
 @pytest.mark.parametrize(
     "scalar_class",
@@ -271,7 +296,6 @@ def test_sklearn_transform():
     normal = SklearnNormalizer(scalar)
     normal.fit(x)
     assert numpy.allclose(normal.transform(x), [0.2,0.4,0.6,0.8,1])
-    assert numpy.array_equal(normal.original_data,x)
 
 def test_sklearn_transform_multidim():
     """Test if transform returns correct answer for multidimensional data"""
@@ -302,6 +326,62 @@ def test_sklearn_inverse_multidim():
     normal_y = normal.inverse_transform(x)
     assert normal_y.shape == true_y.shape
     assert numpy.array_equal(normal_y,true_y)
+
+@pytest.mark.parametrize(
+    "scalar_class",
+    [
+        sklearn.preprocessing.StandardScaler,
+        sklearn.preprocessing.MaxAbsScaler,
+        sklearn.preprocessing.MinMaxScaler,
+        sklearn.preprocessing.PowerTransformer,
+        sklearn.preprocessing.RobustScaler,
+    ],
+)
+def test_sklearn_needs_fit(scalar_class):
+    """Test that error is returned if the scalar is not fit"""
+    x = [1, 2, 3, 4, 5]
+    scalar = scalar_class()
+    normal = SklearnNormalizer(scalar)
+    with pytest.raises(ValueError):
+        normal.transform(x)
+
+@pytest.mark.parametrize(
+    "scalar_class",
+    [
+        sklearn.preprocessing.StandardScaler,
+        sklearn.preprocessing.MaxAbsScaler,
+        sklearn.preprocessing.MinMaxScaler,
+        sklearn.preprocessing.PowerTransformer,
+        sklearn.preprocessing.RobustScaler,
+    ],
+)
+def test_sklearn_fit(scalar_class):
+    """Test that original_data is set using fit"""
+    x = numpy.array(numpy.linspace(-10,10),ndmin=2).transpose()
+    scalar = scalar_class()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    assert numpy.array_equal(normal.original_data,x) 
+    try:
+        normal.scalar.transform(x)
+    except ValueError as exc:
+        assert False, f"transform raised an exception {exc}"
+
+def test_sklearn_refit():
+    """Test that scalar is refitted if original_data is changed"""
+    x = [1, 2, 3, 4, 5]
+    y = [0.2,0.4,0.6,0.8,1]
+    x2 = [1,2,3,4,5,6]
+    y2 = numpy.divide(x,6)
+    scalar = sklearn.preprocessing.MaxAbsScaler()
+    normal = SklearnNormalizer(scalar)
+    normal.fit(x)
+    assert numpy.array_equal(normal.transform(x),y)
+    normal.fit(x2)
+    assert numpy.array_equal(normal.original_data,x2)
+    print(normal.transform(x))
+    assert numpy.array_equal(normal.transform(x),y2)
+    
 
 @pytest.mark.parametrize(
     "scalar_class",

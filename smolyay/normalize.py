@@ -15,14 +15,33 @@ class Normalizer(abc.ABC):
 
     This class specifies a type of normalization, defined by a
     transform function :meth:`transform` and an inverse transform
-    :meth:`inverse_transform`. :meth:`transform` normalizes the training
-    data for the surrogate, and :meth:`inverse_transform` unnormalizes
-    the output of the surrogate. If defined correctly, applying
-    :meth:`transform` and :meth:`inverse_transform` sequentially should
-    return the initial data.
+    :meth:`inverse_transform`. The names of the methods in this class are
+    chosen to maintain compatibility with scripts that use scalars in the
+    sklearn.preprocessing package to transform and normalize data.
+    
     ``original_data`` is the original, unnormalized training data used to
-    calibrate :meth:`transform` and :meth:`inverse_transform`, if
-    calibration is necessary.
+    calibrate and solve for any additional parameters defined by child classes.
+    Setting this parameter is 
+    
+    :meth:`transform` is an abstract method to be defined by child class that 
+    normalizes the input. 
+    :meth:`inverse_transform` is an abstract method to be defined by child 
+    class that is expected to perform an inverse operation to :meth:`transform`
+    that unnormalizes the input. 
+    
+    :meth:`check_normalize` checks if :meth:`inverse_transform` is the inverse
+    of :meth:`transform`. If defined correctly, applying :meth:`transform` 
+    and :meth:`inverse_transform` sequentially should return the initial input, 
+    and the method will return True will be returned if the final output of the 
+    sequential operation is sufficiently close to the initial input.
+    
+    :meth:`fit` obtains and sets the ``original_data`` parameter. It is 
+    expected to be overridden by child classes that use ``original_data`` to
+    calculate their parameters.
+
+    :meth:`fit_tranform` fits the Normalizer using the data, and then performs
+    the transform on the data.
+    
     """
 
     def __init__(self):
@@ -210,7 +229,25 @@ class IntervalNormalizer(Normalizer):
             self._max_val = numpy.max(self.original_data)
 
         return self._max_val
+    
+    def fit(self, x):
+        """Obtain the original training data and reset min and max
 
+        Parameters
+        ----------
+        x : numerical data
+            the training data
+
+        Returns
+        -------
+        Normalizer
+            the normalizer
+        """
+        self._max_val = None
+        self._min_val = None
+        self.original_data = x
+        return self
+    
     def transform(self, x):
         """Normalize the data using the min and max
 
@@ -318,7 +355,25 @@ class ZScoreNormalizer(Normalizer):
             except AttributeError:
                 self._std_val = numpy.std(self.original_data)
         return self._std_val
+    
+    def fit(self, x):
+        """Obtain the original training data and reset mean and std
 
+        Parameters
+        ----------
+        x : numerical data
+            the training data
+
+        Returns
+        -------
+        Normalizer
+            the normalizer
+        """
+        self._std_val = None
+        self._mean_val = None
+        self.original_data = x
+        return self
+    
     def transform(self, x):
         """Normalize the data using the min and max
 
