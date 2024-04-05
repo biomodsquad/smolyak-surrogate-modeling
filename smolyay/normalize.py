@@ -519,7 +519,6 @@ class SklearnNormalizer(Normalizer):
         normalized data
         """
         x = numpy.array(x)
-        self._original_data = x
         original_shape = x.shape
         num_data = numpy.prod(x.shape)
         x = x.reshape((num_data,1))
@@ -540,7 +539,6 @@ class SklearnNormalizer(Normalizer):
         unnormalized data
         """
         x = numpy.array(x)
-        self.original_data = x
         original_shape = x.shape
         num_data = numpy.prod(x.shape)
         x = x.reshape((num_data,1))

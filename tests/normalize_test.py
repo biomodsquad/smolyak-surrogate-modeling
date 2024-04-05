@@ -13,12 +13,82 @@ from smolyay.normalize import (
     SklearnNormalizer,
 )
 
-
-def test_check_null():
-    """Test if the NullNormalizer passes the check"""
+@pytest.mark.parametrize(
+    "normal",
+    [
+        NullNormalizer(),
+        IntervalNormalizer(),
+        SymmetricalLogNormalizer(),
+        ZScoreNormalizer(),
+    ],
+)
+def test_fit(normal):
+    """Test that fit returns Normalizer and sets original_data"""
     x = [1, 2, 3, 4, 5]
-    normal = NullNormalizer()
+    n = normal.fit(x)
+    assert isinstance(n,Normalizer)
+    assert n == normal
+    assert numpy.array_equal(n.original_data,[1, 2, 3, 4, 5])
+
+@pytest.mark.parametrize(
+    "normal",
+    [
+        NullNormalizer(),
+        IntervalNormalizer(),
+        SymmetricalLogNormalizer(),
+        ZScoreNormalizer(),
+    ],
+)
+def test_fit_transform(normal):
+    """Test that original_data is set using fit_transform and not transform"""
+    x = [1, 2, 3, 4, 5]
+    x_reverse = [5, 4, 3, 2, 1]
+    y = normal.fit_transform(x)
+    after_fit = normal.original_data
+    y_reverse = normal.transform(x_reverse)
+    assert numpy.array_equal(after_fit,[1, 2, 3, 4, 5])
+    assert numpy.array_equal(normal.original_data,[1, 2, 3, 4, 5])
+    assert numpy.array_equal(y,numpy.flip(y_reverse))
+    assert not numpy.array_equal(y,y_reverse)
+
+@pytest.mark.parametrize(
+    "normal",
+    [
+        NullNormalizer(),
+        IntervalNormalizer(),
+        SymmetricalLogNormalizer(),
+        ZScoreNormalizer(),
+    ],
+)
+def test_fit_transform_inverse(normal):
+    """Test original_data is not set using inverse_transform"""
+    x = [1, 2, 3, 4, 5]
+    x_reverse = [5, 4, 3, 2, 1]
+    normal.fit_transform(x)
+    after_fit = normal.original_data
+    normal.inverse_transform(x_reverse)
+    assert numpy.array_equal(after_fit,[1, 2, 3, 4, 5])
+    assert numpy.array_equal(normal.original_data,[1, 2, 3, 4, 5])
+
+@pytest.mark.parametrize(
+    "normal",
+    [
+        NullNormalizer(),
+        IntervalNormalizer(),
+        SymmetricalLogNormalizer(),
+        ZScoreNormalizer(),
+    ],
+)
+def test_check(normal):
+    """Test if the all the normalizers pass the check"""
+    x = [1, 2, 3, 4, 5]
+    x2 = numpy.array(numpy.linspace(-10,10),ndmin=2).transpose()
+    x3 = numpy.array([[1,2,3,4,5],[3,4,5,6,7],[5,2,5,9,0],[1,2,3,4,5]])
+    normal.fit(x)
     assert normal.check_normalize(x)
+    assert normal.check_normalize(x2)
+    assert normal.check_normalize(x3)
+    assert numpy.array_equal(normal.original_data,[1, 2, 3, 4, 5])
 
 def test_null_attributes():
     """Test if the attributes of NullNormalizer are added"""
@@ -27,30 +97,18 @@ def test_null_attributes():
     normal.fit(x)
     assert numpy.array_equal(normal.original_data,[1, 2, 3, 4, 5])
 
-def test_null_fit():
-    """Test that the NullNormalizer is fitted"""
-    x = [1, 2, 3, 4, 5]
-    normal = NullNormalizer()
-    assert isinstance(normal.fit(x),NullNormalizer)
-
 def test_null_transform():
     """Test that the NullNormalizer transform is correct"""
     x = [1, 2, 3, 4, 5]
     normal = NullNormalizer()
-    assert numpy.allclose(normal.fit_transform(x), [1, 2, 3, 4, 5])
+    normal.fit(x)
+    assert numpy.allclose(normal.transform(x), [1, 2, 3, 4, 5])
 
 def test_null_inverse():
     """Test that the NullNormalizer inverse transform is correct"""
     x = [1, 2, 3, 4, 5]
     normal = NullNormalizer()
     assert numpy.allclose(normal.inverse_transform(x), [1, 2, 3, 4, 5])
-
-def test_interval_check():
-    """Test if the IntervalNormalizer passes the check"""
-    x = numpy.array([1, 2, 3, 4, 5],ndmin=2).transpose()
-    normal = IntervalNormalizer()
-    normal.fit(x)
-    assert normal.check_normalize(x)
 
 def test_interval_attributes():
     """Test if the attributes of IntervalNormalizer are added"""
@@ -65,7 +123,8 @@ def test_interval_transform():
     """Test that the IntervalNormalizer transform is correct"""
     x = [1, 2, 3, 4, 5]
     normal = IntervalNormalizer()
-    assert numpy.allclose(normal.fit_transform(x), [0, 0.25, 0.5, 0.75, 1])
+    normal.fit(x)
+    assert numpy.allclose(normal.transform(x), [0, 0.25, 0.5, 0.75, 1])
 
 def test_interval_inverse():
     """Test that the IntervalNormalizer inverse transform is correct"""
@@ -84,12 +143,6 @@ def test_interval_transform_error():
     with pytest.raises(ValueError):
         normal.check_normalize([1, 3])
 
-def test_symlog_check():
-    """Test if the SymmetricalLogNormalizer passes the check"""
-    x = numpy.array(numpy.linspace(-10,10),ndmin=2).transpose()
-    normal = SymmetricalLogNormalizer()
-    assert normal.check_normalize(x)
-
 def test_symlog_attributes():
     """Test if the attributes of SymmetricalLogNormalizer are added"""
     x = [1, 2, 3, 4, 5]
@@ -103,7 +156,7 @@ def test_symlog_transform():
     x = [1, 2, 3, 4, 5]
     normal = SymmetricalLogNormalizer()
     normal.fit(x)
-    assert numpy.allclose(normal.fit_transform(x), numpy.log10([2, 3, 4, 5, 6]))
+    assert numpy.allclose(normal.transform(x), numpy.log10([2, 3, 4, 5, 6]))
 
 def test_symlog_inverse():
     """Test that the SymmetricalLogNormalizer inverse transform is correct"""
@@ -112,14 +165,6 @@ def test_symlog_inverse():
     normal.fit(x)
     assert numpy.allclose(normal.inverse_transform(x), 
             [9, 99, 999, 9999, 99999])
-
-
-def test_zscore_check():
-    """Test if the ZScoreNormalizer passes the check"""
-    x = numpy.array([1, 2, 3, 4, 5],ndmin=2).transpose()
-    normal = ZScoreNormalizer()
-    normal.fit(x)
-    assert normal.check_normalize(x)
 
 def test_zscore_attributes():
     """Test if the attributes of ZScoreNormalizer are added"""
@@ -134,7 +179,8 @@ def test_zscore_transform():
     """Test that the ZScoreNormalizer transform is correct"""
     x = [1, 2, 3, 4, 5]
     normal = ZScoreNormalizer()
-    assert numpy.allclose(normal.fit_transform(x), 
+    normal.fit(x)
+    assert numpy.allclose(normal.transform(x), 
             [-2/numpy.sqrt(2), -1/numpy.sqrt(2), 0, 1/numpy.sqrt(2), 
                 2/numpy.sqrt(2)])
 
@@ -146,6 +192,7 @@ def test_zscore_inverse():
     assert numpy.allclose(normal.inverse_transform(x), 
             [numpy.sqrt(2) + 3,2*numpy.sqrt(2)+3, 3*numpy.sqrt(2)+3, 
                 4*numpy.sqrt(2)+3, 5*numpy.sqrt(2)+3])
+    assert numpy.array_equal(normal.original_data,x)
 
 def test_zscore_transform_error():
     """Test if ZScoreNormalizer returns an error without original data"""
@@ -168,7 +215,7 @@ def test_zscore_transform_error():
     ],
 )
 def test_sklearn_check(scalar_class):
-    """Test if SklearnNormalizer functions correctly"""
+    """Test if SklearnNormalizer passes the check for multiple transformers"""
     x = numpy.array([1,2,3,4,5])
     scalar = scalar_class()
     normal = SklearnNormalizer(scalar)
@@ -222,10 +269,12 @@ def test_sklearn_transform():
     x = [1, 2, 3, 4, 5]
     scalar = sklearn.preprocessing.MaxAbsScaler()
     normal = SklearnNormalizer(scalar)
-    assert numpy.allclose(normal.fit_transform(x), [0.2,0.4,0.6,0.8,1])
+    normal.fit(x)
+    assert numpy.allclose(normal.transform(x), [0.2,0.4,0.6,0.8,1])
+    assert numpy.array_equal(normal.original_data,x)
 
 def test_sklearn_transform_multidim():
-    """Test if SklearnNormalizer functions correctly"""
+    """Test if transform returns correct answer for multidimensional data"""
     x = numpy.array([[1,2,3,4,5],[3,4,5,6,7],[5,2,5,9,10],[1,2,3,4,5]])
     true_y = x/10
     scalar = sklearn.preprocessing.MaxAbsScaler()
@@ -244,7 +293,7 @@ def test_sklearn_inverse():
     assert numpy.allclose(normal.inverse_transform(x), [5, 10, 15, 20, 25])
 
 def test_sklearn_inverse_multidim():
-    """Test if SklearnNormalizer functions correctly"""
+    """Test inverse_transform for multidimensional data"""
     x = numpy.array([[1,2,3,4,5],[3,4,5,6,7],[5,2,5,9,10],[1,2,3,4,5]])
     true_y = x*10
     scalar = sklearn.preprocessing.MaxAbsScaler()
@@ -253,3 +302,47 @@ def test_sklearn_inverse_multidim():
     normal_y = normal.inverse_transform(x)
     assert normal_y.shape == true_y.shape
     assert numpy.array_equal(normal_y,true_y)
+
+@pytest.mark.parametrize(
+    "scalar_class",
+    [
+        sklearn.preprocessing.StandardScaler,
+        sklearn.preprocessing.MaxAbsScaler,
+        sklearn.preprocessing.MinMaxScaler,
+        sklearn.preprocessing.PowerTransformer,
+        sklearn.preprocessing.RobustScaler,
+    ],
+)
+def test_sklearn_fit_transform(scalar_class):
+    """Test that original_data is set using fit_transform and not transform"""
+    x = [1, 2, 3, 4, 5]
+    x_reverse = [5, 4, 3, 2, 1]
+    scalar = scalar_class()
+    normal = SklearnNormalizer(scalar)
+    y = normal.fit_transform(x)
+    y_reverse = normal.transform(x_reverse)
+    assert numpy.array_equal(normal.original_data,[1, 2, 3, 4, 5])
+    assert numpy.array_equal(y,numpy.flip(y_reverse))
+
+@pytest.mark.parametrize(
+    "scalar_class",
+    [
+        sklearn.preprocessing.StandardScaler,
+        sklearn.preprocessing.MaxAbsScaler,
+        sklearn.preprocessing.MinMaxScaler,
+        sklearn.preprocessing.PowerTransformer,
+        sklearn.preprocessing.RobustScaler,
+    ],
+)
+def test_sklearn_fit_transform_inverse(scalar_class):
+    """Test original_data is not set using inverse_transform"""
+    x = [1, 2, 3, 4, 5]
+    x_reverse = [5, 4, 3, 2, 1]
+    scalar = scalar_class()
+    normal = SklearnNormalizer(scalar)
+    normal.fit_transform(x)
+    after_fit = normal.original_data
+    normal.inverse_transform(x_reverse)
+    assert numpy.array_equal(after_fit,[1, 2, 3, 4, 5])
+    assert numpy.array_equal(normal.original_data,[1, 2, 3, 4, 5])
+    
