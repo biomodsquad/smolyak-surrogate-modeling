@@ -185,12 +185,11 @@ class Surrogate:
     @norm.setter
     def norm(self, value):
         if not isinstance(value, Normalizer):
-            raise TypeError('Grids must be Normalizer')
+            raise TypeError('norm must be Normalizer')
         # if surrogate was already trained, retrain
         if self._coefficients is not None:
-            original_data = self._norm.original_data
             self._norm = value
-            self.train_from_data(original_data)
+            self.train_from_data(self.data)
         else:
             self._norm = value
 
@@ -380,7 +379,7 @@ class Surrogate:
         if self._data.shape != (len(self.grid.points),):
             raise IndexError("Data must be same length as grid points.")
         # normalization
-        self._data = self.norm.fit_transform(self._data)
+        data = self.norm.fit_transform(self._data)
         # make basis matrix
         points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
         basis_matrix = numpy.zeros((len(points), len(points)))
@@ -394,17 +393,18 @@ class Surrogate:
         if linear_solver == 'lu':
             self._coefficients = numpy.linalg.solve(
                 basis_matrix,
-                self._data)
+                data)
         elif linear_solver == 'inv':
             self._coefficients = numpy.dot(numpy.linalg.inv(
                 basis_matrix),
-                self._data)
+                data)
         elif linear_solver == 'lstsq':
             self._coefficients = numpy.linalg.lstsq(basis_matrix,
-                                                    self._data,
+                                                    data,
                                                     rcond=None)[0]
         else:
             raise ValueError('Solver not recognized')
+
 
     @staticmethod
     def _mapdomain(x, old, new):
@@ -558,7 +558,7 @@ class GradientSurrogate(Surrogate):
             raise IndexError("Data must have size of number"
                              "of grid points x dimension.")
         # normalization
-        self._data = self.norm.fit_transform(self._data)
+        data = self.norm.fit_transform(self._data)
         points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
         num_points = len(points)
         # create basis matrix with appropriate size
@@ -574,7 +574,7 @@ class GradientSurrogate(Surrogate):
                 else:
                     value = basis.derivative(points)
                 basis_matrix[ni::self.dimension, j] = value
-        data = numpy.reshape(self._data,
+        data = numpy.reshape(data,
                              (self.dimension*len(self.grid.points), ))
         self._coefficients = numpy.linalg.lstsq(basis_matrix,
                                                 data,

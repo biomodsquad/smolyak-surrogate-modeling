@@ -498,47 +498,8 @@ def test_error_input_surrogate():
 
 
 @pytest.mark.parametrize(
-    "norm",
-    [
-        NullNormalizer(),
-        IntervalNormalizer(),
-        SymmetricalLogNormalizer(),
-        ZScoreNormalizer(),
-    ],
-)
-def test_norm_data(norm):
-    """Test if the data in the surrogate is normalized"""
-    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
-    surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen, norm)
-    surrogate.train(function_1)
-    fun_out = [function_1(point) for point in surrogate.points]
-    assert numpy.allclose(fun_out, surrogate.norm.original_data)
-    assert numpy.allclose(fun_out, surrogate.norm.inverse_transform(surrogate.data))
-
-
-@pytest.mark.parametrize(
-    "norm",
-    [
-        NullNormalizer(),
-        IntervalNormalizer(),
-        SymmetricalLogNormalizer(),
-        ZScoreNormalizer(),
-    ],
-)
-def test_norm_data_gradient(norm):
-    """Test if the data in the surrogate is normalized"""
-    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
-    surrogate = GradientSurrogate([(-1, 1), (-1, 1)], grid_gen, norm)
-    surrogate.train(function_3)
-    fun_out = [function_3(point) for point in surrogate.points]
-    assert numpy.allclose(fun_out, surrogate.norm.original_data)
-    assert numpy.allclose(fun_out, surrogate.norm.inverse_transform(surrogate.data))
-
-
-@pytest.mark.parametrize(
     "change_norm",
     [
-        NullNormalizer(),
         SymmetricalLogNormalizer(),
         IntervalNormalizer(),
         ZScoreNormalizer(),
@@ -550,23 +511,16 @@ def test_norm_setter(change_norm):
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen, null_norm)
     surrogate.train(function_1)
-    fun_out = [function_1(point) for point in surrogate.points]
-    null_data = surrogate.data
-    null_original = surrogate.norm.original_data
+    null_coefficients = surrogate.coefficients
     # change norm
     surrogate.norm = change_norm
-    change_data = surrogate.data
-    change_original = surrogate.norm.original_data
+    change_coefficients = surrogate.coefficients
     # random points in the domain
     points = [(0.649, -0.9), (-0.885, 1)]
     surrogate_values = [surrogate(x) for x in points]
     exact_values = [function_1(x) for x in points]
-    assert numpy.allclose(fun_out, null_original)
-    assert numpy.allclose(fun_out, change_original)
-    assert numpy.allclose(fun_out, null_data)
-    assert numpy.allclose(surrogate.norm.transform(fun_out), change_data)
-    if hasattr(change_norm, "_min_val"):
-        print(change_norm.min_val)
+    assert surrogate.norm == change_norm
+    assert not numpy.array_equal(null_coefficients, change_coefficients)
     if isinstance(change_norm, SymmetricalLogNormalizer):
         assert numpy.allclose(surrogate_values, exact_values, atol=0.5, rtol=0.3)
     else:
@@ -576,7 +530,6 @@ def test_norm_setter(change_norm):
 @pytest.mark.parametrize(
     "change_norm",
     [
-        NullNormalizer(),
         IntervalNormalizer(),
         SymmetricalLogNormalizer(),
         ZScoreNormalizer(),
@@ -588,23 +541,16 @@ def test_norm_setter_gradient(change_norm):
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = GradientSurrogate([(-1, 1), (-1, 1)], grid_gen, null_norm)
     surrogate.train(function_3)
-    fun_out = [function_3(point) for point in surrogate.points]
-    null_data = surrogate.data
-    null_original = surrogate.norm.original_data
-    print(null_data)
+    null_coefficients = surrogate.coefficients
     # change norm
     surrogate.norm = change_norm
-    change_data = surrogate.data
-    change_original = surrogate.norm.original_data
-    print(change_data)
+    change_coefficients = surrogate.coefficients
     # random points in the domain
     points = [(0.649, -0.9), (-0.885, 1)]
     surrogate_values = surrogate.gradient(points)
     exact_values = [function_3(x) for x in points]
-    assert numpy.allclose(fun_out, null_original)
-    assert numpy.allclose(fun_out, change_original)
-    assert numpy.allclose(fun_out, null_data)
-    assert numpy.allclose(surrogate.norm.transform(fun_out), change_data)
+    assert surrogate.norm == change_norm
+    assert not numpy.array_equal(null_coefficients, change_coefficients)
     if isinstance(change_norm, SymmetricalLogNormalizer):
         assert numpy.allclose(surrogate_values, exact_values, atol=0.5, rtol=0.3)
     else:

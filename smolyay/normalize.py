@@ -3,7 +3,7 @@ import abc
 import numpy
 import sklearn
 
-class Normalizer(abc.ABC,sklearn.base.TransformerMixin):
+class Normalizer(abc.ABC,sklearn.base.TransformerMixin,sklearn.base.BaseEstimator):
     r"""A transformation on the training data of a surrogate
 
     Prior to training a surrogate model, a transformation can be applied
@@ -19,10 +19,6 @@ class Normalizer(abc.ABC,sklearn.base.TransformerMixin):
     chosen to maintain compatibility with scripts that use scalars in the
     sklearn.preprocessing package to transform and normalize data.
     
-    ``original_data`` is the original, unnormalized training data used to
-    calibrate and solve for any additional parameters defined by child classes.
-    Setting this parameter is 
-    
     :meth:`transform` is an abstract method to be defined by child class that 
     normalizes the input. 
     :meth:`inverse_transform` is an abstract method to be defined by child 
@@ -35,34 +31,19 @@ class Normalizer(abc.ABC,sklearn.base.TransformerMixin):
     and the method will return True will be returned if the final output of the 
     sequential operation is sufficiently close to the initial input.
     
-    :meth:`fit` obtains and sets the ``original_data`` parameter. It is 
-    expected to be overridden by child classes that use ``original_data`` to
-    calculate their parameters.
+    :meth:`fit` is expected to be overridden by child classes that use the
+    training data to calculate parameters that need fitting.
 
     :meth:`fit_tranform` fits the Normalizer using the data, and then performs
     the transform on the data.
     
     """
 
-    def __init__(self):
-        self._original_data = None
-
-    @property
-    def original_data(self):
-        """numpy.ndarray: training data before normalization."""
-        return self._original_data
-
-    @original_data.setter
-    def original_data(self, value):
-        value = numpy.array(value, ndmin=1)
-        self._original_data = value
-        self.transform(value)
-        
     def fit(self, x):
-        """Obtain the original training data
+        """Fit the Normalizer
 
-        Method for obtaining the original training data. To be overridden 
-        should a child class require the training data for calculations.
+        To be overridden should a child class require the training data 
+        for calculations.
 
         Parameters
         ----------
@@ -74,7 +55,6 @@ class Normalizer(abc.ABC,sklearn.base.TransformerMixin):
         Normalizer
             the normalizer
         """
-        self.original_data = x
         return self
     
     @abc.abstractmethod
@@ -203,20 +183,15 @@ class IntervalNormalizer(Normalizer):
     @property
     def min_val(self):
         """float: min of original training data"""
-        if not self.original_data is None and self._min_val is None:
-            self._min_val = numpy.min(self.original_data)
         return self._min_val
 
     @property
     def max_val(self):
         """float: max of original training data"""
-        if not self.original_data is None and self._max_val is None:
-            self._max_val = numpy.max(self.original_data)
-
         return self._max_val
     
     def fit(self, x):
-        """Obtain the original training data and reset min and max
+        """Calculates the min and max
 
         Parameters
         ----------
@@ -228,9 +203,8 @@ class IntervalNormalizer(Normalizer):
         Normalizer
             the normalizer
         """
-        self._max_val = None
-        self._min_val = None
-        self.original_data = x
+        self._max_val = numpy.max(x)
+        self._min_val = numpy.min(x)
         return self
     
     def transform(self, x):
@@ -247,15 +221,16 @@ class IntervalNormalizer(Normalizer):
 
         Return
         ------
-        normalized data
+        numpy:ndarray
+            the transformed data
 
         Raises
         ------
         ValueError
-            the original data was never assigned
+            min and max were never calculated
         """
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
+        if self._min_val is None or self._max_val is None:
+            raise ValueError("Normalizer needs fitting!")
         x = numpy.array(x)
         if self.min_val >= self.max_val:
             return x
@@ -276,15 +251,16 @@ class IntervalNormalizer(Normalizer):
 
         Return
         ------
-        unnormalized data
+        numpy:ndarray
+            the untransformed data
 
         Raises
         ------
         ValueError
-            the original data was never assigned
+            min and max were never calculated
         """
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
+        if self._min_val is None or self._max_val is None:
+            raise ValueError("Normalizer needs fitting!")
         x = numpy.array(x)
         if self.min_val >= self.max_val:
             return x
@@ -325,20 +301,11 @@ class ZScoreNormalizer(Normalizer):
     @property
     def mean_val(self):
         """float: mean of original training data"""
-        if not self.original_data is None and self._mean_val is None:
-            self._mean_val = numpy.mean(self.original_data)
         return self._mean_val
 
     @property
     def std_val(self):
         """float: std of original training data"""
-        if not self.original_data is None and self._std_val is None:
-            try:
-                self._std_val = float(numpy.std(
-                    numpy.array(self.original_data, dtype=numpy.float128)
-                ))
-            except AttributeError:
-                self._std_val = numpy.std(self.original_data)
         return self._std_val
     
     def fit(self, x):
@@ -354,17 +321,22 @@ class ZScoreNormalizer(Normalizer):
         Normalizer
             the normalizer
         """
-        self._std_val = None
-        self._mean_val = None
-        self.original_data = x
+        x = numpy.array(x)
+        self._mean_val = numpy.mean(x)
+        try:
+            self._std_val = float(numpy.std(
+                numpy.array(x, dtype=numpy.float128)
+            ))
+        except AttributeError:
+            self._std_val = numpy.std(x)
         return self
     
     def transform(self, x):
-        """Normalize the data using the min and max
+        """Normalize the data using the mean and std
 
-        Using the min and max of the training data, the input is
-        scaled such that the max of the original training data is 1 and
-        the min of the original traning data is 0.
+        Using the mean and std of the training data, the input is
+        scaled such that the mean of the original training data is 0 and
+        the std of the original training data is 0.
 
         Parameters
         ----------
@@ -373,24 +345,25 @@ class ZScoreNormalizer(Normalizer):
 
         Return
         ------
-        normalized data
+        numpy:ndarray
+            the transformed data
 
         Raises
         ------
         ValueError
-            the original data was never assigned
+            mean and std were never calculated
         """
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
+        if self._mean_val is None or self._std_val is None:
+            raise ValueError("Normalizer needs fitting!")
         x = numpy.array(x)
         return (x - self.mean_val) / (self.std_val)
 
     def inverse_transform(self, x):
         """Inverse normalization function
 
-        Using the min and max of the training data, the input is
-        scaled such that 1 becomes the max of the original training data
-        and 0 becomes the min of the original training data
+        Using the mean and std of the training data, the input is
+        scaled such that 1 becomes the mean of the original training data and
+        the an std of 1 becomes the std of the original training data.
 
         Parameters
         ----------
@@ -399,15 +372,16 @@ class ZScoreNormalizer(Normalizer):
 
         Return
         ------
-        unnormalized data
+        numpy:ndarray
+            the untransformed data
 
         Raises
         ------
         ValueError
             the original data was never assigned
         """
-        if self.original_data is None:
-            raise ValueError("The original data was never given")
+        if self._mean_val is None or self._std_val is None:
+            raise ValueError("Normalizer needs fitting!")
         x = numpy.array(x)
         return x * self.std_val + self.mean_val
 
@@ -507,6 +481,8 @@ class SklearnNormalizer(Normalizer):
 
     Raises
     ------
+    AttributeError
+        the transformer does not have the required methods
     ValueError
         the original data was never assigned"""
         
@@ -514,13 +490,29 @@ class SklearnNormalizer(Normalizer):
         super().__init__()
         methods = ['transform','inverse_transform','fit']
         if not all([callable(getattr(scalar,m,False)) for m in methods]):
-            raise TypeError('Object does not have the required methods')
+            raise AttributeError('Object does not have the required methods')
         self._scalar = scalar
+        self._original_data = None
 
     @property
     def scalar(self):
         """Transformer"""
         return self._scalar
+
+    @scalar.setter
+    def scalar(self, value):
+        methods = ['transform','inverse_transform','fit']
+        if not all([callable(getattr(value,m,False)) for m in methods]):
+            raise AttributeError('Object does not have the required methods')
+        self._scalar = value
+        if not self.original_data is None:
+            self._scalar.fit(self.original_data)
+
+
+    @property
+    def original_data(self):
+        """numpy.ndarray: copy of training data used to fit scalar"""
+        return self._original_data
     
     def fit(self, x):
         """Obtain the original training data
@@ -539,11 +531,10 @@ class SklearnNormalizer(Normalizer):
             the normalizer
         """
         x = numpy.array(x)
-        self._original_data = x
-        original_shape = x.shape
         num_data = numpy.prod(x.shape)
         x = x.reshape((num_data,1))
         self.scalar.fit(x)
+        self._original_data = x
         return self
     
     def transform(self, x):
@@ -556,7 +547,8 @@ class SklearnNormalizer(Normalizer):
 
         Return
         ------
-        normalized data
+        numpy:ndarray
+            the transformed data
         """
         x = numpy.array(x)
         original_shape = x.shape
@@ -576,7 +568,8 @@ class SklearnNormalizer(Normalizer):
 
         Return
         ------
-        unnormalized data
+        numpy:ndarray
+            the untransformed data
         """
         x = numpy.array(x)
         original_shape = x.shape
