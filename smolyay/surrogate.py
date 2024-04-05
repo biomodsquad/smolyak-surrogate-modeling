@@ -59,7 +59,7 @@ class Surrogate:
     grid_generator: IndexGridGenerator
         Set of grids and their corresponding basis function.
     norm: Normalizer
-        Normalization transformation to perform, default is no normalizer.
+        Normalization transformation to perform, default is NullNormalizer.
 
     Raises
     ------
