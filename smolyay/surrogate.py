@@ -104,7 +104,7 @@ class Surrogate:
     S = C_0B_0(x) + C_1B_1(x) + C_2B_2(x)
     """
 
-    def __init__(self, domain, grid_generator,norm=NullNormalizer()):
+    def __init__(self, domain, grid_generator, norm=NullNormalizer()):
         self.domain = domain
         self.grid_generator = grid_generator
         self._norm = norm
@@ -146,7 +146,7 @@ class Surrogate:
     def domain(self, value):
         value = numpy.array(value, ndmin=2)
         if value.ndim != 2 or value.shape[1] != 2:
-            raise TypeError('Domain must be dim x 2')
+            raise TypeError("Domain must be dim x 2")
         self._domain = value
         self._reset_grid()
 
@@ -165,7 +165,7 @@ class Surrogate:
     @grid_generator.setter
     def grid_generator(self, value):
         if not isinstance(value, IndexGridGenerator):
-            raise TypeError('Grids must be IndexGridGenerator')
+            raise TypeError("Grids must be IndexGridGenerator")
         self._grid_generator = value
         self._reset_grid()
 
@@ -174,7 +174,8 @@ class Surrogate:
         """numpy.ndarray: Points to be sampled."""
         if self._points is None:
             self._points = self._mapdomain(
-                self.grid.points, [[-1, 1]]*self.dimension, self._domain)
+                self.grid.points, [[-1, 1]] * self.dimension, self._domain
+            )
         return self._points
 
     @property
@@ -185,7 +186,7 @@ class Surrogate:
     @norm.setter
     def norm(self, value):
         if not isinstance(value, Normalizer):
-            raise TypeError('Grids must be Normalizer')
+            raise TypeError("Grids must be Normalizer")
         # if surrogate was already trained, retrain
         if self._coefficients is not None:
             original_data = self._norm.original_data
@@ -221,7 +222,7 @@ class Surrogate:
             function's dimensionality.
         """
         if self._coefficients is None:
-            raise ValueError('Function needs training!')
+            raise ValueError("Function needs training!")
         input_shape = numpy.shape(x)
         x = numpy.array(x, copy=False, ndmin=2)
         if self.dimension == 1:
@@ -234,38 +235,45 @@ class Surrogate:
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
-            oob = any(numpy.any(x[..., i] < self.domain[i][0]) or 
-                    numpy.any(x[..., i] > self.domain[i][1]) 
-                    for i in range(self.dimension))
+            oob = any(
+                numpy.any(x[..., i] < self.domain[i][0])
+                or numpy.any(x[..., i] > self.domain[i][1])
+                for i in range(self.dimension)
+            )
         else:
-            oob = (numpy.any(x < self.domain[0]) or 
-                    numpy.any(x > self.domain[1]))
+            oob = numpy.any(x < self.domain[0]) or numpy.any(x > self.domain[1])
         if oob:
-            raise ValueError('x must lie in domain of surrogate')
+            raise ValueError("x must lie in domain of surrogate")
         # transform point into basis domain
-        x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
+        x_scaled = self._mapdomain(x, self._domain, [[-1, 1]] * self.dimension)
         # evaluate the gradient
         gradient = numpy.zeros(x_scaled.shape)
         for ni in range(self.dimension):
             value = 0
-            for coeff, basis in zip(self.coefficients,
-                                    self.grid.basis_functions):
+            for coeff, basis in zip(self.coefficients, self.grid.basis_functions):
                 if self.dimension > 1:
                     term = numpy.prod(
-                            [basis[dim].derivative(x_scaled[...,dim]) 
-                             if dim == ni else basis[dim](x_scaled[...,dim]) 
-                             for dim in range(len(basis))], axis=0)
+                        [
+                            (
+                                basis[dim].derivative(x_scaled[..., dim])
+                                if dim == ni
+                                else basis[dim](x_scaled[..., dim])
+                            )
+                            for dim in range(len(basis))
+                        ],
+                        axis=0,
+                    )
                 else:
                     term = basis.derivative(x_scaled)
-                
-                value += coeff*term
-            gradient[...,ni] = numpy.reshape(value, gradient.shape[:-1])
+
+                value += coeff * term
+            gradient[..., ni] = numpy.reshape(value, gradient.shape[:-1])
         # unnormalize and resolve output shape
         gradient = self.norm.inverse_transform(gradient)
         if len(input_shape) == 0:
             gradient = gradient.item()
         else:
-            if (self.dimension == 1 and len(input_shape) > 1 and input_shape[-1] == 1):
+            if self.dimension == 1 and len(input_shape) > 1 and input_shape[-1] == 1:
                 output_shape = input_shape[:-1]
             else:
                 output_shape = input_shape
@@ -296,7 +304,7 @@ class Surrogate:
             Input must lie in domain of surrogate.
         """
         if self._coefficients is None:
-            raise ValueError('Function needs training!')
+            raise ValueError("Function needs training!")
         input_shape = numpy.shape(x)
         x = numpy.array(x, copy=False, ndmin=2)
         if self.dimension == 1:
@@ -305,42 +313,45 @@ class Surrogate:
                 x = x.T
             elif x.shape[-1] > 1:
                 x = x[..., numpy.newaxis]
-        
+
         if x.shape[-1] != self.dimension:
             raise IndexError("Input must match dimension of domain")
         if self.dimension > 1:
-            oob = any(numpy.any(x[..., i] < self.domain[i][0]) or 
-                    numpy.any(x[..., i] > self.domain[i][1]) 
-                    for i in range(self.dimension))
+            oob = any(
+                numpy.any(x[..., i] < self.domain[i][0])
+                or numpy.any(x[..., i] > self.domain[i][1])
+                for i in range(self.dimension)
+            )
         else:
-            oob = (numpy.any(x < self.domain[0]) or 
-                    numpy.any(x > self.domain[1]))
+            oob = numpy.any(x < self.domain[0]) or numpy.any(x > self.domain[1])
         if oob:
-            raise ValueError('x must lie in domain of surrogate')
+            raise ValueError("x must lie in domain of surrogate")
         # transform point into basis domain and evaluate
-        x_scaled = self._mapdomain(x, self._domain, [[-1, 1]]*self.dimension)
+        x_scaled = self._mapdomain(x, self._domain, [[-1, 1]] * self.dimension)
         value = 0
         for coeff, basis in zip(self._coefficients, self.grid.basis_functions):
             if self.dimension > 1:
                 term = numpy.prod(
-                        [basis[i](x_scaled[...,i]) for i in range(len(basis))],
-                        axis=0)
+                    [basis[i](x_scaled[..., i]) for i in range(len(basis))], axis=0
+                )
             else:
                 term = basis(x_scaled)
-            value += coeff*term
+            value += coeff * term
         # unnormalize and resolve output shape
         value = self.norm.inverse_transform(value)
-        if (self.dimension == 1 and input_shape == ()) or (self.dimension > 1 and len(input_shape) == 1):
+        if (self.dimension == 1 and input_shape == ()) or (
+            self.dimension > 1 and len(input_shape) == 1
+        ):
             value = value.item()
         else:
-            if (self.dimension == 1 and (len(input_shape) == 1 or input_shape[-1] >  1)):
+            if self.dimension == 1 and (len(input_shape) == 1 or input_shape[-1] > 1):
                 output_shape = input_shape
             else:
                 output_shape = x.shape[:-1]
             value = numpy.reshape(value, output_shape)
         return value
 
-    def train(self, function, linear_solver='lu'):
+    def train(self, function, linear_solver="lu"):
         """Fit surrogate's components (basis functions) to the function.
 
         Parameters
@@ -356,7 +367,7 @@ class Surrogate:
         data = [function(point) for point in self.points]
         self.train_from_data(data, linear_solver)
 
-    def train_from_data(self, data, linear_solver='lu'):
+    def train_from_data(self, data, linear_solver="lu"):
         """Fit surrogate's components (basis functions) to data.
 
         Parameters
@@ -382,29 +393,30 @@ class Surrogate:
         # normalization
         self._data = self.norm.fit_transform(self._data)
         # make basis matrix
-        points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
+        points, basis_functions = (
+            numpy.array(self.grid.points),
+            self.grid.basis_functions,
+        )
         basis_matrix = numpy.zeros((len(points), len(points)))
         for j, basis in enumerate(basis_functions):
             if self.dimension > 1:
-                value = numpy.prod([basis[i](points[...,i]) for i in range(len(basis))],axis=0)
+                value = numpy.prod(
+                    [basis[i](points[..., i]) for i in range(len(basis))], axis=0
+                )
             else:
                 value = basis(points)
-            basis_matrix[:,j]= value
+            basis_matrix[:, j] = value
 
-        if linear_solver == 'lu':
-            self._coefficients = numpy.linalg.solve(
-                basis_matrix,
-                self._data)
-        elif linear_solver == 'inv':
-            self._coefficients = numpy.dot(numpy.linalg.inv(
-                basis_matrix),
-                self._data)
-        elif linear_solver == 'lstsq':
-            self._coefficients = numpy.linalg.lstsq(basis_matrix,
-                                                    self._data,
-                                                    rcond=None)[0]
+        if linear_solver == "lu":
+            self._coefficients = numpy.linalg.solve(basis_matrix, self._data)
+        elif linear_solver == "inv":
+            self._coefficients = numpy.dot(numpy.linalg.inv(basis_matrix), self._data)
+        elif linear_solver == "lstsq":
+            self._coefficients = numpy.linalg.lstsq(
+                basis_matrix, self._data, rcond=None
+            )[0]
         else:
-            raise ValueError('Solver not recognized')
+            raise ValueError("Solver not recognized")
 
     @staticmethod
     def _mapdomain(x, old, new):
@@ -435,17 +447,19 @@ class Surrogate:
 
         # error checking
         if old.shape != new.shape:
-            raise TypeError('Old and new domain must have the same shape')
+            raise TypeError("Old and new domain must have the same shape")
         if old.ndim != 2 or old.shape[1] != 2:
-            raise TypeError('Domain should be a dim x 2 array')
+            raise TypeError("Domain should be a dim x 2 array")
 
-        new_x = new[:,0]+(new[:,1]-new[:,0])*((x-old[:,0])/(old[:,1]-old[:,0]))
+        new_x = new[:, 0] + (new[:, 1] - new[:, 0]) * (
+            (x - old[:, 0]) / (old[:, 1] - old[:, 0])
+        )
         # clamp bounds
         if len(new_x.shape) == 1:
-            numpy.clip(new_x, new[:,0], new[:,1],out=new_x)
+            numpy.clip(new_x, new[:, 0], new[:, 1], out=new_x)
         else:
             for i in range(new.shape[0]):
-                numpy.clip(new_x[...,i], new[i,0], new[i,1],out=new_x[...,i])
+                numpy.clip(new_x[..., i], new[i, 0], new[i, 1], out=new_x[..., i])
         return new_x
 
     def _reset_grid(self):
@@ -523,8 +537,8 @@ class GradientSurrogate(Surrogate):
         S = C_0B_0(x) + C_1B_1(x) + C_2B_2(x)
     """
 
-    def __init__(self, domain, grid_generator,norm=NullNormalizer()):
-        super().__init__(domain, grid_generator,norm)
+    def __init__(self, domain, grid_generator, norm=NullNormalizer()):
+        super().__init__(domain, grid_generator, norm)
 
     def train(self, gradient_function):
         """Fit surrogate's components to the gradient of a function.
@@ -551,15 +565,21 @@ class GradientSurrogate(Surrogate):
             Data should have size length of the grid points x dimension.
         """
         self._data = numpy.array(data, ndmin=1)
-        expected_data_shape = ((len(self.grid.points), self.dimension)
-                               if self.dimension > 1 else (
-                                       len(self.grid.points),))
+        expected_data_shape = (
+            (len(self.grid.points), self.dimension)
+            if self.dimension > 1
+            else (len(self.grid.points),)
+        )
         if self._data.shape != expected_data_shape:
-            raise IndexError("Data must have size of number"
-                             "of grid points x dimension.")
+            raise IndexError(
+                "Data must have size of number" "of grid points x dimension."
+            )
         # normalization
         self._data = self.norm.fit_transform(self._data)
-        points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
+        points, basis_functions = (
+            numpy.array(self.grid.points),
+            self.grid.basis_functions,
+        )
         num_points = len(points)
         # create basis matrix with appropriate size
         basis_matrix = numpy.zeros((self.dimension * len(points), len(points)))
@@ -568,14 +588,18 @@ class GradientSurrogate(Surrogate):
             for j, basis in enumerate(basis_functions):
                 if self.dimension > 1:
                     value = numpy.prod(
-                            [basis[dim].derivative(points[...,dim]) 
-                             if dim == ni else basis[dim](points[...,dim]) 
-                             for dim in range(len(basis))],axis=0)
+                        [
+                            (
+                                basis[dim].derivative(points[..., dim])
+                                if dim == ni
+                                else basis[dim](points[..., dim])
+                            )
+                            for dim in range(len(basis))
+                        ],
+                        axis=0,
+                    )
                 else:
                     value = basis.derivative(points)
-                basis_matrix[ni::self.dimension, j] = value
-        data = numpy.reshape(self._data,
-                             (self.dimension*len(self.grid.points), ))
-        self._coefficients = numpy.linalg.lstsq(basis_matrix,
-                                                data,
-                                                rcond=None)[0]
+                basis_matrix[ni :: self.dimension, j] = value
+        data = numpy.reshape(self._data, (self.dimension * len(self.grid.points),))
+        self._coefficients = numpy.linalg.lstsq(basis_matrix, data, rcond=None)[0]
