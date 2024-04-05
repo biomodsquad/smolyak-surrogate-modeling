@@ -4,16 +4,17 @@ import math
 import numpy
 import scipy.special
 
+
 class BasisFunction(abc.ABC):
     """Basis function for interpolating data.
 
-     A one-dimensional basis function is defined on the domain
-     :math:`[-1,1]`. The function defines the :attr:`points` at
-     which it should be sampled within this interval for interpolation.
-     The function also has an associated :meth:`__call__` method
-     for evaluating it at a point within its domain. Moreover,
-     the first derivative of the function can be evaluated via
-     :meth:`derivative`.
+    A one-dimensional basis function is defined on the domain
+    :math:`[-1,1]`. The function defines the :attr:`points` at
+    which it should be sampled within this interval for interpolation.
+    The function also has an associated :meth:`__call__` method
+    for evaluating it at a point within its domain. Moreover,
+    the first derivative of the function can be evaluated via
+    :meth:`derivative`.
     """
 
     def __init__(self):
@@ -90,7 +91,7 @@ class ChebyshevFirstKind(BasisFunction):
         self._n = n
         self._derivative_polynomial = None
         if n > 0:
-            self._points = -numpy.cos(numpy.pi*numpy.linspace(0,n,n+1)/n)
+            self._points = -numpy.cos(numpy.pi * numpy.linspace(0, n, n + 1) / n)
         else:
             self._points = [0]
 
@@ -118,7 +119,7 @@ class ChebyshevFirstKind(BasisFunction):
         Parameters
         ----------
         x : float
-            One-dimensional point on :math:`[-1,1]`.
+            One-dimensional point on :math:`[-1, 1]`.
 
         Returns
         -------
@@ -128,13 +129,13 @@ class ChebyshevFirstKind(BasisFunction):
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1]
+            if input is outside the domain [-1, 1]
 
         """
         if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
-            raise ValueError("Input is outside the domain [-1,1]")
+            raise ValueError("Input is outside the domain [-1, 1]")
 
-        return scipy.special.eval_chebyt(self._n,x)
+        return scipy.special.eval_chebyt(self._n, x)
 
     def derivative(self, x):
         """Evaluate the derivative of ChebyshevFirstKind.
@@ -159,13 +160,13 @@ class ChebyshevFirstKind(BasisFunction):
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1].
+            if input is outside the domain [-1, 1].
         """
         if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
-            raise ValueError("Input is outside the domain [-1,1]")
+            raise ValueError("Input is outside the domain [-1, 1]")
         if self._derivative_polynomial is None:
-            self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
-        return self.n*self._derivative_polynomial(x)
+            self._derivative_polynomial = ChebyshevSecondKind(self._n - 1)
+        return self.n * self._derivative_polynomial(x)
 
     @classmethod
     def make_nested_set(cls, exactness):
@@ -202,9 +203,9 @@ class ChebyshevFirstKind(BasisFunction):
         basis_functions = []
         levels = []
         points = []
-        for i in range(0, exactness+1):
+        for i in range(0, exactness + 1):
             if i > 1:
-                start_level = 2**(i-1)+1
+                start_level = 2 ** (i - 1) + 1
                 end_level = 2**i
             elif i == 1:
                 start_level = 1
@@ -212,17 +213,17 @@ class ChebyshevFirstKind(BasisFunction):
             else:
                 start_level = 0
                 end_level = 0
-            level_range = range(start_level, end_level+1)
+            level_range = range(start_level, end_level + 1)
 
             basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
             levels.append(list(level_range))
             for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
+                if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
                     points.append(p)
         return NestedBasisFunctionSet(points, basis_functions, levels)
 
     @classmethod
-    def make_slow_nested_set(cls, exactness,rule = lambda x : 2*x + 1):
+    def make_slow_nested_set(cls, exactness, rule=lambda x: 2 * x + 1):
         r"""Create a slow growth nested set of Chebyshev polynomials.
 
         A nested set is created up to a given level of ``exactness``,
@@ -287,13 +288,13 @@ class ChebyshevFirstKind(BasisFunction):
         basis_functions = []
         levels = []
         points = []
-        rule_add = -1 # tracks rules added
-        precision_has = 0 # tracks precision variable
-        for i in range(0, exactness+1):
+        rule_add = -1  # tracks rules added
+        precision_has = 0  # tracks precision variable
+        for i in range(0, exactness + 1):
             if rule(i) > precision_has:
                 rule_add = rule_add + 1
                 if rule_add > 1:
-                    start_level = 2**(rule_add-1)+1
+                    start_level = 2 ** (rule_add - 1) + 1
                     end_level = 2**rule_add
                 elif rule_add == 1:
                     start_level = 1
@@ -301,17 +302,17 @@ class ChebyshevFirstKind(BasisFunction):
                 else:
                     start_level = 0
                     end_level = 0
-                level_range = range(start_level, end_level+1)
+                level_range = range(start_level, end_level + 1)
                 precision_has = precision_has + len(level_range)
 
                 basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
                 levels.append(list(level_range))
                 for p in basis_functions[end_level].points:
-                    if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
+                    if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
                         points.append(p)
             else:
                 levels.append([])
-        return NestedBasisFunctionSet(points,basis_functions,levels)
+        return NestedBasisFunctionSet(points, basis_functions, levels)
 
 
 class ChebyshevSecondKind(BasisFunction):
@@ -346,9 +347,9 @@ class ChebyshevSecondKind(BasisFunction):
         self._n = n
         self._derivative_polynomial = None
         if n > 1:
-            self._points = -numpy.cos(numpy.pi*numpy.linspace(1,n,n)/(n+1))
+            self._points = -numpy.cos(numpy.pi * numpy.linspace(1, n, n) / (n + 1))
         else:
-            self._points = [0.]
+            self._points = [0.0]
 
     @property
     def points(self):
@@ -360,7 +361,7 @@ class ChebyshevSecondKind(BasisFunction):
         """int: Degree of polynomial"""
         return self._n
 
-    def __call__(self,x):
+    def __call__(self, x):
         r"""Evaluate the basis function.
 
         The Chebyshev polynomial is evaluated using the combinatorial formula:
@@ -374,7 +375,7 @@ class ChebyshevSecondKind(BasisFunction):
         Parameters
         ----------
         x : float
-            One-dimensional point on :math:`[-1,1]`.
+            One-dimensional point on :math:`[-1, 1]`.
 
         Returns
         -------
@@ -389,12 +390,12 @@ class ChebyshevSecondKind(BasisFunction):
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1]
+            if input is outside the domain [-1, 1]
 
         """
         if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
-            raise ValueError("Input is outside the domain [-1,1]")
-        return scipy.special.eval_chebyu(self._n,x)
+            raise ValueError("Input is outside the domain [-1, 1]")
+        return scipy.special.eval_chebyu(self._n, x)
 
     def derivative(self, x):
         r"""Evaluate the derivative of Chebyshev Second Kind.
@@ -425,21 +426,23 @@ class ChebyshevSecondKind(BasisFunction):
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1].
+            if input is outside the domain [-1, 1].
         """
         if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
             raise ValueError("Input is outside the domain [-1,1]")
         if self._derivative_polynomial is None:
-            self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
+            self._derivative_polynomial = ChebyshevFirstKind(self._n + 1)
         x = numpy.asarray(x)
         y = numpy.zeros(x.shape)
         flag2 = x == 1
         flag3 = x == -1
         flag1 = ~(flag2 | flag3)
-        y[flag1] =  ((self._n+1)*self._derivative_polynomial(x[flag1]) -
-                     x[flag1]*self(x[flag1]))/(x[flag1]**2-1)
-        y[flag2] = self._n*(self._n + 1)*(self._n + 2)/3
-        y[flag3] = ((-1)**(self._n+1))*self._n*(self._n + 1)*(self._n + 2)/3
+        y[flag1] = (
+            (self._n + 1) * self._derivative_polynomial(x[flag1])
+            - x[flag1] * self(x[flag1])
+        ) / (x[flag1] ** 2 - 1)
+        y[flag2] = self._n * (self._n + 1) * (self._n + 2) / 3
+        y[flag3] = ((-1) ** (self._n + 1)) * self._n * (self._n + 1) * (self._n + 2) / 3
         if y.ndim == 0:
             y = y.item()
         return y
@@ -477,23 +480,23 @@ class ChebyshevSecondKind(BasisFunction):
 
         """
         # initialize 0th level to ensure it has 2 points
-        levels = [[0,1]]
-        basis_functions =  [ChebyshevSecondKind(0),ChebyshevSecondKind(1)]
+        levels = [[0, 1]]
+        basis_functions = [ChebyshevSecondKind(0), ChebyshevSecondKind(1)]
         points = basis_functions[0].points + basis_functions[1].points
-        for i in range(1, exactness+1):
+        for i in range(1, exactness + 1):
             start_level = 2**i
-            end_level = 2**(i+1)-1
-            level_range = range(start_level, end_level+1)
+            end_level = 2 ** (i + 1) - 1
+            level_range = range(start_level, end_level + 1)
 
             basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
             levels.append(list(level_range))
             for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
+                if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
                     points.append(p)
-        return NestedBasisFunctionSet(points,basis_functions,levels)
+        return NestedBasisFunctionSet(points, basis_functions, levels)
 
     @classmethod
-    def make_slow_nested_set(cls, exactness, rule= lambda x : 2*x + 1):
+    def make_slow_nested_set(cls, exactness, rule=lambda x: 2 * x + 1):
         r"""Create a nested set of Chebyshev polynomials of the second kind.
 
         A nested set is created up to a given level of ``exactness``,
@@ -521,22 +524,22 @@ class ChebyshevSecondKind(BasisFunction):
             precision(exactness) = 2* ``exactness`` + 1
 
         For a given ``exactness``, points from the next generating Chebyshev
-        polynomials are added at levels where the precision rule at the 
-        current exactness is greater than the number of points accumulated at 
+        polynomials are added at levels where the precision rule at the
+        current exactness is greater than the number of points accumulated at
         previous levels.
-        
+
         For example, for an ``exactness`` of 2, the generating polynomials are
         of degree 1, 3, and 7 at each of 3 levels. There are 2, 2, and 4
         new points added at each level, and the number of points accumulated
-        at each level is 2, 4, and 8. The polynomial at level 0 is of degree 
-        0 and 1, the polynomials at level 1 are of degrees 2 and 3, and those at 
+        at each level is 2, 4, and 8. The polynomial at level 0 is of degree
+        0 and 1, the polynomials at level 1 are of degrees 2 and 3, and those at
         level 2 are of degree 4 and 5.
-        
+
         For an ``exactness`` of 3, there would be 2, 2, 4, and 8 new points
         added at each level. However, the precision rule states that for level
         3 the precision rule is 7, and the accumulated number of points
-        already added is 8. Since the precision rule is not greater than the 
-        accumulated number of points, no new points are added. If the 
+        already added is 8. Since the precision rule is not greater than the
+        accumulated number of points, no new points are added. If the
         ``exactness increases to 5, the precision rule will be greater than 8,
         and the 8 points that were skipped at ``exactness`` 3 are added.
 
@@ -555,30 +558,30 @@ class ChebyshevSecondKind(BasisFunction):
 
         """
         # initialize 0th level to ensure it has 2 points
-        levels = [[0,1]]
-        basis_functions =  [ChebyshevSecondKind(0),ChebyshevSecondKind(1)]
+        levels = [[0, 1]]
+        basis_functions = [ChebyshevSecondKind(0), ChebyshevSecondKind(1)]
         points = basis_functions[0].points + basis_functions[1].points
         rule_add = 0
         precision_has = 2
-        for i in range(1, exactness+1):
+        for i in range(1, exactness + 1):
             if rule(i) > precision_has:
                 rule_add += 1
                 start_level = 2**rule_add
-                end_level = 2**(rule_add+1)-1
-                level_range = range(start_level, end_level+1)
+                end_level = 2 ** (rule_add + 1) - 1
+                level_range = range(start_level, end_level + 1)
                 precision_has += len(level_range)
 
                 basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
                 levels.append(list(level_range))
                 for p in basis_functions[end_level].points:
-                    if not numpy.isclose(points, p,rtol=0,atol=1e-11).any():
+                    if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
                         points.append(p)
             else:
                 levels.append([])
-        return NestedBasisFunctionSet(points,basis_functions,levels)
+        return NestedBasisFunctionSet(points, basis_functions, levels)
 
 
-class BasisFunctionSet():
+class BasisFunctionSet:
     """Set of basis functions and sample points.
 
     Parameters
@@ -591,12 +594,13 @@ class BasisFunctionSet():
 
     """
 
-    def __init__(self,points,basis_functions):
+    def __init__(self, points, basis_functions):
         self._basis_functions = basis_functions
         self._points = points
         if len(basis_functions) != len(points):
-            raise IndexError("basis_functions and points must have the "
-                    "same number of elements.")
+            raise IndexError(
+                "basis_functions and points must have the same number of elements."
+            )
 
     @property
     def points(self):
@@ -622,8 +626,8 @@ class NestedBasisFunctionSet(BasisFunctionSet):
        Assignment of points/basis functions to each level.
     """
 
-    def __init__(self,points,basis_functions,levels):
-        super().__init__(points,basis_functions)
+    def __init__(self, points, basis_functions, levels):
+        super().__init__(points, basis_functions)
         self._levels = levels
 
     @property
@@ -637,9 +641,9 @@ class NestedBasisFunctionSet(BasisFunctionSet):
         return self._levels
 
     @levels.setter
-    def levels(self,levels):
+    def levels(self, levels):
         if numpy.any(numpy.concatenate(levels) > len(self.points)):
-            raise IndexError("max level index must be less than total "
-                    "number of points.")
+            raise IndexError(
+                "max level index must be less than total number of points."
+            )
         self._levels = levels
-
