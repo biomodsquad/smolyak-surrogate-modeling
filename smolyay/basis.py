@@ -169,8 +169,8 @@ class ChebyshevFirstKind(BasisFunction):
         return self.n * self._derivative_polynomial(x)
 
     @classmethod
-    def make_nested_set(cls, exactness):
-        """Create a nested set of Chebyshev polynomials.
+    def make_nested_set(cls, exactness, precision_rule=None):
+        r"""Create a nested set of Chebyshev polynomials.
 
         A nested set is created up to a given level of ``exactness``,
         which corresponds to a highest-order Chebyshev polynomial of
@@ -188,102 +188,50 @@ class ChebyshevFirstKind(BasisFunction):
         0, the polynomials at level 1 are of degrees 1 and 2, those at level 2
         are of degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and
         8.
-
-        Parameters
-        ----------
-        exactness : int
-            Level of exactness.
-
-        Returns
-        -------
-        NestedBasisFunctionSet
-            Nested Chebyshev polynomials of the first kind.
-
-        """
-        basis_functions = []
-        levels = []
-        points = []
-        for i in range(0, exactness + 1):
-            if i > 1:
-                start_level = 2 ** (i - 1) + 1
-                end_level = 2**i
-            elif i == 1:
-                start_level = 1
-                end_level = 2
-            else:
-                start_level = 0
-                end_level = 0
-            level_range = range(start_level, end_level + 1)
-
-            basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
-            levels.append(list(level_range))
-            for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
-                    points.append(p)
-        return NestedBasisFunctionSet(points, basis_functions, levels)
-
-    @classmethod
-    def make_slow_nested_set(cls, exactness, rule=lambda x: 2 * x + 1):
-        r"""Create a slow growth nested set of Chebyshev polynomials.
-
-        A nested set is created up to a given level of ``exactness``,
-        which corresponds to a highest-order Chebyshev polynomial of
-        degree ``n = 2**exactness``.
-        
-        Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**exactness``, with the first level being a special case. The 
-        generating Chebyshev polynomials are hence of degree (0, 2, 4, ...).
-        Each new point added in a level is paired with a basis function of 
-        increasing order.
         
         The total number of 1D points accumulated at a given level i is given by
         the following equation.
 
         ..math::
 
-            points(i) = \left\{ \begin{array}{cl} 1 & : \ i = 0 \\ 
-                2^{i} + 1 & : \ otherwise \end{array} \right.
+            points(i) = 2^{i+1}
 
         The precision rule is a function that grows slower than the point
-        accumulation, where the default is
+        accumulation, where the recommended rule, if given, is
 
         ..math::
 
-            precision(exactness) = 2* ``exactness`` + 1
+            points(i) = \left\{ \begin{array}{cl} 1 & : \ i = 0 \\ 
+                2^{i} + 1 & : \ otherwise \end{array} \right.
 
-        For a given ``exactness``, points from the next generating Chebyshev
-        polynomials are added at levels where the precision rule at the 
-        current exactness is greater than the number of points accumulated at 
+        If a precision rule is given, points from the next generating Chebyshev
+        polynomials are added at levels where the precision rule at the
+        current exactness is greater than the number of points accumulated at
         previous levels.
-        
-        For example, for an ``exactness`` of 3, the generating polynomials are
-        of degree 0, 2, 4, and 8, at each of 4 levels. There are 1, 2, 2, and 4
-        new points added at each level, and the number of points accumulated
-        at each level is 1, 3, 5, and 9. The polynomial at level 0 is of degree 
-        0, the polynomials at level 1 are of degrees 1 and 2, those at level 2 
-        are of degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and
-        8.
-        
-        For an ``exactness`` of 4, there would be 1, 2, 2, 4, and 8 new points
+
+        For example if the above precision rule is used for an ``exactness`` of 
+        4, there would normally be 1, 2, 2, 4, and 8 new points
         added at each level. However, the precision rule states that for level
         4 the precision rule is 9, and the accumulated number of points
-        already added is 9. Since the precision rule is not greater than the 
-        accumulated number of points, no new points are added. If the 
-        ``exactness increases to 5, the precision rule will be greater than 9,
-        and the 8 points that were skipped at ``exactness`` 4 are added.
-    
+        already added at the previous exactness is 9. Since the precision rule 
+        is not greater than the accumulated number of points, no new points are
+        added. If the ``exactness`` increases to 5, the precision rule will be 
+        greater than 9, and the 8 points that were skipped at ``exactness`` 4 
+        are added.
+
         Parameters
         ----------
         exactness : int
             Level of exactness.
 
-        rule : func
+        precision_rule : None or callable
             custom precision rule.
-            
+        
         Returns
         -------
         NestedBasisFunctionSet
             Nested Chebyshev polynomials of the first kind.
+
         """
         basis_functions = []
         levels = []
@@ -291,7 +239,7 @@ class ChebyshevFirstKind(BasisFunction):
         rule_add = -1  # tracks rules added
         precision_has = 0  # tracks precision variable
         for i in range(0, exactness + 1):
-            if rule(i) > precision_has:
+            if not callable(precision_rule) or precision_rule(i) > precision_has:
                 rule_add = rule_add + 1
                 if rule_add > 1:
                     start_level = 2 ** (rule_add - 1) + 1
@@ -448,8 +396,8 @@ class ChebyshevSecondKind(BasisFunction):
         return y
 
     @classmethod
-    def make_nested_set(cls, exactness):
-        """Create a nested set of Chebyshev polynomials.
+    def make_nested_set(cls, exactness, precision_rule=None):
+        r"""Create a nested set of Chebyshev polynomials.
 
         A nested set is created up to a given level of ``exactness``,
         which corresponds to a highest-order Chebyshev polynomial of
@@ -468,47 +416,6 @@ class ChebyshevSecondKind(BasisFunction):
         level 2 are of degree 4, 5, 6, and 7, and those at level 3 are of
         degrees 8, 9, 10, 11, 12, 13, 14, and 15.
 
-        Parameters
-        ----------
-        exactness : int
-            Level of exactness.
-
-        Returns
-        -------
-        NestedBasisFunctionSet
-            Nested Chebyshev polynomials of the first kind.
-
-        """
-        # initialize 0th level to ensure it has 2 points
-        levels = [[0, 1]]
-        basis_functions = [ChebyshevSecondKind(0), ChebyshevSecondKind(1)]
-        points = basis_functions[0].points + basis_functions[1].points
-        for i in range(1, exactness + 1):
-            start_level = 2**i
-            end_level = 2 ** (i + 1) - 1
-            level_range = range(start_level, end_level + 1)
-
-            basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
-            levels.append(list(level_range))
-            for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
-                    points.append(p)
-        return NestedBasisFunctionSet(points, basis_functions, levels)
-
-    @classmethod
-    def make_slow_nested_set(cls, exactness, rule=lambda x: 2 * x + 1):
-        r"""Create a nested set of Chebyshev polynomials of the second kind.
-
-        A nested set is created up to a given level of ``exactness``,
-        which corresponds to a highest-order Chebyshev polynomial of
-        degree ``n = 2**(exactness + 1) - 1``.
-
-        Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**(exactness + 1) - 1``, with the first level being a special case.
-        The generating Chebyshev polynomials are hence of degree (1, 3, 7,
-        15, ...). Each new point added in a level is paired with a basis
-        function of increasing order.
-
         The total number of 1D points accumulated at a given level i is given by
         the following equation.
 
@@ -517,38 +424,31 @@ class ChebyshevSecondKind(BasisFunction):
             points(i) = 2^{i+1}
 
         The precision rule is a function that grows slower than the point
-        accumulation, where the default is
+        accumulation, where the recommended rule, if given, is
 
         ..math::
 
             precision(exactness) = 2* ``exactness`` + 1
 
-        For a given ``exactness``, points from the next generating Chebyshev
+        If a precision rule is given, points from the next generating Chebyshev
         polynomials are added at levels where the precision rule at the
         current exactness is greater than the number of points accumulated at
         previous levels.
 
-        For example, for an ``exactness`` of 2, the generating polynomials are
-        of degree 1, 3, and 7 at each of 3 levels. There are 2, 2, and 4
-        new points added at each level, and the number of points accumulated
-        at each level is 2, 4, and 8. The polynomial at level 0 is of degree
-        0 and 1, the polynomials at level 1 are of degrees 2 and 3, and those at
-        level 2 are of degree 4 and 5.
-
-        For an ``exactness`` of 3, there would be 2, 2, 4, and 8 new points
-        added at each level. However, the precision rule states that for level
-        3 the precision rule is 7, and the accumulated number of points
-        already added is 8. Since the precision rule is not greater than the
-        accumulated number of points, no new points are added. If the
-        ``exactness increases to 5, the precision rule will be greater than 8,
+        For example, for an ``exactness`` of 3, there would be 2, 2, 4, and 8
+        new points added at each level. However, if the precision rule given
+        above is used then its value at level 3 is 7, and the accumulated number 
+        of points already added is 8. Since the precision rule is not greater 
+        than the accumulated number of points, no new points are added. If the
+        ``exactness increases to 4, the precision rule will be greater than 8,
         and the 8 points that were skipped at ``exactness`` 3 are added.
 
         Parameters
         ----------
         exactness : int
             Level of exactness.
-
-        rule : func
+        
+        precision_rule : None or callable
             custom precision rule.
 
         Returns
@@ -564,7 +464,7 @@ class ChebyshevSecondKind(BasisFunction):
         rule_add = 0
         precision_has = 2
         for i in range(1, exactness + 1):
-            if rule(i) > precision_has:
+            if not callable(precision_rule) or precision_rule(i) > precision_has:
                 rule_add += 1
                 start_level = 2**rule_add
                 end_level = 2 ** (rule_add + 1) - 1
