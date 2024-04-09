@@ -5,7 +5,6 @@ from smolyay.basis import ChebyshevFirstKind
 from smolyay.grid import SmolyakGridGenerator, IndexGrid
 from smolyay.normalize import (
     Normalizer,
-    NullNormalizer,
     SymmetricalLogNormalizer,
     IntervalNormalizer,
     ZScoreNormalizer,
@@ -111,7 +110,7 @@ def test_initialization_2d():
         ],
         atol=1e-4,
     )
-    assert isinstance(surrogate.norm, NullNormalizer)
+    assert surrogate.transformer is None
 
 
 def test_gradient_initialization_2d():
@@ -142,7 +141,7 @@ def test_gradient_initialization_2d():
         ],
         atol=1e-4,
     )
-    assert isinstance(surrogate.norm, NullNormalizer)
+    assert surrogate.transformer is None
 
 
 def test_error_grid_generator_type():
@@ -209,7 +208,7 @@ def test_surrogate_1():
 @pytest.mark.parametrize(
     "norm",
     [
-        NullNormalizer(),
+        None,
         IntervalNormalizer(),
         ZScoreNormalizer(),
     ],
@@ -237,7 +236,7 @@ def test_surrogate_1_multi_input(norm):
 @pytest.mark.parametrize(
     "norm",
     [
-        NullNormalizer(),
+        None,
         IntervalNormalizer(),
         ZScoreNormalizer(),
     ],
@@ -296,7 +295,7 @@ def test_surrogate_2_multi_input(linear_solver):
 @pytest.mark.parametrize(
     "norm",
     [
-        NullNormalizer(),
+        None,
         IntervalNormalizer(),
         ZScoreNormalizer(),
     ],
@@ -358,7 +357,7 @@ def test_gradient_surrogate_3():
 @pytest.mark.parametrize(
     "norm",
     [
-        NullNormalizer(),
+        None,
         IntervalNormalizer(),
         ZScoreNormalizer(),
     ],
@@ -386,7 +385,7 @@ def test_gradient_surrogate_3_multi_input(norm):
 @pytest.mark.parametrize(
     "norm",
     [
-        NullNormalizer(),
+        None,
         IntervalNormalizer(),
         ZScoreNormalizer(),
     ],
@@ -440,7 +439,7 @@ def test_gradient_surrogate_4_multi_input():
 @pytest.mark.parametrize(
     "norm",
     [
-        NullNormalizer(),
+        None,
         IntervalNormalizer(),
         ZScoreNormalizer(),
     ],
@@ -507,19 +506,19 @@ def test_error_input_surrogate():
 )
 def test_norm_setter(change_norm):
     """Test if the changing the normalizer correctly retrains the function"""
-    null_norm = NullNormalizer()
+    null_norm = None
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = Surrogate([(-1, 1), (-1, 1)], grid_gen, null_norm)
     surrogate.train(function_1)
     null_coefficients = surrogate.coefficients
     # change norm
-    surrogate.norm = change_norm
+    surrogate.transformer = change_norm
     change_coefficients = surrogate.coefficients
     # random points in the domain
     points = [(0.649, -0.9), (-0.885, 1)]
     surrogate_values = [surrogate(x) for x in points]
     exact_values = [function_1(x) for x in points]
-    assert surrogate.norm == change_norm
+    assert surrogate.transformer == change_norm
     assert not numpy.array_equal(null_coefficients, change_coefficients)
     if isinstance(change_norm, SymmetricalLogNormalizer):
         assert numpy.allclose(surrogate_values, exact_values, atol=0.5, rtol=0.3)
@@ -537,33 +536,21 @@ def test_norm_setter(change_norm):
 )
 def test_norm_setter_gradient(change_norm):
     """Test if the changing the normalizer correctly retrains the function"""
-    null_norm = NullNormalizer()
+    null_norm = None
     grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
     surrogate = GradientSurrogate([(-1, 1), (-1, 1)], grid_gen, null_norm)
     surrogate.train(function_3)
     null_coefficients = surrogate.coefficients
     # change norm
-    surrogate.norm = change_norm
+    surrogate.transformer = change_norm
     change_coefficients = surrogate.coefficients
     # random points in the domain
     points = [(0.649, -0.9), (-0.885, 1)]
     surrogate_values = surrogate.gradient(points)
     exact_values = [function_3(x) for x in points]
-    assert surrogate.norm == change_norm
+    assert surrogate.transformer == change_norm
     assert not numpy.array_equal(null_coefficients, change_coefficients)
     if isinstance(change_norm, SymmetricalLogNormalizer):
         assert numpy.allclose(surrogate_values, exact_values, atol=0.5, rtol=0.3)
     else:
         assert numpy.allclose(surrogate_values, exact_values)
-
-def test_error_norm_type():
-    """Test norm's type"""
-    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
-    with pytest.raises(TypeError):
-        Surrogate([(-1, 1), (-1, 1)], grid_gen, "not a Normalizer")
-
-def test_error_gradient_norm_type():
-    """Test norm's type"""
-    grid_gen = SmolyakGridGenerator(ChebyshevFirstKind.make_nested_set(2))
-    with pytest.raises(TypeError):
-        GradientSurrogate([(-1, 1), (-1, 1)], grid_gen, "not a Normalizer")

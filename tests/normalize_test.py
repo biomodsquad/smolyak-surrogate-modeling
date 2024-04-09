@@ -6,7 +6,6 @@ import sklearn.preprocessing
 
 from smolyay.normalize import (
     Normalizer,
-    NullNormalizer,
     SymmetricalLogNormalizer,
     IntervalNormalizer,
     ZScoreNormalizer,
@@ -16,7 +15,6 @@ from smolyay.normalize import (
 @pytest.mark.parametrize(
     "normal",
     [
-        NullNormalizer(),
         IntervalNormalizer(),
         SymmetricalLogNormalizer(),
         ZScoreNormalizer(),
@@ -33,7 +31,6 @@ def test_fit(normal):
 @pytest.mark.parametrize(
     "normal",
     [
-        NullNormalizer(),
         IntervalNormalizer(),
         SymmetricalLogNormalizer(),
         ZScoreNormalizer(),
@@ -48,19 +45,6 @@ def test_check(normal):
     assert normal.check_normalize(x)
     assert normal.check_normalize(x2)
     assert normal.check_normalize(x3)
-
-def test_null_transform():
-    """Test that the NullNormalizer transform is correct"""
-    x = [1, 2, 3, 4, 5]
-    normal = NullNormalizer()
-    normal.fit(x)
-    assert numpy.allclose(normal.transform(x), [1, 2, 3, 4, 5])
-
-def test_null_inverse():
-    """Test that the NullNormalizer inverse transform is correct"""
-    x = [1, 2, 3, 4, 5]
-    normal = NullNormalizer()
-    assert numpy.allclose(normal.inverse_transform(x), [1, 2, 3, 4, 5])
 
 def test_interval_attributes():
     """Test if the attributes of IntervalNormalizer are added"""

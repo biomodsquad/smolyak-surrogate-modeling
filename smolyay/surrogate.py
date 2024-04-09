@@ -3,7 +3,6 @@ import numpy
 from smolyay.grid import IndexGridGenerator
 from smolyay.normalize import (
     Normalizer,
-    NullNormalizer,
     SymmetricalLogNormalizer,
     IntervalNormalizer,
     ZScoreNormalizer,
@@ -59,7 +58,7 @@ class Surrogate:
     grid_generator: IndexGridGenerator
         Set of grids and their corresponding basis function.
     norm: Normalizer
-        Normalization transformation to perform, default is NullNormalizer.
+        Normalization transformation to perform, default is None.
 
     Raises
     ------
@@ -104,10 +103,10 @@ class Surrogate:
     S = C_0B_0(x) + C_1B_1(x) + C_2B_2(x)
     """
 
-    def __init__(self, domain, grid_generator,norm=NullNormalizer()):
+    def __init__(self, domain, grid_generator, transformer=None):
         self.domain = domain
         self.grid_generator = grid_generator
-        self._norm = norm
+        self._transformer = transformer
         self._coefficients = None
         self._grid = None
         self._points = None
@@ -178,20 +177,18 @@ class Surrogate:
         return self._points
 
     @property
-    def norm(self):
+    def transformer(self):
         """Normalizer: Pre-training normalizer"""
-        return self._norm
+        return self._transformer
 
-    @norm.setter
-    def norm(self, value):
-        if not isinstance(value, Normalizer):
-            raise TypeError('norm must be Normalizer')
+    @transformer.setter
+    def transformer(self, value):
         # if surrogate was already trained, retrain
         if self._coefficients is not None:
-            self._norm = value
+            self._transformer = value
             self.train_from_data(self.data)
         else:
-            self._norm = value
+            self._transformer = value
 
     def gradient(self, x):
         """Take the derivative of the surrogate at a given point.
@@ -260,7 +257,8 @@ class Surrogate:
                 value += coeff*term
             gradient[...,ni] = numpy.reshape(value, gradient.shape[:-1])
         # unnormalize and resolve output shape
-        gradient = self.norm.inverse_transform(gradient)
+        if not self.transformer is None:
+            gradient = self.transformer.inverse_transform(gradient)
         if len(input_shape) == 0:
             gradient = gradient.item()
         else:
@@ -328,7 +326,8 @@ class Surrogate:
                 term = basis(x_scaled)
             value += coeff*term
         # unnormalize and resolve output shape
-        value = self.norm.inverse_transform(value)
+        if not self.transformer is None:
+            value = self.transformer.inverse_transform(value)
         if (self.dimension == 1 and input_shape == ()) or (self.dimension > 1 and len(input_shape) == 1):
             value = value.item()
         else:
@@ -379,7 +378,8 @@ class Surrogate:
         if self._data.shape != (len(self.grid.points),):
             raise IndexError("Data must be same length as grid points.")
         # normalization
-        data = self.norm.fit_transform(self._data)
+        if not self.transformer is None:
+            data = self.transformer.fit_transform(self._data)
         # make basis matrix
         points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
         basis_matrix = numpy.zeros((len(points), len(points)))
@@ -523,8 +523,8 @@ class GradientSurrogate(Surrogate):
         S = C_0B_0(x) + C_1B_1(x) + C_2B_2(x)
     """
 
-    def __init__(self, domain, grid_generator, norm=NullNormalizer()):
-        super().__init__(domain, grid_generator, norm)
+    def __init__(self, domain, grid_generator, transformer=None):
+        super().__init__(domain, grid_generator, transformer)
 
     def train(self, gradient_function):
         """Fit surrogate's components to the gradient of a function.
@@ -558,7 +558,8 @@ class GradientSurrogate(Surrogate):
             raise IndexError("Data must have size of number"
                              "of grid points x dimension.")
         # normalization
-        data = self.norm.fit_transform(self._data)
+        if not self.transformer is None:
+            data = self.transformer.fit_transform(self._data)
         points, basis_functions = numpy.array(self.grid.points), self.grid.basis_functions
         num_points = len(points)
         # create basis matrix with appropriate size

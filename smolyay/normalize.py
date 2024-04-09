@@ -3,7 +3,8 @@ import abc
 import numpy
 import sklearn
 
-class Normalizer(abc.ABC,sklearn.base.TransformerMixin,sklearn.base.BaseEstimator):
+
+class Normalizer(abc.ABC, sklearn.base.TransformerMixin, sklearn.base.BaseEstimator):
     r"""A transformation on the training data of a surrogate
 
     Prior to training a surrogate model, a transformation can be applied
@@ -18,31 +19,31 @@ class Normalizer(abc.ABC,sklearn.base.TransformerMixin,sklearn.base.BaseEstimato
     :meth:`inverse_transform`. The names of the methods in this class are
     chosen to maintain compatibility with scripts that use scalars in the
     sklearn.preprocessing package to transform and normalize data.
-    
-    :meth:`transform` is an abstract method to be defined by child class that 
-    normalizes the input. 
-    :meth:`inverse_transform` is an abstract method to be defined by child 
+
+    :meth:`transform` is an abstract method to be defined by child class that
+    normalizes the input.
+    :meth:`inverse_transform` is an abstract method to be defined by child
     class that is expected to perform an inverse operation to :meth:`transform`
-    that unnormalizes the input. 
-    
+    that unnormalizes the input.
+
     :meth:`check_normalize` checks if :meth:`inverse_transform` is the inverse
-    of :meth:`transform`. If defined correctly, applying :meth:`transform` 
-    and :meth:`inverse_transform` sequentially should return the initial input, 
-    and the method will return True will be returned if the final output of the 
+    of :meth:`transform`. If defined correctly, applying :meth:`transform`
+    and :meth:`inverse_transform` sequentially should return the initial input,
+    and the method will return True will be returned if the final output of the
     sequential operation is sufficiently close to the initial input.
-    
+
     :meth:`fit` is expected to be overridden by child classes that use the
     training data to calculate parameters that need fitting.
 
     :meth:`fit_tranform` fits the Normalizer using the data, and then performs
     the transform on the data.
-    
+
     """
 
     def fit(self, x):
         """Fit the Normalizer
 
-        To be overridden should a child class require the training data 
+        To be overridden should a child class require the training data
         for calculations.
 
         Parameters
@@ -56,7 +57,7 @@ class Normalizer(abc.ABC,sklearn.base.TransformerMixin,sklearn.base.BaseEstimato
             the normalizer
         """
         return self
-    
+
     @abc.abstractmethod
     def transform(self, x):
         """Normalization function
@@ -109,43 +110,7 @@ class Normalizer(abc.ABC,sklearn.base.TransformerMixin,sklearn.base.BaseEstimato
         """
         x = numpy.array(x)
         new_x = self.inverse_transform(self.transform(x))
-        return numpy.allclose(x,new_x)
-
-
-class NullNormalizer(Normalizer):
-    """ "Normalizer that does not modify data
-
-    Using this normalizer will not transform the data in any way
-    and is equilivant to not doing any normalization or transformation.
-    """
-
-    def transform(self, x):
-        """Normalization function
-
-        Parameters
-        ----------
-        x : numerical data
-            data to be transformed
-
-        Return
-        ------
-        normalized data
-        """
-        return x
-
-    def inverse_transform(self, x):
-        """Inverse normalization function
-
-        Parameters
-        ----------
-        x : numerical data
-            normalized data to be transformed
-
-        Return
-        ------
-        unnormalized data
-        """
-        return x
+        return numpy.allclose(x, new_x)
 
 
 class IntervalNormalizer(Normalizer):
@@ -189,7 +154,7 @@ class IntervalNormalizer(Normalizer):
     def max_val(self):
         """float: max of original training data"""
         return self._max_val
-    
+
     def fit(self, x):
         """Calculates the min and max
 
@@ -206,7 +171,7 @@ class IntervalNormalizer(Normalizer):
         self._max_val = numpy.max(x)
         self._min_val = numpy.min(x)
         return self
-    
+
     def transform(self, x):
         """Normalize the data using the min and max
 
@@ -307,7 +272,7 @@ class ZScoreNormalizer(Normalizer):
     def std_val(self):
         """float: std of original training data"""
         return self._std_val
-    
+
     def fit(self, x):
         """Obtain the original training data and reset mean and std
 
@@ -324,13 +289,11 @@ class ZScoreNormalizer(Normalizer):
         x = numpy.array(x)
         self._mean_val = numpy.mean(x)
         try:
-            self._std_val = float(numpy.std(
-                numpy.array(x, dtype=numpy.float128)
-            ))
+            self._std_val = float(numpy.std(numpy.array(x, dtype=numpy.float128)))
         except AttributeError:
             self._std_val = numpy.std(x)
         return self
-    
+
     def transform(self, x):
         """Normalize the data using the mean and std
 
@@ -469,15 +432,16 @@ class SymmetricalLogNormalizer(Normalizer):
         unnormalized data
         """
         return numpy.sign(x) * self.linthresh * (-1 + numpy.power(10, numpy.abs(x)))
-    
+
+
 class SklearnNormalizer(Normalizer):
     """Normalizer that uses a scalar or transformer from the sklearn package
-    
+
     Given a scalar or transformer object from the sklearn package, this
     implements the transform and inverse transform of that object as a
     Normalizer object. The parameter ``scalar`` must have the methods
     :meth:`transform`, :meth:`inverse_transform`, :meth:`fit`, and
-    :meth:`fit_transform`. 
+    :meth:`fit_transform`.
 
     Raises
     ------
@@ -485,12 +449,12 @@ class SklearnNormalizer(Normalizer):
         the transformer does not have the required methods
     ValueError
         the original data was never assigned"""
-        
+
     def __init__(self, scalar):
         super().__init__()
-        methods = ['transform','inverse_transform','fit']
-        if not all([callable(getattr(scalar,m,False)) for m in methods]):
-            raise AttributeError('Object does not have the required methods')
+        methods = ["transform", "inverse_transform", "fit"]
+        if not all([callable(getattr(scalar, m, False)) for m in methods]):
+            raise AttributeError("Object does not have the required methods")
         self._scalar = scalar
         self._original_data = None
 
@@ -501,23 +465,22 @@ class SklearnNormalizer(Normalizer):
 
     @scalar.setter
     def scalar(self, value):
-        methods = ['transform','inverse_transform','fit']
-        if not all([callable(getattr(value,m,False)) for m in methods]):
-            raise AttributeError('Object does not have the required methods')
+        methods = ["transform", "inverse_transform", "fit"]
+        if not all([callable(getattr(value, m, False)) for m in methods]):
+            raise AttributeError("Object does not have the required methods")
         self._scalar = value
         if not self.original_data is None:
             self._scalar.fit(self.original_data)
-
 
     @property
     def original_data(self):
         """numpy.ndarray: copy of training data used to fit scalar"""
         return self._original_data
-    
+
     def fit(self, x):
         """Obtain the original training data
 
-        Method for obtaining the original training data. To be overridden 
+        Method for obtaining the original training data. To be overridden
         should a child class require the training data for calculations.
 
         Parameters
@@ -532,11 +495,11 @@ class SklearnNormalizer(Normalizer):
         """
         x = numpy.array(x)
         num_data = numpy.prod(x.shape)
-        x = x.reshape((num_data,1))
+        x = x.reshape((num_data, 1))
         self.scalar.fit(x)
         self._original_data = x
         return self
-    
+
     def transform(self, x):
         """Normalization function
 
@@ -553,7 +516,7 @@ class SklearnNormalizer(Normalizer):
         x = numpy.array(x)
         original_shape = x.shape
         num_data = numpy.prod(x.shape)
-        x = x.reshape((num_data,1))
+        x = x.reshape((num_data, 1))
         y = self.scalar.transform(x)
         y = y.reshape(original_shape)
         return y
@@ -574,7 +537,7 @@ class SklearnNormalizer(Normalizer):
         x = numpy.array(x)
         original_shape = x.shape
         num_data = numpy.prod(x.shape)
-        x = x.reshape((num_data,1))
+        x = x.reshape((num_data, 1))
         y = self.scalar.inverse_transform(x)
         y = y.reshape(original_shape)
         return y
