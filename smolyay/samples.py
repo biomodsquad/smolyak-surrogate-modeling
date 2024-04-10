@@ -1,0 +1,142 @@
+import abc
+
+import numpy
+
+class UnidimensionalPointSet(abc.ABC):
+    """Set of unidimensional points
+    """
+
+    def __init__(self,natural_domain):
+        self._natural_domain = natural_domain
+        self._points = []
+        self._number_points = 0
+
+    @property
+    def natural_domain(self):
+        """list: Domain the sample points come from."""
+        return self._natural_domain
+    
+    @property
+    def points(self):
+        """list: Points stored by the set."""
+        return self._points
+
+    @property
+    def number_points(self):
+        """int: The number of points stored by the set."""
+        return self._number_points
+    
+    @number_points.setter
+    def number_points(self, value):
+        if not isinstance(value, int):
+            raise TypeError('Number must be integer greater than 0.')
+        if value <= 0:
+            raise ValueError('Number of points must be greater than 0')
+        if len(self._points) < value:
+            self._points = self._generate_points(value)
+        self._points = self._points[:value]
+        self._number_points = len(self._points)
+
+    @abc.abstractmethod
+    def _generate_points(self, num_points):
+        r"""Generating the points
+
+        An abstract method for generating the points stored by the point set.
+        Called when the number of points requested is larger than the number
+        of points available.
+
+        Parameters
+        ----------
+        x : int
+            The number of points to generate
+
+        Returns
+        -------
+        list
+            points stored by the set
+        """
+        pass
+
+
+class ClenshawCurtisPointSet(UnidimensionalPointSet):
+    r"""Set of unidimensional points for Clenshaw Curtis sampling
+
+    The :attr:`points` for this interpolation scheme are the extrema of the 
+    Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
+
+    .. math::
+
+        x_i^* = -\cos(\pi i/n), i = 0,...,n
+
+    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    """
+
+    def __init__(self):
+        super().__init__([-1, 1])
+
+    def _generate_points(self, num_points):
+        r"""Generating the points
+
+        Parameters
+        ----------
+        x : int
+            The number of points to generate
+
+        Returns
+        -------
+        list
+            Value of Chebyshev polynomial of the first kind.
+        """
+        print('here')
+        points = [0]
+        degree = 0
+        counter = 0
+        while len(points) < num_points:
+            counter = counter + 1
+            degree = 2**counter
+            new_points = -numpy.cos(numpy.pi * numpy.linspace(0, degree, degree + 1) / degree)
+            for p in new_points:
+                if not numpy.isclose(points, p,  rtol=0, atol=1e-11).any():
+                    points.append(p)
+        return points
+    
+class ChebyshevRoots(UnidimensionalPointSet):
+    r"""Set of unidimensional points from Chebyshev polynomial roots
+
+    The :attr:`points` for this interpolation scheme are the roots of the 
+    Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
+
+    .. math::
+
+        x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
+
+    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    """
+
+    def __init__(self):
+        super().__init__([-1, 1])
+
+    def _generate_points(self, num_points):
+        r"""Generating the points
+
+        Parameters
+        ----------
+        x : int
+            The number of points to generate
+
+        Returns
+        -------
+        list
+            Value of Chebyshev polynomial of the first kind.
+        """
+        points = [0]
+        degree = 0
+        counter = 0
+        while len(points) < num_points:
+            counter = counter + 1
+            degree = 2**(counter+1)-1
+            new_points = -numpy.cos(numpy.pi * numpy.linspace(1, degree, degree) / (degree + 1))
+            for p in new_points:
+                if not numpy.isclose(points, p,  rtol=0, atol=1e-11).any():
+                    points.append(p)
+        return points
