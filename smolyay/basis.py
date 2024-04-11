@@ -286,6 +286,98 @@ class ChebyshevSecondKind(BasisFunction):
             y = y.item()
         return y
 
+class Trigonometric(BasisFunction): 
+    r"""Trigonometric basis functions. 
+    
+    The Trigonometric polynomials represents periodic functions 
+    as sums of sine and cosine terms, where *n* is the order 
+    of trigonometric polynomial and is a non-negative integer.
+
+    .. math::
+
+        \phi_n(x) = \exp(2\pi i \sigma(n) x)
+    
+    The :attr:`sigma` for this polynomial is the frequency of the 
+    complex exponential. 
+
+
+    Parameters
+    ----------
+    n : int
+        Degree of trigonometric polynomial.
+        
+    """
+    def __init__(self, n):
+        super().__init__([0, 2*numpy.pi])
+        self._n = n
+    
+    @property
+    def n(self):
+        """int: Degree of trigonometric polynomial."""
+        return self._n
+
+    @property
+    def sigma(self):
+        """float: Frequency of the complex exponential."""
+        if self._n % 2 == 1: 
+            return (1+self._n)/2
+        else: 
+            return -self._n/2 
+        
+    def __call__(self, x):
+        r"""Evaluate the basis function.
+
+        The Trigonometric polynomial is evaluated using the following formula:
+
+        .. math::
+
+            \phi_n(x) = \exp(x i \sigma(n))
+
+        where *n* is the order of trigonometric polynomial and
+        is a non-negative integer, and `sigma` the frequency of the 
+        complex exponential
+
+        Parameters
+        ----------
+        x : float
+            One-dimensional point on :math:`[0, 2\pi]`.
+
+        Returns
+        -------
+        float
+            Value of Trigonometric polynomial.
+
+        Raises
+        ------
+        ValueError
+            If input is outside the domain `[0, 2\pi]`
+        """
+        if numpy.any(numpy.greater(x, 2*numpy.pi)) or numpy.any(numpy.less(x, 0)):
+            raise ValueError("Input is outside the domain [0, 2pi]")
+        return numpy.exp(x*self.sigma*1j)
+
+    def derivative(self, x): 
+        r"""Evaluate the derivetive of the trigonometric polynomials. 
+        
+        Parameters
+        ----------
+        x : float
+            One-dimensional point on :math:`[0, 2\pi]`.
+
+        Returns
+        -------
+        float
+            Value of the derivative of Trigonometric polynomial.
+
+        Raises
+        ------
+        ValueError
+            If input is outside the domain `[0, 2\pi]`
+        """
+        x=numpy.asarray(x)
+        if numpy.any(numpy.greater(x, 2*numpy.pi)) or numpy.any(numpy.less(x, 0)):
+            raise ValueError("Input is outside the domain [0, 2pi]")
+        return self.sigma*1j*numpy.exp(x*self.sigma*1j)
 
 class BasisFunctionSet:
     """Set of basis functions and sample points.
