@@ -4,6 +4,22 @@ import numpy
 
 class UnidimensionalPointSet(abc.ABC):
     """Set of unidimensional points
+
+    A set of unique unidimensional points to be used as the sampling points
+    in a tensor product grid or sparse grid. These unidimensional points are
+    associated with certain polynomial families, and the combination of 
+    unique points and polynomial families are the basis for different types
+    of quadrature rules that are used in numerical integration and in 
+    approximation.
+    The natural domain of the points specified by :param:``natural_domain`` is
+    the domain in which all the possible points in the set lies within.
+    ``number_points`` is the number of points that the UnidimensionalPointSet
+    is expected to store.
+    
+    Parameters
+    ----------
+    natural_domain : list of two numbers
+        the natural domain of the function within which calls are made.
     """
 
     def __init__(self,natural_domain):

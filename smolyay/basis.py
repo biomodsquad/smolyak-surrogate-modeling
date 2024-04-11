@@ -7,13 +7,17 @@ import scipy.special
 class BasisFunction(abc.ABC):
     """Basis function for interpolating data.
 
-    A one-dimensional basis function is defined on the domain
-    :math:`[-1,1]`. The function defines the :attr:`points` at
-    which it should be sampled within this interval for interpolation.
-    The function also has an associated :meth:`__call__` method
-    for evaluating it at a point within its domain. Moreover,
-    the first derivative of the function can be evaluated via
-    :meth:`derivative`.
+    A one-dimensional basis function is defined on some given natural 
+    domain. The function defines the :attr:`points` at which it should 
+    be sampled within this interval for interpolation. The function also 
+    has an associated :meth:`__call__` method for evaluating it at a 
+    point within its domain. Moreover, the first derivative of the function 
+    can be evaluated via :meth:`derivative`.
+
+    Parameters
+    ----------
+    natural_domain : list of two numbers
+        the natural domain of the function within which calls are made.
     """
 
     def __init__(self, natural_domain):
@@ -87,14 +91,9 @@ class ChebyshevFirstKind(BasisFunction):
         T_1(x) = x
         T_{n+1}(x) = 2x T_n(x) - T_{n-1}(x)
 
-    The :attr:`points` for this polynomial are the extrema on the domain
-    :math:`[-1,1]`:
-
-    .. math::
-
-        x_i^* = -\cos(\pi i/n), i = 0,...,n
-
-    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    The Chebyshev polynomials form an orthonormal basis on the domain 
+    :math:`[-1,1]`, and thus that is their natural domain when used as a basis
+    function. 
 
     Parameters
     ----------
@@ -184,14 +183,9 @@ class ChebyshevSecondKind(BasisFunction):
         U_1(x) = 2x
         U_{n+1}(x) = 2x U_n(x) - U_{n-1}(x)
 
-    The :attr:`points` for this polynomial are the zeros on the domain
-    :math:`[-1,1]`:
-
-    .. math::
-
-        x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
-
-    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    The Chebyshev polynomials form an orthonormal basis on the domain 
+    :math:`[-1,1]`, and thus that is their natural domain when used as a basis
+    function. 
 
     Parameters
     ----------
@@ -202,11 +196,6 @@ class ChebyshevSecondKind(BasisFunction):
     def __init__(self, n):
         super().__init__([-1, 1])
         self._n = n
-
-    @property
-    def points(self):
-        """list: Sampling points at extrema of polynomial."""
-        return self._points
 
     @property
     def n(self):
