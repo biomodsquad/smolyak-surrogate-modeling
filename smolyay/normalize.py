@@ -4,7 +4,7 @@ import numpy
 import sklearn
 
 
-class Normalizer(abc.ABC, sklearn.base.TransformerMixin, sklearn.base.BaseEstimator):
+class Normalizer(abc.ABC):
     r"""A transformation on the training data of a surrogate
 
     Prior to training a surrogate model, a transformation can be applied
@@ -72,6 +72,20 @@ class Normalizer(abc.ABC, sklearn.base.TransformerMixin, sklearn.base.BaseEstima
         normalized data
         """
         pass
+
+    def fit_transform(self, x):
+        """Fit the data and then normalize it
+
+        Parameters
+        ----------
+        x : numerical data
+            data to be transformed
+
+        Return
+        ------
+        normalized data
+        """
+        return self.fit(x).transform(x)
 
     @abc.abstractmethod
     def inverse_transform(self, x):
