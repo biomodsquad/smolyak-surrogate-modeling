@@ -23,15 +23,15 @@ class UnidimensionalPointSet(abc.ABC):
         the natural domain of the function within which calls are made.
     """
 
-    def __init__(self, natural_domain):
-        self._natural_domain = natural_domain
+    def __init__(self):
         self._points = []
         self._number_points = 0
 
     @property
+    @abc.abstractmethod
     def domain(self):
         """list: Domain the sample points come from."""
-        return self._natural_domain
+        pass
 
     @property
     def points(self):
@@ -89,7 +89,12 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
     """
 
     def __init__(self):
-        super().__init__([-1, 1])
+        super().__init__()
+
+    @property
+    def domain(self):
+        """list: Domain the sample points come from."""
+        return [-1, 1]
 
     def _generate_points(self, num_points):
         r"""Generating the points
@@ -120,50 +125,6 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         return points
 
 
-class ChebyshevRoots(UnidimensionalPointSet):
-    r"""Set of unidimensional points from Chebyshev polynomial roots
-
-    The :attr:`points` for this interpolation scheme are the roots of the
-    Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
-
-    .. math::
-
-        x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
-
-    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
-    """
-
-    def __init__(self):
-        super().__init__([-1, 1])
-
-    def _generate_points(self, num_points):
-        r"""Generating the points
-
-        Parameters
-        ----------
-        x : int
-            The number of points to generate
-
-        Returns
-        -------
-        list
-            Value of Chebyshev polynomial of the first kind.
-        """
-        points = [0]
-        degree = 0
-        counter = 0
-        while len(points) < num_points:
-            counter = counter + 1
-            degree = 2 ** (counter + 1) - 1
-            new_points = -numpy.cos(
-                numpy.pi * numpy.linspace(1, degree, degree) / (degree + 1)
-            )
-            for p in new_points:
-                if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
-                    points.append(p)
-        return points
-
-
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
 
@@ -176,7 +137,12 @@ class TrigonometricPointSet(UnidimensionalPointSet):
     """
 
     def __init__(self):
-        super().__init__([0, 2 * numpy.pi])
+        super().__init__()
+
+    @property
+    def domain(self):
+        """list: Domain the sample points come from."""
+        return [0, 2 * numpy.pi]
 
     def _generate_points(self, num_points):
         r"""Generating the points
