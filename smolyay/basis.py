@@ -61,7 +61,7 @@ class BasisFunction(abc.ABC):
         """
         pass
 
-    def outside_domain(self, x):
+    def check_in_domain(self, x):
         """Check if the input is within the natural domain.
 
         Parameters
