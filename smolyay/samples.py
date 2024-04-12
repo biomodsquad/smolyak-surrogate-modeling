@@ -29,7 +29,7 @@ class UnidimensionalPointSet(abc.ABC):
         self._number_points = 0
 
     @property
-    def natural_domain(self):
+    def domain(self):
         """list: Domain the sample points come from."""
         return self._natural_domain
 
