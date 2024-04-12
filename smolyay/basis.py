@@ -166,7 +166,7 @@ class ChebyshevFirstKind(BasisFunction):
         """
         if self.outside_domain(x):
             raise ValueError("Input is outside the domain [-1, 1]")
-        return self.n * scipy.special.eval_chebyu(self._n - 1, x)
+        return self.n * scipy.special.eval_chebyu(self.n - 1, x)
 
 
 class ChebyshevSecondKind(BasisFunction):
