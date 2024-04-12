@@ -91,9 +91,7 @@ class ChebyshevFirstKind(BasisFunction):
         T_1(x) = x
         T_{n+1}(x) = 2x T_n(x) - T_{n-1}(x)
 
-    The Chebyshev polynomials form an orthonormal basis on the domain 
-    :math:`[-1,1]`, and thus that is their natural domain when used as a basis
-    function. 
+    Their domain is defined to be :math:`-1 \le x \le 1`.
 
     Parameters
     ----------
