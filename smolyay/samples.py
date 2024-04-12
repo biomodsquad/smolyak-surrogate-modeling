@@ -1,5 +1,5 @@
 import abc
-
+import sys
 import numpy
 
 
@@ -109,19 +109,19 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         list
             Value of Chebyshev polynomial of the first kind.
         """
-        print("here")
         points = [0]
         degree = 0
         counter = 0
         while len(points) < num_points:
             counter = counter + 1
             degree = 2**counter
-            new_points = -numpy.cos(
-                numpy.pi * numpy.linspace(0, degree, degree + 1) / degree
-            )
-            for p in new_points:
-                if not numpy.isclose(points, p, rtol=0, atol=1e-11).any():
-                    points.append(p)
+            if counter == 1:
+                indexes = numpy.linspace(0, degree, 2, dtype=int)
+            else:
+                indexes = numpy.linspace(1, degree - 1, degree - 1, dtype=int)
+                indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+            new_points = list(-numpy.cos(numpy.pi * indexes / degree))
+            points.extend(new_points)
         return points
 
 
