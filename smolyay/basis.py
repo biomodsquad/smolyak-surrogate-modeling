@@ -74,8 +74,8 @@ class BasisFunction(abc.ABC):
         bool
             True if input was outside domain, False otherwise
         """
-        return numpy.any(numpy.greater(x, self.natural_domain[1])) or numpy.any(
-            numpy.less(x, self.natural_domain[0])
+        return numpy.logical_and(numpy.greater_equal(x, self.domain[0]),
+            numpy.less_equal(x, self.domain[1]))
         )
 
 
