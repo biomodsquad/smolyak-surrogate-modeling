@@ -7,30 +7,73 @@ import scipy.special
 class BasisFunction(abc.ABC):
     """Basis function for interpolating data.
 
-    A one-dimensional basis function is defined on some given natural 
-    domain. The function defines the :attr:`points` at which it should 
-    be sampled within this interval for interpolation. The function also 
-    has an associated :meth:`__call__` method for evaluating it at a 
-    point within its domain. Moreover, the first derivative of the function 
+    A one-dimensional basis function is defined on some given natural
+    domain. The function defines the :attr:`points` at which it should
+    be sampled within this interval for interpolation. The function also
+    has an associated :meth:`__call__` method for evaluating it at a
+    point within its domain. Moreover, the first derivative of the function
     can be evaluated via :meth:`derivative`.
-
-    Parameters
-    ----------
-    natural_domain : list of two numbers
-        the natural domain of the function within which calls are made.
     """
 
-    def __init__(self, natural_domain):
-        self._points = []
-        self._natural_domain = natural_domain
-
     @property
-    def natural_domain(self):
+    @abc.abstractmethod
+    def domain(self):
         """list: Domain the sample points come from."""
-        return self._natural_domain
+        pass
+
+    def __call__(self, x):
+        """Evaluate the basis function.
+
+        Parameters
+        ----------
+        x : float
+            One-dimensional point.
+
+        Returns
+        -------
+        float
+            Value of basis function.
+        """
+        if not numpy.all(self.check_in_domain(x)):
+            raise ValueError("Input is outside the domain " + str(self.domain))
+        return self._function(x)
+
+    def derivative(self, x):
+        """Evaluate the first derivative of the basis function.
+
+        Parameters
+        ----------
+        x : float
+            one-dimensional point.
+
+        Returns
+        -------
+        float
+            Value of the derivative of the basis function.
+        """
+        if not numpy.all(self.check_in_domain(x)):
+            raise ValueError("Input is outside the domain")
+        return self._derivative(x)
+
+    def check_in_domain(self, x):
+        """Check if the input is within the natural domain.
+
+        Parameters
+        ----------
+        x : float, numpy:ndarray
+            One-dimensional points.
+
+        Returns
+        -------
+        bool
+            True if input was outside domain, False otherwise
+        """
+        return numpy.logical_and(
+            numpy.greater_equal(x, self.domain[0]), numpy.less_equal(x, self.domain[1])
+        )
 
     @abc.abstractmethod
-    def __call__(self, x):
+    def _function(self, x):
         """Evaluate the basis function.
 
         Parameters
@@ -46,7 +89,7 @@ class BasisFunction(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def derivative(self, x):
+    def _derivative(self, x):
         """Evaluate the first derivative of the basis function.
 
         Parameters
@@ -60,23 +103,6 @@ class BasisFunction(abc.ABC):
             Value of the derivative of the basis function.
         """
         pass
-
-    def check_in_domain(self, x):
-        """Check if the input is within the natural domain.
-
-        Parameters
-        ----------
-        x : float, numpy:ndarray
-            One-dimensional points.
-
-        Returns
-        -------
-        bool
-            True if input was outside domain, False otherwise
-        """
-        return numpy.logical_and(numpy.greater_equal(x, self.domain[0]),
-            numpy.less_equal(x, self.domain[1]))
-        )
 
 
 class ChebyshevFirstKind(BasisFunction):
@@ -100,15 +126,20 @@ class ChebyshevFirstKind(BasisFunction):
     """
 
     def __init__(self, n):
-        super().__init__([-1, 1])
+        super().__init__()
         self._n = n
+
+    @property
+    def domain(self):
+        """list: Domain the sample points come from."""
+        return [-1, 1]
 
     @property
     def n(self):
         """int: Degree of polynomial."""
         return self._n
 
-    def __call__(self, x):
+    def _function(self, x):
         r"""Evaluate the basis function.
 
         The Chebyshev polynomial is evaluated using the combinatorial formula:
@@ -135,11 +166,9 @@ class ChebyshevFirstKind(BasisFunction):
             if input is outside the domain [-1, 1]
 
         """
-        if not numpy.all(self.check_in_domain(x)):
-            raise ValueError("Input is outside the domain [-1, 1]")
-        return scipy.special.eval_chebyt(self._n, x)
+        return scipy.special.eval_chebyt(self.n, x)
 
-    def derivative(self, x):
+    def _derivative(self, x):
         """Evaluate the derivative of ChebyshevFirstKind.
 
         The first derivative of Chebyshev polynomials of first kind is
@@ -164,8 +193,6 @@ class ChebyshevFirstKind(BasisFunction):
         ValueError
             if input is outside the domain [-1, 1].
         """
-        if self.outside_domain(x):
-            raise ValueError("Input is outside the domain [-1, 1]")
         return self.n * scipy.special.eval_chebyu(self.n - 1, x)
 
 
@@ -181,9 +208,7 @@ class ChebyshevSecondKind(BasisFunction):
         U_1(x) = 2x
         U_{n+1}(x) = 2x U_n(x) - U_{n-1}(x)
 
-    The Chebyshev polynomials form an orthonormal basis on the domain 
-    :math:`[-1,1]`, and thus that is their natural domain when used as a basis
-    function. 
+    Their domain is defined to be :math:`-1 \le x \le 1`.
 
     Parameters
     ----------
@@ -192,15 +217,20 @@ class ChebyshevSecondKind(BasisFunction):
     """
 
     def __init__(self, n):
-        super().__init__([-1, 1])
+        super().__init__()
         self._n = n
+
+    @property
+    def domain(self):
+        """list: Domain the sample points come from."""
+        return [-1, 1]
 
     @property
     def n(self):
         """int: Degree of polynomial"""
         return self._n
 
-    def __call__(self, x):
+    def _function(self, x):
         r"""Evaluate the basis function.
 
         The Chebyshev polynomial is evaluated using the combinatorial formula:
@@ -232,11 +262,9 @@ class ChebyshevSecondKind(BasisFunction):
             if input is outside the domain [-1, 1]
 
         """
-        if self.outside_domain(x):
-            raise ValueError("Input is outside the domain [-1, 1]")
-        return scipy.special.eval_chebyu(self._n, x)
+        return scipy.special.eval_chebyu(self.n, x)
 
-    def derivative(self, x):
+    def _derivative(self, x):
         r"""Evaluate the derivative of Chebyshev Second Kind.
 
         The first derivative of Chebyshev polynomials of second kind is
@@ -267,48 +295,57 @@ class ChebyshevSecondKind(BasisFunction):
         ValueError
             if input is outside the domain [-1, 1].
         """
-        if self.outside_domain(x):
-            raise ValueError("Input is outside the domain [-1, 1]")
         x = numpy.asarray(x)
         y = numpy.zeros(x.shape)
-        flag2 = x == 1
-        flag3 = x == -1
-        flag1 = ~(flag2 | flag3)
+        flag2 = numpy.abs(x) == 1
+        flag1 = ~(flag2)
         y[flag1] = (
-            (self._n + 1) * scipy.special.eval_chebyt(self._n + 1, x[flag1])
+            (self.n + 1) * scipy.special.eval_chebyt(self.n + 1, x[flag1])
             - x[flag1] * self(x[flag1])
         ) / (x[flag1] ** 2 - 1)
-        y[flag2] = self._n * (self._n + 1) * (self._n + 2) / 3
-        y[flag3] = ((-1) ** (self._n + 1)) * self._n * (self._n + 1) * (self._n + 2) / 3
+        y[flag2] = (
+            (numpy.sign(x[flag2]) ** (self.n + 1))
+            * self.n
+            * (self.n + 1)
+            * (self.n + 2)
+            / 3
+        )
         if y.ndim == 0:
             y = y.item()
         return y
 
-class Trigonometric(BasisFunction): 
-    r"""Trigonometric basis functions. 
-    
-    The Trigonometric polynomials represents periodic functions 
-    as sums of sine and cosine terms, where *n* is the order 
+
+class Trigonometric(BasisFunction):
+    r"""Trigonometric basis functions.
+
+    The Trigonometric polynomials represents periodic functions
+    as sums of sine and cosine terms, where *n* is the order
     of trigonometric polynomial and is a non-negative integer.
 
     .. math::
 
         \phi_n(x) = \exp(2\pi i \sigma(n) x)
-    
-    The :attr:`sigma` for this polynomial is the frequency of the 
-    complex exponential. 
+
+    The :attr:`sigma` for this polynomial is the frequency of the
+    complex exponential.
 
 
     Parameters
     ----------
     n : int
         Degree of trigonometric polynomial.
-        
+
     """
+
     def __init__(self, n):
-        super().__init__([0, 2*numpy.pi])
+        super().__init__()
         self._n = n
-    
+
+    @property
+    def domain(self):
+        """list: Domain the sample points come from."""
+        return [0, 2 * numpy.pi]
+
     @property
     def n(self):
         """int: Degree of trigonometric polynomial."""
@@ -317,12 +354,12 @@ class Trigonometric(BasisFunction):
     @property
     def sigma(self):
         """float: Frequency of the complex exponential."""
-        if self._n % 2 == 1: 
-            return (1+self._n)/2
-        else: 
-            return -self._n/2 
-        
-    def __call__(self, x):
+        if self.n % 2 == 1:
+            return (1 + self.n) / 2
+        else:
+            return -self.n / 2
+
+    def _function(self, x):
         r"""Evaluate the basis function.
 
         The Trigonometric polynomial is evaluated using the following formula:
@@ -332,7 +369,7 @@ class Trigonometric(BasisFunction):
             \phi_n(x) = \exp(x i \sigma(n))
 
         where *n* is the order of trigonometric polynomial and
-        is a non-negative integer, and `sigma` the frequency of the 
+        is a non-negative integer, and `sigma` the frequency of the
         complex exponential
 
         Parameters
@@ -350,13 +387,11 @@ class Trigonometric(BasisFunction):
         ValueError
             If input is outside the domain `[0, 2\pi]`
         """
-        if numpy.any(numpy.greater(x, 2*numpy.pi)) or numpy.any(numpy.less(x, 0)):
-            raise ValueError("Input is outside the domain [0, 2pi]")
-        return numpy.exp(x*self.sigma*1j)
+        return numpy.exp(x * self.sigma * 1j)
 
-    def derivative(self, x): 
-        r"""Evaluate the derivetive of the trigonometric polynomials. 
-        
+    def _derivative(self, x):
+        r"""Evaluate the derivetive of the trigonometric polynomials.
+
         Parameters
         ----------
         x : float
@@ -372,10 +407,9 @@ class Trigonometric(BasisFunction):
         ValueError
             If input is outside the domain `[0, 2\pi]`
         """
-        x=numpy.asarray(x)
-        if numpy.any(numpy.greater(x, 2*numpy.pi)) or numpy.any(numpy.less(x, 0)):
-            raise ValueError("Input is outside the domain [0, 2pi]")
-        return self.sigma*1j*numpy.exp(x*self.sigma*1j)
+        x = numpy.asarray(x)
+        return self.sigma * 1j * numpy.exp(x * self.sigma * 1j)
+
 
 class BasisFunctionSet:
     """Set of basis functions and sample points.
