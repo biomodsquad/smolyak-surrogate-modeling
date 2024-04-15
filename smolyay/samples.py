@@ -186,6 +186,5 @@ class TrigonometricPointSet(UnidimensionalPointSet):
                 if not numpy.isclose(points, point).any():
                     points.append(point)
             counter += 1
-        print(points)
         self._points = points[:num_points]
         return self
