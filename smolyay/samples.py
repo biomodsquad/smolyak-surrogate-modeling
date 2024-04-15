@@ -21,7 +21,6 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __init__(self):
         self._points = []
-        self._number_points = 0
 
     @property
     @abc.abstractmethod
@@ -34,24 +33,8 @@ class UnidimensionalPointSet(abc.ABC):
         """list: Points stored by the set."""
         return self._points
 
-    @property
-    def number_points(self):
-        """int: The number of points stored by the set."""
-        return self._number_points
-
-    @number_points.setter
-    def number_points(self, value):
-        if not isinstance(value, int):
-            raise TypeError("Number must be integer greater than 0.")
-        if value <= 0:
-            raise ValueError("Number of points must be greater than 0")
-        if len(self._points) < value:
-            self._points = self._generate_points(value)
-        self._points = self._points[:value]
-        self._number_points = len(self._points)
-
     @abc.abstractmethod
-    def _generate_points(self, num_points):
+    def generate_points(self, num_points):
         r"""Generating the points
 
         An abstract method for generating the points stored by the point set.
@@ -65,8 +48,8 @@ class UnidimensionalPointSet(abc.ABC):
 
         Returns
         -------
-        list
-            points stored by the set
+        self
+            The UnidimensionalPointSet
         """
         pass
 
@@ -92,21 +75,8 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         """list: Domain the sample points come from."""
         return [-1, 1]
 
-    @property
-    def number_points(self):
-        """int: The number of points stored by the set."""
-        return self._number_points
 
-    @number_points.setter
-    def number_points(self, value):
-        if not isinstance(value, int):
-            raise TypeError("Number must be integer greater than 0.")
-        if value <= 0:
-            raise ValueError("Number of points must be greater than 0")
-        self._points = self._generate_points(value)
-        self._number_points = len(self._points)
-
-    def _generate_points(self, num_points):
+    def generate_points(self, num_points):
         r"""Generating the points
 
         Parameters
@@ -116,18 +86,19 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
         Returns
         -------
-        list
-            Value of Chebyshev polynomial of the first kind.
+        self
+            The UnidimensionalPointSet
         """
         if num_points == 0:
-            return []
+            self._points = []
         degree = num_points - 1
         if degree > 0:
-            return list(
+            self._points = list(
                 -numpy.cos(numpy.pi * numpy.linspace(0, degree, degree + 1) / degree)
             )
         else:
-            return [0]
+            self._points = [0]
+        return self
         
         
 
@@ -144,7 +115,7 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
     """
     
-    def _generate_points(self, num_points):
+    def generate_points(self, num_points):
         r"""Generating the points
 
         Parameters
@@ -154,8 +125,8 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
 
         Returns
         -------
-        list
-            Value of Chebyshev polynomial of the first kind.
+        self
+            The UnidimensionalPointSet
         """
         points = [0]
         degree = 0
@@ -170,7 +141,8 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
-        return points
+        self._points = points[:num_points]
+        return self
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
@@ -191,7 +163,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         """list: Domain the sample points come from."""
         return [0, 2 * numpy.pi]
 
-    def _generate_points(self, num_points):
+    def generate_points(self, num_points):
         r"""Generating the points
 
         Parameters
@@ -201,8 +173,8 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         Returns
         -------
-        list
-            Value of Chebyshev polynomial of the first kind.
+        self
+            The UnidimensionalPointSet
         """
         points = []
         degree = 0
@@ -214,4 +186,6 @@ class TrigonometricPointSet(UnidimensionalPointSet):
                 if not numpy.isclose(points, point).any():
                     points.append(point)
             counter += 1
-        return points
+        print(points)
+        self._points = points[:num_points]
+        return self
