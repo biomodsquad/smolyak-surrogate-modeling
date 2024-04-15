@@ -75,7 +75,6 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         """list: Domain the sample points come from."""
         return [-1, 1]
 
-
     def generate_points(self, num_points):
         r"""Generating the points
 
@@ -99,12 +98,11 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         else:
             self._points = [0]
         return self
-        
-        
+
 
 class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
     r"""Generate nested Clenshaw Curtis points in accordance with a growth rule
-    
+
     The :attr:`points` for this interpolation scheme are the extrema of the
     Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
 
@@ -113,8 +111,26 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
         x_i^* = -\cos(\pi i/n), i = 0,...,n
 
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+
+    The nested Clenshaw Curtis points come from the nested extrema of the
+    Chebyshev polynomials of the first kind :math:0, 2, 2^{k} where k is an
+    integer.
+
+    These extrema are symmetric about 0. When generating levels of points, each
+    level with contain a certain number of symmetric pairs except the first which
+    also includes 0. The number of points assigned to each level can vary.
+    The default, exponential growth adds points such that the new extrema
+    calculated from a Chebyshev polynomial 2^{k} is given its own level k-1.
+    Alternative growth rules may delay the addition of new extrema and have
+    intermediary empty levels, but the general order that points are added to
+    levels remains the same.
+
+    This class will generate the nested extrema in the order that corresponds
+    to the exponential growth. For increasing k, the unique extrema of Chebyshev
+    polynomial with degree 2^{k - 1} will be added followed by the extrema of the
+    polynomial with degree 2^{k} , then 2^{k + 1} , then 2^{k + 2} and so on.
     """
-    
+
     def generate_points(self, num_points):
         r"""Generating the points
 
@@ -143,6 +159,7 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
             points.extend(new_points)
         self._points = points[:num_points]
         return self
+
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
