@@ -4,7 +4,7 @@ import numpy
 
 from smolyay.samples import (
     UnidimensionalPointSet,
-    ClenshawCurtisPointSet,
+    ClenshawCurtisPointSet,NestedClenshawCurtisPointSet,
     TrigonometricPointSet,
 )
 
@@ -46,7 +46,6 @@ def trig_num9():
         )
     )
 
-
 def test_clenshaw_initial():
     """test default properties"""
     f = ClenshawCurtisPointSet()
@@ -59,7 +58,7 @@ def test_clenshaw_num3():
     """test number of points is changed to 3"""
     f = ClenshawCurtisPointSet()
     f.number_points = 3
-    assert numpy.allclose(f.points, [0, -1, 1], atol=1e-10)
+    assert numpy.allclose(f.points, [-1, 0, 1], atol=1e-10)
     assert f.number_points == 3
 
 
@@ -67,23 +66,65 @@ def test_clenshaw_num_increased(clenshaw_curtis_num9):
     """test number of points is increased"""
     f = ClenshawCurtisPointSet()
     f.number_points = 3
-    f.number_points = 9
-    assert numpy.allclose(f.points, clenshaw_curtis_num9, atol=1e-10)
-    assert f.number_points == 9
+    f.number_points = 4
+    assert numpy.allclose(f.points, [-1, -0.5, 0.5, 1], atol=1e-10)
+    assert f.number_points == 4
 
 
 def test_clenshaw_num_decreased(clenshaw_curtis_num9):
     """test number of points is decreased"""
     f = ClenshawCurtisPointSet()
+    f.number_points = 5
+    f.number_points = 2
+    assert numpy.allclose(f.points, [-1, 1], atol=1e-10)
+    assert f.number_points == 2
+
+
+def test_clenshaw_num_error():
+    """test number of points is invalid"""
+    f = ClenshawCurtisPointSet()
+    with pytest.raises(TypeError):
+        f.number_points = "Not a number"
+    with pytest.raises(ValueError):
+        f.number_points = -1
+
+def test_nestedclenshaw_initial():
+    """test default properties"""
+    f = ClenshawCurtisPointSet()
+    assert f.domain == [-1, 1]
+    assert f.points == []
+    assert f.number_points == 0
+
+
+def test_nestedclenshaw_num3():
+    """test number of points is changed to 3"""
+    f = NestedClenshawCurtisPointSet()
+    f.number_points = 3
+    assert numpy.allclose(f.points, [0, -1, 1], atol=1e-10)
+    assert f.number_points == 3
+
+
+def test_nestedclenshaw_num_increased(clenshaw_curtis_num9):
+    """test number of points is increased"""
+    f = NestedClenshawCurtisPointSet()
+    f.number_points = 3
+    f.number_points = 9
+    assert numpy.allclose(f.points, clenshaw_curtis_num9, atol=1e-10)
+    assert f.number_points == 9
+
+
+def test_nestedclenshaw_num_decreased(clenshaw_curtis_num9):
+    """test number of points is decreased"""
+    f = NestedClenshawCurtisPointSet()
     f.number_points = 16
     f.number_points = 9
     assert numpy.allclose(f.points, clenshaw_curtis_num9, atol=1e-10)
     assert f.number_points == 9
 
 
-def test_clenshaw_num_error():
+def test_nestedclenshaw_num_error():
     """test number of points is invalid"""
-    f = ClenshawCurtisPointSet()
+    f = NestedClenshawCurtisPointSet()
     with pytest.raises(TypeError):
         f.number_points = "Not a number"
     with pytest.raises(ValueError):
