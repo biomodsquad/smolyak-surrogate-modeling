@@ -287,19 +287,18 @@ class ChebyshevSecondKind(BasisFunction):
         """
         x = numpy.asarray(x)
         y = numpy.zeros(x.shape)
-        flag2 = numpy.abs(x) == 1
-        flag1 = ~(flag2)
-        y[flag1] = (
-            (self.n + 1) * scipy.special.eval_chebyt(self.n + 1, x[flag1])
-            - x[flag1] * self(x[flag1])
-        ) / (x[flag1] ** 2 - 1)
-        y[flag2] = (
-            (numpy.sign(x[flag2]) ** (self.n + 1))
-            * self.n
-            * (self.n + 1)
-            * (self.n + 2)
-            / 3
-        )
+        u_limit = self.n * (self.n + 1) * (self.n + 2) / 3
+        flag_upper = x == 1
+        y[flag_upper] = u_limit
+        
+        flag_lower = x == -1
+        y[flag_lower] = (-1) ** (self.n+1) * u_limit
+
+        flag = ~(flag_upper | flag_lower)
+        y[flag] = (
+            (self.n + 1) * scipy.special.eval_chebyt(self.n + 1, x[flag])
+            - x[flag] * scipy.special.eval_chebyu(self.n, x[flag])
+        ) / (x[flag] ** 2 - 1)
         if y.ndim == 0:
             y = y.item()
         return y
