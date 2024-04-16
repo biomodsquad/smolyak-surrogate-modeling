@@ -55,7 +55,7 @@ class BasisFunction(abc.ABC):
             raise ValueError("Input is outside the domain")
         return self._derivative(x)
 
-    def check_in_domain(self, x):
+    def in_domain(self, x):
         """Check if the input is within the natural domain.
 
         Parameters
