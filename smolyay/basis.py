@@ -18,7 +18,7 @@ class BasisFunction(abc.ABC):
     @property
     @abc.abstractmethod
     def domain(self):
-        """list: Domain the sample points come from."""
+        """numpy.ndarray: Domain the sample points come from."""
         pass
 
     def __call__(self, x):
