@@ -77,7 +77,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         """list: Domain the sample points come from."""
         return [-1, 1]
 
-    def generate_points(self, num_points):
+    def _create_points(self):
         r"""Generating the points
 
         Parameters
