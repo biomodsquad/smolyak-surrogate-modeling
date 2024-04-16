@@ -20,7 +20,7 @@ class UnidimensionalPointSet(abc.ABC):
     """
 
     def __init__(self):
-        self._points = []
+        self._points = None
 
     @property
     @abc.abstractmethod
