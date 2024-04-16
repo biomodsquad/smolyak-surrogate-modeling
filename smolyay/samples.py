@@ -69,7 +69,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
     """
 
-    def __init__(self):
+    def __init__(self, degree):
         super().__init__()
 
     @property
