@@ -34,7 +34,7 @@ class UnidimensionalPointSet(abc.ABC):
         return self._points
 
     @abc.abstractmethod
-    def generate_points(self, num_points):
+    def _create_points(self):
         r"""Generating the points
 
         An abstract method for generating the points stored by the point set.
