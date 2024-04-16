@@ -90,15 +90,11 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         self
             The UnidimensionalPointSet
         """
-        if num_points == 0:
-            self._points = []
-        degree = num_points - 1
-        if degree > 0:
-            self._points = list(
-                -numpy.cos(numpy.pi * numpy.linspace(0, degree, degree + 1) / degree)
-            )
+        if self.degree > 0:
+            points = -numpy.cos(numpy.pi * numpy.linspace(0, self.degree, self.degree + 1) / degree)
         else:
-            self._points = [0]
+            points = numpy.zeros(1)
+        return points
         return self
 
 
