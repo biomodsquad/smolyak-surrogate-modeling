@@ -31,6 +31,8 @@ class UnidimensionalPointSet(abc.ABC):
     @property
     def points(self):
         """list: Points stored by the set."""
+        if not self._points:
+            self._points = self._create_points()
         return self._points
 
     @abc.abstractmethod
