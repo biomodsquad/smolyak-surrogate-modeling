@@ -34,7 +34,7 @@ class BasisFunction(abc.ABC):
         float
             Value of basis function.
         """
-        if not numpy.all(self.check_in_domain(x)):
+        if not numpy.all(self.in_domain(x)):
             raise ValueError("Input is outside the domain " + str(self.domain))
         return self._function(x)
 
@@ -51,7 +51,7 @@ class BasisFunction(abc.ABC):
         float
             Value of the derivative of the basis function.
         """
-        if not numpy.all(self.check_in_domain(x)):
+        if not numpy.all(self.in_domain(x)):
             raise ValueError("Input is outside the domain")
         return self._derivative(x)
 
@@ -131,8 +131,8 @@ class ChebyshevFirstKind(BasisFunction):
 
     @property
     def domain(self):
-        """list: Domain the sample points come from."""
-        return np.array([-1, 1])
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([-1, 1])
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -217,8 +217,8 @@ class ChebyshevSecondKind(BasisFunction):
 
     @property
     def domain(self):
-        """list: Domain the sample points come from."""
-        return [-1, 1]
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([-1, 1])
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -332,8 +332,8 @@ class Trigonometric(BasisFunction):
 
     @property
     def domain(self):
-        """list: Domain the sample points come from."""
-        return [0, 2 * numpy.pi]
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([0, 2 * numpy.pi])
 
     @property
     def sigma(self):
@@ -371,6 +371,7 @@ class Trigonometric(BasisFunction):
         ValueError
             If input is outside the domain `[0, 2\pi]`
         """
+        x = numpy.asarray(x)
         return numpy.exp(x * self.sigma * 1j)
 
     def _derivative(self, x):

@@ -16,7 +16,7 @@ def test_cheb_initial():
     """test degrees returns correctly"""
     f2 = ChebyshevFirstKind(2)
     assert f2.n == 2
-    assert f2.domain == [-1, 1]
+    assert numpy.array_equal(f2.domain,[-1, 1])
 
 
 def test_cheb_call_degree_0_1():
@@ -114,7 +114,7 @@ def test_cheb_2nd_initial():
     """test degrees returns correctly"""
     f2 = ChebyshevSecondKind(2)
     assert f2.n == 2
-    assert f2.domain == [-1, 1]
+    assert numpy.array_equal(f2.domain,[-1, 1])
 
 
 def test_cheb_2nd_call_degree_0_1():
@@ -174,7 +174,7 @@ def test_trig_initial():
     """test degrees returns correctly"""
     f2 = Trigonometric(2)
     assert f2.n == 2
-    assert f2.domain == [0, 2 * numpy.pi]
+    assert numpy.array_equal(f2.domain,[0, 2 * numpy.pi])
 
 
 def test_trig_call():
