@@ -71,11 +71,12 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
     def __init__(self, degree):
         super().__init__()
+        self.degree = degree
 
     @property
     def domain(self):
-        """list: Domain the sample points come from."""
-        return [-1, 1]
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([-1, 1])
 
     def _create_points(self):
         r"""Generating the points
@@ -91,14 +92,13 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
             The UnidimensionalPointSet
         """
         if self.degree > 0:
-            points = -numpy.cos(numpy.pi * numpy.linspace(0, self.degree, self.degree + 1) / degree)
+            points = -numpy.cos(numpy.pi * numpy.linspace(0, self.degree, self.degree + 1) / self.degree)
         else:
             points = numpy.zeros(1)
         return points
-        return self
 
 
-class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
+class NestedClenshawCurtisPointSet(UnidimensionalPointSet):
     r"""Generate nested Clenshaw Curtis points in accordance with a growth rule
 
     The :attr:`points` for this interpolation scheme are the extrema of the
@@ -128,8 +128,16 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
     polynomial with degree 2^{k - 1} will be added followed by the extrema of the
     polynomial with degree 2^{k} , then 2^{k + 1} , then 2^{k + 2} and so on.
     """
+    def __init__(self, max_level):
+        super().__init__()
+        self.max_level = max_level
 
-    def generate_points(self, num_points):
+    @property
+    def domain(self):
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([-1, 1])
+    
+    def _create_points(self):
         r"""Generating the points
 
         Parameters
@@ -145,7 +153,7 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
         points = [0]
         degree = 0
         counter = 0
-        while len(points) < num_points:
+        for i in range(1,self.max_level+1):
             counter = counter + 1
             degree = 2**counter
             if counter == 1:
@@ -155,9 +163,7 @@ class NestedClenshawCurtisPointSet(ClenshawCurtisPointSet):
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
-        self._points = points[:num_points]
-        return self
-
+        return points
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
@@ -170,15 +176,57 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         x^l_j = \frac{j-1}{m(l)},  1 \leq j \leq m(l), l \geq 0
     """
 
-    def __init__(self):
+    def __init__(self, degree):
         super().__init__()
+        self.degree = degree
 
     @property
     def domain(self):
-        """list: Domain the sample points come from."""
-        return [0, 2 * numpy.pi]
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([0, 2 * numpy.pi])
 
-    def generate_points(self, num_points):
+    def _create_points(self):
+        r"""Generating the points
+
+        Parameters
+        ----------
+        num_points : int
+            The number of points to generate
+
+        Returns
+        -------
+        self
+            The UnidimensionalPointSet
+        """
+        if self.degree > 0:
+            idx = numpy.linspace(1, self.degree, self.degree)
+            points = (idx - 1) * 2 * numpy.pi / self.degree
+        else:
+            points = numpy.zeros(1)
+        return points
+
+
+class NestedTrigonometricPointSet(UnidimensionalPointSet):
+    r"""Set of unidimensional points for Trigonometric sampling
+
+    The :attr:`points` for this interpolation scheme are nested
+    trigonometric points
+
+    .. math::
+
+        x^l_j = \frac{j-1}{m(l)},  1 \leq j \leq m(l), l \geq 0
+    """
+
+    def __init__(self, max_level):
+        super().__init__()
+        self.max_level = max_level
+
+    @property
+    def domain(self):
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([0, 2 * numpy.pi])
+
+    def _create_points(self):
         r"""Generating the points
 
         Parameters
@@ -194,12 +242,11 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         points = []
         degree = 0
         counter = 0
-        while len(points) < num_points:
+        for i in range(self.max_level+1):
             degree = 3**counter
             for idx in range(1, degree + 1):
                 point = (idx - 1) * 2 * numpy.pi / degree
                 if not numpy.isclose(points, point).any():
                     points.append(point)
             counter += 1
-        self._points = points[:num_points]
-        return self
+        return points

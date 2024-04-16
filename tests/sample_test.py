@@ -7,6 +7,7 @@ from smolyay.samples import (
     ClenshawCurtisPointSet,
     NestedClenshawCurtisPointSet,
     TrigonometricPointSet,
+    NestedTrigonometricPointSet,
 )
 
 
@@ -50,59 +51,77 @@ def trig_num9():
 
 def test_clenshaw_initial():
     """test default properties"""
-    f = ClenshawCurtisPointSet()
-    assert f.domain == [-1, 1]
-    assert f.points == []
+    f = ClenshawCurtisPointSet(7)
+    assert numpy.array_equal(f.domain, [-1, 1])
+    assert f.degree == 7
 
 
-def test_clenshaw_generate_values():
+def test_clenshaw_generate_values(clenshaw_curtis_num9):
     """test the output of generate_points"""
-    f = ClenshawCurtisPointSet()
-    assert numpy.allclose(f.generate_points(0).points, [], atol=1e-10)
-    assert numpy.allclose(f.generate_points(1).points, [0], atol=1e-10)
-    assert numpy.allclose(f.generate_points(2).points, [-1, 1], atol=1e-10)
-    assert numpy.allclose(f.generate_points(3).points, [-1, 0, 1], atol=1e-10)
-    assert numpy.allclose(f.generate_points(4).points, [-1, -0.5, 0.5, 1], atol=1e-10)
+    assert numpy.allclose(ClenshawCurtisPointSet(0).points, [0], atol=1e-10)
+    assert numpy.allclose(ClenshawCurtisPointSet(1).points, [-1, 1], atol=1e-10)
+    assert numpy.allclose(ClenshawCurtisPointSet(2).points, [-1, 0, 1], atol=1e-10)
+    assert numpy.allclose(
+        ClenshawCurtisPointSet(3).points, [-1, -0.5, 0.5, 1], atol=1e-10
+    )
+    assert numpy.allclose(
+        ClenshawCurtisPointSet(8).points, sorted(clenshaw_curtis_num9), atol=1e-10
+    )
 
 
 def test_nestedclenshaw_initial():
     """test default properties"""
-    f = ClenshawCurtisPointSet()
-    assert f.domain == [-1, 1]
-    assert f.points == []
+    f = NestedClenshawCurtisPointSet(7)
+    assert numpy.array_equal(f.domain, [-1, 1])
+    assert f.max_level == 7
 
 
-def test_nestedclenshaw_num3(clenshaw_curtis_num9):
+def test_nestedclenshaw_values(clenshaw_curtis_num9):
     """test number of points is changed to 3"""
-    f = NestedClenshawCurtisPointSet()
-    assert numpy.allclose(f.generate_points(0).points, [], atol=1e-10)
-    assert numpy.allclose(f.generate_points(1).points, [0], atol=1e-10)
-    assert numpy.allclose(f.generate_points(2).points, [0, -1], atol=1e-10)
-    assert numpy.allclose(f.generate_points(3).points, [0, -1, 1], atol=1e-10)
+    assert numpy.allclose(NestedClenshawCurtisPointSet(0).points, [0], atol=1e-10)
     assert numpy.allclose(
-        f.generate_points(4).points, [0, -1, 1, -1 / numpy.sqrt(2)], atol=1e-10
+        NestedClenshawCurtisPointSet(1).points, [0, -1, 1], atol=1e-10
     )
     assert numpy.allclose(
-        f.generate_points(9).points, [clenshaw_curtis_num9], atol=1e-10
+        NestedClenshawCurtisPointSet(3).points, [clenshaw_curtis_num9], atol=1e-10
     )
 
 
 def test_trig_initial():
     """test default properties"""
-    f = TrigonometricPointSet()
-    assert f.domain == [0, 2 * numpy.pi]
-    assert f.points == []
+    f = TrigonometricPointSet(7)
+    assert numpy.array_equal(f.domain, [0, 2 * numpy.pi])
+    assert f.degree == 7
 
 
 def test_trig_generate_values(trig_num9):
     """test number of points is changed to 3"""
-    f = TrigonometricPointSet()
-    assert numpy.allclose(f.generate_points(0).points, [], atol=1e-10)
-    assert numpy.allclose(f.generate_points(1).points, [0], atol=1e-10)
+    assert numpy.allclose(TrigonometricPointSet(0).points, [0], atol=1e-10)
+    assert numpy.allclose(TrigonometricPointSet(1).points, [0], atol=1e-10)
+    assert numpy.allclose(TrigonometricPointSet(2).points, [0, numpy.pi], atol=1e-10)
     assert numpy.allclose(
-        f.generate_points(2).points, [0, 2 * numpy.pi / 3], atol=1e-10
+        TrigonometricPointSet(3).points,
+        [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
+        atol=1e-10,
     )
     assert numpy.allclose(
-        f.generate_points(3).points, [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3], atol=1e-10
+        TrigonometricPointSet(9).points, sorted(trig_num9), atol=1e-10
     )
-    assert numpy.allclose(f.generate_points(9).points, trig_num9, atol=1e-10)
+
+
+def test_nestedtrig_initial():
+    """test default properties"""
+    f = NestedTrigonometricPointSet(7)
+    assert numpy.array_equal(f.domain, [0, 2 * numpy.pi])
+    assert f.max_level == 7
+
+
+def test_nestedtrig_generate_values(trig_num9):
+    """test number of points is changed to 3"""
+    assert numpy.allclose(NestedTrigonometricPointSet(0).points, [0], atol=1e-10)
+    assert numpy.allclose(
+        NestedTrigonometricPointSet(1).points,
+        [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
+        atol=1e-10,
+    )
+    assert numpy.allclose(NestedTrigonometricPointSet(2).points, trig_num9, atol=1e-10)
