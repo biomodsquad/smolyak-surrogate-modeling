@@ -132,7 +132,7 @@ class ChebyshevFirstKind(BasisFunction):
     @property
     def domain(self):
         """list: Domain the sample points come from."""
-        return [-1, 1]
+        return np.array([-1, 1])
 
     def _function(self, x):
         r"""Evaluate the basis function.
