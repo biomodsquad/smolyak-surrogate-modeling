@@ -62,6 +62,17 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
     of quadrature rules that are used in numerical integration and in
     approximation.
 
+    The number of unique points is controlled by `levels`, where at each
+    new level more points are added. The amount of points added by each level
+    is determined via a growth scheme related to the polynomial familiy.
+    `points` describes the unique points added as the number of levels increase,
+    and the order of elements is reflective of the level each element first 
+    appears in. Some point set are nested, meaning that the points in a previous
+    level reappear in following levels. However, `points` does not attempt to
+    capture this behavior and should be free of duplicates.
+    `levels` describes the number of points in each level and assigns each
+    a set of indices of elements in `points`. 
+
     Parameters
     ----------
     max_level ; int
@@ -309,6 +320,9 @@ class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
     .. math::
 
         x^l_j = \frac{j-1}{m(l)},  1 \leq j \leq m(l), l \geq 0
+
+    These points are nested, such that the order of elements in
+    `points` corresponds to the indices in `levels`.
     """
 
     def __init__(self, max_level):
