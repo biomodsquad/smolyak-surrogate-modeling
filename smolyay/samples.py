@@ -20,6 +20,7 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __init__(self):
         self._points = None
+        self._valid_cache = True
 
     @property
     @abc.abstractmethod
@@ -30,12 +31,13 @@ class UnidimensionalPointSet(abc.ABC):
     @property
     def points(self):
         """list: Points stored by the set."""
-        if not self._points:
-            self._points = self._create_points()
+        if self._valid_cache:
+            self._create()
+        self._valid_cache = False
         return self._points
 
     @abc.abstractmethod
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         An abstract method for generating the points stored by the point set.
@@ -46,13 +48,9 @@ class UnidimensionalPointSet(abc.ABC):
         ----------
         num_points : int
             The number of points to generate
-
-        Returns
-        -------
-        self
-            The UnidimensionalPointSet
         """
         pass
+
 
 class TieredUnidimensionalPointSet(UnidimensionalPointSet):
     """Set of unidimensional points with levels
@@ -63,7 +61,7 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
     unique points and polynomial families are the basis for different types
     of quadrature rules that are used in numerical integration and in
     approximation.
-    
+
     Parameters
     ----------
     max_level ; int
@@ -83,9 +81,18 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
     @max_level.setter
     def max_level(self, value):
         self._max_level = value
+        self._valid_cache = True
 
+    @property
+    def levels(self):
+        """list: level indices stored by the set."""
+        if self._valid_cache:
+            self._create()
+        self._valid_cache = False
+        return self._levels
+    
     @abc.abstractmethod
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         An abstract method for generating the points stored by the point set.
@@ -103,6 +110,7 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
             The UnidimensionalPointSet
         """
         pass
+
 
 class ClenshawCurtisPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Clenshaw Curtis sampling
@@ -139,8 +147,9 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
     @degree.setter
     def degree(self, value):
         self._degree = value
+        self._valid_cache = True
 
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         Parameters
@@ -154,10 +163,12 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
             The UnidimensionalPointSet
         """
         if self.degree > 0:
-            points = -numpy.cos(numpy.pi * numpy.linspace(0, self.degree, self.degree + 1) / self.degree)
+            points = -numpy.cos(
+                numpy.pi * numpy.linspace(0, self.degree, self.degree + 1) / self.degree
+            )
         else:
             points = numpy.zeros(1)
-        return points
+        self._points = points
 
 
 class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
@@ -195,6 +206,7 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
     max_level ; int
         the maximum level the points are used for
     """
+
     def __init__(self, max_level):
         super().__init__(max_level)
 
@@ -203,7 +215,7 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
 
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         Parameters
@@ -219,7 +231,7 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
         points = [0]
         degree = 0
         counter = 0
-        for i in range(1,self.max_level+1):
+        for i in range(1, self.max_level + 1):
             counter = counter + 1
             degree = 2**counter
             if counter == 1:
@@ -229,7 +241,8 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
-        return points
+        self._points = points
+
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
@@ -264,8 +277,9 @@ class TrigonometricPointSet(UnidimensionalPointSet):
     @frequency.setter
     def frequency(self, value):
         self._frequency = value
+        self._valid_cache = True
 
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         Parameters
@@ -283,7 +297,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
             points = (idx - 1) * 2 * numpy.pi / self.frequency
         else:
             points = numpy.zeros(1)
-        return points
+        self._points = points
 
 
 class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
@@ -305,7 +319,7 @@ class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
 
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         Parameters
@@ -321,11 +335,11 @@ class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
         points = []
         degree = 0
         counter = 0
-        for i in range(self.max_level+1):
+        for i in range(self.max_level + 1):
             degree = 3**counter
             for idx in range(1, degree + 1):
                 point = (idx - 1) * 2 * numpy.pi / degree
                 if not numpy.isclose(points, point).any():
                     points.append(point)
             counter += 1
-        return points
+        self._points = points
