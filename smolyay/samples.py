@@ -40,14 +40,8 @@ class UnidimensionalPointSet(abc.ABC):
     def _create(self):
         r"""Generating the points
 
-        An abstract method for generating the points stored by the point set.
-        Called when the number of points requested is larger than the number
-        of points available.
-
-        Parameters
-        ----------
-        num_points : int
-            The number of points to generate
+        An abstract method for generating the points stored by the point set
+        and other parameters.
         """
         pass
 
@@ -104,21 +98,9 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
     
     @abc.abstractmethod
     def _create(self):
-        r"""Generating the points
+        r"""Generating the points and levels
 
-        An abstract method for generating the points stored by the point set.
-        Called when the number of points requested is larger than the number
-        of points available.
-
-        Parameters
-        ----------
-        num_points : int
-            The number of points to generate
-
-        Returns
-        -------
-        self
-            The UnidimensionalPointSet
+        Generating the points stored by the point set and the levels.
         """
         pass
 
@@ -163,15 +145,8 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
     def _create(self):
         r"""Generating the points
 
-        Parameters
-        ----------
-        num_points : int
-            The number of points to generate
-
-        Returns
-        -------
-        self
-            The UnidimensionalPointSet
+        Generating the extrema of a Cheybshev polynomial of the first kind at
+        a given degree.
         """
         if self.degree > 0:
             points = -numpy.cos(
@@ -229,15 +204,7 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
     def _create(self):
         r"""Generating the points
 
-        Parameters
-        ----------
-        num_points : int
-            The number of points to generate
-
-        Returns
-        -------
-        self
-            The UnidimensionalPointSet
+        Generating nested extrema of chebyshev polynomials of the first kind.
         """
         points = [0]
         degree = 0
@@ -293,15 +260,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
     def _create(self):
         r"""Generating the points
 
-        Parameters
-        ----------
-        num_points : int
-            The number of points to generate
-
-        Returns
-        -------
-        self
-            The UnidimensionalPointSet
+        Generating trigonometic points at a given frequency.
         """
         if self.frequency > 0:
             idx = numpy.linspace(1, self.frequency, self.frequency)
@@ -336,15 +295,8 @@ class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
     def _create(self):
         r"""Generating the points
 
-        Parameters
-        ----------
-        num_points : int
-            The number of points to generate
-
-        Returns
-        -------
-        self
-            The UnidimensionalPointSet
+        Generating the trignometric points using the frequencies 
+        :math:1, 3, 9, ..., 3^{i} where i is an integer.  
         """
         points = []
         degree = 0
