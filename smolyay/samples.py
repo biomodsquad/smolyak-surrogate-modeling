@@ -77,6 +77,15 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
 
+    @property
+    def degree(self):
+        """int: degree of polynomial to create points for."""
+        return self._degree
+
+    @degree.setter
+    def degree(self, value):
+        self._degree = value
+
     def _create_points(self):
         r"""Generating the points
 
@@ -135,7 +144,16 @@ class NestedClenshawCurtisPointSet(UnidimensionalPointSet):
     def domain(self):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
-    
+
+    @property
+    def max_level(self):
+        """int: maximum level to compute points for."""
+        return self._max_level
+
+    @max_level.setter
+    def max_level(self, value):
+        self._max_level = value
+
     def _create_points(self):
         r"""Generating the points
 
@@ -184,6 +202,15 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
 
+    @property
+    def degree(self):
+        """int: degree to create points for."""
+        return self._degree
+
+    @degree.setter
+    def degree(self, value):
+        self._degree = value
+
     def _create_points(self):
         r"""Generating the points
 
@@ -224,6 +251,15 @@ class NestedTrigonometricPointSet(UnidimensionalPointSet):
     def domain(self):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
+
+    @property
+    def max_level(self):
+        """int: maximum level to compute points for."""
+        return self._max_level
+
+    @max_level.setter
+    def max_level(self, value):
+        self._max_level = value
 
     def _create_points(self):
         r"""Generating the points
