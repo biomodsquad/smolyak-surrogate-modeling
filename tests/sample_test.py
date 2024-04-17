@@ -91,7 +91,7 @@ def test_trig_initial():
     """test default properties"""
     f = TrigonometricPointSet(7)
     assert numpy.array_equal(f.domain, [0, 2 * numpy.pi])
-    assert f.degree == 7
+    assert f.frequency == 7
 
 
 def test_trig_generate_values(trig_num9):

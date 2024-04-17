@@ -66,6 +66,11 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         x_i^* = -\cos(\pi i/n), i = 0,...,n
 
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+
+    Parameters
+    ----------
+    degree : int
+        degree of the Chebyshev polynomial of the first kind to get extrema from
     """
 
     def __init__(self, degree):
@@ -135,6 +140,11 @@ class NestedClenshawCurtisPointSet(UnidimensionalPointSet):
     to the exponential growth. For increasing k, the unique extrema of Chebyshev
     polynomial with degree 2^{k - 1} will be added followed by the extrema of the
     polynomial with degree 2^{k} , then 2^{k + 1} , then 2^{k + 2} and so on.
+
+    Parameters
+    ----------
+    max_level ; int
+        the maximum level the points are used for
     """
     def __init__(self, max_level):
         super().__init__()
@@ -191,11 +201,16 @@ class TrigonometricPointSet(UnidimensionalPointSet):
     .. math::
 
         x^l_j = \frac{j-1}{m(l)},  1 \leq j \leq m(l), l \geq 0
+
+    Parameters
+    ----------
+    frequency : int
+        the frequency to take points from
     """
 
-    def __init__(self, degree):
+    def __init__(self, frequency):
         super().__init__()
-        self.degree = degree
+        self.frequency = frequency
 
     @property
     def domain(self):
@@ -203,13 +218,13 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         return numpy.array([0, 2 * numpy.pi])
 
     @property
-    def degree(self):
-        """int: degree to create points for."""
-        return self._degree
+    def frequency(self):
+        """int: frequency to create points for."""
+        return self._frequency
 
-    @degree.setter
-    def degree(self, value):
-        self._degree = value
+    @frequency.setter
+    def frequency(self, value):
+        self._frequency = value
 
     def _create_points(self):
         r"""Generating the points
@@ -224,9 +239,9 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         self
             The UnidimensionalPointSet
         """
-        if self.degree > 0:
-            idx = numpy.linspace(1, self.degree, self.degree)
-            points = (idx - 1) * 2 * numpy.pi / self.degree
+        if self.frequency > 0:
+            idx = numpy.linspace(1, self.frequency, self.frequency)
+            points = (idx - 1) * 2 * numpy.pi / self.frequency
         else:
             points = numpy.zeros(1)
         return points
