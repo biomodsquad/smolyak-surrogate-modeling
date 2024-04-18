@@ -136,6 +136,7 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
         """
         self._create_points()
         self._create_levels()
+        
 
     @abc.abstractmethod
     def _create_points(self):
@@ -346,7 +347,12 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
         points = [0]
         degree = 0
         counter = 0
-        for i in range(1, self.max_level + 1):
+        new_vector = numpy.array([self._growth_rule(0)] + [
+                self._growth_rule(i) - self._growth_rule(i - 1)
+                for i in range(1, self.max_level + 1)
+            ])
+        num_levels = numpy.sum(new_vector != 0)
+        for i in range(1, num_levels):
             counter = counter + 1
             degree = 2**counter
             if counter == 1:
@@ -358,6 +364,12 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
             points.extend(new_points)
         self._points = points
 
+class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
+    """Set for Clenshaw Curtis slow exponential growth"""
+    @property
+    def growth_order(self):
+        """callable or list: the order of the growth rule."""
+        return lambda x : 1 if x==0 else int(2**(numpy.ceil(numpy.log2(x))+1) + 1)
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
