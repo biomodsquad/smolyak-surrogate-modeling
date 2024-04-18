@@ -60,12 +60,12 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
     new level more points are added. The amount of points added by each level
     is determined via a growth scheme related to the polynomial familiy.
     `points` describes the unique points added as the number of levels increase,
-    and the order of elements is reflective of the level each element first 
+    and the order of elements is reflective of the level each element first
     appears in. Some point set are nested, meaning that the points in a previous
     level reappear in following levels. However, `points` does not attempt to
     capture this behavior and should be free of duplicates.
     `levels` describes the number of points in each level and assigns each
-    a set of indices of elements in `points`. 
+    a set of indices of elements in `points`.
 
     Parameters
     ----------
@@ -95,14 +95,141 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
             self._create()
         self._valid_cache = False
         return self._levels
-    
+
+    @property
     @abc.abstractmethod
+    def growth_order(self):
+        """callable or list: the order of the growth rule."""
+        pass
+
+    @property
+    @abc.abstractmethod
+    def nestedness(self):
+        """str: the type of nestedness of the point set."""
+        pass
+
+    def _growth_rule(self, level):
+        """ "The order of the level
+
+        Returns the order of the level according to the growth rule given
+        by `growth_order`
+
+        Parameters
+        ----------
+        level : int
+            the given level
+
+        Returns
+        -------
+        int
+            the order at that level
+        """
+        if callable(self.growth_order):
+            return self.growth_order(level)
+        else:
+            return self.growth_order[level]
+
     def _create(self):
         r"""Generating the points and levels
 
         Generating the points stored by the point set and the levels.
         """
+        self._create_points()
+        self._create_levels()
+
+    @abc.abstractmethod
+    def _create_points(self):
+        r"""Generating the points stored by the point set."""
         pass
+
+    def _create_levels(self):
+        r"""Generating the levels stored by the point set. 
+        
+        The levels of the point set describes what points go into each level
+        and how many. This amount is determined by both the polynomial family
+        and by the growth scheme given by `growth_order`. Determining the
+        number of points in each level varies depending on whether the 
+        point set is fully nested, weakly nested, very weakly nested, or 
+        non-nested. A fully nested point set has every level contain all the
+        points of the previous levels, a weakly nested point set has the 
+        point 0 recur in each level, a very weakly nested point set has the 
+        point 0 recur only in some levels, and a nonnested point set has no
+        repeating points in any level.
+        
+        For a fully nested point set, the relationship between the order and 
+        the number of new unique points per level L is 
+        :math..
+
+        n(L) = \begin{cases}
+            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
+            1 & \text{ if } L = 0
+            \end{cases}
+        
+        For a non-nested point set, the relationship between the order and 
+        the number of new points per level L is 
+        :math..
+
+        n(L) = \begin{cases}
+            gr(L)& \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) > 0 \\ 
+            0 & \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) = 0 \\ 
+            1 & \text{ if } L= 0
+            \end{cases}
+
+        For a weakly nested point set with 1 point recurring each level, the
+        relationship is 
+        :math..
+
+        n(L) = \begin{cases}
+            gr(L) - 1 & \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) > 0 \\ 
+            0 & \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) = 0 \\ 
+            1 & \text{ if } L= 0
+            \end{cases}
+
+        For a very weakly nested set, this method should be overridden to
+        specify which levels points recur.
+
+        Raises
+        ------
+        NotImplementedError
+            Cannot determine points per level for a very weakly nested set.
+        ValueError
+            Not a valid nestedness.
+        """
+        if self.nestedness == "fully":
+            # new vector at index L is rule(L) - rule(L-1)
+            new_vector = [self._growth_rule(0)] + [
+                self._growth_rule(i) - self._growth_rule(i - 1)
+                for i in range(1, self.max_level + 1)
+            ]
+        elif self.nestedness == "none":
+            # new vector at index L is rule(L) if rule(L) - rule(L-1) != 0
+            new_vector = [self._growth_rule(0)] + [
+                (
+                    self._growth_rule(i)
+                    if self._growth_rule(i) - self._growth_rule(i - 1) != 0
+                    else 0
+                )
+                for i in range(1, self.max_level + 1)
+            ]
+        elif self.nestedness == "weakly":
+            # new vector at index L is rule(L) if rule(L) - rule(L-1) != 0
+            new_vector = [self._growth_rule(0)] + [
+                (
+                    self._growth_rule(i) - 1
+                    if self._growth_rule(i) - self._growth_rule(i - 1) != 0
+                    else 0
+                )
+                for i in range(1, self.max_level + 1)
+            ]
+        elif self.nestedness == "very weakly":
+            raise NotImplementedError()
+        else:
+            raise ValueError("Not a valid nestedness.")
+        acc = numpy.cumsum([0] + new_vector)
+        levels = [
+            list(range(acc[i], new_vector[i] + acc[i])) for i in range(len(new_vector))
+        ]
+        self._levels = levels
 
 
 class ClenshawCurtisPointSet(UnidimensionalPointSet):
@@ -201,7 +328,17 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
 
-    def _create(self):
+    @property
+    def growth_order(self):
+        """callable or list: the order of the growth rule."""
+        return lambda x: 1 if x == 0 else 2**x + 1
+
+    @property
+    def nestedness(self):
+        """str: the type of nestedness of the point set."""
+        return "fully"
+
+    def _create_points(self):
         r"""Generating the points
 
         Generating nested extrema of chebyshev polynomials of the first kind.
@@ -292,11 +429,21 @@ class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
 
-    def _create(self):
+    @property
+    def growth_order(self):
+        """callable or list: the order of the growth rule."""
+        return lambda x: 3**x
+
+    @property
+    def nestedness(self):
+        """str: the type of nestedness of the point set."""
+        return "fully"
+
+    def _create_points(self):
         r"""Generating the points
 
-        Generating the trignometric points using the frequencies 
-        :math:1, 3, 9, ..., 3^{i} where i is an integer.  
+        Generating the trignometric points using the frequencies
+        :math:1, 3, 9, ..., 3^{i} where i is an integer.
         """
         points = []
         degree = 0

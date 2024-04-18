@@ -74,10 +74,13 @@ def test_nestedclenshaw_initial():
     f = NestedClenshawCurtisPointSet(7)
     assert numpy.array_equal(f.domain, [-1, 1])
     assert f.max_level == 7
+    assert f._valid_cache == True
+    f.points
+    assert f._valid_cache == False
 
 
 def test_nestedclenshaw_values(clenshaw_curtis_num9):
-    """test number of points is changed to 3"""
+    """test number of points"""
     assert numpy.allclose(NestedClenshawCurtisPointSet(0).points, [0], atol=1e-10)
     assert numpy.allclose(
         NestedClenshawCurtisPointSet(1).points, [0, -1, 1], atol=1e-10
@@ -85,6 +88,29 @@ def test_nestedclenshaw_values(clenshaw_curtis_num9):
     assert numpy.allclose(
         NestedClenshawCurtisPointSet(3).points, [clenshaw_curtis_num9], atol=1e-10
     )
+
+def test_nestedclenshaw_growth():
+    """test growth order matches point accumulation"""
+    f = NestedClenshawCurtisPointSet(7)
+    assert f._growth_rule(0) == 1
+    assert f._growth_rule(1) == 3
+    assert f._growth_rule(2) == 5
+    assert f._growth_rule(3) == 9
+
+def test_nestedclenshaw_levels():
+    """test number of levels"""
+    assert NestedClenshawCurtisPointSet(0).levels == [[0]]
+    assert NestedClenshawCurtisPointSet(1).levels == [[0],[1,2]]
+    assert NestedClenshawCurtisPointSet(2).levels == [[0],[1,2],[3,4]]
+    assert NestedClenshawCurtisPointSet(3).levels == [[0],[1,2],[3,4],[5,6,7,8]]
+
+
+def test_nestedclenshaw_growth_point_match():
+    """test the growth rule matches number of points accumulating"""
+    for i in range(10):
+        f = NestedClenshawCurtisPointSet(i)
+        assert f._growth_rule(i) == len(f.points)
+        assert len(f.points) - 1 == f.levels[-1][-1]
 
 
 def test_trig_initial():
@@ -125,3 +151,26 @@ def test_nestedtrig_generate_values(trig_num9):
         atol=1e-10,
     )
     assert numpy.allclose(NestedTrigonometricPointSet(2).points, trig_num9, atol=1e-10)
+
+def test_nestedtrig_growth():
+    """test growth order matches point accumulation"""
+    f = NestedTrigonometricPointSet(7)
+    assert f._growth_rule(0) == 1
+    assert f._growth_rule(1) == 3
+    assert f._growth_rule(2) == 9
+    assert f._growth_rule(3) == 27
+
+def test_nestedtrig_levels():
+    """test number of levels"""
+    assert NestedTrigonometricPointSet(0).levels == [[0]]
+    assert NestedTrigonometricPointSet(1).levels == [[0],[1,2]]
+    assert NestedTrigonometricPointSet(2).levels == [[0],[1,2],[3,4,5,6,7,8]]
+    assert NestedTrigonometricPointSet(3).levels == [[0],[1,2],[3,4,5,6,7,8],[9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]]
+
+
+def test_nestedtrig_growth_point_match():
+    """test the growth rule matches number of points accumulating"""
+    for i in range(7):
+        f = NestedTrigonometricPointSet(i)
+        assert f._growth_rule(i) == len(f.points)
+        assert len(f.points) - 1 == f.levels[-1][-1]
