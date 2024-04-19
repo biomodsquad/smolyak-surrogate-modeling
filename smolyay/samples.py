@@ -96,62 +96,19 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
         self._valid_cache = False
         return self._levels
 
-    @property
     @abc.abstractmethod
-    def growth_order(self):
-        """callable or list: the order of the growth rule."""
-        pass
+    def _new_per_level(self, level):
+        r"""A vector describing the number of new points per level
 
-    @property
-    @abc.abstractmethod
-    def nestedness(self):
-        """str: the type of nestedness of the point set."""
-        pass
+        Returns a vector with the number of new unique points per level 
+        specified by the growth scheme that the point set describes.
 
-    def _growth_rule(self, level):
-        """ "The order of the level
+        Certain growth rules such as exponential, slow exponential, linear,
+        etc. specify the growth order of a polynomial family. The number of
+        points added per level depends on this order. The number of unique
+        points is additionally dependent on the nestedness of the level
 
-        Returns the order of the level according to the growth rule given
-        by `growth_order`
-
-        Parameters
-        ----------
-        level : int
-            the given level
-
-        Returns
-        -------
-        int
-            the order at that level
-        """
-        if callable(self.growth_order):
-            return self.growth_order(level)
-        else:
-            return self.growth_order[level]
-
-    def _create(self):
-        r"""Generating the points and levels
-
-        Generating the points stored by the point set and the levels.
-        """
-        self._create_points()
-        self._create_levels()
-        
-
-    @abc.abstractmethod
-    def _create_points(self):
-        r"""Generating the points stored by the point set."""
-        pass
-
-    def _create_levels(self):
-        r"""Generating the levels stored by the point set. 
-        
-        The levels of the point set describes what points go into each level
-        and how many. This amount is determined by both the polynomial family
-        and by the growth scheme given by `growth_order`. Determining the
-        number of points in each level varies depending on whether the 
-        point set is fully nested, weakly nested, very weakly nested, or 
-        non-nested. A fully nested point set has every level contain all the
+        A fully nested point set has every level contain all the
         points of the previous levels, a weakly nested point set has the 
         point 0 recur in each level, a very weakly nested point set has the 
         point 0 recur only in some levels, and a nonnested point set has no
@@ -186,46 +143,47 @@ class TieredUnidimensionalPointSet(UnidimensionalPointSet):
             1 & \text{ if } L= 0
             \end{cases}
 
-        For a very weakly nested set, this method should be overridden to
-        specify which levels points recur.
+        For a very weakly nested point set, the relationship between the 
+        growth order and the number of unique new points per level depends
+        on which levels have recurring points. Additionally, certain polynomial
+        families such as Gauss-Patterson are not known to extend to infinite
+        levels or are known to be finite.
 
-        Raises
-        ------
-        NotImplementedError
-            Cannot determine points per level for a very weakly nested set.
-        ValueError
-            Not a valid nestedness.
+        Parameters
+        ----------
+        level : int
+            the given level
+
+        Returns
+        -------
+        list
+            the number of new unique points added each level
         """
-        if self.nestedness == "fully":
-            # new vector at index L is rule(L) - rule(L-1)
-            new_vector = [self._growth_rule(0)] + [
-                self._growth_rule(i) - self._growth_rule(i - 1)
-                for i in range(1, self.max_level + 1)
-            ]
-        elif self.nestedness == "none":
-            # new vector at index L is rule(L) if rule(L) - rule(L-1) != 0
-            new_vector = [self._growth_rule(0)] + [
-                (
-                    self._growth_rule(i)
-                    if self._growth_rule(i) - self._growth_rule(i - 1) != 0
-                    else 0
-                )
-                for i in range(1, self.max_level + 1)
-            ]
-        elif self.nestedness == "weakly":
-            # new vector at index L is rule(L) if rule(L) - rule(L-1) != 0
-            new_vector = [self._growth_rule(0)] + [
-                (
-                    self._growth_rule(i) - 1
-                    if self._growth_rule(i) - self._growth_rule(i - 1) != 0
-                    else 0
-                )
-                for i in range(1, self.max_level + 1)
-            ]
-        elif self.nestedness == "very weakly":
-            raise NotImplementedError()
-        else:
-            raise ValueError("Not a valid nestedness.")
+        pass
+
+    def _create(self):
+        r"""Generating the points and levels
+
+        Generating the points stored by the point set and the levels.
+        """
+        self._create_points()
+        self._create_levels()
+        
+
+    @abc.abstractmethod
+    def _create_points(self):
+        r"""Generating the points stored by the point set."""
+        pass
+
+    def _create_levels(self):
+        r"""Generating the levels stored by the point set. 
+        
+        The levels of the point set describes what points go into each level
+        and how many. This amount is determined by both the polynomial family
+        and by the growth scheme. Determining the number of unique points in 
+        each level is handled by :meth:`_new_per_level`
+        """
+        new_vector = self._new_per_level(self.max_level)
         acc = numpy.cumsum([0] + new_vector)
         levels = [
             list(range(acc[i], new_vector[i] + acc[i])) for i in range(len(new_vector))
@@ -329,15 +287,41 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
 
-    @property
-    def growth_order(self):
-        """callable or list: the order of the growth rule."""
-        return lambda x: 1 if x == 0 else 2**x + 1
+    def _new_per_level(self, level):
+        r"""A vector describing the number of new points per level
 
-    @property
-    def nestedness(self):
-        """str: the type of nestedness of the point set."""
-        return "fully"
+        Returns a vector with the number of new unique points per level 
+        specified by the growth scheme that the point set describes.
+
+        The Clenshaw Curtis point set is by default experiences exponential
+        growth of 1D unique points. It's growth order is described as
+
+        .. math::
+        o(L) = \begin{cases}
+            1 & \text{ if } L=0 \\ 
+            2^{L}+1 & \text{ if } L>0 
+        \end{cases}
+        
+        The polynomial family is fully nested, so the relationship between
+        this growth order and the number of new points per level is
+        .. math::
+        n(L) = \begin{cases}
+            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
+            1 & \text{ if } L = 0
+        \end{cases}
+
+        Parameters
+        ----------
+        level : int
+            the given level
+
+        Returns
+        -------
+        list
+            the number of new unique points added each level
+        """
+        rule = lambda x: 1 if x == 0 else 2**x + 1
+        return [rule(0)] + [rule(i)-rule(i-1) for i in range(1,level+1)]
 
     def _create_points(self):
         r"""Generating the points
@@ -347,10 +331,7 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
         points = [0]
         degree = 0
         counter = 0
-        new_vector = numpy.array([self._growth_rule(0)] + [
-                self._growth_rule(i) - self._growth_rule(i - 1)
-                for i in range(1, self.max_level + 1)
-            ])
+        new_vector = numpy.array(self._new_per_level(self.max_level))
         num_levels = numpy.sum(new_vector != 0)
         for i in range(1, num_levels):
             counter = counter + 1
@@ -366,10 +347,50 @@ class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
 
 class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     """Set for Clenshaw Curtis slow exponential growth"""
-    @property
-    def growth_order(self):
-        """callable or list: the order of the growth rule."""
-        return lambda x : 1 if x==0 else int(2**(numpy.ceil(numpy.log2(x))+1) + 1)
+
+    def _new_per_level(self, level):
+        r"""A vector describing the number of new points per level
+
+        Returns a vector with the number of new unique points per level 
+        specified by the growth scheme that the point set describes.
+
+        The Clenshaw Curtis point set is by default experiences exponential
+        growth of 1D unique points. This growth rule can be slowed down by
+        delaying which points are added at which levels. This delay is 
+        described by setting a "precision rule" of :math:2 * L + 1 where L 
+        is the level. New unique points are added at levels where the 
+        accumulated number of points is less than the precision rule. If the
+        number of points accumulated is greater or equal to the precision rule,
+        then no points are added at that level. The size and progression of
+        the nonempty levels remains the same as the exponential growth case.  
+
+        .. math::
+        o(L) = \begin{cases}
+            1 & \text{ if } L=0 \\ 
+            2^{\left \lceil \log_{2}(L) \right \rceil+1}+1 & \text{ if } L>0 
+        \end{cases}
+
+        
+        The polynomial family is fully nested, so the relationship between
+        this growth order and the number of new points per level is
+        .. math::
+        n(L) = \begin{cases}
+            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
+            1 & \text{ if } L = 0
+            \end{cases}
+
+        Parameters
+        ----------
+        level : int
+            the given level
+
+        Returns
+        -------
+        list
+            the number of new unique points added each level
+        """
+        rule = lambda x : 1 if x==0 else int(2**(numpy.ceil(numpy.log2(x))+1) + 1)
+        return [rule(0)] + [rule(i)-rule(i-1) for i in range(1,level+1)]
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
@@ -440,17 +461,40 @@ class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
     def domain(self):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
+    
+    def _new_per_level(self, level):
+        r"""A vector describing the number of new points per level
 
-    @property
-    def growth_order(self):
-        """callable or list: the order of the growth rule."""
-        return lambda x: 3**x
+        Returns a vector with the number of new unique points per level 
+        specified by the growth scheme that the point set describes.
 
-    @property
-    def nestedness(self):
-        """str: the type of nestedness of the point set."""
-        return "fully"
+        The Trigonometric point set is by default experiences exponential
+        growth of 1D unique points. The growth order of this set is 
+        described as 
+        .. math::
+        o(L) = 3^{x}
+        
+        The polynomial family is fully nested, so the relationship between
+        this growth order and the number of new points per level is
+        .. math::
+        n(L) = \begin{cases}
+            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
+            1 & \text{ if } L = 0
+            \end{cases}
 
+        Parameters
+        ----------
+        level : int
+            the given level
+
+        Returns
+        -------
+        list
+            the number of new unique points added each level
+        """
+        rule = lambda x: 3**x
+        return [rule(0)] + [rule(i)-rule(i-1) for i in range(1,level+1)]
+    
     def _create_points(self):
         r"""Generating the points
 
