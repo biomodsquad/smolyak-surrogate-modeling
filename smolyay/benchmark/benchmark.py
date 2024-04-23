@@ -68,6 +68,18 @@ class BenchmarkFunction(abc.ABC):
         The domain must be specified as lower and upper bounds for each variable as a list of lists.
         """
         pass
+
+    @property
+    @abc.abstractmethod
+    def global_minimum(self):
+        """float: global minimum of the function."""
+        pass
+
+    @property
+    @abc.abstractmethod
+    def global_minimum_location(self):
+        """list: location global minimum of the function."""
+        pass
  
     @abc.abstractmethod
     def _function(self,x):

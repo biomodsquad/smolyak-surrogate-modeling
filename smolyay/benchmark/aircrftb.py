@@ -7,6 +7,14 @@ class aircrftb(BenchmarkFunction):
     def domain(self):
         return [[-10.9654790084, 8.13106889244], [-9.9364470184, 9.05719768344], [-10.0579260446, 8.94786655986], [-9.9385332696, 9.05532005736], [-10.0108611902, 8.99022492882]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [ -0.9654790084, 0.0635529816, -0.0579260446, 0.0614667304, -0.0108611902 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [18])
         v[...,8] = -4.583 - 3.933*x[...,0]

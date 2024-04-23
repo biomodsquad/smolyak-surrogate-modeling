@@ -8,6 +8,14 @@ class ex4_1_5(BenchmarkFunction):
     def domain(self):
         return [[-5.0, 10.0], [-10.0, 0.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
@@ -32,6 +40,14 @@ class ex8_1_1(BenchmarkFunction):
     def domain(self):
         return [[-1.0, 2.0], [-1.0, 1.0]]
 
+    @property
+    def global_minimum(self):
+        return -2.0218067834
+    
+    @property
+    def global_minimum_location(self):
+        return [ 2, 0.1057834695 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = numpy.cos(x[...,0])
@@ -48,6 +64,14 @@ class ex8_1_3(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.6, 8.46], [-10.4, 8.64]]
+
+    @property
+    def global_minimum(self):
+        return 30
+    
+    @property
+    def global_minimum_location(self):
+        return [ -0.6, -0.4 ]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])
@@ -97,6 +121,14 @@ class ex8_1_4(BenchmarkFunction):
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
@@ -120,11 +152,26 @@ class ex8_1_5(_camel):
     def domain(self):
         return [[-9.9101579868, 9.08085781188], [-10.7126564026, 8.35860923766]]
     
+    @property
+    def global_minimum(self):
+        return -1.0316284535
+    
+    @property
+    def global_minimum_location(self):
+        return [ 0.0898420132, -0.7126564026 ]
 
 class ex8_1_6(BenchmarkFunction):
     @property
     def domain(self):
         return [[-6.0000519964, 12.59995320324], [-6.0000519964, 12.59995320324]]
+
+    @property
+    def global_minimum(self):
+        return -10.0860014962
+    
+    @property
+    def global_minimum_location(self):
+        return [ 3.9999480036, 3.9999480036 ]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])

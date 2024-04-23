@@ -6,7 +6,15 @@ class cliff(BenchmarkFunction):
     @property
     def domain(self):
         return [[-7, 11.7], [-6.8502133863, 11.83480795233]]
-        
+
+    @property
+    def global_minimum(self):
+        return 0.1997866137
+    
+    @property
+    def global_minimum_location(self):
+        return [3, 3.1497866137]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 0.01 * x[...,0]

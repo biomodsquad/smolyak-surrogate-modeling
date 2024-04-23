@@ -8,6 +8,14 @@ class fermat_vareps(BenchmarkFunction):
         return [[-7.9999999999, 12.0000000001],
                 [-8.8452994616, 11.1547005384], [1e-08, 10.00000001]]
 
+    @property
+    def global_minimum(self):
+        return 7.4641016251
+    
+    @property
+    def global_minimum_location(self):
+        return [2.0000000001, 1.1547005384, 1e-08]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = x[...,0] * x[...,0]
@@ -40,6 +48,14 @@ class fermat2_vareps(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8, 12], [-9.00000002, 10.99999998], [1e-08, 10.00000001]]
+
+    @property
+    def global_minimum(self):
+        return 4.4721359695
+    
+    @property
+    def global_minimum_location(self):
+        return  [2, 0.99999998, 1e-08]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])

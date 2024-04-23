@@ -6,6 +6,15 @@ class shekel(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 10], [0, 10], [0, 10], [0, 10]]
+    
+    @property
+    def global_minimum(self):
+        return -10.1531996791
+    
+    @property
+    def global_minimum_location(self):
+        return [4.0000371528, 4.0001332766, 4.0000371528, 4.0001332766]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -4. + x[...,0]

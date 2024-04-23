@@ -7,6 +7,14 @@ class humps(BenchmarkFunction):
     def domain(self):
         return [[-10.0000000029, 8.99999999739], [-10.000000004, 8.9999999964]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [-2.9e-09, -4e-09]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]

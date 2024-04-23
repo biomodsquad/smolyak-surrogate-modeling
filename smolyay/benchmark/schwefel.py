@@ -8,6 +8,14 @@ class schwefel(BenchmarkFunction):
         return [[-0.5, 0.36], [-0.5, 0.36], [-0.5, 0.36],
                 [-0.5, 0.36], [-0.5, 0.36]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [ 0.0714072734, 0.0714072734, 0.0714073339, 0.0714073339, 0.0714073339]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [2])
         v[...,0] = pow(x[...,0], 10)

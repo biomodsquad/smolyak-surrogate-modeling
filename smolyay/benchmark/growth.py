@@ -7,6 +7,14 @@ class growth(BenchmarkFunction):
     def domain(self):
         return [[-8.53967303, 10.314294273], [-9.5571937886, 9.39852559026], [-9.836246351, 9.1473782841]]
 
+    @property
+    def global_minimum(self):
+        return 1.0040405841
+    
+    @property
+    def global_minimum_location(self):
+        return [1.46032697, 0.4428062114, 0.163753649]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 2.0794415416798357 * x[...,2]
@@ -110,6 +118,14 @@ class growthls(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.53967303, 10.314294273], [-9.5571937886, 9.39852559026], [-9.836246351, 9.1473782841]]
+
+    @property
+    def global_minimum(self):
+        return 1.0040405841
+    
+    @property
+    def global_minimum_location(self):
+        return [1.46032697, 0.4428062114, 0.163753649]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])

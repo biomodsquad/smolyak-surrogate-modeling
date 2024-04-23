@@ -434,13 +434,28 @@ class osborne1(_osborne):
         # originally -2 and 2 for all, changed to avoid runtime warning
         return [[-2.0, 2.0], [-2.0, 2.0], [-2.0, 2.0],
                 [-1.0, 2.0], [-0.5, 0.5]]
-
+    @property
+    def global_minimum(self):
+        return 5.46489e-05
+    
+    @property
+    def global_minimum_location(self):
+        return [0.3754100517, 1.9358468712, -1.4646870948, 0.0128675346, 0.0221226998]
 
 class osbornea(BenchmarkFunction):
     @property
     def domain(self):
         return [[-1.0, 1.0], [-1.0, 2.0], [-2.0, 1.0],
                 [-1.0, 1.0], [-1.0, 1.0]]
+    
+    @property
+    def global_minimum(self):
+        return 5.46489e-05
+    
+    @property
+    def global_minimum_location(self):
+        return [0.3754100522, 1.935846923, -1.464687147, 0.0128675347, 0.0221226996]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.844 - x[...,0]

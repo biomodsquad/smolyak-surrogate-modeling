@@ -7,6 +7,14 @@ class esfl(BenchmarkFunction):
     def domain(self):
         return [[-9.5195173415, 9.43243439265], [-9.5099228378, 9.44106944598]]
 
+    @property
+    def global_minimum(self):
+        return 191.223912413
+    
+    @property
+    def global_minimum_location(self):
+        return [0.4804826585, 0.4900771622 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.171747132 + x[...,0]

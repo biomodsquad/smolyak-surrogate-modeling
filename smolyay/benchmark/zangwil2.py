@@ -7,6 +7,14 @@ class zangwil2(BenchmarkFunction):
     def domain(self):
         return [[-6.0, 12.6], [-1.0, 17.1]]
 
+    @property
+    def global_minimum(self):
+        return -18.2
+    
+    @property
+    def global_minimum_location(self):
+        return [4, 9]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]

@@ -17,6 +17,14 @@ class s201(BenchmarkFunction):
     def domain(self):
         return [[-5.0, 13.5], [-4.0, 14.4]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [5, 6]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -5. + x[...,0]
@@ -31,6 +39,14 @@ class s202(BenchmarkFunction):
     @property
     def domain(self):
         return [[-4.9999999725, 13.50000002475], [-6.0000000005, 12.59999999955]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [5.0000000275, 3.9999999995]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -61,10 +77,26 @@ class s205(_beale):
     def domain(self):
         return [[-7.0000000003, 11.69999999973], [-9.5000000001, 9.44999999991]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [2.9999999997, 0.4999999999]
+
 class s206(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -82,6 +114,14 @@ class s207(BenchmarkFunction):
     def domain(self):
         return [[-9.0000000009, 9.89999999919], [-9.0000000021, 9.89999999811]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999991, 0.9999999979]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
@@ -97,10 +137,26 @@ class s208(_rosenbrock):
     def domain(self):
         return [[-9.0, 9.9], [-9.0000000001, 9.89999999991]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 0.9999999999]
+
 class s209(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -118,6 +174,14 @@ class s210(BenchmarkFunction):
     def domain(self):
         return [[-9.0000000407, 9.89999996337], [-9.0000000813, 9.89999992683]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999593, 0.9999999187]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
@@ -134,10 +198,26 @@ class s211(_cube):
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
+
 class s212(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [6])
@@ -163,6 +243,14 @@ class s213(BenchmarkFunction):
     def domain(self):
         return [[-8.9315761266, 9.96158148606], [-8.9315761266, 9.96158148606]]
 
+    @property
+    def global_minimum(self):
+        return 5e-10
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999593, 0.9999999187]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] - x[...,1]
@@ -178,6 +266,14 @@ class s214(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -195,10 +291,26 @@ class s229(_rosenbrock):
     def domain(self):
         return [[-2.0, 2.0], [-2.0, 2.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999996, 0.9999999992]
+
 class s240(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0], [-10.0, 9.0]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -221,10 +333,26 @@ class s242(_box):
     def domain(self):
         return [[0, 10], [0, 10], [0, 10]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999844, 10, 1.0000000061]
+
 class s244(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 10], [0, 10], [0, 10]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999613, 10, 4.9999999643]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -343,13 +471,28 @@ class s245(_box):
     def domain(self):
         return [[-9.0000000001, 0], [-7.90000065364893e-09, 0],
                 [-8.9999999998, 0]]
-
+    
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999999, 9.9999999921, 1.0000000002]
 
 class s246(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0000000002, 9.89999999982], [-9.0000000002, 9.89999999982],
                 [-9.0000000004, 9.89999999964]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999998, 0.9999999998, 0.9999999996]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -374,10 +517,26 @@ class s256(_powell):
                 [-10.0001862011, 8.99983241901],
                 [-9.9994511045, 9.00049400595], [-9.9994511048, 9.00049400568]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.0018620114, -0.0001862011, 0.0005488955, 0.0005488952]
+
 class s257(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 11], [-9, 11], [0, 11], [-9, 11]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1, 1, 1]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -417,10 +576,26 @@ class s258(_wood):
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-8.9999999999, 9.90000000009]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1, 1, 1.0000000001]
+
 class s259(BenchmarkFunction):
     @property
     def domain(self):
         return [[-8.5641580904, 11.4358419096], [-7.936840288, 12.063159712], [-9.9310254894, 10.0689745106], [-10.0999682161, 0.0]]
+
+    @property
+    def global_minimum(self):
+        return -8.5446210148
+    
+    @property
+    def global_minimum_location(self):
+        return [1.4358419096, 2.063159712, 0.0689745106, -0.0999682161]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -457,6 +632,14 @@ class s260(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-8.9999999999, 9.90000000009]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1, 1, 1.0000000001]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -496,6 +679,14 @@ class s261(BenchmarkFunction):
     def domain(self):
         return [[-9.9909450357, 9.00814946787], [-8.991563976, 9.9075924216], [-9.0016688312, 9.89849805192], [-9.0000000002, 9.89999999982]]
 
+    @property
+    def global_minimum(self):
+        return 1e-10
+    
+    @property
+    def global_minimum_location(self):
+        return [0.0090549643, 1.008436024, 0.9983311688, 0.9999999998]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = numpy.exp(x[...,0])
@@ -520,6 +711,14 @@ class s266(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9999999907, 9.00000000837], [-10.0000000009, 8.99999999919], [-10.0000000271, 8.99999997561], [-10.0, 9.0], [-9.9999999805, 9.00000001755]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [9.3e-09, -9e-10, -2.71e-08, 0, 1.95e-08]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [24])
@@ -1211,6 +1410,14 @@ class s267(BenchmarkFunction):
                 [6.1236156871, 26.1236156871], [-10.5942083977, 9.4057916023],
                 [-5.2928287845, 14.7071712155], [-8.2232796262, 0]]
 
+    @property
+    def global_minimum(self):
+        return 0.0026499877
+    
+    @property
+    def global_minimum_location(self):
+        return [1.7767204712, 16.1236156871, -0.5942083977, 4.7071712155, 1.7767203738]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.1 * x[...,0]
@@ -1403,6 +1610,14 @@ class s271(BenchmarkFunction):
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1, 1, 1, 1, 1]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -1. + x[...,0]
@@ -1435,6 +1650,14 @@ class s272(BenchmarkFunction):
     def domain(self):
         return [[0, 10.999999907], [0, 20.0000005284], [0, 13.9999995189],
                 [0, 10.9999998493], [0, 14.9999995532], [0, 12.99999966]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.999999907, 10.0000005284, 3.9999995189, 0.9999998493, 4.9999995532, 2.99999966]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -1663,6 +1886,14 @@ class s273(BenchmarkFunction):
     def domain(self):
         return [[-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9], [-9.0, 9.9]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1, 1, 1, 1, 1]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -1. + x[...,0]
@@ -1721,6 +1952,14 @@ class s274(BenchmarkFunction):
     def domain(self):
         return [[-10.0000000052, 8.99999999532],[-10.0000000026, 8.99999999766]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [-5.2e-09, -2.6e-09]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.5 * x[...,1]
@@ -1737,6 +1976,14 @@ class s275(BenchmarkFunction):
     @property
     def domain(self):
         return [[-9.9999927549, 9.00000652059], [-10.000081616, 8.9999265456], [-9.999803482, 9.0001768662], [-10.0001277807, 8.99988499737]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [7.2451e-06, -8.1616e-05, 0.000196518, -0.0001277807]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -1780,6 +2027,14 @@ class s276(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0013714286, 9.9986285714], [-9.96, 10.04], [-10.2742857143, 9.7257142857], [-9.28, 10.72], [-10.8, 0.0], [-9.6832, 10.3168]]
+
+    @property
+    def global_minimum(self):
+        return 1.451e-07
+    
+    @property
+    def global_minimum_location(self):
+        return [-0.0013714286, 0.04, -0.2742857143, 0.72, -0.8, 0.3168]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -1866,6 +2121,14 @@ class s290(BenchmarkFunction):
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
@@ -1880,6 +2143,14 @@ class s294(BenchmarkFunction):
         return [[-10.9865749796, 0.0], [-9.0166017712, 10.9833982288],
                 [-9.0278933299, 10.9721066701], [-9.0525625632, 10.9474374368],
                 [-9.1013488151, 10.8986511849], [-9.192426048, 10.807573952]]
+
+    @property
+    def global_minimum(self):
+        return 3.9739405009
+    
+    @property
+    def global_minimum_location(self):
+        return [-0.9865749796, 0.9833982288, 0.9721066701, 0.9474374368, 0.8986511849, 0.807573952]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -1929,6 +2200,14 @@ class s308(BenchmarkFunction):
     def domain(self):
         return [[-9.8445627595, 9.13989351645], [-10.6945637774, 8.37489260034]]
 
+    @property
+    def global_minimum(self):
+        return 0.7731990565
+    
+    @property
+    def global_minimum_location(self):
+        return [0.1554372405, -0.6945637774]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
@@ -1950,6 +2229,14 @@ class s309(BenchmarkFunction):
     @property
     def domain(self):
         return [[-6.517315694, 12.1344158754], [-6.1, 12.51]]
+
+    @property
+    def global_minimum(self):
+        return -3.9871708076
+    
+    @property
+    def global_minimum_location(self):
+        return [3.482684306, 3.9]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -1973,6 +2260,14 @@ class s311(BenchmarkFunction):
     def domain(self):
         return [[-7.0, 11.7], [-8.0, 10.8]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [3, 2]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]
@@ -1990,6 +2285,14 @@ class s312(BenchmarkFunction):
     @property
     def domain(self):
         return [[-31.0266522627, -9.92398703643], [-46.7600087813, -24.08400790317]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [-21.0266522627, -36.7600087813]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -2016,6 +2319,14 @@ class s328(BenchmarkFunction):
     @property
     def domain(self):
         return [[1, 2.7], [1, 2.7]]
+
+    @property
+    def global_minimum(self):
+        return 1.7441520056
+    
+    @property
+    def global_minimum_location(self):
+        return [1.7434520863, 2.0296947099]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])
@@ -2044,6 +2355,14 @@ class s333(BenchmarkFunction):
     @property
     def domain(self):
         return [[79.901992908, 89.9117936172], [-1, 0.9], [-1, 0.9]]
+
+    @property
+    def global_minimum(self):
+        return 0.043270354
+    
+    @property
+    def global_minimum_location(self):
+        return [89.901992908, 0.0669920435, 0.4780852008]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -2126,10 +2445,26 @@ class s350(_kow):
         return [[-9.75, 9.225], [-9.61, 9.351],
                 [-9.585, 9.3735], [-9.61, 9.351]]
 
+    @property
+    def global_minimum(self):
+        return 0.0053131723
+    
+    @property
+    def global_minimum_location(self):
+        return [0.25, 0.39, 0.415, 0.39]
+
 class s351(BenchmarkFunction):
     @property
     def domain(self):
         return [[-7.3, 11.43], [80, 90], [1359, 1490], [0, 18]]
+
+    @property
+    def global_minimum(self):
+        return 29053.002356629
+    
+    @property
+    def global_minimum_location(self):
+        return [2.7, 90, 1500, 10]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -2243,6 +2578,14 @@ class s352(BenchmarkFunction):
                 [1.9084286837, 19.71758581533],
                 [-10.4580411955, 8.58776292405],
                 [-9.4196803043, 9.52228772613]]
+
+    @property
+    def global_minimum(self):
+        return 903.2343317964
+    
+    @property
+    def global_minimum_location(self):
+        return [-10.2235736001, 11.9084286837, -0.4580411955, 0.5803196957]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
@@ -2452,10 +2795,26 @@ class s358(_osborne):
         return [[-0.5, 0.45], [1.5, 2.25],
                 [-2, -0.9], [0.001, 0.09], [0.001, 0.09]]
 
+    @property
+    def global_minimum(self):
+        return 5.46489e-05
+    
+    @property
+    def global_minimum_location(self):
+        return [0.3754100521, 1.9358469135, -1.4646871374, 0.0128675346, 0.0221226997]
+
 class s370(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10.0157250871, 8.98584742161], [-8.9875651305, 9.91119138255], [-10.2329916267, 8.79030753597], [-8.7395699127, 10.13438707857], [-11.5137289215, 7.63764397065], [-9.0070035692, 9.89369678772]]
+
+    @property
+    def global_minimum(self):
+        return 0.0022876701
+    
+    @property
+    def global_minimum_location(self):
+        return [-0.0157250871, 1.0124348695, -0.2329916267, 1.2604300873, -1.5137289215, 0.9929964308]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])

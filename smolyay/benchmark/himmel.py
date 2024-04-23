@@ -7,6 +7,14 @@ class himmelbb(BenchmarkFunction):
     def domain(self):
         return [[-9.7002462348, 9.26977838868], [-9.29902796, 9.630874836]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [ 0.2997537652, 0.70097204 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,1]
@@ -26,6 +34,14 @@ class himmelbg(BenchmarkFunction):
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -x[...,0]
@@ -44,7 +60,15 @@ class himmelp1(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 95], [0, 75]]
-        
+
+    @property
+    def global_minimum(self):
+        return -62.0538693754
+    
+    @property
+    def global_minimum_location(self):
+        return [81.1916339943, 69.1579052089]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]
@@ -114,6 +138,14 @@ class himmelbf(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
+
+    @property
+    def global_minimum(self):
+        return 318.5717487911
+    
+    @property
+    def global_minimum_location(self):
+        return [-2.7143660599, 140.4358059569, 1707.5156165381, -31.5128692689]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])

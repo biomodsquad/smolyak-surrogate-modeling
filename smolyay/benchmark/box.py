@@ -7,7 +7,15 @@ class box2(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10, 10], [0, 10]]
-        
+    
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [ 0.9999999991, 9.9999999977 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.1 * x[...,0]
@@ -247,3 +255,11 @@ class box3(_box):
         return [[-9.0000004305, 9.89999961255],
                 [3.23989999984065e-06, 18.00000291591],
                 [-8.9999997323, 9.90000024093]]
+    
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [ 0.9999995695, 10.0000032399, 1.0000002677 ]

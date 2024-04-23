@@ -8,8 +8,6 @@ import inspect
 from smolyay.basis import ChebyshevFirstKind
 import smolyay.benchmark
 from smolyay.benchmark import (BenchmarkFunction, branin)
-from smolyay.grid import SmolyakGridGenerator
-from smolyay.surrogate import Surrogate
 
 
 class TestClass1D(BenchmarkFunction):
@@ -17,6 +15,12 @@ class TestClass1D(BenchmarkFunction):
     @property
     def domain(self):
         return [[0.4,10]]
+    @property
+    def global_minimum(self):
+        return -0.5
+    @property
+    def global_minimum_location(self):
+        return [2.245]
     def _function(self,x):
         return numpy.squeeze(4*0.5*((2/x)**12 - (2/x)**6))
 
@@ -25,6 +29,12 @@ class TestClass3D(BenchmarkFunction):
     @property
     def domain(self):
         return [[0,10],[-5,-1],[11,13]]
+    @property
+    def global_minimum(self):
+        return -19 + 1/3
+    @property
+    def global_minimum_location(self):
+        return [0, -5, 13]
     def _function(self,x):
         return x[...,0]**0.5 + x[...,1]*3 - x[...,2]/3 + x[...,0]/x[...,1]
 
@@ -222,3 +232,9 @@ def test_functions_call_shape(fun):
     x_list[0] = numpy.linspace(fun.lower_bounds,mid_point,50)
     x_list[1] = numpy.linspace(mid_point,fun.upper_bounds,50)
     assert fun(x_list).shape == (2,50)
+
+@pytest.mark.parametrize("fun",functions)
+def test_functions_optimum(fun):
+    """Test all functions optimums are at their locations"""
+    print(fun.name)
+    assert numpy.isclose(fun(fun.global_minimum_location),fun.global_minimum)

@@ -7,6 +7,14 @@ class price(BenchmarkFunction):
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0]]
 
+    @property
+    def global_minimum(self):
+        return 3e-10
+    
+    @property
+    def global_minimum_location(self):
+        return [-0.0042706636, 0.0263165412]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = pow(x[...,0], 3)

@@ -8,6 +8,14 @@ class yfit(BenchmarkFunction):
         return [[-9.9978786299, 10.0021213701],
                 [-10.0035439984, 9.9964560016], [0, 10010]]
 
+    @property
+    def global_minimum(self):
+        return 0.2361273466
+    
+    @property
+    def global_minimum_location(self):
+        return [0.0021213701, -0.0035439984, 10000]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = numpy.tan(x[...,0])

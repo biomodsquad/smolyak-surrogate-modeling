@@ -7,7 +7,14 @@ class palmer1(BenchmarkFunction):
     def domain(self):
         return [[1.3636340716, 21.3636340716], [1e-05, 160.4544000091],
                 [1e-05, 11.5013647921], [1e-05, 10.0931561774]]
-
+    @property
+    def global_minimum(self):
+        return 11754.6025453495
+    
+    @property
+    def global_minimum_location(self):
+        return [11.3636340716, 150.4544000091, 1.5013647921, 0.0931561774 ]
+    
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 3.2003886153690004 * x[...,0]
@@ -263,6 +270,14 @@ class palmer2a(BenchmarkFunction):
                 [-25.3729423234,-5.3729423234],
                 [3.6520539577,23.6520539577],
                 [-10.081937131,9.918062869]]
+
+    @property
+    def global_minimum(self):
+        return 0.0171607394
+    
+    @property
+    def global_minimum_location(self):
+        return [22.4286981517, 0.7435278989, -10.7797273226, -15.3729423234, 13.6520539577, -0.081937131]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -541,6 +556,15 @@ class palmer3(BenchmarkFunction):
     def domain(self):
         return [[1e-06, 10.0375049888], [1e-06, 10.0034428969],
                 [1e-06, 14.6439962785], [7.3225711014, 27.3225711014]]
+    
+    @property
+    def global_minimum(self):
+        return 2265.9582182824
+    
+    @property
+    def global_minimum_location(self):
+        return [0.0375049888, 0.0034428969, 4.6439962785, 17.3225711014]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2.749172911969 * x[...,0]
@@ -731,6 +755,14 @@ class palmer4(BenchmarkFunction):
         return [[1e-05, 19.3292787916], [1e-05, 10.8767116668],
                 [1e-05, 10.0158603779], [8.2655580306, 28.2655580306]]
     
+    @property
+    def global_minimum(self):
+        return 2285.3832254496
+    
+    @property
+    def global_minimum_location(self):
+        return [9.3292787916, 0.8767116668, 0.0158603779, 18.2655580306 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2.749172911969 * x[...,0]
@@ -925,6 +957,14 @@ class palmer5c(BenchmarkFunction):
                 [-6.2910484684, 12.33805637844],
                 [-10.1772297675, 8.84049320925]]
 
+    @property
+    def global_minimum(self):
+        return 2.1280866661
+    
+    @property
+    def global_minimum_location(self):
+        return [37.5370157298, -1.7302338172, 40.7938174564, 0.8302128023, 3.7089515316, -0.1772297675]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -x[...,1]
@@ -1088,6 +1128,14 @@ class palmer5d(BenchmarkFunction):
         return [[70.2513178169, 81.22618603521], [-142.1059487487, -109.89535387383],
                 [41.6401308813, 55.47611779317], [-9.304685674, 9.6257828934]]
 
+    @property
+    def global_minimum(self):
+        return 87.3393995278
+    
+    @property
+    def global_minimum_location(self):
+        return [80.2513178169, -132.1059487487, 51.6401308813, 0.695314326]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         
@@ -1201,6 +1249,14 @@ class palmer6a(BenchmarkFunction):
                 [-1.1808208888, 18.8191791112],
                 [-8.633061426, 11.366938574], [1e-05, 43.2710391882],
                 [1e-05, 10.7437425261]]
+
+    @property
+    def global_minimum(self):
+        return 0.055948839
+    
+    @property
+    def global_minimum_location(self):
+        return [-34.1581372624, 10.120997701, 8.8191791112, 1.366938574, 33.2710391882, 0.7437425261]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
@@ -1361,6 +1417,14 @@ class palmer8a(BenchmarkFunction):
                 [-17.7129671187, 2.2870328813],
                 [-5.0299734848, 14.9700265152],
                 [2.8287670723, 22.8287670723], [-9.0495003432, 10.9504996568]]
+
+    @property
+    def global_minimum(self):
+        return 0.074009698
+    
+    @property
+    def global_minimum_location(self):
+        return [2.4961104793, 0.2011908033, -7.7129671187, 4.9700265152, 12.8287670723, 0.9504996568]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])

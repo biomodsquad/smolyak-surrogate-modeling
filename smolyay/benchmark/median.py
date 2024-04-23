@@ -7,6 +7,14 @@ class median_vareps(BenchmarkFunction):
     def domain(self):
         return [[1e-08, 10.00000001], [-9.499789331, 10.500210669]]
 
+    @property
+    def global_minimum(self):
+        return 4.942409183
+    
+    @property
+    def global_minimum_location(self):
+        return [1e-08, 0.500210669]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]

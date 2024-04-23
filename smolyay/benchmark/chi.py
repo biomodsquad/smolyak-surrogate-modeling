@@ -6,7 +6,15 @@ class chi(BenchmarkFunction):
     @property
     def domain(self):
         return [[-30, 30], [-30, 30]]
-        
+
+    @property
+    def global_minimum(self):
+        return -42.282242007
+    
+    @property
+    def global_minimum_location(self):
+        return [ 6.2961280222, 0.5000000004]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]

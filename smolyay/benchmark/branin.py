@@ -6,7 +6,15 @@ class branin(BenchmarkFunction):
     @property
     def domain(self):
         return [[-5, 10], [0, 15]]
-        
+
+    @property
+    def global_minimum(self):
+        return 0.3978873577
+    
+    @property
+    def global_minimum_location(self):
+        return [ 9.4247779642, 2.4750000028 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]

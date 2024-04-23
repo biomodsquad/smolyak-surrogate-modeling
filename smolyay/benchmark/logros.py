@@ -7,6 +7,14 @@ class logros(BenchmarkFunction):
     def domain(self):
         return [[0, 11], [0, 11]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]

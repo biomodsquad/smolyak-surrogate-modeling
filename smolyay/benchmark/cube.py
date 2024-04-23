@@ -18,3 +18,11 @@ class cube(_cube):
     @property
     def domain(self):
         return [[-18, 9.9], [-18, 9.9]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
