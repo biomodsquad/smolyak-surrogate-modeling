@@ -13,7 +13,7 @@ class esfl(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [0.4804826585, 0.4900771622 ]
+        return [-0.4804826585, -0.4900771622]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
