@@ -197,6 +197,7 @@ def test_trig_initial():
     f2 = Trigonometric(2)
     assert f2.n == 2
     assert numpy.array_equal(f2.domain,[0, 2 * numpy.pi])
+    assert f2.sigma == -1
 
 def test_trig_ntype():
     """test type of degree"""
@@ -209,6 +210,7 @@ def test_trig_n_setter():
     f2.n = 3
     assert f2.n == 3
     assert isinstance(f2.n,int)
+    assert f2.sigma == 2
 
 def test_trig_call():
     """Test call method of trigonometric basis function"""
