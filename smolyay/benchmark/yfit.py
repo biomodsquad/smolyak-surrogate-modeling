@@ -10,7 +10,7 @@ class yfit(BenchmarkFunction):
 
     @property
     def global_minimum(self):
-        return 0.2361273466
+        return 0
     
     @property
     def global_minimum_location(self):

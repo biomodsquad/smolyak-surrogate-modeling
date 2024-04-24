@@ -93,7 +93,7 @@ class denschnf(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [2.9999999992, 0.4999999998]
+        return [1, 1]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])

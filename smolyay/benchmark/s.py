@@ -714,7 +714,7 @@ class s266(BenchmarkFunction):
 
     @property
     def global_minimum(self):
-        return 0
+        return 1
     
     @property
     def global_minimum_location(self):
