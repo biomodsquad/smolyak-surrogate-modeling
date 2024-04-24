@@ -28,15 +28,6 @@ def test_cheb_n_setter():
     assert isinstance(f2.n, int)
 
 
-def test_cheb_call_degree_0_1():
-    """Chebyshev polynomial degree 0 is always 1 and degree 1 returns input"""
-    f0 = smolyay.basis.ChebyshevFirstKind(0)
-    f1 = smolyay.basis.ChebyshevFirstKind(1)
-    for i in [-1, -0.5, 0, 0.5, 1]:
-        assert f0(i) == 1
-        assert f1(i) == i
-
-
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_call_random_points(n):
     """Test chebyshev polynomial at some degree at some input"""
@@ -44,16 +35,6 @@ def test_cheb_call_random_points(n):
     xs = numpy.random.rand(20) * 2 - 1
     f = smolyay.basis.ChebyshevFirstKind(n)
     assert numpy.allclose(f(xs), special.eval_chebyt(n, xs))
-
-
-def test_cheb_call_random_points():
-    """Test chebyshev polynomial at some degree at some input"""
-    numpy.random.seed(567)
-    ns = numpy.random.randint(20, size=20)
-    xs = numpy.random.rand(20) * 2 - 1
-    for n, x in zip(ns, xs):
-        f = smolyay.basis.ChebyshevFirstKind(n)
-        assert numpy.isclose(f(x), special.eval_chebyt(n, x))
 
 
 def test_cheb_call_extrema_points():
@@ -143,15 +124,6 @@ def test_cheb_2nd_n_setter():
     f2.n = 3
     assert f2.n == 3
     assert isinstance(f2.n, int)
-
-
-def test_cheb_2nd_call_degree_0_1():
-    """Chebyshev polynomial degree 0 is always 1 and degree 1 returns 2*input"""
-    f0 = smolyay.basis.ChebyshevSecondKind(0)
-    f1 = smolyay.basis.ChebyshevSecondKind(1)
-    for i in [-1, -0.5, 0, 0.5, 1]:
-        assert f0(i) == 1
-        assert f1(i) == i * 2
 
 
 @pytest.mark.parametrize("n", list(range(20)))
