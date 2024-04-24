@@ -16,19 +16,22 @@ def test_cheb_initial():
     """test degrees returns correctly"""
     f2 = ChebyshevFirstKind(2)
     assert f2.n == 2
-    assert numpy.array_equal(f2.domain,[-1, 1])
+    assert numpy.array_equal(f2.domain, [-1, 1])
+
 
 def test_cheb_ntype():
     """test type of degree"""
     f2 = ChebyshevFirstKind(2)
-    assert isinstance(f2.n,int)
+    assert isinstance(f2.n, int)
+
 
 def test_cheb_n_setter():
     """test degree setter"""
     f2 = ChebyshevFirstKind(2)
     f2.n = 3
     assert f2.n == 3
-    assert isinstance(f2.n,int)
+    assert isinstance(f2.n, int)
+
 
 def test_cheb_call_degree_0_1():
     """Chebyshev polynomial degree 0 is always 1 and degree 1 returns input"""
@@ -47,6 +50,26 @@ def test_cheb_call_random_points():
     for n, x in zip(ns, xs):
         f = ChebyshevFirstKind(n)
         assert numpy.isclose(f(x), special.eval_chebyt(n, x))
+
+
+def test_cheb_call_extrema_points():
+    """Test chebyshev polynomial at some degree at some input"""
+    extrema_points = [-1.0, -1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2), 1]
+    extrema_output = [1, -1, 1, -1, 1]
+    f = ChebyshevFirstKind(4)
+    assert numpy.allclose(f(extrema_points), extrema_output)
+
+
+def test_cheb_call_root_points():
+    """Test chebyshev polynomial at some degree at some input"""
+    root_points = [
+        -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+        -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+        numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+        numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+    ]
+    f = ChebyshevFirstKind(4)
+    assert numpy.allclose(f(root_points), [0, 0, 0, 0])
 
 
 def test_cheb_call_random_points_multi_input():
@@ -125,19 +148,22 @@ def test_cheb_2nd_initial():
     """test degrees returns correctly"""
     f2 = ChebyshevSecondKind(2)
     assert f2.n == 2
-    assert numpy.array_equal(f2.domain,[-1, 1])
+    assert numpy.array_equal(f2.domain, [-1, 1])
+
 
 def test_cheb_2nd_ntype():
     """test type of degree"""
     f2 = ChebyshevSecondKind(2)
-    assert isinstance(f2.n,int)
+    assert isinstance(f2.n, int)
+
 
 def test_cheb_2nd_n_setter():
     """test degree setter"""
     f2 = ChebyshevSecondKind(2)
     f2.n = 3
     assert f2.n == 3
-    assert isinstance(f2.n,int)
+    assert isinstance(f2.n, int)
+
 
 def test_cheb_2nd_call_degree_0_1():
     """Chebyshev polynomial degree 0 is always 1 and degree 1 returns 2*input"""
@@ -156,6 +182,13 @@ def test_cheb_2nd_call_random_points():
     for n, x in zip(ns, xs):
         f = ChebyshevSecondKind(n)
         assert numpy.isclose(f(x), special.eval_chebyu(n, x))
+
+
+def test_cheb_2nd_call_root_points():
+    """Test chebyshev polynomial roots"""
+    root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
+    f = ChebyshevSecondKind(3)
+    assert numpy.allclose(f(root_points), [0, 0, 0])
 
 
 def test_cheb_2nd_call_random_points_multi_input():
@@ -196,21 +229,24 @@ def test_trig_initial():
     """test degrees returns correctly"""
     f2 = Trigonometric(2)
     assert f2.n == 2
-    assert numpy.array_equal(f2.domain,[0, 2 * numpy.pi])
+    assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
     assert f2.sigma == -1
+
 
 def test_trig_ntype():
     """test type of degree"""
     f2 = Trigonometric(2)
-    assert isinstance(f2.n,int)
+    assert isinstance(f2.n, int)
+
 
 def test_trig_n_setter():
     """test degree setter"""
     f2 = Trigonometric(2)
     f2.n = 3
     assert f2.n == 3
-    assert isinstance(f2.n,int)
+    assert isinstance(f2.n, int)
     assert f2.sigma == 2
+
 
 def test_trig_call():
     """Test call method of trigonometric basis function"""
