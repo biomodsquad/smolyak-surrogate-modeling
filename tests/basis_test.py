@@ -78,7 +78,7 @@ def test_cheb_call_root_points():
 
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_call_random_points_multi_input(n):
-    """Test that chebyshev polynomial call handles multiple x inputs"""
+    """Test chebyshev polynomial call handles inputs with complex shape"""
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
     f = smolyay.basis.ChebyshevFirstKind(n)
@@ -160,8 +160,7 @@ def test_cheb_2nd_call_random_points(n):
     numpy.random.seed(567)
     xs = numpy.random.rand(20) * 2 - 1
     f = smolyay.basis.ChebyshevSecondKind(n)
-    for x in xs:
-        assert numpy.isclose(f(x), special.eval_chebyu(n, x))
+    assert numpy.allclose(f(xs), special.eval_chebyu(n, xs))
 
 
 def test_cheb_2nd_call_root_points():
@@ -173,7 +172,7 @@ def test_cheb_2nd_call_root_points():
 
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_2nd_call_random_points_multi_input(n):
-    """Test that chebyshev polynomial call handles multiple x inputs"""
+    """Test chebyshev polynomial call handles inputs with complex shape"""
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
     f = smolyay.basis.ChebyshevSecondKind(n)
@@ -256,34 +255,34 @@ def test_trig_n_setter():
 
 
 @pytest.mark.parametrize(
-    "n,expected",
+    "n,c",
     [
-        (0, lambda x: numpy.exp(x * 0)),
-        (1, lambda x: numpy.exp(x * 1j)),
-        (2, lambda x: numpy.exp(x * 1j * -1)),
+        (0, 0),
+        (1, 1j),
+        (2, 1j * -1),
     ],
 )
-def test_trig_call(n, expected):
+def test_trig_call(n, c):
     """Test call method of trigonometric basis function"""
     f = smolyay.basis.Trigonometric(n)
     for i in [0, numpy.pi / 3, 3 * numpy.pi / 2]:
-        assert f(i) == expected(i)
+        assert f(i) == numpy.exp(i * c)
 
 
 @pytest.mark.parametrize(
-    "n,i",
+    "n,c",
     [
         (0, 0),
         (1, 1j),
         (5, 1j * 3),
     ],
 )
-def test_trig_call_random_points_multi_input(n, i):
+def test_trig_call_random_points_multi_input(n, c):
     """Test that Trigonometric polynomial call handles multiple x inputs"""
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 6, 3, 2) * 2 * numpy.pi
     f = smolyay.basis.Trigonometric(n)
-    assert numpy.allclose(f(xs), numpy.exp(xs * i))
+    assert numpy.allclose(f(xs), numpy.exp(xs * c))
 
 
 @pytest.mark.parametrize(
