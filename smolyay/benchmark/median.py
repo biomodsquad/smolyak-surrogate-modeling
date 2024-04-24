@@ -9,7 +9,7 @@ class median_vareps(BenchmarkFunction):
 
     @property
     def global_minimum(self):
-        return 4.942409183
+        return 4.6263263
     
     @property
     def global_minimum_location(self):
