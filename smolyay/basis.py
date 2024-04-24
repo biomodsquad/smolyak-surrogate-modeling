@@ -333,9 +333,15 @@ class Trigonometric(BasisFunction):
 
         \phi_n(x) = \exp(2\pi i \sigma(n) x)
 
-    The :attr:`sigma` for this polynomial is the frequency of the
-    complex exponential.
+    The :math:`\sigma` for this polynomial is the frequency of the
+    complex exponential. It is calculated in the following equation.
 
+    .. math::
+
+        \sigma(n) = \begin{cases}
+            (1 + n) / 2 & \text{ if } n \text{ is odd}\\ 
+            -n / 2 & \text{ if } n \text{ is even} 
+            \end{cases}
 
     Parameters
     ----------
@@ -361,14 +367,6 @@ class Trigonometric(BasisFunction):
     @n.setter
     def n(self,value):
         self._n = int(value)
-
-    @property
-    def sigma(self):
-        """float: Frequency of the complex exponential."""
-        if self.n % 2 == 1:
-            return (1 + self.n) / 2
-        else:
-            return -self.n / 2
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -399,7 +397,10 @@ class Trigonometric(BasisFunction):
             If input is outside the domain `[0, 2\pi]`
         """
         x = numpy.asarray(x)
-        return numpy.exp(x * self.sigma * 1j)
+        if self.n % 2 == 1:
+            return numpy.exp(x * (1 + self.n) / 2 * 1j)
+        else:
+            return numpy.exp(x * -self.n / 2 * 1j)
 
     def _derivative(self, x):
         r"""Evaluate the derivetive of the trigonometric polynomials.
@@ -420,7 +421,10 @@ class Trigonometric(BasisFunction):
             If input is outside the domain `[0, 2\pi]`
         """
         x = numpy.asarray(x)
-        return self.sigma * 1j * numpy.exp(x * self.sigma * 1j)
+        if self.n % 2 == 1:
+            return (1 + self.n) / 2 * 1j * numpy.exp(x * (1 + self.n) / 2 * 1j)
+        else:
+            return -self.n / 2 * 1j * numpy.exp(x * -self.n / 2 * 1j)
 
 
 class BasisFunctionSet:

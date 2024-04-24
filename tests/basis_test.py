@@ -193,22 +193,11 @@ def test_cheb_2nd_derivative_invalid_input():
         f.derivative([0.5, 0.7, 3, 0.8])
 
 
-@pytest.mark.parametrize(
-    "n,sigma",
-    [
-        (0, 0),
-        (2, -1),
-        (3, 2),
-        (7, 4),
-        (10, -5),
-    ],
-)
-def test_trig_initial(n, sigma):
+def test_trig_initial():
     """test degrees returns correctly"""
-    f2 = smolyay.basis.Trigonometric(n)
-    assert f2.n == n
+    f2 = smolyay.basis.Trigonometric(2)
+    assert f2.n == 2
     assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
-    assert f2.sigma == sigma
 
 
 def test_trig_ntype():
@@ -223,7 +212,6 @@ def test_trig_n_setter():
     f2.n = 3
     assert f2.n == 3
     assert isinstance(f2.n, int)
-    assert f2.sigma == 2
 
 
 @pytest.mark.parametrize(
