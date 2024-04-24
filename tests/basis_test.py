@@ -18,6 +18,17 @@ def test_cheb_initial():
     assert f2.n == 2
     assert numpy.array_equal(f2.domain,[-1, 1])
 
+def test_cheb_ntype():
+    """test type of degree"""
+    f2 = ChebyshevFirstKind(2)
+    assert isinstance(f2.n,int)
+
+def test_cheb_n_setter():
+    """test degree setter"""
+    f2 = ChebyshevFirstKind(2)
+    f2.n = 3
+    assert f2.n == 3
+    assert isinstance(f2.n,int)
 
 def test_cheb_call_degree_0_1():
     """Chebyshev polynomial degree 0 is always 1 and degree 1 returns input"""
@@ -116,6 +127,17 @@ def test_cheb_2nd_initial():
     assert f2.n == 2
     assert numpy.array_equal(f2.domain,[-1, 1])
 
+def test_cheb_2nd_ntype():
+    """test type of degree"""
+    f2 = ChebyshevSecondKind(2)
+    assert isinstance(f2.n,int)
+
+def test_cheb_2nd_n_setter():
+    """test degree setter"""
+    f2 = ChebyshevSecondKind(2)
+    f2.n = 3
+    assert f2.n == 3
+    assert isinstance(f2.n,int)
 
 def test_cheb_2nd_call_degree_0_1():
     """Chebyshev polynomial degree 0 is always 1 and degree 1 returns 2*input"""
@@ -176,6 +198,17 @@ def test_trig_initial():
     assert f2.n == 2
     assert numpy.array_equal(f2.domain,[0, 2 * numpy.pi])
 
+def test_trig_ntype():
+    """test type of degree"""
+    f2 = Trigonometric(2)
+    assert isinstance(f2.n,int)
+
+def test_trig_n_setter():
+    """test degree setter"""
+    f2 = Trigonometric(2)
+    f2.n = 3
+    assert f2.n == 3
+    assert isinstance(f2.n,int)
 
 def test_trig_call():
     """Test call method of trigonometric basis function"""

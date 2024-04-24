@@ -127,12 +127,21 @@ class ChebyshevFirstKind(BasisFunction):
 
     def __init__(self, n):
         super().__init__()
-        self.n = n
+        self._n = int(n)
 
     @property
     def domain(self):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
+
+    @property
+    def n(self):
+        """int: Degree of polynomial."""
+        return self._n
+    
+    @n.setter
+    def n(self,value):
+        self._n = int(value)
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -213,12 +222,21 @@ class ChebyshevSecondKind(BasisFunction):
 
     def __init__(self, n):
         super().__init__()
-        self.n = n
+        self._n = int(n)
 
     @property
     def domain(self):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
+
+    @property
+    def n(self):
+        """int: Degree of polynomial."""
+        return self._n
+    
+    @n.setter
+    def n(self,value):
+        self._n = int(value)
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -328,12 +346,21 @@ class Trigonometric(BasisFunction):
 
     def __init__(self, n):
         super().__init__()
-        self.n = n
+        self._n = int(n)
 
     @property
     def domain(self):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
+
+    @property
+    def n(self):
+        """int: Degree of polynomial."""
+        return self._n
+    
+    @n.setter
+    def n(self,value):
+        self._n = int(value)
 
     @property
     def sigma(self):
