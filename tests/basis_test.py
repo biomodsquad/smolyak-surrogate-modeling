@@ -27,6 +27,18 @@ def test_cheb_call(n):
         assert f(x) == pytest.approx(special.eval_chebyt(n, x))
 
 
+@pytest.mark.parametrize("n", list(range(20)))
+def test_cheb_call_random_points_multi_input(n):
+    """Test chebyshev polynomial call handles inputs with complex shape"""
+    f = smolyay.basis.ChebyshevFirstKind(n)
+    numpy.random.seed(567)
+    xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
+    answer = f(xs)
+    answer_check = special.eval_chebyt(n, xs)
+    assert answer.shape == answer_check.shape
+    assert numpy.allclose(answer, answer_check)
+
+
 def test_cheb_call_extrema_points():
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevFirstKind(4)
@@ -45,18 +57,6 @@ def test_cheb_call_root_points():
         numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
     ]
     assert numpy.allclose(f(root_points), numpy.zeros(4))
-
-
-@pytest.mark.parametrize("n", list(range(20)))
-def test_cheb_call_random_points_multi_input(n):
-    """Test chebyshev polynomial call handles inputs with complex shape"""
-    f = smolyay.basis.ChebyshevFirstKind(n)
-    numpy.random.seed(567)
-    xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
-    answer = f(xs)
-    answer_check = special.eval_chebyt(n, xs)
-    assert answer.shape == answer_check.shape
-    assert numpy.allclose(answer, answer_check)
 
 
 @pytest.mark.parametrize(
@@ -120,13 +120,6 @@ def test_cheb_2nd_call(n):
         assert f(x) == pytest.approx(special.eval_chebyu(n, x))
 
 
-def test_cheb_2nd_call_root_points():
-    """Test chebyshev polynomial roots"""
-    f = smolyay.basis.ChebyshevSecondKind(3)
-    root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
-    assert numpy.allclose(f(root_points), numpy.zeros(3))
-
-
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_2nd_call_random_points_multi_input(n):
     """Test chebyshev polynomial call handles inputs with complex shape"""
@@ -137,6 +130,12 @@ def test_cheb_2nd_call_random_points_multi_input(n):
     answer_check = special.eval_chebyu(n, xs)
     assert answer.shape == answer_check.shape
     assert numpy.allclose(answer, answer_check)
+
+def test_cheb_2nd_call_root_points():
+    """Test chebyshev polynomial roots"""
+    f = smolyay.basis.ChebyshevSecondKind(3)
+    root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
+    assert numpy.allclose(f(root_points), numpy.zeros(3))
 
 
 @pytest.mark.parametrize(
