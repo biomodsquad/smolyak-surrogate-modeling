@@ -20,39 +20,39 @@ def test_cheb_initial():
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_call(n):
     """Test chebyshev polynomial at some degree at some input"""
+    f = smolyay.basis.ChebyshevFirstKind(n)
     numpy.random.seed(567)
     xs = numpy.linspace(-1, 1, 20)
-    f = smolyay.basis.ChebyshevFirstKind(n)
     for x in xs:
         assert f(x) == pytest.approx(special.eval_chebyt(n, x))
 
 
 def test_cheb_call_extrema_points():
     """Test chebyshev polynomial at some degree at some input"""
+    f = smolyay.basis.ChebyshevFirstKind(4)
     extrema_points = [-1.0, -1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2), 1]
     extrema_output = [1, -1, 1, -1, 1]
-    f = smolyay.basis.ChebyshevFirstKind(4)
     assert numpy.allclose(f(extrema_points), extrema_output)
 
 
 def test_cheb_call_root_points():
     """Test chebyshev polynomial at some degree at some input"""
+    f = smolyay.basis.ChebyshevFirstKind(4)
     root_points = [
         -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
         -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
         numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
         numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
     ]
-    f = smolyay.basis.ChebyshevFirstKind(4)
     assert numpy.allclose(f(root_points), [0, 0, 0, 0])
 
 
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_call_random_points_multi_input(n):
     """Test chebyshev polynomial call handles inputs with complex shape"""
+    f = smolyay.basis.ChebyshevFirstKind(n)
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
-    f = smolyay.basis.ChebyshevFirstKind(n)
     answer = f(xs)
     answer_check = special.eval_chebyt(n, xs)
     assert answer.shape == answer_check.shape
@@ -113,26 +113,26 @@ def test_cheb_2nd_initial():
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_2nd_call(n):
     """Test chebyshev polynomial at some degree at some input"""
+    f = smolyay.basis.ChebyshevSecondKind(n)
     numpy.random.seed(567)
     xs = numpy.linspace(-1, 1, 20)
-    f = smolyay.basis.ChebyshevSecondKind(n)
     for x in xs:
         assert f(x) == pytest.approx(special.eval_chebyu(n, x))
 
 
 def test_cheb_2nd_call_root_points():
     """Test chebyshev polynomial roots"""
-    root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
     f = smolyay.basis.ChebyshevSecondKind(3)
+    root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
     assert numpy.allclose(f(root_points), [0, 0, 0])
 
 
 @pytest.mark.parametrize("n", list(range(20)))
 def test_cheb_2nd_call_random_points_multi_input(n):
     """Test chebyshev polynomial call handles inputs with complex shape"""
+    f = smolyay.basis.ChebyshevSecondKind(n)
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
-    f = smolyay.basis.ChebyshevSecondKind(n)
     answer = f(xs)
     answer_check = special.eval_chebyu(n, xs)
     assert answer.shape == answer_check.shape
@@ -218,9 +218,9 @@ def test_trig_call(n, c):
 )
 def test_trig_call_random_points_multi_input(n, c):
     """Test that Trigonometric polynomial call handles multiple x inputs"""
+    f = smolyay.basis.Trigonometric(n)
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 6, 3, 2) * 2 * numpy.pi
-    f = smolyay.basis.Trigonometric(n)
     assert numpy.allclose(f(xs), numpy.exp(xs * c))
 
 
