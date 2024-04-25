@@ -5,7 +5,7 @@ from .benchmark import BenchmarkFunction
 class least(BenchmarkFunction):
     @property
     def domain(self):
-        return [[473.98605675534, 506.6511741726],
+        return [[473.98605675534, 526.6511741726],
                 [-159.3518936954, -125.41670432586],[-5, 4.5]]
 
     @property

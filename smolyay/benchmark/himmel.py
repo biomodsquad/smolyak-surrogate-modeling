@@ -137,7 +137,7 @@ class himmelp1(BenchmarkFunction):
 class himmelbf(BenchmarkFunction):
     @property
     def domain(self):
-        return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
+        return [[-10, 0.378], [0, 200], [0, 1800], [-50, 0.378]]
 
     @property
     def global_minimum(self):

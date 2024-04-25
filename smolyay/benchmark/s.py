@@ -469,8 +469,8 @@ class s244(BenchmarkFunction):
 class s245(_box):
     @property
     def domain(self):
-        return [[-9.0000000001, 0], [-7.90000065364893e-09, 0],
-                [-8.9999999998, 0]]
+        return [[-9.0000000001, 2], [-7.90000065364893e-09, 15],
+                [-8.9999999998, 10]]
     
     @property
     def global_minimum(self):
@@ -1408,7 +1408,7 @@ class s267(BenchmarkFunction):
     def domain(self):
         return [[-8.2232795288, 11.7767204712],
                 [6.1236156871, 26.1236156871], [-10.5942083977, 9.4057916023],
-                [-5.2928287845, 14.7071712155], [-8.2232796262, 0]]
+                [-5.2928287845, 14.7071712155], [-8.2232796262, 2]]
 
     @property
     def global_minimum(self):
@@ -2456,7 +2456,7 @@ class s350(_kow):
 class s351(BenchmarkFunction):
     @property
     def domain(self):
-        return [[-7.3, 11.43], [80, 90], [1359, 1490], [0, 18]]
+        return [[-7.3, 11.43], [80, 90], [1359, 1510], [0, 18]]
 
     @property
     def global_minimum(self):
