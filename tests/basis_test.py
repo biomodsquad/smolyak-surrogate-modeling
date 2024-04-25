@@ -10,18 +10,8 @@ def test_cheb_initial():
     """test degrees returns correctly"""
     f2 = smolyay.basis.ChebyshevFirstKind(2)
     assert f2.n == 2
-    assert numpy.array_equal(f2.domain, [-1, 1])
-
-
-def test_cheb_ntype():
-    """test type of degree"""
-    f2 = smolyay.basis.ChebyshevFirstKind(2)
     assert isinstance(f2.n, int)
-
-
-def test_cheb_n_setter():
-    """test degree setter"""
-    f2 = smolyay.basis.ChebyshevFirstKind(2)
+    assert numpy.array_equal(f2.domain, [-1, 1])
     f2.n = 3
     assert f2.n == 3
     assert isinstance(f2.n, int)
@@ -113,18 +103,8 @@ def test_cheb_2nd_initial():
     """test degrees returns correctly"""
     f2 = smolyay.basis.ChebyshevSecondKind(2)
     assert f2.n == 2
-    assert numpy.array_equal(f2.domain, [-1, 1])
-
-
-def test_cheb_2nd_ntype():
-    """test type of degree"""
-    f2 = smolyay.basis.ChebyshevSecondKind(2)
     assert isinstance(f2.n, int)
-
-
-def test_cheb_2nd_n_setter():
-    """test degree setter"""
-    f2 = smolyay.basis.ChebyshevSecondKind(2)
+    assert numpy.array_equal(f2.domain, [-1, 1])
     f2.n = 3
     assert f2.n == 3
     assert isinstance(f2.n, int)
@@ -206,18 +186,8 @@ def test_trig_initial():
     """test degrees returns correctly"""
     f2 = smolyay.basis.Trigonometric(2)
     assert f2.n == 2
-    assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
-
-
-def test_trig_ntype():
-    """test type of degree"""
-    f2 = smolyay.basis.Trigonometric(2)
     assert isinstance(f2.n, int)
-
-
-def test_trig_n_setter():
-    """test degree setter"""
-    f2 = smolyay.basis.Trigonometric(2)
+    assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
     f2.n = 3
     assert f2.n == 3
     assert isinstance(f2.n, int)
