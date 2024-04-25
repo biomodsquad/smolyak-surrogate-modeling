@@ -44,7 +44,7 @@ def test_cheb_call_root_points():
         numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
         numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
     ]
-    assert numpy.allclose(f(root_points), [0, 0, 0, 0])
+    assert numpy.allclose(f(root_points), numpy.zeros(4))
 
 
 @pytest.mark.parametrize("n", list(range(20)))
@@ -124,7 +124,7 @@ def test_cheb_2nd_call_root_points():
     """Test chebyshev polynomial roots"""
     f = smolyay.basis.ChebyshevSecondKind(3)
     root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
-    assert numpy.allclose(f(root_points), [0, 0, 0])
+    assert numpy.allclose(f(root_points), numpy.zeros(3))
 
 
 @pytest.mark.parametrize("n", list(range(20)))
