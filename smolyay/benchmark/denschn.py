@@ -81,39 +81,7 @@ class denschnc(BenchmarkFunction):
         v[...,0] = v[...,2] * v[...,2]
         v[...,2] = v[...,1] + v[...,0]
         return v[...,2]
-
-class denschnf(BenchmarkFunction):
-    @property
-    def domain(self):
-        return [[-10000.0, 10000.0], [-10000.0, 10000.0]]
-
-    @property
-    def global_minimum(self):
-        return 0
     
-    @property
-    def global_minimum_location(self):
-        return [1, 1]
-
-    def _function(self,x):
-        v = numpy.zeros(list(x.shape[:-1]) + [4])
-        v[...,0] = x[...,0] + x[...,1]
-        v[...,1] = v[...,0] * v[...,0]
-        v[...,0] = 2. * v[...,1]
-        v[...,1] = x[...,0] - x[...,1]
-        v[...,2] = v[...,1] * v[...,1]
-        v[...,1] = v[...,0] + v[...,2]
-        v[...,0] = -8. + v[...,1]
-        v[...,1] = v[...,0] * v[...,0]
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,2] = 5. * v[...,0]
-        v[...,0] = -3. + x[...,1]
-        v[...,3] = v[...,0] * v[...,0]
-        v[...,0] = v[...,2] + v[...,3]
-        v[...,2] = -9. + v[...,0]
-        v[...,0] = v[...,2] * v[...,2]
-        v[...,2] = v[...,1] + v[...,0]
-        return v[...,2]
 
 class denschnd(BenchmarkFunction):
     @property
@@ -178,3 +146,36 @@ class denschne(BenchmarkFunction):
         v[...,1] = v[...,2] * v[...,2]
         v[...,0] += v[...,1]
         return v[...,0]
+
+class denschnf(BenchmarkFunction):
+    @property
+    def domain(self):
+        return [[-10000.0, 10000.0], [-10000.0, 10000.0]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
+
+    def _function(self,x):
+        v = numpy.zeros(list(x.shape[:-1]) + [4])
+        v[...,0] = x[...,0] + x[...,1]
+        v[...,1] = v[...,0] * v[...,0]
+        v[...,0] = 2. * v[...,1]
+        v[...,1] = x[...,0] - x[...,1]
+        v[...,2] = v[...,1] * v[...,1]
+        v[...,1] = v[...,0] + v[...,2]
+        v[...,0] = -8. + v[...,1]
+        v[...,1] = v[...,0] * v[...,0]
+        v[...,0] = x[...,0] * x[...,0]
+        v[...,2] = 5. * v[...,0]
+        v[...,0] = -3. + x[...,1]
+        v[...,3] = v[...,0] * v[...,0]
+        v[...,0] = v[...,2] + v[...,3]
+        v[...,2] = -9. + v[...,0]
+        v[...,0] = v[...,2] * v[...,2]
+        v[...,2] = v[...,1] + v[...,0]
+        return v[...,2]
