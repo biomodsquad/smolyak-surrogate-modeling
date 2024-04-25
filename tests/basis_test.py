@@ -6,7 +6,6 @@ from scipy import special
 import smolyay.basis
 
 
-
 def test_cheb_initial():
     """test degrees returns correctly"""
     f2 = smolyay.basis.ChebyshevFirstKind(2)
@@ -35,7 +34,7 @@ def test_cheb_call_random_points(n):
     xs = numpy.random.rand(20) * 2 - 1
     f = smolyay.basis.ChebyshevFirstKind(n)
     for x in xs:
-        assert f(x)  == pytest.approx(special.eval_chebyt(n, x))
+        assert f(x) == pytest.approx(special.eval_chebyt(n, x))
 
 
 def test_cheb_call_extrema_points():
@@ -96,7 +95,7 @@ def test_cheb_call_invalid_input():
     with pytest.raises(ValueError):
         f([0.5, 0.7, 3, 0.8])
     with pytest.raises(ValueError):
-        f([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
+        f([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
 
 
 def test_cheb_derivative_invalid_input():
@@ -107,7 +106,8 @@ def test_cheb_derivative_invalid_input():
     with pytest.raises(ValueError):
         f.derivative(-2)
     with pytest.raises(ValueError):
-        f.derivative([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
+        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+
 
 def test_cheb_2nd_initial():
     """test degrees returns correctly"""
@@ -137,7 +137,7 @@ def test_cheb_2nd_call_random_points(n):
     xs = numpy.random.rand(20) * 2 - 1
     f = smolyay.basis.ChebyshevSecondKind(n)
     for x in xs:
-        assert f(x)  == pytest.approx(special.eval_chebyu(n, x))
+        assert f(x) == pytest.approx(special.eval_chebyu(n, x))
 
 
 def test_cheb_2nd_call_root_points():
@@ -186,7 +186,7 @@ def test_cheb_2nd_call_invalid_input():
     with pytest.raises(ValueError):
         f([0.5, 0.7, 3, 0.8])
     with pytest.raises(ValueError):
-        f([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
+        f([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
 
 
 def test_cheb_2nd_derivative_invalid_input():
@@ -199,7 +199,8 @@ def test_cheb_2nd_derivative_invalid_input():
     with pytest.raises(ValueError):
         f.derivative([0.5, 0.7, 3, 0.8])
     with pytest.raises(ValueError):
-        f.derivative([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
+        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+
 
 def test_trig_initial():
     """test degrees returns correctly"""
@@ -282,7 +283,8 @@ def test_trig_call_invalid_input():
     with pytest.raises(ValueError):
         f([0.5, 0.7, 3, -0.8])
     with pytest.raises(ValueError):
-        f([[0.5, 0.7, -3, 0.8],[0.5, 0.7, 0.8, 0.5]])
+        f([[0.5, 0.7, -3, 0.8], [0.5, 0.7, 0.8, 0.5]])
+
 
 def test_trig_derivative_invalid_input():
     """Test call raises error if input is outside domain [0, 2pi]"""
@@ -294,17 +296,12 @@ def test_trig_derivative_invalid_input():
     with pytest.raises(ValueError):
         f.derivative([0.5, 0.7, 3, -0.8])
     with pytest.raises(ValueError):
-        f.derivative([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
-
-def test_set_initialize_empty():
-    """Check BasisFunctionSet initializes with empty set"""
-    basis_functions = []
-    f = smolyay.basis.BasisFunctionSet(basis_functions)
-    assert f.basis_functions == []
+        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
 
 
-def test_set_initialize_0():
+def test_set_initialize():
     """Check BasisFunctionSet correctly initializes"""
-    basis_functions = [smolyay.basis.ChebyshevFirstKind(0)]
-    f = smolyay.basis.BasisFunctionSet(basis_functions)
-    assert f.basis_functions[0].n == 0
+    f = smolyay.basis.BasisFunctionSet([])
+    f2 = smolyay.basis.BasisFunctionSet([smolyay.basis.ChebyshevFirstKind(0)])
+    assert f.basis_functions == []
+    assert f2.basis_functions[0].n == 0
