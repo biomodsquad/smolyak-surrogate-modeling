@@ -46,7 +46,7 @@ class UnidimensionalPointSet(abc.ABC):
         pass
 
 
-class TieredUnidimensionalPointSet(UnidimensionalPointSet):
+class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     """Set of unidimensional points with levels
 
     A set of unique unidimensional points to be used as the sampling points
@@ -243,7 +243,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         self._points = points
 
 
-class NestedClenshawCurtisPointSet(TieredUnidimensionalPointSet):
+class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     r"""Generate nested Clenshaw Curtis points in accordance with a growth rule
 
     The :attr:`points` for this interpolation scheme are the extrema of the
@@ -440,7 +440,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         self._points = points
 
 
-class NestedTrigonometricPointSet(TieredUnidimensionalPointSet):
+class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
 
     The :attr:`points` for this interpolation scheme are nested
