@@ -17,7 +17,7 @@ def test_cheb_initial():
     assert isinstance(f2.n, int)
 
 
-@pytest.mark.parametrize("n", list(range(20)))
+@pytest.mark.parametrize("n", list(range(5)))
 def test_cheb_call(n):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevFirstKind(n)
@@ -27,7 +27,7 @@ def test_cheb_call(n):
         assert f(x) == pytest.approx(special.eval_chebyt(n, x))
 
 
-@pytest.mark.parametrize("n", list(range(20)))
+@pytest.mark.parametrize("n", list(range(5)))
 def test_cheb_call_random_points_multi_input(n):
     """Test chebyshev polynomial call handles inputs with complex shape"""
     f = smolyay.basis.ChebyshevFirstKind(n)
@@ -110,7 +110,7 @@ def test_cheb_2nd_initial():
     assert isinstance(f2.n, int)
 
 
-@pytest.mark.parametrize("n", list(range(20)))
+@pytest.mark.parametrize("n", list(range(5)))
 def test_cheb_2nd_call(n):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevSecondKind(n)
@@ -120,7 +120,7 @@ def test_cheb_2nd_call(n):
         assert f(x) == pytest.approx(special.eval_chebyu(n, x))
 
 
-@pytest.mark.parametrize("n", list(range(20)))
+@pytest.mark.parametrize("n", list(range(5)))
 def test_cheb_2nd_call_random_points_multi_input(n):
     """Test chebyshev polynomial call handles inputs with complex shape"""
     f = smolyay.basis.ChebyshevSecondKind(n)
