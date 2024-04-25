@@ -95,6 +95,8 @@ def test_cheb_call_invalid_input():
         f(-2)
     with pytest.raises(ValueError):
         f([0.5, 0.7, 3, 0.8])
+    with pytest.raises(ValueError):
+        f([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
 
 
 def test_cheb_derivative_invalid_input():
@@ -104,7 +106,8 @@ def test_cheb_derivative_invalid_input():
         f.derivative(2)
     with pytest.raises(ValueError):
         f.derivative(-2)
-
+    with pytest.raises(ValueError):
+        f.derivative([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
 
 def test_cheb_2nd_initial():
     """test degrees returns correctly"""
@@ -182,6 +185,8 @@ def test_cheb_2nd_call_invalid_input():
         f(-2)
     with pytest.raises(ValueError):
         f([0.5, 0.7, 3, 0.8])
+    with pytest.raises(ValueError):
+        f([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
 
 
 def test_cheb_2nd_derivative_invalid_input():
@@ -193,7 +198,8 @@ def test_cheb_2nd_derivative_invalid_input():
         f.derivative(-2)
     with pytest.raises(ValueError):
         f.derivative([0.5, 0.7, 3, 0.8])
-
+    with pytest.raises(ValueError):
+        f.derivative([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
 
 def test_trig_initial():
     """test degrees returns correctly"""
@@ -275,7 +281,8 @@ def test_trig_call_invalid_input():
         f(-1)
     with pytest.raises(ValueError):
         f([0.5, 0.7, 3, -0.8])
-
+    with pytest.raises(ValueError):
+        f([[0.5, 0.7, -3, 0.8],[0.5, 0.7, 0.8, 0.5]])
 
 def test_trig_derivative_invalid_input():
     """Test call raises error if input is outside domain [0, 2pi]"""
@@ -284,7 +291,10 @@ def test_trig_derivative_invalid_input():
         f.derivative(-0.04)
     with pytest.raises(ValueError):
         f.derivative(6.5)
-
+    with pytest.raises(ValueError):
+        f.derivative([0.5, 0.7, 3, -0.8])
+    with pytest.raises(ValueError):
+        f.derivative([[0.5, 0.7, 3, 0.8],[0.5, 0.7, 0.8, -0.5]])
 
 def test_set_initialize_empty():
     """Check BasisFunctionSet initializes with empty set"""
