@@ -34,7 +34,8 @@ def test_cheb_call_random_points(n):
     numpy.random.seed(567)
     xs = numpy.random.rand(20) * 2 - 1
     f = smolyay.basis.ChebyshevFirstKind(n)
-    assert numpy.allclose(f(xs), special.eval_chebyt(n, xs))
+    for x in xs:
+        assert f(x)  == pytest.approx(special.eval_chebyt(n, x))
 
 
 def test_cheb_call_extrema_points():
@@ -132,7 +133,8 @@ def test_cheb_2nd_call_random_points(n):
     numpy.random.seed(567)
     xs = numpy.random.rand(20) * 2 - 1
     f = smolyay.basis.ChebyshevSecondKind(n)
-    assert numpy.allclose(f(xs), special.eval_chebyu(n, xs))
+    for x in xs:
+        assert f(x)  == pytest.approx(special.eval_chebyu(n, x))
 
 
 def test_cheb_2nd_call_root_points():
