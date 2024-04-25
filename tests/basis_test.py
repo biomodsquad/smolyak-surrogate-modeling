@@ -18,10 +18,10 @@ def test_cheb_initial():
 
 
 @pytest.mark.parametrize("n", list(range(20)))
-def test_cheb_call_random_points(n):
+def test_cheb_call(n):
     """Test chebyshev polynomial at some degree at some input"""
     numpy.random.seed(567)
-    xs = numpy.random.rand(20) * 2 - 1
+    xs = numpy.linspace(-1, 1, 20)
     f = smolyay.basis.ChebyshevFirstKind(n)
     for x in xs:
         assert f(x) == pytest.approx(special.eval_chebyt(n, x))
@@ -111,10 +111,10 @@ def test_cheb_2nd_initial():
 
 
 @pytest.mark.parametrize("n", list(range(20)))
-def test_cheb_2nd_call_random_points(n):
+def test_cheb_2nd_call(n):
     """Test chebyshev polynomial at some degree at some input"""
     numpy.random.seed(567)
-    xs = numpy.random.rand(20) * 2 - 1
+    xs = numpy.linspace(-1, 1, 20)
     f = smolyay.basis.ChebyshevSecondKind(n)
     for x in xs:
         assert f(x) == pytest.approx(special.eval_chebyu(n, x))
