@@ -117,17 +117,18 @@ class ChebyshevFirstKind(BasisFunction):
         T_1(x) = x
         T_{n+1}(x) = 2x T_n(x) - T_{n-1}(x)
 
-    Their domain is defined to be :math:`-1 \le x \le 1`.
+    Their domain is defined to be :math:`-1 \le x \le 1`. The degree *n* is
+    represented by property `degree`.
 
     Parameters
     ----------
-    n : int
+    degree : int
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self, n):
+    def __init__(self, degree):
         super().__init__()
-        self.n = int(n)
+        self.degree = degree
 
     @property
     def domain(self):
@@ -135,13 +136,13 @@ class ChebyshevFirstKind(BasisFunction):
         return numpy.array([-1, 1])
 
     @property
-    def n(self):
+    def degree(self):
         """int: Degree of polynomial."""
-        return self._n
+        return self._degree
     
-    @n.setter
-    def n(self,value):
-        self._n = int(value)
+    @degree.setter
+    def degree(self,value):
+        self._degree = int(value)
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -170,7 +171,7 @@ class ChebyshevFirstKind(BasisFunction):
             if input is outside the domain [-1, 1]
 
         """
-        return scipy.special.eval_chebyt(self.n, x)
+        return scipy.special.eval_chebyt(self.degree, x)
 
     def _derivative(self, x):
         """Evaluate the derivative of ChebyshevFirstKind.
@@ -197,7 +198,7 @@ class ChebyshevFirstKind(BasisFunction):
         ValueError
             if input is outside the domain [-1, 1].
         """
-        return self.n * scipy.special.eval_chebyu(self.n - 1, x)
+        return self.degree * scipy.special.eval_chebyu(self.degree - 1, x)
 
 
 class ChebyshevSecondKind(BasisFunction):
@@ -212,17 +213,18 @@ class ChebyshevSecondKind(BasisFunction):
         U_1(x) = 2x
         U_{n+1}(x) = 2x U_n(x) - U_{n-1}(x)
 
-    Their domain is defined to be :math:`-1 \le x \le 1`.
+    Their domain is defined to be :math:`-1 \le x \le 1`. The degree *n* is
+    represented by property `degree`.
 
     Parameters
     ----------
-    n : int
+    degree : int
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self, n):
+    def __init__(self, degree):
         super().__init__()
-        self._n = int(n)
+        self.degree = degree
 
     @property
     def domain(self):
@@ -230,13 +232,13 @@ class ChebyshevSecondKind(BasisFunction):
         return numpy.array([-1, 1])
 
     @property
-    def n(self):
+    def degree(self):
         """int: Degree of polynomial."""
-        return self._n
+        return self._degree
     
-    @n.setter
-    def n(self,value):
-        self._n = int(value)
+    @degree.setter
+    def degree(self,value):
+        self._degree = int(value)
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -270,7 +272,7 @@ class ChebyshevSecondKind(BasisFunction):
             if input is outside the domain [-1, 1]
 
         """
-        return scipy.special.eval_chebyu(self.n, x)
+        return scipy.special.eval_chebyu(self.degree, x)
 
     def _derivative(self, x):
         r"""Evaluate the derivative of Chebyshev Second Kind.
@@ -305,17 +307,17 @@ class ChebyshevSecondKind(BasisFunction):
         """
         x = numpy.asarray(x)
         y = numpy.zeros(x.shape)
-        u_limit = self.n * (self.n + 1) * (self.n + 2) / 3
+        u_limit = self.degree * (self.degree + 1) * (self.degree + 2) / 3
         flag_upper = x == 1
         y[flag_upper] = u_limit
         
         flag_lower = x == -1
-        y[flag_lower] = (-1) ** (self.n+1) * u_limit
+        y[flag_lower] = (-1) ** (self.degree+1) * u_limit
 
         flag = ~(flag_upper | flag_lower)
         y[flag] = (
-            (self.n + 1) * scipy.special.eval_chebyt(self.n + 1, x[flag])
-            - x[flag] * scipy.special.eval_chebyu(self.n, x[flag])
+            (self.degree + 1) * scipy.special.eval_chebyt(self.degree + 1, x[flag])
+            - x[flag] * scipy.special.eval_chebyu(self.degree, x[flag])
         ) / (x[flag] ** 2 - 1)
         if y.ndim == 0:
             y = y.item()
