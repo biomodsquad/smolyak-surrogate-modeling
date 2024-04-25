@@ -127,7 +127,7 @@ class ChebyshevFirstKind(BasisFunction):
 
     def __init__(self, n):
         super().__init__()
-        self._n = int(n)
+        self.n = int(n)
 
     @property
     def domain(self):
