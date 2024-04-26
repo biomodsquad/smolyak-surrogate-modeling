@@ -17,7 +17,7 @@ def test_cheb_initial():
     assert isinstance(f2.degree, int)
 
 
-@pytest.mark.parametrize("degree", list(range(3)))
+@pytest.mark.parametrize("degree", [0, 1, 2])
 def test_cheb_call(degree):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
