@@ -26,7 +26,7 @@ def test_cheb_call(degree):
     assert f(-1) == pytest.approx(special.eval_chebyt(degree, -1))
 
 
-@pytest.mark.parametrize("degree", list(range(3)))
+@pytest.mark.parametrize("degree", [0, 1, 2])
 def test_cheb_call_random_points_multi_input(degree):
     """Test chebyshev polynomial call handles inputs with complex shape"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
