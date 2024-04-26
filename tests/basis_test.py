@@ -27,8 +27,8 @@ def test_cheb_call(degree):
 
 
 @pytest.mark.parametrize("degree", [0, 1, 2])
-def test_cheb_call_random_points_multi_input(degree):
-    """Test chebyshev polynomial call handles inputs with complex shape"""
+def test_cheb_call_shape(degree):
+    """Test chebyshev polynomial call handles inputs with complex shapes"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
@@ -104,7 +104,7 @@ def test_cheb_2nd_initial():
     assert f2.degree == 2
     assert isinstance(f2.degree, int)
     assert numpy.array_equal(f2.domain, [-1, 1])
-    f2.degree = 3
+    f2.degree = float(3)
     assert f2.degree == 3
     assert isinstance(f2.degree, int)
 
@@ -186,7 +186,7 @@ def test_trig_initial():
     assert f2.frequency == 2
     assert isinstance(f2.frequency, int)
     assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
-    f2.frequency = 3
+    f2.frequency = float(3)
     assert f2.frequency == 3
     assert isinstance(f2.frequency, int)
 
