@@ -131,6 +131,7 @@ def test_cheb_2nd_call_random_points_multi_input(degree):
     assert answer.shape == answer_check.shape
     assert numpy.allclose(answer, answer_check)
 
+
 def test_cheb_2nd_call_root_points():
     """Test chebyshev polynomial roots"""
     f = smolyay.basis.ChebyshevSecondKind(3)

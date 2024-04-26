@@ -139,9 +139,9 @@ class ChebyshevFirstKind(BasisFunction):
     def degree(self):
         """int: Degree of polynomial."""
         return self._degree
-    
+
     @degree.setter
-    def degree(self,value):
+    def degree(self, value):
         self._degree = int(value)
 
     def _function(self, x):
@@ -235,9 +235,9 @@ class ChebyshevSecondKind(BasisFunction):
     def degree(self):
         """int: Degree of polynomial."""
         return self._degree
-    
+
     @degree.setter
-    def degree(self,value):
+    def degree(self, value):
         self._degree = int(value)
 
     def _function(self, x):
@@ -310,9 +310,9 @@ class ChebyshevSecondKind(BasisFunction):
         u_limit = self.degree * (self.degree + 1) * (self.degree + 2) / 3
         flag_upper = x == 1
         y[flag_upper] = u_limit
-        
+
         flag_lower = x == -1
-        y[flag_lower] = (-1) ** (self.degree+1) * u_limit
+        y[flag_lower] = (-1) ** (self.degree + 1) * u_limit
 
         flag = ~(flag_upper | flag_lower)
         y[flag] = (
@@ -355,9 +355,9 @@ class Trigonometric(BasisFunction):
     def frequency(self):
         """int: frequency of polynomial."""
         return self._frequency
-    
+
     @frequency.setter
-    def frequency(self,value):
+    def frequency(self, value):
         self._frequency = int(value)
 
     def _function(self, x):
@@ -388,7 +388,7 @@ class Trigonometric(BasisFunction):
             If input is outside the domain `[0, 2\pi]`
         """
         x = numpy.asarray(x)
-        return numpy.exp(x * self.frequency  * 1j)
+        return numpy.exp(x * self.frequency * 1j)
 
     def _derivative(self, x):
         r"""Evaluate the derivetive of the trigonometric polynomials.
