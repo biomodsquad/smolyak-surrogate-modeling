@@ -17,25 +17,91 @@ def test_cheb_initial():
     assert isinstance(f2.degree, int)
 
 
-@pytest.mark.parametrize("degree", [0, 1, 2])
-def test_cheb_call(degree):
+@pytest.mark.parametrize(
+    "degree,answer",
+    [
+        (0, [1, 1, 1, 1]),
+        (1, [0.5, 1, -1, -0.25]),
+        (2, [-0.5, 1, 1, -0.875]),
+    ],
+)
+def test_cheb_call(degree, answer):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    assert f(0.5) == pytest.approx(scipy.special.eval_chebyt(degree, 0.5))
-    assert f(1) == pytest.approx(scipy.special.eval_chebyt(degree, 1))
-    assert f(-1) == pytest.approx(scipy.special.eval_chebyt(degree, -1))
+    assert f(0.5) == pytest.approx(answer[0])
+    assert f(1) == pytest.approx(answer[1])
+    assert f(-1) == pytest.approx(answer[2])
+    assert f(-0.25) == pytest.approx(answer[3])
+
+
+@pytest.mark.parametrize(
+    "degree,answer",
+    [
+        (0, [1, 1, 1, 1]),
+        (1, [0.5, 1, -1, -0.25]),
+        (2, [-0.5, 1, 1, -0.875]),
+    ],
+)
+def test_cheb_call_1D(degree, answer):
+    """Test chebyshev polynomial call handles inputs from a 1D array"""
+    f = smolyay.basis.ChebyshevFirstKind(degree)
+    xs = [0.5, 1, -1, -0.25]
+    assert numpy.shape(f(xs)) == numpy.shape(answer)
+    assert numpy.allclose(f(xs), answer)
+
+
+@pytest.mark.parametrize(
+    "degree,answer",
+    [
+        (0, [[1, 1, 1, 1], [1, 1, 1, 1]]),
+        (1, [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25]]),
+        (2, [[-0.5, 1, 1, -0.875], [-0.5, 1, 1, -0.875]]),
+    ],
+)
+def test_cheb_call_2D(degree, answer):
+    """Test chebyshev polynomial call handles inputs from a 2D array"""
+    f = smolyay.basis.ChebyshevFirstKind(degree)
+    xs = [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25]]
+    xs2 = numpy.reshape(xs[0], (1, 4))
+    xs3 = numpy.reshape(xs[0], (4, 1))
+    answer2 = numpy.reshape(answer[0], (1, 4))
+    answer3 = numpy.reshape(answer[0], (4, 1))
+    assert numpy.shape(f(xs)) == numpy.shape(answer)
+    assert numpy.allclose(f(xs), answer)
+    assert numpy.shape(f(xs2)) == (1, 4)
+    assert numpy.allclose(f(xs2), answer2)
+    assert numpy.shape(f(xs3)) == (4, 1)
+    assert numpy.allclose(f(xs3), answer3)
 
 
 @pytest.mark.parametrize("degree", [0, 1, 2])
-def test_cheb_call_shape(degree):
-    """Test chebyshev polynomial call handles inputs with complex shapes"""
+def test_cheb_call_3D(degree):
+    """Test chebyshev polynomial call handles inputs from a 3D array"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    numpy.random.seed(567)
-    xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
-    answer = f(xs)
-    answer_check = scipy.special.eval_chebyt(degree, xs)
-    assert answer.shape == answer_check.shape
-    assert numpy.allclose(answer, answer_check)
+    xs = [
+        [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, -1, 0.5]],
+        [[0.5, 1, 1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, 1, 0.5]],
+    ]
+    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
+    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
+    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
+    xs5 = numpy.reshape(xs[0], (1, 3, 4))
+    xs6 = numpy.reshape(xs[0], (3, 4, 1))
+    xs7 = numpy.ones((1, 1, 1))
+    assert numpy.shape(f(xs)) == numpy.shape(xs)
+    assert numpy.allclose(f(xs), scipy.special.eval_chebyt(degree, xs))
+    assert numpy.shape(f(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f(xs2), scipy.special.eval_chebyt(degree, xs2))
+    assert numpy.shape(f(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f(xs3), scipy.special.eval_chebyt(degree, xs3))
+    assert numpy.shape(f(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f(xs4), scipy.special.eval_chebyt(degree, xs4))
+    assert numpy.shape(f(xs5)) == numpy.shape(xs5)
+    assert numpy.allclose(f(xs5), scipy.special.eval_chebyt(degree, xs5))
+    assert numpy.shape(f(xs6)) == numpy.shape(xs6)
+    assert numpy.allclose(f(xs6), scipy.special.eval_chebyt(degree, xs6))
+    assert numpy.shape(f(xs7)) == numpy.shape(xs7)
+    assert numpy.allclose(f(xs7), scipy.special.eval_chebyt(degree, xs7))
 
 
 def test_cheb_call_extrema_points():
@@ -58,22 +124,6 @@ def test_cheb_call_root_points():
     assert numpy.allclose(f(root_points), numpy.zeros(4))
 
 
-@pytest.mark.parametrize(
-    "degree,answer",
-    [
-        (0, [0, 0]),
-        (1, [1, 1]),
-        (2, [4, -2]),
-    ],
-)
-def test_cheb_derivative(degree, answer):
-    """Test if the correct derivative is generated."""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
-    assert f.derivative(1) == pytest.approx(answer[0])
-    assert f.derivative(-0.5) == pytest.approx(answer[1])
-    assert numpy.allclose(f.derivative([1, -0.5]), answer)
-
-
 def test_cheb_call_invalid_input():
     """Test call raises error if input is outside domain [-1, 1]"""
     f = smolyay.basis.ChebyshevFirstKind(4)
@@ -85,6 +135,124 @@ def test_cheb_call_invalid_input():
         f([0.5, 0.7, 3, 0.8])
     with pytest.raises(ValueError):
         f([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+
+
+@pytest.mark.parametrize(
+    "degree,answer",
+    [
+        (0, [0, 0, 0, 0]),
+        (1, [1, 1, 1, 1]),
+        (2, [2, 4, -4, -1]),
+    ],
+)
+def test_cheb_derivative(degree, answer):
+    """Test chebyshev polynomial derivative at some degree at some input"""
+    f = smolyay.basis.ChebyshevFirstKind(degree)
+    assert f.derivative(0.5) == pytest.approx(answer[0])
+    assert f.derivative(1) == pytest.approx(answer[1])
+    assert f.derivative(-1) == pytest.approx(answer[2])
+    assert f.derivative(-0.25) == pytest.approx(answer[3])
+
+
+@pytest.mark.parametrize(
+    "degree,answer",
+    [
+        (0, [0, 0, 0, 0]),
+        (1, [1, 1, 1, 1]),
+        (2, [2, 4, -4, -1]),
+    ],
+)
+def test_cheb_derivative_1D(degree, answer):
+    """Test chebyshev polynomial derivative handles inputs from a 1D array"""
+    f = smolyay.basis.ChebyshevFirstKind(degree)
+    xs = [0.5, 1, -1, -0.25]
+    assert numpy.shape(f.derivative(xs)) == numpy.shape(answer)
+    assert numpy.allclose(f.derivative(xs), answer)
+
+
+@pytest.mark.parametrize(
+    "degree,answer",
+    [
+        (0, [[0, 0, 0, 0], [0, 0, 0, 0]]),
+        (1, [[1, 1, 1, 1], [1, 1, 1, 1]]),
+        (2, [[2, 4, -4, -1], [-2, -4, 4, -1]]),
+    ],
+)
+def test_cheb_derivative_2D(degree, answer):
+    """Test chebyshev polynomial derivative handles inputs from a 2D array"""
+    f = smolyay.basis.ChebyshevFirstKind(degree)
+    xs = [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25]]
+    xs2 = numpy.reshape(xs[0], (1, 4))
+    xs3 = numpy.reshape(xs[0], (4, 1))
+    answer2 = numpy.reshape(answer[0], (1, 4))
+    answer3 = numpy.reshape(answer[0], (4, 1))
+    assert numpy.shape(f.derivative(xs)) == numpy.shape(answer)
+    assert numpy.allclose(f.derivative(xs), answer)
+    assert numpy.shape(f.derivative(xs2)) == (1, 4)
+    assert numpy.allclose(f.derivative(xs2), answer2)
+    assert numpy.shape(f.derivative(xs3)) == (4, 1)
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+
+@pytest.mark.parametrize(
+    "degree,answer",
+    [
+        (
+            0,
+            [
+                [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+                [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+            ],
+        ),
+        (
+            1,
+            [
+                [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]],
+                [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]],
+            ],
+        ),
+        (
+            2,
+            [
+                [[2, 4, -4, -1], [-2, -4, 4, -1], [-1, 4, -4, 2]],
+                [[2, 4, 4, -1], [-2, -4, 4, -1], [-1, 4, 4, 2]],
+            ],
+        ),
+    ],
+)
+def test_cheb_derivative_3D(degree, answer):
+    """Test chebyshev polynomial derivative handles inputs from a 3D array"""
+    f = smolyay.basis.ChebyshevFirstKind(degree)
+    xs = [
+        [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, -1, 0.5]],
+        [[0.5, 1, 1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, 1, 0.5]],
+    ]
+    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
+    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
+    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
+    xs5 = numpy.reshape(xs[0], (1, 3, 4))
+    xs6 = numpy.reshape(xs[0], (3, 4, 1))
+    xs7 = numpy.ones((1, 1, 1)) * xs[0][0][0]
+    answer2 = numpy.reshape(answer[0][0], (1, 1, 4))
+    answer3 = numpy.reshape(answer[0][0], (1, 4, 1))
+    answer4 = numpy.reshape(answer[0][0], (1, 1, 4))
+    answer5 = numpy.reshape(answer[0], (1, 3, 4))
+    answer6 = numpy.reshape(answer[0], (3, 4, 1))
+    answer7 = numpy.ones((1, 1, 1)) * answer[0][0][0]
+    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
+    assert numpy.allclose(f.derivative(xs), answer)
+    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f.derivative(xs2), answer2)
+    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f.derivative(xs3), answer3)
+    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f.derivative(xs4), answer4)
+    assert numpy.shape(f.derivative(xs5)) == numpy.shape(xs5)
+    assert numpy.allclose(f.derivative(xs5), answer5)
+    assert numpy.shape(f.derivative(xs6)) == numpy.shape(xs6)
+    assert numpy.allclose(f.derivative(xs6), answer6)
+    assert numpy.shape(f.derivative(xs7)) == numpy.shape(xs7)
+    assert numpy.allclose(f.derivative(xs7), answer7)
 
 
 def test_cheb_derivative_invalid_input():
