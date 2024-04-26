@@ -2,6 +2,9 @@ import numpy
 
 from .benchmark import BenchmarkFunction
 
+def sqr(x):
+    return x**2
+
 class fermat_vareps(BenchmarkFunction):
     @property
     def domain(self):
@@ -16,33 +19,14 @@ class fermat_vareps(BenchmarkFunction):
     def global_minimum_location(self):
         return [2.0000000001, 1.1547005384, 1e-08]
 
-    def _function(self,x):
-        v = numpy.zeros(list(x.shape[:-1]) + [5])
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,1] = x[...,1] * x[...,1]
-        v[...,2] = x[...,2] * x[...,2]
-        v[...,3] = v[...,1] + v[...,2]
-        v[...,1] = v[...,0] + v[...,3]
-        v[...,0] = numpy.sqrt(v[...,1])
-        v[...,1] = x[...,0] * x[...,0]
-        v[...,3] = -4. + x[...,1]
-        v[...,2] = v[...,3] * v[...,3]
-        v[...,3] = x[...,2] * x[...,2]
-        v[...,4] = v[...,2] + v[...,3]
-        v[...,2] = v[...,1] + v[...,4]
-        v[...,1] = numpy.sqrt(v[...,2])
-        v[...,0] += v[...,1]
-        v[...,1] = x[...,0] * x[...,0]
-        v[...,2] = -2. + x[...,1]
-        v[...,4] = v[...,2] * v[...,2]
-        v[...,2] = -4. + x[...,2]
-        v[...,3] = v[...,2] * v[...,2]
-        v[...,2] = v[...,4] + v[...,3]
-        v[...,4] = v[...,1] + v[...,2]
-        v[...,1] = numpy.sqrt(v[...,4])
-        v[...,0] += v[...,1]
-        rv = v[...,0] + x[...,0]
-        return rv
+    def _function(self, x):
+        return (
+            numpy.sqrt(sqr(x[..., 2]) + sqr(x[..., 0]) + sqr(x[..., 1]))
+            + numpy.sqrt(sqr(x[..., 2]) + sqr((-4) + x[..., 0]) + sqr(x[..., 1]))
+            + numpy.sqrt(sqr(x[..., 2]) + sqr((-2) + x[..., 0]) + sqr((-4) + x[..., 1]))
+            + x[..., 2]
+        )
+
 
 class fermat2_vareps(BenchmarkFunction):
     @property
@@ -57,30 +41,10 @@ class fermat2_vareps(BenchmarkFunction):
     def global_minimum_location(self):
         return  [2, 0.99999998, 1e-08]
 
-    def _function(self,x):
-        v = numpy.zeros(list(x.shape[:-1]) + [5])
-        v[...,0] = x[...,0] * x[...,0]
-        v[...,1] = x[...,1] * x[...,1]
-        v[...,2] = x[...,2] * x[...,2]
-        v[...,3] = v[...,1] + v[...,2]
-        v[...,1] = v[...,0] + v[...,3]
-        v[...,0] = numpy.sqrt(v[...,1])
-        v[...,1] = x[...,0] * x[...,0]
-        v[...,3] = -4. + x[...,1]
-        v[...,2] = v[...,3] * v[...,3]
-        v[...,3] = x[...,2] * x[...,2]
-        v[...,4] = v[...,2] + v[...,3]
-        v[...,2] = v[...,1] + v[...,4]
-        v[...,1] = numpy.sqrt(v[...,2])
-        v[...,0] += v[...,1]
-        v[...,1] = x[...,0] * x[...,0]
-        v[...,2] = -2. + x[...,1]
-        v[...,4] = v[...,2] * v[...,2]
-        v[...,2] = -1. + x[...,2]
-        v[...,3] = v[...,2] * v[...,2]
-        v[...,2] = v[...,4] + v[...,3]
-        v[...,4] = v[...,1] + v[...,2]
-        v[...,1] = numpy.sqrt(v[...,4])
-        v[...,0] += v[...,1]
-        rv = v[...,0] + x[...,0]
-        return rv
+    def _function(self, x):
+        return (
+            numpy.sqrt(sqr(x[..., 2]) + sqr(x[..., 0]) + sqr(x[..., 1]))
+            + numpy.sqrt(sqr(x[..., 2]) + sqr((-4) + x[..., 0]) + sqr(x[..., 1]))
+            + numpy.sqrt(sqr(x[..., 2]) + sqr((-2) + x[..., 0]) + sqr((-1) + x[..., 1]))
+            + x[..., 2]
+        )
