@@ -11,8 +11,6 @@ from .powell import _powell
 from .rosenbr import _rosenbrock
 from .hs import _wood
 
-def sqr(x):
-    return x**2
 
 class s201(BenchmarkFunction):
     @property
@@ -725,7 +723,7 @@ class s266(BenchmarkFunction):
     def _function(self, x):
         return -(
             -(
-                sqr(
+                numpy.square(
                     (
                         1.173295
                         * (
@@ -777,7 +775,7 @@ class s266(BenchmarkFunction):
                         - 0.0735084 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         1.42024
                         * (
@@ -829,7 +827,7 @@ class s266(BenchmarkFunction):
                         - 0.869487 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         0.56444
                         * (
@@ -881,7 +879,7 @@ class s266(BenchmarkFunction):
                         + 0.949721 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         1.51143
                         * (
@@ -933,7 +931,7 @@ class s266(BenchmarkFunction):
                         + 0.463136 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         0.860695
                         * (
@@ -985,7 +983,7 @@ class s266(BenchmarkFunction):
                         + 0.149926 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         0.0769585
                         * (
@@ -1037,7 +1035,7 @@ class s266(BenchmarkFunction):
                         + 0.413248 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         0.1452885
                         * (
@@ -1089,7 +1087,7 @@ class s266(BenchmarkFunction):
                         - 0.0182537 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         -0.079689
                         * (
@@ -1141,7 +1139,7 @@ class s266(BenchmarkFunction):
                         + 0.887866 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         27.3455
                         * (
@@ -1193,7 +1191,7 @@ class s266(BenchmarkFunction):
                         + 0.662362 * x[..., 4]
                     )
                 )
-                + sqr(
+                + numpy.square(
                     (
                         0.819831 * x[..., 0]
                         - 0.2224365

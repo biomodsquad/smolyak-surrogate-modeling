@@ -2,8 +2,6 @@ import numpy
 
 from .benchmark import BenchmarkFunction
 
-def sqr(x):
-    return x**2
 
 class fermat_vareps(BenchmarkFunction):
     @property
@@ -21,9 +19,9 @@ class fermat_vareps(BenchmarkFunction):
 
     def _function(self, x):
         return (
-            numpy.sqrt(sqr(x[..., 2]) + sqr(x[..., 0]) + sqr(x[..., 1]))
-            + numpy.sqrt(sqr(x[..., 2]) + sqr((-4) + x[..., 0]) + sqr(x[..., 1]))
-            + numpy.sqrt(sqr(x[..., 2]) + sqr((-2) + x[..., 0]) + sqr((-4) + x[..., 1]))
+            numpy.sqrt(numpy.square(x[..., 2]) + numpy.square(x[..., 0]) + numpy.square(x[..., 1]))
+            + numpy.sqrt(numpy.square(x[..., 2]) + numpy.square((-4) + x[..., 0]) + numpy.square(x[..., 1]))
+            + numpy.sqrt(numpy.square(x[..., 2]) + numpy.square((-2) + x[..., 0]) + numpy.square((-4) + x[..., 1]))
             + x[..., 2]
         )
 
@@ -43,8 +41,8 @@ class fermat2_vareps(BenchmarkFunction):
 
     def _function(self, x):
         return (
-            numpy.sqrt(sqr(x[..., 2]) + sqr(x[..., 0]) + sqr(x[..., 1]))
-            + numpy.sqrt(sqr(x[..., 2]) + sqr((-4) + x[..., 0]) + sqr(x[..., 1]))
-            + numpy.sqrt(sqr(x[..., 2]) + sqr((-2) + x[..., 0]) + sqr((-1) + x[..., 1]))
+            numpy.sqrt(numpy.square(x[..., 2]) + numpy.square(x[..., 0]) + numpy.square(x[..., 1]))
+            + numpy.sqrt(numpy.square(x[..., 2]) + numpy.square((-4) + x[..., 0]) + numpy.square(x[..., 1]))
+            + numpy.sqrt(numpy.square(x[..., 2]) + numpy.square((-2) + x[..., 0]) + numpy.square((-1) + x[..., 1]))
             + x[..., 2]
         )
