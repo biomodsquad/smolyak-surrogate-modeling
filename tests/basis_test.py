@@ -3,7 +3,7 @@ import pytest
 import numpy
 from scipy import special
 
-import smolyay.basis
+import smolyay
 
 
 def test_cheb_initial():
