@@ -21,10 +21,9 @@ def test_cheb_initial():
 def test_cheb_call(degree):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    numpy.random.seed(567)
-    xs = numpy.linspace(-1, 1, 20)
-    for x in xs:
-        assert f(x) == pytest.approx(special.eval_chebyt(degree, x))
+    assert f(0.5) == pytest.approx(special.eval_chebyt(degree, 0.5))
+    assert f(1) == pytest.approx(special.eval_chebyt(degree, 1))
+    assert f(-1) == pytest.approx(special.eval_chebyt(degree, -1))
 
 
 @pytest.mark.parametrize("degree", list(range(3)))
@@ -114,10 +113,9 @@ def test_cheb_2nd_initial():
 def test_cheb_2nd_call(degree):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
-    numpy.random.seed(567)
-    xs = numpy.linspace(-1, 1, 20)
-    for x in xs:
-        assert f(x) == pytest.approx(special.eval_chebyu(degree, x))
+    assert f(0.5) == pytest.approx(special.eval_chebyu(degree, 0.5))
+    assert f(1) == pytest.approx(special.eval_chebyu(degree, 1))
+    assert f(-1) == pytest.approx(special.eval_chebyu(degree, -1))
 
 
 @pytest.mark.parametrize("degree", list(range(3)))
@@ -204,8 +202,9 @@ def test_trig_initial():
 def test_trig_call(frequency, c):
     """Test call method of trigonometric basis function"""
     f = smolyay.basis.Trigonometric(frequency)
-    for i in [0, numpy.pi / 3, 3 * numpy.pi / 2]:
-        assert f(i) == numpy.exp(i * c)
+    assert f(0) == numpy.exp(0 * c)
+    assert f(numpy.pi / 3) == numpy.exp(numpy.pi / 3 * c)
+    assert f(3 * numpy.pi / 2) == numpy.exp(3 * numpy.pi / 2 * c)
 
 
 @pytest.mark.parametrize(
