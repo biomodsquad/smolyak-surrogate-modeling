@@ -21,9 +21,9 @@ def test_cheb_initial():
 def test_cheb_call(degree):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    assert f(0.5) == pytest.approx(special.eval_chebyt(degree, 0.5))
-    assert f(1) == pytest.approx(special.eval_chebyt(degree, 1))
-    assert f(-1) == pytest.approx(special.eval_chebyt(degree, -1))
+    assert f(0.5) == pytest.approx(scipy.special.eval_chebyt(degree, 0.5))
+    assert f(1) == pytest.approx(scipy.special.eval_chebyt(degree, 1))
+    assert f(-1) == pytest.approx(scipy.special.eval_chebyt(degree, -1))
 
 
 @pytest.mark.parametrize("degree", [0, 1, 2])
@@ -33,7 +33,7 @@ def test_cheb_call_random_points_multi_input(degree):
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
     answer = f(xs)
-    answer_check = special.eval_chebyt(degree, xs)
+    answer_check = scipy.special.eval_chebyt(degree, xs)
     assert answer.shape == answer_check.shape
     assert numpy.allclose(answer, answer_check)
 
@@ -113,9 +113,9 @@ def test_cheb_2nd_initial():
 def test_cheb_2nd_call(degree):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
-    assert f(0.5) == pytest.approx(special.eval_chebyu(degree, 0.5))
-    assert f(1) == pytest.approx(special.eval_chebyu(degree, 1))
-    assert f(-1) == pytest.approx(special.eval_chebyu(degree, -1))
+    assert f(0.5) == pytest.approx(scipy.special.eval_chebyu(degree, 0.5))
+    assert f(1) == pytest.approx(scipy.special.eval_chebyu(degree, 1))
+    assert f(-1) == pytest.approx(scipy.special.eval_chebyu(degree, -1))
 
 
 @pytest.mark.parametrize("degree", list(range(3)))
@@ -125,7 +125,7 @@ def test_cheb_2nd_call_random_points_multi_input(degree):
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 3, 4, 6) * 2 - 1
     answer = f(xs)
-    answer_check = special.eval_chebyu(degree, xs)
+    answer_check = scipy.special.eval_chebyu(degree, xs)
     assert answer.shape == answer_check.shape
     assert numpy.allclose(answer, answer_check)
 
