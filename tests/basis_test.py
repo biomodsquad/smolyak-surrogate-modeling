@@ -1,7 +1,7 @@
 import pytest
 
 import numpy
-from scipy import special
+import scipy.special
 
 import smolyay
 
