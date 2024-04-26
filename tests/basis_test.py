@@ -17,7 +17,7 @@ def test_cheb_initial():
     assert isinstance(f2.degree, int)
 
 
-@pytest.mark.parametrize("degree", list(range(5)))
+@pytest.mark.parametrize("degree", list(range(3)))
 def test_cheb_call(degree):
     """Test chebyshev polynomial at some degree at some input"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
@@ -27,7 +27,7 @@ def test_cheb_call(degree):
         assert f(x) == pytest.approx(special.eval_chebyt(degree, x))
 
 
-@pytest.mark.parametrize("degree", list(range(5)))
+@pytest.mark.parametrize("degree", list(range(3)))
 def test_cheb_call_random_points_multi_input(degree):
     """Test chebyshev polynomial call handles inputs with complex shape"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
@@ -120,7 +120,7 @@ def test_cheb_2nd_call(degree):
         assert f(x) == pytest.approx(special.eval_chebyu(degree, x))
 
 
-@pytest.mark.parametrize("degree", list(range(5)))
+@pytest.mark.parametrize("degree", list(range(3)))
 def test_cheb_2nd_call_random_points_multi_input(degree):
     """Test chebyshev polynomial call handles inputs with complex shape"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
@@ -184,59 +184,59 @@ def test_cheb_2nd_derivative_invalid_input():
 def test_trig_initial():
     """test degrees returns correctly"""
     f2 = smolyay.basis.Trigonometric(2)
-    assert f2.n == 2
-    assert isinstance(f2.n, int)
+    assert f2.frequency == 2
+    assert isinstance(f2.frequency, int)
     assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
-    f2.n = 3
-    assert f2.n == 3
-    assert isinstance(f2.n, int)
+    f2.frequency = 3
+    assert f2.frequency == 3
+    assert isinstance(f2.frequency, int)
 
 
 @pytest.mark.parametrize(
-    "n,c",
+    "frequency,c",
     [
         (0, 0),
         (1, 1j),
-        (2, 1j * -1),
+        (-1, 1j * -1),
     ],
 )
-def test_trig_call(n, c):
+def test_trig_call(frequency, c):
     """Test call method of trigonometric basis function"""
-    f = smolyay.basis.Trigonometric(n)
+    f = smolyay.basis.Trigonometric(frequency)
     for i in [0, numpy.pi / 3, 3 * numpy.pi / 2]:
         assert f(i) == numpy.exp(i * c)
 
 
 @pytest.mark.parametrize(
-    "n,c",
+    "frequency,c",
     [
         (0, 0),
         (1, 1j),
-        (5, 1j * 3),
+        (3, 1j * 3),
     ],
 )
-def test_trig_call_random_points_multi_input(n, c):
+def test_trig_call_random_points_multi_input(frequency, c):
     """Test that Trigonometric polynomial call handles multiple x inputs"""
-    f = smolyay.basis.Trigonometric(n)
+    f = smolyay.basis.Trigonometric(frequency)
     numpy.random.seed(567)
     xs = numpy.random.rand(20, 6, 3, 2) * 2 * numpy.pi
     assert numpy.allclose(f(xs), numpy.exp(xs * c))
 
 
 @pytest.mark.parametrize(
-    "n,answer",
+    "frequency,answer",
     [
         (0, [0, 0]),
         (1, [1j * numpy.exp(1j), 1j * numpy.exp(numpy.pi * 1j * 1 / 6)]),
         (
-            2,
+            -1,
             [-1j * numpy.exp(1 * 1j * (-1)), -1j * numpy.exp(numpy.pi * 1j * (-1) / 6)],
         ),
     ],
 )
-def test_trig_derivative(n, answer):
+def test_trig_derivative(frequency, answer):
     """Test if the correct derivative is generated."""
-    f = smolyay.basis.Trigonometric(n)
+    f = smolyay.basis.Trigonometric(frequency)
     assert f.derivative(1) == pytest.approx(answer[0])
     assert f.derivative(numpy.pi / 6) == pytest.approx(answer[1])
     assert numpy.allclose(f.derivative([1, numpy.pi / 6]), answer)

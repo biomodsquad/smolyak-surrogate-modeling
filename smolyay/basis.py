@@ -328,33 +328,23 @@ class Trigonometric(BasisFunction):
     r"""Trigonometric basis functions.
 
     The Trigonometric polynomials represents periodic functions
-    as sums of sine and cosine terms, where *n* is the order
-    of trigonometric polynomial and is a non-negative integer.
+    as sums of sine and cosine terms, where *n* is the frequency
+    of trigonometric polynomial and is any integer.
 
     .. math::
 
-        \phi_n(x) = \exp(2\pi i \sigma(n) x)
-
-    The :math:`\sigma` for this polynomial is the frequency of the
-    complex exponential. It is calculated in the following equation.
-
-    .. math::
-
-        \sigma(n) = \begin{cases}
-            (1 + n) / 2 & \text{ if } n \text{ is odd}\\ 
-            -n / 2 & \text{ if } n \text{ is even} 
-            \end{cases}
+        \phi_n(x) = \exp(xi * n)
 
     Parameters
     ----------
-    n : int
+    frequency : int
         Degree of trigonometric polynomial.
 
     """
 
-    def __init__(self, n):
+    def __init__(self, frequency):
         super().__init__()
-        self._n = int(n)
+        self.frequency = frequency
 
     @property
     def domain(self):
@@ -362,13 +352,13 @@ class Trigonometric(BasisFunction):
         return numpy.array([0, 2 * numpy.pi])
 
     @property
-    def n(self):
-        """int: Degree of polynomial."""
-        return self._n
+    def frequency(self):
+        """int: frequency of polynomial."""
+        return self._frequency
     
-    @n.setter
-    def n(self,value):
-        self._n = int(value)
+    @frequency.setter
+    def frequency(self,value):
+        self._frequency = int(value)
 
     def _function(self, x):
         r"""Evaluate the basis function.
@@ -377,11 +367,10 @@ class Trigonometric(BasisFunction):
 
         .. math::
 
-            \phi_n(x) = \exp(x i \sigma(n))
+            \phi_n(x) = \exp(xi * n)
 
-        where *n* is the order of trigonometric polynomial and
-        is a non-negative integer, and `sigma` the frequency of the
-        complex exponential
+        where *n* is the frequency of the trigonometric polynomial and
+        is any integer.
 
         Parameters
         ----------
@@ -399,10 +388,7 @@ class Trigonometric(BasisFunction):
             If input is outside the domain `[0, 2\pi]`
         """
         x = numpy.asarray(x)
-        if self.n % 2 == 1:
-            return numpy.exp(x * (1 + self.n) / 2 * 1j)
-        else:
-            return numpy.exp(x * -self.n / 2 * 1j)
+        return numpy.exp(x * self.frequency  * 1j)
 
     def _derivative(self, x):
         r"""Evaluate the derivetive of the trigonometric polynomials.
@@ -423,10 +409,7 @@ class Trigonometric(BasisFunction):
             If input is outside the domain `[0, 2\pi]`
         """
         x = numpy.asarray(x)
-        if self.n % 2 == 1:
-            return (1 + self.n) / 2 * 1j * numpy.exp(x * (1 + self.n) / 2 * 1j)
-        else:
-            return -self.n / 2 * 1j * numpy.exp(x * -self.n / 2 * 1j)
+        return self.frequency * 1j * numpy.exp(x * self.frequency * 1j)
 
 
 class BasisFunctionSet:
