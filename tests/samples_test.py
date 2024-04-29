@@ -2,261 +2,235 @@ import pytest
 
 import numpy
 
-from smolyay.samples import (
-    UnidimensionalPointSet,
-    ClenshawCurtisPointSet,
-    NestedClenshawCurtisPointSet,
-    SlowNestedClenshawCurtisPointSet,
-    TrigonometricPointSet,
-    NestedTrigonometricPointSet,
-)
-
-
-@pytest.fixture
-def clenshaw_curtis_num9():
-    """the first 9 extrema"""
-    return [
-        0,
-        -1.0,
-        1.0,
-        -1 / numpy.sqrt(2),
-        1 / numpy.sqrt(2),
-        -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-        -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-        numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-        numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-    ]
-
-
-@pytest.fixture
-def trig_num9():
-    """the first 9 points"""
-    return (
-        2
-        * numpy.pi
-        * numpy.array(
-            [
-                0,
-                1 / 3,
-                2 / 3,
-                1 / 9,
-                2 / 9,
-                4 / 9,
-                5 / 9,
-                7 / 9,
-                8 / 9,
-            ]
-        )
-    )
+import smolyay.samples
 
 
 def test_clenshaw_initial():
     """test default properties"""
-    f = ClenshawCurtisPointSet(7)
+    f = smolyay.samples.ClenshawCurtisPointSet(7)
     assert numpy.array_equal(f.domain, [-1, 1])
     assert f.degree == 7
 
 
-def test_clenshaw_generate_values(clenshaw_curtis_num9):
+@pytest.mark.parametrize(
+    "degree,points",
+    [
+        (0, [0]),
+        (1, [-1, 1]),
+        (2, [-1, 0, 1]),
+        (3, [-1, -0.5, 0.5, 1]),
+        (
+            8,
+            [
+                -1,
+                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+                -1 / numpy.sqrt(2),
+                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                0,
+                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                1 / numpy.sqrt(2),
+                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+                1,
+            ],
+        ),
+    ],
+)
+def test_clenshaw_generate_values(degree, points):
     """test the output of generate_points"""
-    assert numpy.allclose(ClenshawCurtisPointSet(0).points, [0], atol=1e-10)
-    assert numpy.allclose(ClenshawCurtisPointSet(1).points, [-1, 1], atol=1e-10)
-    assert numpy.allclose(ClenshawCurtisPointSet(2).points, [-1, 0, 1], atol=1e-10)
     assert numpy.allclose(
-        ClenshawCurtisPointSet(3).points, [-1, -0.5, 0.5, 1], atol=1e-10
+        smolyay.samples.ClenshawCurtisPointSet(degree).points, points, atol=1e-10
     )
-    assert numpy.allclose(
-        ClenshawCurtisPointSet(8).points, sorted(clenshaw_curtis_num9), atol=1e-10
-    )
-
-
-def test_nestedclenshaw_initial():
-    """test default properties"""
-    f = NestedClenshawCurtisPointSet(7)
-    assert numpy.array_equal(f.domain, [-1, 1])
-    assert f.max_level == 7
-    assert f._valid_cache == True
-    f.points
-    assert f._valid_cache == False
-
-
-def test_nestedclenshaw_values(clenshaw_curtis_num9):
-    """test number of points"""
-    print(NestedClenshawCurtisPointSet(3).points)
-    assert numpy.allclose(NestedClenshawCurtisPointSet(0).points, [0], atol=1e-10)
-    assert numpy.allclose(
-        NestedClenshawCurtisPointSet(1).points, [0, -1, 1], atol=1e-10
-    )
-    assert numpy.allclose(
-        NestedClenshawCurtisPointSet(3).points, [clenshaw_curtis_num9], atol=1e-10
-    )
-
-
-def test_nestedclenshaw_growth():
-    """test growth order matches point accumulation"""
-    f = NestedClenshawCurtisPointSet(7)
-    assert f._new_per_level(0) == [1]
-    assert f._new_per_level(1) == [1,2]
-    assert f._new_per_level(2) == [1,2,2]
-    assert f._new_per_level(3) == [1,2,2,4]
-    assert f._new_per_level(4) == [1,2,2,4,8]
-
-
-def test_nestedclenshaw_levels():
-    """test number of levels"""
-    assert NestedClenshawCurtisPointSet(0).levels == [[0]]
-    assert NestedClenshawCurtisPointSet(1).levels == [[0], [1, 2]]
-    assert NestedClenshawCurtisPointSet(2).levels == [[0], [1, 2], [3, 4]]
-    assert NestedClenshawCurtisPointSet(3).levels == [[0], [1, 2], [3, 4], [5, 6, 7, 8]]
-
-
-def test_nestedclenshaw_growth_point_match():
-    """test the growth rule matches number of points accumulating"""
-    for i in range(10):
-        f = NestedClenshawCurtisPointSet(i)
-        assert numpy.sum(f._new_per_level(i)) == len(f.points)
-        assert len(f.points) - 1 == f.levels[-1][-1]
-
-
-def test_slownestedclenshaw_initial():
-    """test default properties"""
-    f = SlowNestedClenshawCurtisPointSet(7)
-    assert numpy.array_equal(f.domain, [-1, 1])
-    assert f.max_level == 7
-    assert f._valid_cache == True
-    f.points
-    assert f._valid_cache == False
-
-
-def test_slownestedclenshaw_values(clenshaw_curtis_num9):
-    """test number of points"""
-    assert numpy.allclose(SlowNestedClenshawCurtisPointSet(0).points, [0], atol=1e-10)
-    assert numpy.allclose(
-        SlowNestedClenshawCurtisPointSet(1).points, [0, -1, 1], atol=1e-10
-    )
-    assert numpy.allclose(
-        SlowNestedClenshawCurtisPointSet(3).points, [clenshaw_curtis_num9], atol=1e-10
-    )
-    assert numpy.allclose(
-        SlowNestedClenshawCurtisPointSet(4).points, [clenshaw_curtis_num9], atol=1e-10
-    )
-
-
-def test_slownestedclenshaw_growth():
-    """test growth order matches point accumulation"""
-    f = SlowNestedClenshawCurtisPointSet(7)
-    assert f._new_per_level(0) == [1]
-    assert f._new_per_level(1) == [1,2]
-    assert f._new_per_level(2) == [1,2,2]
-    assert f._new_per_level(3) == [1,2,2,4]
-    assert f._new_per_level(4) == [1,2,2,4,0]
-    assert f._new_per_level(5) == [1,2,2,4,0,8]
-
-
-def test_slownestedclenshaw_levels():
-    """test number of levels"""
-    assert SlowNestedClenshawCurtisPointSet(0).levels == [[0]]
-    assert SlowNestedClenshawCurtisPointSet(1).levels == [[0], [1, 2]]
-    assert SlowNestedClenshawCurtisPointSet(2).levels == [[0], [1, 2], [3, 4]]
-    assert SlowNestedClenshawCurtisPointSet(3).levels == [
-        [0],
-        [1, 2],
-        [3, 4],
-        [5, 6, 7, 8],
-    ]
-    assert SlowNestedClenshawCurtisPointSet(4).levels == [
-        [0],
-        [1, 2],
-        [3, 4],
-        [5, 6, 7, 8],
-        [],
-    ]
-    assert SlowNestedClenshawCurtisPointSet(5).levels == [
-        [0],
-        [1, 2],
-        [3, 4],
-        [5, 6, 7, 8],
-        [],
-        [9, 10, 11, 12, 13, 14, 15, 16],
-    ]
-
-
-def test_slownestedclenshaw_growth_point_match():
-    """test the growth rule matches number of points accumulating"""
-    for i in range(2, 10):
-        f = SlowNestedClenshawCurtisPointSet(i)
-        nonempty_index = next(
-            i for i in range(len(f.levels) - 1, -1, -1) if len(f.levels[i]) != 0
-        )
-        assert numpy.sum(f._new_per_level(i)) == len(f.points)
-        assert len(f.points) - 1 == f.levels[nonempty_index][-1]
 
 
 def test_trig_initial():
     """test default properties"""
-    f = TrigonometricPointSet(7)
+    f = smolyay.samples.TrigonometricPointSet(7)
     assert numpy.array_equal(f.domain, [0, 2 * numpy.pi])
     assert f.frequency == 7
 
 
-def test_trig_generate_values(trig_num9):
+@pytest.mark.parametrize(
+    "degree,points",
+    [
+        (0, [0]),
+        (1, [0]),
+        (2, [0, numpy.pi]),
+        (3, [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3]),
+        (
+            9,
+            2 * numpy.pi * numpy.linspace(0, 8 / 9, 9),
+        ),
+    ],
+)
+def test_trig_generate_values(degree, points):
     """test number of points is changed to 3"""
-    assert numpy.allclose(TrigonometricPointSet(0).points, [0], atol=1e-10)
-    assert numpy.allclose(TrigonometricPointSet(1).points, [0], atol=1e-10)
-    assert numpy.allclose(TrigonometricPointSet(2).points, [0, numpy.pi], atol=1e-10)
     assert numpy.allclose(
-        TrigonometricPointSet(3).points,
-        [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
-        atol=1e-10,
-    )
-    assert numpy.allclose(
-        TrigonometricPointSet(9).points, sorted(trig_num9), atol=1e-10
+        smolyay.samples.TrigonometricPointSet(degree).points, points, atol=1e-10
     )
 
 
-def test_nestedtrig_initial():
+@pytest.mark.parametrize(
+    "nested_samples,domain",
+    [
+        (smolyay.samples.NestedClenshawCurtisPointSet, [-1, 1]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, [-1, 1]),
+        (smolyay.samples.NestedTrigonometricPointSet, [0, 2 * numpy.pi]),
+    ],
+)
+def test_nested_initial(nested_samples, domain):
     """test default properties"""
-    f = NestedTrigonometricPointSet(7)
-    assert numpy.array_equal(f.domain, [0, 2 * numpy.pi])
+    f = nested_samples(7)
+    assert numpy.array_equal(f.domain, domain)
     assert f.max_level == 7
+    assert f._valid_cache == True
+    f.points
+    assert f._valid_cache == False
 
 
-def test_nestedtrig_generate_values(trig_num9):
-    """test number of points is changed to 3"""
-    assert numpy.allclose(NestedTrigonometricPointSet(0).points, [0], atol=1e-10)
-    assert numpy.allclose(
-        NestedTrigonometricPointSet(1).points,
-        [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
-        atol=1e-10,
-    )
-    assert numpy.allclose(NestedTrigonometricPointSet(2).points, trig_num9, atol=1e-10)
+@pytest.mark.parametrize(
+    "nested_samples,max_level,points",
+    [
+        (smolyay.samples.NestedClenshawCurtisPointSet, 0, [0]),
+        (smolyay.samples.NestedClenshawCurtisPointSet, 1, [0, -1, 1]),
+        (
+            smolyay.samples.NestedClenshawCurtisPointSet,
+            3,
+            [
+                0,
+                -1.0,
+                1.0,
+                -1 / numpy.sqrt(2),
+                1 / numpy.sqrt(2),
+                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+            ],
+        ),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 0, [0]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 1, [0, -1, 1]),
+        (
+            smolyay.samples.SlowNestedClenshawCurtisPointSet,
+            3,
+            [
+                0,
+                -1.0,
+                1.0,
+                -1 / numpy.sqrt(2),
+                1 / numpy.sqrt(2),
+                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+            ],
+        ),
+        (
+            smolyay.samples.SlowNestedClenshawCurtisPointSet,
+            4,
+            [
+                0,
+                -1.0,
+                1.0,
+                -1 / numpy.sqrt(2),
+                1 / numpy.sqrt(2),
+                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+            ],
+        ),
+        (smolyay.samples.NestedTrigonometricPointSet, 0, [0]),
+        (
+            smolyay.samples.NestedTrigonometricPointSet,
+            1,
+            [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
+        ),
+        (
+            smolyay.samples.NestedTrigonometricPointSet,
+            2,
+            2
+            * numpy.pi
+            * numpy.array(
+                [
+                    0,
+                    1 / 3,
+                    2 / 3,
+                    1 / 9,
+                    2 / 9,
+                    4 / 9,
+                    5 / 9,
+                    7 / 9,
+                    8 / 9,
+                ]
+            ),
+        ),
+    ],
+)
+def test_nested_points(nested_samples, max_level, points):
+    """test number of points"""
+    f = nested_samples(max_level)
+    assert numpy.allclose(f.points, points, atol=1e-10)
 
 
-def test_nestedtrig_growth():
-    """test growth order matches point accumulation"""
-    f = NestedTrigonometricPointSet(7)
-    assert f._new_per_level(0) == [1]
-    assert f._new_per_level(1) == [1,2]
-    assert f._new_per_level(2) == [1,2,6]
-    assert f._new_per_level(3) == [1,2,6,18]
+@pytest.mark.parametrize(
+    "nested_samples,max_level,num_points",
+    [
+        (smolyay.samples.NestedClenshawCurtisPointSet, 0, [1]),
+        (smolyay.samples.NestedClenshawCurtisPointSet, 1, [1, 2]),
+        (smolyay.samples.NestedClenshawCurtisPointSet, 3, [1, 2, 2, 4]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 0, [1]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 1, [1, 2]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 3, [1, 2, 2, 4]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 4, [1, 2, 2, 4, 0]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 5, [1, 2, 2, 4, 0, 8]),
+        (smolyay.samples.NestedTrigonometricPointSet, 0, [1]),
+        (smolyay.samples.NestedTrigonometricPointSet, 1, [1, 2]),
+        (smolyay.samples.NestedTrigonometricPointSet, 2, [1, 2, 6]),
+    ],
+)
+def test_nested_num_points_per_level(nested_samples, max_level, num_points):
+    """test number of points per level"""
+    f = nested_samples(max_level)
+    assert f.num_points == num_points
 
+@pytest.mark.parametrize(
+    "nested_samples,max_level,start_level",
+    [
+        (smolyay.samples.NestedClenshawCurtisPointSet, 0, [0]),
+        (smolyay.samples.NestedClenshawCurtisPointSet, 1, [0, 1]),
+        (smolyay.samples.NestedClenshawCurtisPointSet, 3, [0, 1, 3, 5]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 0, [0]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 1, [0, 1]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 3, [0, 1, 3, 5]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 4, [0, 1, 3, 5, 9]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 5, [0, 1, 3, 5, 9, 9]),
+        (smolyay.samples.NestedTrigonometricPointSet, 0, [0]),
+        (smolyay.samples.NestedTrigonometricPointSet, 1, [0, 1]),
+        (smolyay.samples.NestedTrigonometricPointSet, 2, [0, 1, 3]),
+    ],
+)
+def test_nested_start_level(nested_samples, max_level, start_level):
+    """test number of points per level"""
+    f = nested_samples(max_level)
+    assert numpy.array_equal(f.start_level,start_level)
 
-def test_nestedtrig_levels():
-    """test number of levels"""
-    assert NestedTrigonometricPointSet(0).levels == [[0]]
-    assert NestedTrigonometricPointSet(1).levels == [[0], [1, 2]]
-    assert NestedTrigonometricPointSet(2).levels == [[0], [1, 2], [3, 4, 5, 6, 7, 8]]
-    assert NestedTrigonometricPointSet(3).levels == [
-        [0],
-        [1, 2],
-        [3, 4, 5, 6, 7, 8],
-        [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
-    ]
-
-
-def test_nestedtrig_growth_point_match():
-    """test the growth rule matches number of points accumulating"""
-    for i in range(7):
-        f = NestedTrigonometricPointSet(i)
-        assert numpy.sum(f._new_per_level(i)) == len(f.points)
-        assert len(f.points) - 1 == f.levels[-1][-1]
+@pytest.mark.parametrize(
+    "nested_samples,max_level,end_level",
+    [
+        (smolyay.samples.NestedClenshawCurtisPointSet, 0, [1]),
+        (smolyay.samples.NestedClenshawCurtisPointSet, 1, [1, 3]),
+        (smolyay.samples.NestedClenshawCurtisPointSet, 3, [1, 3, 5, 9]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 0, [1]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 1, [1, 3]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 3, [1, 3, 5, 9]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 4, [1, 3, 5, 9, 9]),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, 5, [1, 3, 5, 9, 9, 17]),
+        (smolyay.samples.NestedTrigonometricPointSet, 0, [1]),
+        (smolyay.samples.NestedTrigonometricPointSet, 1, [1, 3]),
+        (smolyay.samples.NestedTrigonometricPointSet, 2, [1, 3, 9]),
+    ],
+)
+def test_nested_end_level(nested_samples, max_level, end_level):
+    """test number of points per level"""
+    f = nested_samples(max_level)
+    assert numpy.array_equal(f.end_level,end_level)

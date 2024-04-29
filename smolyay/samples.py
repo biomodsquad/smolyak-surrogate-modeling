@@ -56,16 +56,13 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     of quadrature rules that are used in numerical integration and in
     approximation.
 
-    The number of unique points is controlled by `levels`, where at each
-    new level more points are added. The amount of points added by each level
-    is determined via a growth scheme related to the polynomial familiy.
+    The number of unique points is controlled by `num_points`, which describes 
+    the amount of points added by each level.
     `points` describes the unique points added as the number of levels increase,
     and the order of elements is reflective of the level each element first
     appears in. Some point set are nested, meaning that the points in a previous
     level reappear in following levels. However, `points` does not attempt to
     capture this behavior and should be free of duplicates.
-    `levels` describes the number of points in each level and assigns each
-    a set of indices of elements in `points`.
 
     Parameters
     ----------
@@ -76,7 +73,9 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     def __init__(self, max_level):
         super().__init__()
         self.max_level = max_level
-        self._levels = None
+        self._num_points = None
+        self._start_level = None
+        self._end_level = None
 
     @property
     def max_level(self):
@@ -89,106 +88,28 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
         self._valid_cache = True
 
     @property
-    def levels(self):
-        """list: level indices stored by the set."""
+    def num_points(self):
+        """list: number of points per level."""
         if self._valid_cache:
             self._create()
         self._valid_cache = False
-        return self._levels
-
-    @abc.abstractmethod
-    def _new_per_level(self, level):
-        r"""A vector describing the number of new points per level
-
-        Returns a vector with the number of new unique points per level 
-        specified by the growth scheme that the point set describes.
-
-        Certain growth rules such as exponential, slow exponential, linear,
-        etc. specify the growth order of a polynomial family. The number of
-        points added per level depends on this order. The number of unique
-        points is additionally dependent on the nestedness of the level
-
-        A fully nested point set has every level contain all the
-        points of the previous levels, a weakly nested point set has the 
-        point 0 recur in each level, a very weakly nested point set has the 
-        point 0 recur only in some levels, and a nonnested point set has no
-        repeating points in any level.
-        
-        For a fully nested point set, the relationship between the order and 
-        the number of new unique points per level L is 
-        :math..
-
-        n(L) = \begin{cases}
-            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
-            1 & \text{ if } L = 0
-            \end{cases}
-        
-        For a non-nested point set, the relationship between the order and 
-        the number of new points per level L is 
-        :math..
-
-        n(L) = \begin{cases}
-            gr(L)& \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) > 0 \\ 
-            0 & \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) = 0 \\ 
-            1 & \text{ if } L= 0
-            \end{cases}
-
-        For a weakly nested point set with 1 point recurring each level, the
-        relationship is 
-        :math..
-
-        n(L) = \begin{cases}
-            gr(L) - 1 & \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) > 0 \\ 
-            0 & \text{ if } L > 0 \text{ and }gr(L) - gr(L-1) = 0 \\ 
-            1 & \text{ if } L= 0
-            \end{cases}
-
-        For a very weakly nested point set, the relationship between the 
-        growth order and the number of unique new points per level depends
-        on which levels have recurring points. Additionally, certain polynomial
-        families such as Gauss-Patterson are not known to extend to infinite
-        levels or are known to be finite.
-
-        Parameters
-        ----------
-        level : int
-            the given level
-
-        Returns
-        -------
-        list
-            the number of new unique points added each level
-        """
-        pass
-
-    def _create(self):
-        r"""Generating the points and levels
-
-        Generating the points stored by the point set and the levels.
-        """
-        self._create_points()
-        self._create_levels()
-        
-
-    @abc.abstractmethod
-    def _create_points(self):
-        r"""Generating the points stored by the point set."""
-        pass
-
-    def _create_levels(self):
-        r"""Generating the levels stored by the point set. 
-        
-        The levels of the point set describes what points go into each level
-        and how many. This amount is determined by both the polynomial family
-        and by the growth scheme. Determining the number of unique points in 
-        each level is handled by :meth:`_new_per_level`
-        """
-        new_vector = self._new_per_level(self.max_level)
-        acc = numpy.cumsum([0] + new_vector)
-        levels = [
-            list(range(acc[i], new_vector[i] + acc[i])) for i in range(len(new_vector))
-        ]
-        self._levels = levels
+        return self._num_points
+    
+    @property
+    def start_level(self):
+        """list: the starting index of each level."""
+        if self._valid_cache:
+            self._create()
+        self._valid_cache = False
+        return self._start_level
+    
+    @property
+    def end_level(self):
+        """list: the ending index of each level."""
+        if self._valid_cache:
+            self._create()
+        self._valid_cache = False
+        return self._end_level
 
 
 class ClenshawCurtisPointSet(UnidimensionalPointSet):
@@ -287,56 +208,23 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([-1, 1])
 
-    def _new_per_level(self, level):
-        r"""A vector describing the number of new points per level
-
-        Returns a vector with the number of new unique points per level 
-        specified by the growth scheme that the point set describes.
-
-        The Clenshaw Curtis point set is by default experiences exponential
-        growth of 1D unique points. It's growth order is described as
-
-        .. math::
-        o(L) = \begin{cases}
-            1 & \text{ if } L=0 \\ 
-            2^{L}+1 & \text{ if } L>0 
-        \end{cases}
-        
-        The polynomial family is fully nested, so the relationship between
-        this growth order and the number of new points per level is
-        .. math::
-        n(L) = \begin{cases}
-            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
-            1 & \text{ if } L = 0
-        \end{cases}
-
-        Parameters
-        ----------
-        level : int
-            the given level
-
-        Returns
-        -------
-        list
-            the number of new unique points added each level
-        """
-        rule = lambda x: 1 if x == 0 else 2**x + 1
-        return [rule(0)] + [rule(i)-rule(i-1) for i in range(1,level+1)]
-
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         Generating nested extrema of chebyshev polynomials of the first kind.
         """
+        # create properties for levels
+        rule = lambda x: 1 if x == 0 else 2**x + 1
+        self._num_points = [rule(0)] + [rule(i)-rule(i-1) for i in range(1,self.max_level+1)]
+        self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
+        self._end_level = numpy.cumsum(list(self._num_points))
+        # points
         points = [0]
         degree = 0
-        counter = 0
-        new_vector = numpy.array(self._new_per_level(self.max_level))
-        num_levels = numpy.sum(new_vector != 0)
+        num_levels = numpy.sum(numpy.array(self._num_points) != 0)
         for i in range(1, num_levels):
-            counter = counter + 1
-            degree = 2**counter
-            if counter == 1:
+            degree = 2**i
+            if i == 1:
                 indexes = numpy.linspace(0, degree, 2, dtype=int)
             else:
                 indexes = numpy.linspace(1, degree - 1, degree - 1, dtype=int)
@@ -345,52 +233,34 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
             points.extend(new_points)
         self._points = points
 
+
 class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     """Set for Clenshaw Curtis slow exponential growth"""
+    
+    def _create(self):
+        r"""Generating the points
 
-    def _new_per_level(self, level):
-        r"""A vector describing the number of new points per level
-
-        Returns a vector with the number of new unique points per level 
-        specified by the growth scheme that the point set describes.
-
-        The Clenshaw Curtis point set is by default experiences exponential
-        growth of 1D unique points. This growth rule can be slowed down by
-        delaying which points are added at which levels. This delay is 
-        described by setting a "precision rule" of :math:2 * L + 1 where L 
-        is the level. New unique points are added at levels where the 
-        accumulated number of points is less than the precision rule. If the
-        number of points accumulated is greater or equal to the precision rule,
-        then no points are added at that level. The size and progression of
-        the nonempty levels remains the same as the exponential growth case.  
-
-        .. math::
-        o(L) = \begin{cases}
-            1 & \text{ if } L=0 \\ 
-            2^{\left \lceil \log_{2}(L) \right \rceil+1}+1 & \text{ if } L>0 
-        \end{cases}
-
-        
-        The polynomial family is fully nested, so the relationship between
-        this growth order and the number of new points per level is
-        .. math::
-        n(L) = \begin{cases}
-            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
-            1 & \text{ if } L = 0
-            \end{cases}
-
-        Parameters
-        ----------
-        level : int
-            the given level
-
-        Returns
-        -------
-        list
-            the number of new unique points added each level
+        Generating nested extrema of chebyshev polynomials of the first kind.
         """
+        # create properties for levels
         rule = lambda x : 1 if x==0 else int(2**(numpy.ceil(numpy.log2(x))+1) + 1)
-        return [rule(0)] + [rule(i)-rule(i-1) for i in range(1,level+1)]
+        self._num_points = [rule(0)] + [rule(i)-rule(i-1) for i in range(1,self.max_level+1)]
+        self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
+        self._end_level = numpy.cumsum(list(self._num_points))
+        # points
+        points = [0]
+        degree = 0
+        num_levels = numpy.sum(numpy.array(self._num_points) != 0)
+        for i in range(1, num_levels):
+            degree = 2**i
+            if i == 1:
+                indexes = numpy.linspace(0, degree, 2, dtype=int)
+            else:
+                indexes = numpy.linspace(1, degree - 1, degree - 1, dtype=int)
+                indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+            new_points = list(-numpy.cos(numpy.pi * indexes / degree))
+            points.extend(new_points)
+        self._points = points
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
@@ -462,53 +332,24 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
     
-    def _new_per_level(self, level):
-        r"""A vector describing the number of new points per level
-
-        Returns a vector with the number of new unique points per level 
-        specified by the growth scheme that the point set describes.
-
-        The Trigonometric point set is by default experiences exponential
-        growth of 1D unique points. The growth order of this set is 
-        described as 
-        .. math::
-        o(L) = 3^{x}
-        
-        The polynomial family is fully nested, so the relationship between
-        this growth order and the number of new points per level is
-        .. math::
-        n(L) = \begin{cases}
-            gr(L) - gr(L-1)) & \text{ if } L > 0 \\ 
-            1 & \text{ if } L = 0
-            \end{cases}
-
-        Parameters
-        ----------
-        level : int
-            the given level
-
-        Returns
-        -------
-        list
-            the number of new unique points added each level
-        """
-        rule = lambda x: 3**x
-        return [rule(0)] + [rule(i)-rule(i-1) for i in range(1,level+1)]
-    
-    def _create_points(self):
+    def _create(self):
         r"""Generating the points
 
         Generating the trignometric points using the frequencies
         :math:1, 3, 9, ..., 3^{i} where i is an integer.
         """
+            # create properties for levels
+        rule = lambda x: 3**x
+        self._num_points = [rule(0)] + [rule(i)-rule(i-1) for i in range(1,self.max_level+1)]
+        self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
+        self._end_level = numpy.cumsum(list(self._num_points))
+        # points
         points = []
         degree = 0
-        counter = 0
         for i in range(self.max_level + 1):
-            degree = 3**counter
+            degree = 3**i
             for idx in range(1, degree + 1):
                 point = (idx - 1) * 2 * numpy.pi / degree
                 if not numpy.isclose(points, point).any():
                     points.append(point)
-            counter += 1
         self._points = points
