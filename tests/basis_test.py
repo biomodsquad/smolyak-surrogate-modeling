@@ -49,7 +49,12 @@ def test_cheb_call_1D(degree, answer_key):
     xs = [0.5, 1, -1, -0.25, -0.5]
     answers = [answer_key[x] for x in xs]
     assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
+    assert numpy.allclose(f(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
 
 
 @pytest.mark.parametrize(
@@ -63,18 +68,27 @@ def test_cheb_call_1D(degree, answer_key):
 def test_cheb_call_2D(degree, answer_key):
     """Test chebyshev polynomial call with a 2D array"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25]]
-    xs2 = numpy.reshape(xs[0], (1, 4))
-    xs3 = numpy.reshape(xs[0], (4, 1))
-    assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
-    assert numpy.shape(f(xs2)) == (1, 4)
-    assert numpy.allclose(f(xs2), get_answer(xs2))
-    assert numpy.shape(f(xs3)) == (4, 1)
-    assert numpy.allclose(f(xs3), get_answer(xs3))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
+    answers = [answer_key[x] for x in xs]
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(f(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(f(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f(xs4), answer4)
 
 
 @pytest.mark.parametrize(
@@ -88,33 +102,49 @@ def test_cheb_call_2D(degree, answer_key):
 def test_cheb_call_3D(degree, answer_key):
     """Test chebyshev polynomial call with a 3D array"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [
-        [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, -1, 0.5]],
-        [[0.5, 1, 1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, 1, 0.5]],
-    ]
-    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
-    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs5 = numpy.reshape(xs[0], (1, 3, 4))
-    xs6 = numpy.reshape(xs[0], (3, 4, 1))
-    xs7 = numpy.ones((1, 1, 1))
-    assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
+          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f(xs2), get_answer(xs2))
+    assert numpy.allclose(f(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
     assert numpy.shape(f(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f(xs3), get_answer(xs3))
+    assert numpy.allclose(f(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f(xs4), get_answer(xs4))
+    assert numpy.allclose(f(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
     assert numpy.shape(f(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f(xs5), get_answer(xs5))
+    assert numpy.allclose(f(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
     assert numpy.shape(f(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f(xs6), get_answer(xs6))
+    assert numpy.allclose(f(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
     assert numpy.shape(f(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f(xs7), get_answer(xs7))
+    assert numpy.allclose(f(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(f(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(f(xs8), answer8)
 
 
 def test_cheb_call_extrema_points():
@@ -179,13 +209,15 @@ def test_cheb_derivative(degree, answer_key):
 def test_cheb_derivative_1D(degree, answer_key):
     """Test chebyshev polynomial derivative with a 1D array"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
     xs = [0.5, 1, -1, -0.25, -0.5]
+    answers = [answer_key[x] for x in xs]
     assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
+    assert numpy.allclose(f.derivative(xs), answers)
 
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
 
 @pytest.mark.parametrize(
     "degree,answer_key",
@@ -198,19 +230,27 @@ def test_cheb_derivative_1D(degree, answer_key):
 def test_cheb_derivative_2D(degree, answer_key):
     """Test chebyshev polynomial derivative with a 2D array"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25]]
-    xs2 = numpy.reshape(xs[0], (1, 4))
-    xs3 = numpy.reshape(xs[0], (4, 1))
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
-    assert numpy.shape(f.derivative(xs2)) == (1, 4)
-    assert numpy.allclose(f.derivative(xs2), get_answer(xs2))
-    assert numpy.shape(f.derivative(xs3)) == (4, 1)
-    assert numpy.allclose(f.derivative(xs3), get_answer(xs3))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
+    answers = [answer_key[x] for x in xs]
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
 
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f.derivative(xs4), answer4)
 
 @pytest.mark.parametrize(
     "degree,answer_key",
@@ -223,33 +263,49 @@ def test_cheb_derivative_2D(degree, answer_key):
 def test_cheb_derivative_3D(degree, answer_key):
     """Test chebyshev polynomial derivative with a 3D array"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [
-        [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, -1, 0.5]],
-        [[0.5, 1, 1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, 1, 0.5]],
-    ]
-    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
-    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs5 = numpy.reshape(xs[0], (1, 3, 4))
-    xs6 = numpy.reshape(xs[0], (3, 4, 1))
-    xs7 = numpy.ones((1, 1, 1)) * xs[0][0][0]
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
+          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f.derivative(xs2), get_answer(xs2))
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
     assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f.derivative(xs3), get_answer(xs3))
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f.derivative(xs4), get_answer(xs4))
+    assert numpy.allclose(f.derivative(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
     assert numpy.shape(f.derivative(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f.derivative(xs5), get_answer(xs5))
+    assert numpy.allclose(f.derivative(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
     assert numpy.shape(f.derivative(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f.derivative(xs6), get_answer(xs6))
+    assert numpy.allclose(f.derivative(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
     assert numpy.shape(f.derivative(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f.derivative(xs7), get_answer(xs7))
+    assert numpy.allclose(f.derivative(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(f.derivative(xs8), answer8)
 
 
 def test_cheb_derivative_invalid_input():
@@ -304,10 +360,14 @@ def test_cheb_2nd_call_1D(degree, answer_key):
     """Test chebyshev polynomial call with a 1D array"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
     xs = [0.5, 1, -1, -0.25, -0.5]
-    conditions = [numpy.array(xs) == k for k in answer_key]
-    answer = numpy.select(conditions, answer_key.values(), -100000)
+    answers = [answer_key[x] for x in xs]
     assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), answer)
+    assert numpy.allclose(f(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
 
 
 @pytest.mark.parametrize(
@@ -321,18 +381,27 @@ def test_cheb_2nd_call_1D(degree, answer_key):
 def test_cheb_2nd_call_2D(degree, answer_key):
     """Test chebyshev polynomial call with a 2D array"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25]]
-    xs2 = numpy.reshape(xs[0], (1, 4))
-    xs3 = numpy.reshape(xs[0], (4, 1))
-    assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
-    assert numpy.shape(f(xs2)) == (1, 4)
-    assert numpy.allclose(f(xs2), get_answer(xs2))
-    assert numpy.shape(f(xs3)) == (4, 1)
-    assert numpy.allclose(f(xs3), get_answer(xs3))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
+    answers = [answer_key[x] for x in xs]
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(f(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(f(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f(xs4), answer4)
 
 
 @pytest.mark.parametrize(
@@ -346,33 +415,49 @@ def test_cheb_2nd_call_2D(degree, answer_key):
 def test_cheb_2nd_call_3D(degree, answer_key):
     """Test chebyshev polynomial call with a 3D array"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [
-        [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, -1, 0.5]],
-        [[0.5, 1, 1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, 1, 0.5]],
-    ]
-    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
-    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs5 = numpy.reshape(xs[0], (1, 3, 4))
-    xs6 = numpy.reshape(xs[0], (3, 4, 1))
-    xs7 = numpy.ones((1, 1, 1))
-    assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
+          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f(xs2), get_answer(xs2))
+    assert numpy.allclose(f(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
     assert numpy.shape(f(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f(xs3), get_answer(xs3))
+    assert numpy.allclose(f(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f(xs4), get_answer(xs4))
+    assert numpy.allclose(f(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
     assert numpy.shape(f(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f(xs5), get_answer(xs5))
+    assert numpy.allclose(f(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
     assert numpy.shape(f(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f(xs6), get_answer(xs6))
+    assert numpy.allclose(f(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
     assert numpy.shape(f(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f(xs7), get_answer(xs7))
+    assert numpy.allclose(f(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(f(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(f(xs8), answer8)
 
 
 def test_cheb_2nd_call_root_points():
@@ -424,12 +509,15 @@ def test_cheb_2nd_derivative(degree, answer_key):
 def test_cheb_2nd_derivative_1D(degree, answer_key):
     """Test chebyshev polynomial derivative with a 1D array"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
     xs = [0.5, 1, -1, -0.25, -0.5]
+    answers = [answer_key[x] for x in xs]
     assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
+    assert numpy.allclose(f.derivative(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
 
 
 @pytest.mark.parametrize(
@@ -443,18 +531,27 @@ def test_cheb_2nd_derivative_1D(degree, answer_key):
 def test_cheb_2nd_derivative_2D(degree, answer_key):
     """Test chebyshev polynomial derivative with a 2D array"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25]]
-    xs2 = numpy.reshape(xs[0], (1, 4))
-    xs3 = numpy.reshape(xs[0], (4, 1))
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
-    assert numpy.shape(f.derivative(xs2)) == (1, 4)
-    assert numpy.allclose(f.derivative(xs2), get_answer(xs2))
-    assert numpy.shape(f.derivative(xs3)) == (4, 1)
-    assert numpy.allclose(f.derivative(xs3), get_answer(xs3))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
+    answers = [answer_key[x] for x in xs]
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f.derivative(xs4), answer4)
 
 
 @pytest.mark.parametrize(
@@ -468,33 +565,49 @@ def test_cheb_2nd_derivative_2D(degree, answer_key):
 def test_cheb_2nd_derivative_3D(degree, answer_key):
     """Test chebyshev polynomial derivative with a 3D array"""
     f = smolyay.basis.ChebyshevSecondKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [
-        [[0.5, 1, -1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, -1, 0.5]],
-        [[0.5, 1, 1, -0.25], [-0.5, -1, 1, -0.25], [-0.25, 1, 1, 0.5]],
-    ]
-    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
-    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs5 = numpy.reshape(xs[0], (1, 3, 4))
-    xs6 = numpy.reshape(xs[0], (3, 4, 1))
-    xs7 = numpy.ones((1, 1, 1)) * xs[0][0][0]
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
+          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f.derivative(xs2), get_answer(xs2))
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
     assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f.derivative(xs3), get_answer(xs3))
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f.derivative(xs4), get_answer(xs4))
+    assert numpy.allclose(f.derivative(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
     assert numpy.shape(f.derivative(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f.derivative(xs5), get_answer(xs5))
+    assert numpy.allclose(f.derivative(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
     assert numpy.shape(f.derivative(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f.derivative(xs6), get_answer(xs6))
+    assert numpy.allclose(f.derivative(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
     assert numpy.shape(f.derivative(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f.derivative(xs7), get_answer(xs7))
+    assert numpy.allclose(f.derivative(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(f.derivative(xs8), answer8)
 
 
 def test_cheb_2nd_derivative_invalid_input():
@@ -608,12 +721,15 @@ def test_trig_call(frequency, answer_key):
 def test_trig_call_1D(frequency, answer_key):
     """Test Trigonometric function call with a 1D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
     xs = [0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi]
+    answers = [answer_key[x] for x in xs]
     assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
+    assert numpy.allclose(f(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
 
 
 @pytest.mark.parametrize(
@@ -656,22 +772,28 @@ def test_trig_call_1D(frequency, answer_key):
 def test_trig_call_2D(frequency, answer_key):
     """Test Trigonometric function call with a 2D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
+    xs = [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,0, 
+          numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi]
+    answers = [answer_key[x] for x in xs]
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
 
-    xs = [
-        [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi],
-        [0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi],
-    ]
-    xs2 = numpy.reshape(xs[0], (1, 4))
-    xs3 = numpy.reshape(xs[0], (4, 1))
-    assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
-    assert numpy.shape(f(xs2)) == (1, 4)
-    assert numpy.allclose(f(xs2), get_answer(xs2))
-    assert numpy.shape(f(xs3)) == (4, 1)
-    assert numpy.allclose(f(xs3), get_answer(xs3))
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(f(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(f(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f(xs4), answer4)
 
 
 @pytest.mark.parametrize(
@@ -714,41 +836,53 @@ def test_trig_call_2D(frequency, answer_key):
 def test_trig_call_3D(frequency, answer_key):
     """Test Trigonometric function call with a 3D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [
-        [
-            [numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi],
-            [0, 3 * numpy.pi / 2, numpy.pi / 3, 2 * numpy.pi],
-            [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi],
-        ],
-        [
-            [0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6],
-            [0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi],
-            [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi],
-        ],
-    ]
-    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
-    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs5 = numpy.reshape(xs[0], (1, 3, 4))
-    xs6 = numpy.reshape(xs[0], (3, 4, 1))
-    xs7 = numpy.ones((1, 1, 1)) * xs[0][0][0]
-    assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), get_answer(xs))
+    xs = [numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi,
+          0, 3 * numpy.pi / 2, numpy.pi / 3, 2 * numpy.pi,
+          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,
+          0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6,
+          0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi,
+          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi]
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f(xs2), get_answer(xs2))
+    assert numpy.allclose(f(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
     assert numpy.shape(f(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f(xs3), get_answer(xs3))
+    assert numpy.allclose(f(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f(xs4), get_answer(xs4))
+    assert numpy.allclose(f(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
     assert numpy.shape(f(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f(xs5), get_answer(xs5))
+    assert numpy.allclose(f(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
     assert numpy.shape(f(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f(xs6), get_answer(xs6))
+    assert numpy.allclose(f(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
     assert numpy.shape(f(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f(xs7), get_answer(xs7))
+    assert numpy.allclose(f(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(f(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(f(xs8), answer8)
 
 
 @pytest.mark.parametrize(
@@ -838,12 +972,15 @@ def test_trig_derivative(frequency, answer_key):
 def test_trig_derivative_1D(frequency, answer_key):
     """Test Trigonometric function derivative with a 1D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
     xs = [0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi]
+    answers = [answer_key[x] for x in xs]
     assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
+    assert numpy.allclose(f.derivative(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
 
 
 @pytest.mark.parametrize(
@@ -886,22 +1023,28 @@ def test_trig_derivative_1D(frequency, answer_key):
 def test_trig_derivative_2D(frequency, answer_key):
     """Test Trigonometric function derivative  with a 2D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
+    xs = [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,0, 
+          numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi]
+    answers = [answer_key[x] for x in xs]
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
 
-    xs = [
-        [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi],
-        [0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi],
-    ]
-    xs2 = numpy.reshape(xs[0], (1, 4))
-    xs3 = numpy.reshape(xs[0], (4, 1))
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
-    assert numpy.shape(f.derivative(xs2)) == (1, 4)
-    assert numpy.allclose(f.derivative(xs2), get_answer(xs2))
-    assert numpy.shape(f.derivative(xs3)) == (4, 1)
-    assert numpy.allclose(f.derivative(xs3), get_answer(xs3))
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f.derivative(xs4), answer4)
 
 
 @pytest.mark.parametrize(
@@ -944,41 +1087,53 @@ def test_trig_derivative_2D(frequency, answer_key):
 def test_trig_derivative_3D(frequency, answer_key):
     """Test Trigonometric function derivative with a 3D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
-    xs = [
-        [
-            [numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi],
-            [0, 3 * numpy.pi / 2, numpy.pi / 3, 2 * numpy.pi],
-            [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi],
-        ],
-        [
-            [0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6],
-            [0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi],
-            [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi],
-        ],
-    ]
-    xs2 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs3 = numpy.reshape(xs[0][0], (1, 4, 1))
-    xs4 = numpy.reshape(xs[0][0], (1, 1, 4))
-    xs5 = numpy.reshape(xs[0], (1, 3, 4))
-    xs6 = numpy.reshape(xs[0], (3, 4, 1))
-    xs7 = numpy.ones((1, 1, 1)) * xs[0][0][0]
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), get_answer(xs))
+    xs = [numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi,
+          0, 3 * numpy.pi / 2, numpy.pi / 3, 2 * numpy.pi,
+          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,
+          0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6,
+          0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi,
+          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi]
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f.derivative(xs2), get_answer(xs2))
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
     assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f.derivative(xs3), get_answer(xs3))
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
     assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f.derivative(xs4), get_answer(xs4))
+    assert numpy.allclose(f.derivative(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
     assert numpy.shape(f.derivative(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f.derivative(xs5), get_answer(xs5))
+    assert numpy.allclose(f.derivative(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
     assert numpy.shape(f.derivative(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f.derivative(xs6), get_answer(xs6))
+    assert numpy.allclose(f.derivative(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
     assert numpy.shape(f.derivative(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f.derivative(xs7), get_answer(xs7))
+    assert numpy.allclose(f.derivative(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(f.derivative(xs8), answer8)
 
 
 def test_trig_call_invalid_input():
