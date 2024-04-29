@@ -5,10 +5,16 @@ import scipy.special
 
 import smolyay
 
-
-def test_cheb_initial():
+@pytest.mark.parametrize(
+    "cheb_function",
+    [
+        smolyay.basis.ChebyshevFirstKind,
+        smolyay.basis.ChebyshevSecondKind,
+    ],
+)
+def test_cheb_initial(cheb_function):
     """test degrees returns correctly"""
-    f2 = smolyay.basis.ChebyshevFirstKind(2)
+    f2 = cheb_function(2)
     assert f2.degree == 2
     assert isinstance(f2.degree, int)
     assert numpy.array_equal(f2.domain, [-1, 1])
@@ -317,17 +323,6 @@ def test_cheb_derivative_invalid_input():
         f.derivative(-2)
     with pytest.raises(ValueError):
         f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
-def test_cheb_2nd_initial():
-    """test degrees returns correctly"""
-    f2 = smolyay.basis.ChebyshevSecondKind(2)
-    assert f2.degree == 2
-    assert isinstance(f2.degree, int)
-    assert numpy.array_equal(f2.domain, [-1, 1])
-    f2.degree = float(3)
-    assert f2.degree == 3
-    assert isinstance(f2.degree, int)
 
 
 @pytest.mark.parametrize(
