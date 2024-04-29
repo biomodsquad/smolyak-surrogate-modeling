@@ -1,7 +1,6 @@
 import pytest
 
 import numpy
-import scipy.special
 
 import smolyay
 
