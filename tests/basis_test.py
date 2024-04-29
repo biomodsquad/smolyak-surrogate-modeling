@@ -46,10 +46,8 @@ def test_cheb_call(degree, answer_key):
 def test_cheb_call_1D(degree, answer_key):
     """Test chebyshev polynomial call with a 1D array"""
     f = smolyay.basis.ChebyshevFirstKind(degree)
-    get_answer = lambda x: numpy.select(
-        [numpy.array(x) == k for k in answer_key], answer_key.values(), numpy.nan
-    )
     xs = [0.5, 1, -1, -0.25, -0.5]
+    answers = [answer_key[x] for x in xs]
     assert numpy.shape(f(xs)) == numpy.shape(xs)
     assert numpy.allclose(f(xs), get_answer(xs))
 
