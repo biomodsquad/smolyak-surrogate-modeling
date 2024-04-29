@@ -5,6 +5,7 @@ import scipy.special
 
 import smolyay
 
+
 @pytest.mark.parametrize(
     "cheb_function",
     [
@@ -24,16 +25,39 @@ def test_cheb_initial(cheb_function):
 
 
 @pytest.mark.parametrize(
-    "degree,answer_key",
+    "cheb_function,degree,answer_key",
     [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5}),
-        (2, {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5}),
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            1,
+            {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0},
+        ),
     ],
 )
-def test_cheb_call(degree, answer_key):
+def test_cheb_call(cheb_function, degree, answer_key):
     """Test chebyshev polynomial call"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
+    f = cheb_function(degree)
     assert f(0.5) == pytest.approx(answer_key[0.5])
     assert f(1) == pytest.approx(answer_key[1])
     assert f(-1) == pytest.approx(answer_key[-1])
@@ -42,16 +66,39 @@ def test_cheb_call(degree, answer_key):
 
 
 @pytest.mark.parametrize(
-    "degree,answer_key",
+    "cheb_function,degree,answer_key",
     [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5}),
-        (2, {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5}),
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            1,
+            {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0},
+        ),
     ],
 )
-def test_cheb_call_1D(degree, answer_key):
+def test_cheb_call_1D(cheb_function, degree, answer_key):
     """Test chebyshev polynomial call with a 1D array"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
+    f = cheb_function(degree)
     xs = [0.5, 1, -1, -0.25, -0.5]
     answers = [answer_key[x] for x in xs]
     assert numpy.shape(f(xs)) == numpy.shape(xs)
@@ -64,16 +111,39 @@ def test_cheb_call_1D(degree, answer_key):
 
 
 @pytest.mark.parametrize(
-    "degree,answer_key",
+    "cheb_function,degree,answer_key",
     [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5}),
-        (2, {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5}),
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            1,
+            {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0},
+        ),
     ],
 )
-def test_cheb_call_2D(degree, answer_key):
+def test_cheb_call_2D(cheb_function, degree, answer_key):
     """Test chebyshev polynomial call with a 2D array"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
+    f = cheb_function(degree)
     xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
     answers = [answer_key[x] for x in xs]
     xs1 = numpy.reshape(xs, (2, 4))
@@ -98,18 +168,65 @@ def test_cheb_call_2D(degree, answer_key):
 
 
 @pytest.mark.parametrize(
-    "degree,answer_key",
+    "cheb_function,degree,answer_key",
     [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5}),
-        (2, {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5}),
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            1,
+            {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0},
+        ),
     ],
 )
-def test_cheb_call_3D(degree, answer_key):
+def test_cheb_call_3D(cheb_function, degree, answer_key):
     """Test chebyshev polynomial call with a 3D array"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
-          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
+    f = cheb_function(degree)
+    xs = [
+        0.5,
+        1,
+        -1,
+        -0.25,
+        -0.5,
+        -1,
+        1,
+        -0.25,
+        -0.25,
+        1,
+        -1,
+        0.5,
+        0.5,
+        1,
+        1,
+        -0.25,
+        -0.5,
+        -1,
+        1,
+        -0.25,
+        -0.25,
+        1,
+        1,
+        0.5,
+    ]
     answers = [answer_key[x] for x in xs]
 
     xs1 = numpy.reshape(xs, (2, 3, 4))
@@ -151,6 +268,274 @@ def test_cheb_call_3D(degree, answer_key):
     answer8 = numpy.ones((1, 1, 1)) * answers[0]
     assert numpy.shape(f(xs8)) == numpy.shape(xs8)
     assert numpy.allclose(f(xs8), answer8)
+
+
+@pytest.mark.parametrize(
+    "cheb_function",
+    [
+        smolyay.basis.ChebyshevFirstKind,
+        smolyay.basis.ChebyshevSecondKind,
+    ],
+)
+def test_cheb_call_invalid_input(cheb_function):
+    """Test call raises error if input is outside domain [-1, 1]"""
+    f = cheb_function(4)
+    with pytest.raises(ValueError):
+        f(2)
+    with pytest.raises(ValueError):
+        f(-2)
+    with pytest.raises(ValueError):
+        f([0.5, 0.7, 3, 0.8])
+    with pytest.raises(ValueError):
+        f([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+
+
+@pytest.mark.parametrize(
+    "cheb_function,degree,answer_key",
+    [
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
+        (smolyay.basis.ChebyshevFirstKind, 1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4},
+        ),
+    ],
+)
+def test_cheb_derivative(cheb_function, degree, answer_key):
+    """Test chebyshev polynomial derivative"""
+    f = cheb_function(degree)
+    assert f.derivative(0.5) == pytest.approx(answer_key[0.5])
+    assert f.derivative(1) == pytest.approx(answer_key[1])
+    assert f.derivative(-1) == pytest.approx(answer_key[-1])
+    assert f.derivative(-0.25) == pytest.approx(answer_key[-0.25])
+    assert f.derivative(-0.5) == pytest.approx(answer_key[-0.5])
+
+
+@pytest.mark.parametrize(
+    "cheb_function,degree,answer_key",
+    [
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
+        (smolyay.basis.ChebyshevFirstKind, 1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4},
+        ),
+    ],
+)
+def test_cheb_derivative_1D(cheb_function, degree, answer_key):
+    """Test chebyshev polynomial derivative with a 1D array"""
+    f = cheb_function(degree)
+    xs = [0.5, 1, -1, -0.25, -0.5]
+    answers = [answer_key[x] for x in xs]
+    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
+    assert numpy.allclose(f.derivative(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
+
+
+@pytest.mark.parametrize(
+    "cheb_function,degree,answer_key",
+    [
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
+        (smolyay.basis.ChebyshevFirstKind, 1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4},
+        ),
+    ],
+)
+def test_cheb_derivative_2D(cheb_function, degree, answer_key):
+    """Test chebyshev polynomial derivative with a 2D array"""
+    f = cheb_function(degree)
+    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
+    answers = [answer_key[x] for x in xs]
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f.derivative(xs4), answer4)
+
+
+@pytest.mark.parametrize(
+    "cheb_function,degree,answer_key",
+    [
+        (smolyay.basis.ChebyshevFirstKind, 0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
+        (smolyay.basis.ChebyshevFirstKind, 1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
+        (
+            smolyay.basis.ChebyshevFirstKind,
+            2,
+            {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            0,
+            {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            1,
+            {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2},
+        ),
+        (
+            smolyay.basis.ChebyshevSecondKind,
+            2,
+            {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4},
+        ),
+    ],
+)
+def test_cheb_derivative_3D(cheb_function, degree, answer_key):
+    """Test chebyshev polynomial derivative with a 3D array"""
+    f = cheb_function(degree)
+    xs = [
+        0.5,
+        1,
+        -1,
+        -0.25,
+        -0.5,
+        -1,
+        1,
+        -0.25,
+        -0.25,
+        1,
+        -1,
+        0.5,
+        0.5,
+        1,
+        1,
+        -0.25,
+        -0.5,
+        -1,
+        1,
+        -0.25,
+        -0.25,
+        1,
+        1,
+        0.5,
+    ]
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(f.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
+    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(f.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
+    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(f.derivative(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
+    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(f.derivative(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
+    assert numpy.shape(f.derivative(xs5)) == numpy.shape(xs5)
+    assert numpy.allclose(f.derivative(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
+    assert numpy.shape(f.derivative(xs6)) == numpy.shape(xs6)
+    assert numpy.allclose(f.derivative(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
+    assert numpy.shape(f.derivative(xs7)) == numpy.shape(xs7)
+    assert numpy.allclose(f.derivative(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(f.derivative(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(f.derivative(xs8), answer8)
+
+
+@pytest.mark.parametrize(
+    "cheb_function",
+    [
+        smolyay.basis.ChebyshevFirstKind,
+        smolyay.basis.ChebyshevSecondKind,
+    ],
+)
+def test_cheb_derivative_invalid_input(cheb_function):
+    """Test call raises error if input is outside domain [-1, 1]"""
+    f = cheb_function(4)
+    with pytest.raises(ValueError):
+        f.derivative(2)
+    with pytest.raises(ValueError):
+        f.derivative(-2)
+    with pytest.raises(ValueError):
+        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
 
 
 def test_cheb_call_extrema_points():
@@ -173,449 +558,11 @@ def test_cheb_call_root_points():
     assert numpy.allclose(f(root_points), numpy.zeros(4))
 
 
-def test_cheb_call_invalid_input():
-    """Test call raises error if input is outside domain [-1, 1]"""
-    f = smolyay.basis.ChebyshevFirstKind(4)
-    with pytest.raises(ValueError):
-        f(2)
-    with pytest.raises(ValueError):
-        f(-2)
-    with pytest.raises(ValueError):
-        f([0.5, 0.7, 3, 0.8])
-    with pytest.raises(ValueError):
-        f([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (2, {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2}),
-    ],
-)
-def test_cheb_derivative(degree, answer_key):
-    """Test chebyshev polynomial derivative"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
-    assert f.derivative(0.5) == pytest.approx(answer_key[0.5])
-    assert f.derivative(1) == pytest.approx(answer_key[1])
-    assert f.derivative(-1) == pytest.approx(answer_key[-1])
-    assert f.derivative(-0.25) == pytest.approx(answer_key[-0.25])
-    assert f.derivative(-0.5) == pytest.approx(answer_key[-0.5])
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (2, {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2}),
-    ],
-)
-def test_cheb_derivative_1D(degree, answer_key):
-    """Test chebyshev polynomial derivative with a 1D array"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5]
-    answers = [answer_key[x] for x in xs]
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), answers)
-
-    xs1 = numpy.ones((1, 1)) * xs[0]
-    answer1 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f.derivative(xs1), answer1)
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (2, {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2}),
-    ],
-)
-def test_cheb_derivative_2D(degree, answer_key):
-    """Test chebyshev polynomial derivative with a 2D array"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
-    answers = [answer_key[x] for x in xs]
-    xs1 = numpy.reshape(xs, (2, 4))
-    answer1 = numpy.reshape(answers, (2, 4))
-    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f.derivative(xs1), answer1)
-
-    xs2 = numpy.reshape(xs, (1, 8))
-    answer2 = numpy.reshape(answers, (1, 8))
-    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f.derivative(xs2), answer2)
-
-    xs3 = numpy.reshape(xs, (8, 1))
-    answer3 = numpy.reshape(answers, (8, 1))
-    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f.derivative(xs3), answer3)
-
-    xs4 = numpy.ones((1, 1)) * xs[0]
-    answer4 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f.derivative(xs4), answer4)
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (2, {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2}),
-    ],
-)
-def test_cheb_derivative_3D(degree, answer_key):
-    """Test chebyshev polynomial derivative with a 3D array"""
-    f = smolyay.basis.ChebyshevFirstKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
-          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
-    answers = [answer_key[x] for x in xs]
-
-    xs1 = numpy.reshape(xs, (2, 3, 4))
-    answer1 = numpy.reshape(answers, (2, 3, 4))
-    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f.derivative(xs1), answer1)
-
-    xs2 = numpy.reshape(xs, (1, 1, 24))
-    answer2 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f.derivative(xs2), answer2)
-
-    xs3 = numpy.reshape(xs, (1, 24, 1))
-    answer3 = numpy.reshape(answers, (1, 24, 1))
-    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f.derivative(xs3), answer3)
-
-    xs4 = numpy.reshape(xs, (1, 1, 24))
-    answer4 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f.derivative(xs4), answer4)
-
-    xs5 = numpy.reshape(xs, (1, 6, 4))
-    answer5 = numpy.reshape(answers, (1, 6, 4))
-    assert numpy.shape(f.derivative(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f.derivative(xs5), answer5)
-
-    xs6 = numpy.reshape(xs, (6, 4, 1))
-    answer6 = numpy.reshape(answers, (6, 4, 1))
-    assert numpy.shape(f.derivative(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f.derivative(xs6), answer6)
-
-    xs7 = numpy.reshape(xs, (6, 1, 4))
-    answer7 = numpy.reshape(answers, (6, 1, 4))
-    assert numpy.shape(f.derivative(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f.derivative(xs7), answer7)
-
-    xs8 = numpy.ones((1, 1, 1)) * xs[0]
-    answer8 = numpy.ones((1, 1, 1)) * answers[0]
-    assert numpy.shape(f.derivative(xs8)) == numpy.shape(xs8)
-    assert numpy.allclose(f.derivative(xs8), answer8)
-
-
-def test_cheb_derivative_invalid_input():
-    """Test call raises error if input is outside domain [-1, 1]"""
-    f = smolyay.basis.ChebyshevFirstKind(4)
-    with pytest.raises(ValueError):
-        f.derivative(2)
-    with pytest.raises(ValueError):
-        f.derivative(-2)
-    with pytest.raises(ValueError):
-        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1}),
-        (2, {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0}),
-    ],
-)
-def test_cheb_2nd_call(degree, answer_key):
-    """Test chebyshev polynomial call"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    assert f(0.5) == pytest.approx(answer_key[0.5])
-    assert f(1) == pytest.approx(answer_key[1])
-    assert f(-1) == pytest.approx(answer_key[-1])
-    assert f(-0.25) == pytest.approx(answer_key[-0.25])
-    assert f(-0.5) == pytest.approx(answer_key[-0.5])
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1}),
-        (2, {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0}),
-    ],
-)
-def test_cheb_2nd_call_1D(degree, answer_key):
-    """Test chebyshev polynomial call with a 1D array"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5]
-    answers = [answer_key[x] for x in xs]
-    assert numpy.shape(f(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f(xs), answers)
-
-    xs1 = numpy.ones((1, 1)) * xs[0]
-    answer1 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f(xs1), answer1)
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1}),
-        (2, {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0}),
-    ],
-)
-def test_cheb_2nd_call_2D(degree, answer_key):
-    """Test chebyshev polynomial call with a 2D array"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
-    answers = [answer_key[x] for x in xs]
-    xs1 = numpy.reshape(xs, (2, 4))
-    answer1 = numpy.reshape(answers, (2, 4))
-    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f(xs1), answer1)
-
-    xs2 = numpy.reshape(xs, (1, 8))
-    answer2 = numpy.reshape(answers, (1, 8))
-    assert numpy.shape(f(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f(xs2), answer2)
-
-    xs3 = numpy.reshape(xs, (8, 1))
-    answer3 = numpy.reshape(answers, (8, 1))
-    assert numpy.shape(f(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f(xs3), answer3)
-
-    xs4 = numpy.ones((1, 1)) * xs[0]
-    answer4 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(f(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f(xs4), answer4)
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1}),
-        (1, {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1}),
-        (2, {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0}),
-    ],
-)
-def test_cheb_2nd_call_3D(degree, answer_key):
-    """Test chebyshev polynomial call with a 3D array"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
-          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
-    answers = [answer_key[x] for x in xs]
-
-    xs1 = numpy.reshape(xs, (2, 3, 4))
-    answer1 = numpy.reshape(answers, (2, 3, 4))
-    assert numpy.shape(f(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f(xs1), answer1)
-
-    xs2 = numpy.reshape(xs, (1, 1, 24))
-    answer2 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(f(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f(xs2), answer2)
-
-    xs3 = numpy.reshape(xs, (1, 24, 1))
-    answer3 = numpy.reshape(answers, (1, 24, 1))
-    assert numpy.shape(f(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f(xs3), answer3)
-
-    xs4 = numpy.reshape(xs, (1, 1, 24))
-    answer4 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(f(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f(xs4), answer4)
-
-    xs5 = numpy.reshape(xs, (1, 6, 4))
-    answer5 = numpy.reshape(answers, (1, 6, 4))
-    assert numpy.shape(f(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f(xs5), answer5)
-
-    xs6 = numpy.reshape(xs, (6, 4, 1))
-    answer6 = numpy.reshape(answers, (6, 4, 1))
-    assert numpy.shape(f(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f(xs6), answer6)
-
-    xs7 = numpy.reshape(xs, (6, 1, 4))
-    answer7 = numpy.reshape(answers, (6, 1, 4))
-    assert numpy.shape(f(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f(xs7), answer7)
-
-    xs8 = numpy.ones((1, 1, 1)) * xs[0]
-    answer8 = numpy.ones((1, 1, 1)) * answers[0]
-    assert numpy.shape(f(xs8)) == numpy.shape(xs8)
-    assert numpy.allclose(f(xs8), answer8)
-
-
 def test_cheb_2nd_call_root_points():
     """Test chebyshev polynomial roots"""
     f = smolyay.basis.ChebyshevSecondKind(3)
     root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
     assert numpy.allclose(f(root_points), numpy.zeros(3))
-
-
-def test_cheb_2nd_call_invalid_input():
-    """Test call raises error if input is outside domain [-1, 1]"""
-    f = smolyay.basis.ChebyshevSecondKind(4)
-    with pytest.raises(ValueError):
-        f(2)
-    with pytest.raises(ValueError):
-        f(-2)
-    with pytest.raises(ValueError):
-        f([0.5, 0.7, 3, 0.8])
-    with pytest.raises(ValueError):
-        f([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2}),
-        (2, {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4}),
-    ],
-)
-def test_cheb_2nd_derivative(degree, answer_key):
-    """Test chebyshev polynomial derivative"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    assert f.derivative(0.5) == pytest.approx(answer_key[0.5])
-    assert f.derivative(1) == pytest.approx(answer_key[1])
-    assert f.derivative(-1) == pytest.approx(answer_key[-1])
-    assert f.derivative(-0.25) == pytest.approx(answer_key[-0.25])
-    assert f.derivative(-0.5) == pytest.approx(answer_key[-0.5])
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2}),
-        (2, {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4}),
-    ],
-)
-def test_cheb_2nd_derivative_1D(degree, answer_key):
-    """Test chebyshev polynomial derivative with a 1D array"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5]
-    answers = [answer_key[x] for x in xs]
-    assert numpy.shape(f.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(f.derivative(xs), answers)
-
-    xs1 = numpy.ones((1, 1)) * xs[0]
-    answer1 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f.derivative(xs1), answer1)
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2}),
-        (2, {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4}),
-    ],
-)
-def test_cheb_2nd_derivative_2D(degree, answer_key):
-    """Test chebyshev polynomial derivative with a 2D array"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
-    answers = [answer_key[x] for x in xs]
-    xs1 = numpy.reshape(xs, (2, 4))
-    answer1 = numpy.reshape(answers, (2, 4))
-    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f.derivative(xs1), answer1)
-
-    xs2 = numpy.reshape(xs, (1, 8))
-    answer2 = numpy.reshape(answers, (1, 8))
-    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f.derivative(xs2), answer2)
-
-    xs3 = numpy.reshape(xs, (8, 1))
-    answer3 = numpy.reshape(answers, (8, 1))
-    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f.derivative(xs3), answer3)
-
-    xs4 = numpy.ones((1, 1)) * xs[0]
-    answer4 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f.derivative(xs4), answer4)
-
-
-@pytest.mark.parametrize(
-    "degree,answer_key",
-    [
-        (0, {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0}),
-        (1, {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2}),
-        (2, {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4}),
-    ],
-)
-def test_cheb_2nd_derivative_3D(degree, answer_key):
-    """Test chebyshev polynomial derivative with a 3D array"""
-    f = smolyay.basis.ChebyshevSecondKind(degree)
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, -1, 0.5,
-          0.5, 1, 1, -0.25, -0.5, -1, 1, -0.25, -0.25, 1, 1, 0.5]
-    answers = [answer_key[x] for x in xs]
-
-    xs1 = numpy.reshape(xs, (2, 3, 4))
-    answer1 = numpy.reshape(answers, (2, 3, 4))
-    assert numpy.shape(f.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(f.derivative(xs1), answer1)
-
-    xs2 = numpy.reshape(xs, (1, 1, 24))
-    answer2 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(f.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(f.derivative(xs2), answer2)
-
-    xs3 = numpy.reshape(xs, (1, 24, 1))
-    answer3 = numpy.reshape(answers, (1, 24, 1))
-    assert numpy.shape(f.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(f.derivative(xs3), answer3)
-
-    xs4 = numpy.reshape(xs, (1, 1, 24))
-    answer4 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(f.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(f.derivative(xs4), answer4)
-
-    xs5 = numpy.reshape(xs, (1, 6, 4))
-    answer5 = numpy.reshape(answers, (1, 6, 4))
-    assert numpy.shape(f.derivative(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(f.derivative(xs5), answer5)
-
-    xs6 = numpy.reshape(xs, (6, 4, 1))
-    answer6 = numpy.reshape(answers, (6, 4, 1))
-    assert numpy.shape(f.derivative(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(f.derivative(xs6), answer6)
-
-    xs7 = numpy.reshape(xs, (6, 1, 4))
-    answer7 = numpy.reshape(answers, (6, 1, 4))
-    assert numpy.shape(f.derivative(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(f.derivative(xs7), answer7)
-
-    xs8 = numpy.ones((1, 1, 1)) * xs[0]
-    answer8 = numpy.ones((1, 1, 1)) * answers[0]
-    assert numpy.shape(f.derivative(xs8)) == numpy.shape(xs8)
-    assert numpy.allclose(f.derivative(xs8), answer8)
-
-
-def test_cheb_2nd_derivative_invalid_input():
-    """Test call raises error if input is outside domain [-1, 1]"""
-    f = smolyay.basis.ChebyshevSecondKind(4)
-    with pytest.raises(ValueError):
-        f.derivative(2)
-    with pytest.raises(ValueError):
-        f.derivative(-2)
-    with pytest.raises(ValueError):
-        f.derivative([0.5, 0.7, 3, 0.8])
-    with pytest.raises(ValueError):
-        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
 
 
 def test_trig_initial():
@@ -767,8 +714,16 @@ def test_trig_call_1D(frequency, answer_key):
 def test_trig_call_2D(frequency, answer_key):
     """Test Trigonometric function call with a 2D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    xs = [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,0, 
-          numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi]
+    xs = [
+        0,
+        numpy.pi / 3,
+        numpy.pi / 6,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 6,
+        3 * numpy.pi / 2,
+        2 * numpy.pi,
+    ]
     answers = [answer_key[x] for x in xs]
     xs1 = numpy.reshape(xs, (2, 4))
     answer1 = numpy.reshape(answers, (2, 4))
@@ -831,12 +786,32 @@ def test_trig_call_2D(frequency, answer_key):
 def test_trig_call_3D(frequency, answer_key):
     """Test Trigonometric function call with a 3D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    xs = [numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi,
-          0, 3 * numpy.pi / 2, numpy.pi / 3, 2 * numpy.pi,
-          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,
-          0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6,
-          0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi,
-          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi]
+    xs = [
+        numpy.pi / 3,
+        3 * numpy.pi / 2,
+        numpy.pi / 6,
+        2 * numpy.pi,
+        0,
+        3 * numpy.pi / 2,
+        numpy.pi / 3,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 3,
+        numpy.pi / 6,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 3,
+        3 * numpy.pi / 2,
+        numpy.pi / 6,
+        0,
+        numpy.pi / 6,
+        3 * numpy.pi / 2,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 3,
+        numpy.pi / 6,
+        2 * numpy.pi,
+    ]
     answers = [answer_key[x] for x in xs]
 
     xs1 = numpy.reshape(xs, (2, 3, 4))
@@ -1018,8 +993,16 @@ def test_trig_derivative_1D(frequency, answer_key):
 def test_trig_derivative_2D(frequency, answer_key):
     """Test Trigonometric function derivative  with a 2D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    xs = [0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,0, 
-          numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi]
+    xs = [
+        0,
+        numpy.pi / 3,
+        numpy.pi / 6,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 6,
+        3 * numpy.pi / 2,
+        2 * numpy.pi,
+    ]
     answers = [answer_key[x] for x in xs]
     xs1 = numpy.reshape(xs, (2, 4))
     answer1 = numpy.reshape(answers, (2, 4))
@@ -1082,12 +1065,32 @@ def test_trig_derivative_2D(frequency, answer_key):
 def test_trig_derivative_3D(frequency, answer_key):
     """Test Trigonometric function derivative with a 3D array"""
     f = smolyay.basis.Trigonometric(frequency)
-    xs = [numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6, 2 * numpy.pi,
-          0, 3 * numpy.pi / 2, numpy.pi / 3, 2 * numpy.pi,
-          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi,
-          0, numpy.pi / 3, 3 * numpy.pi / 2, numpy.pi / 6,
-          0, numpy.pi / 6, 3 * numpy.pi / 2, 2 * numpy.pi,
-          0, numpy.pi / 3, numpy.pi / 6, 2 * numpy.pi]
+    xs = [
+        numpy.pi / 3,
+        3 * numpy.pi / 2,
+        numpy.pi / 6,
+        2 * numpy.pi,
+        0,
+        3 * numpy.pi / 2,
+        numpy.pi / 3,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 3,
+        numpy.pi / 6,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 3,
+        3 * numpy.pi / 2,
+        numpy.pi / 6,
+        0,
+        numpy.pi / 6,
+        3 * numpy.pi / 2,
+        2 * numpy.pi,
+        0,
+        numpy.pi / 3,
+        numpy.pi / 6,
+        2 * numpy.pi,
+    ]
     answers = [answer_key[x] for x in xs]
 
     xs1 = numpy.reshape(xs, (2, 3, 4))
