@@ -245,11 +245,11 @@ class s213(BenchmarkFunction):
 
     @property
     def global_minimum(self):
-        return 5e-10
+        return 0
     
     @property
     def global_minimum_location(self):
-        return [0.9999999593, 0.9999999187]
+        return [1, 1]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
