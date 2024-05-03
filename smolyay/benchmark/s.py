@@ -83,7 +83,7 @@ class s205(_beale):
     
     @property
     def global_minimum_location(self):
-        return [2.9999999997, 0.4999999999]
+        return [3, 0.5]
 
 class s206(BenchmarkFunction):
     @property
