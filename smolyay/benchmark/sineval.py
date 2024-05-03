@@ -13,7 +13,7 @@ class sineval(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [-2e-10, -2e-10]
+        return [0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
