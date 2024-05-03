@@ -126,6 +126,14 @@ basis_derivative_answer_key = pytest.mark.parametrize(
     ],
 )
 
+basis_outside_domain = pytest.mark.parametrize(
+    "basis_fun,too_large,too_small,valid_input",
+        [
+        (smolyay.basis.ChebyshevFirstKind(4),1.01,-1.01,0),
+        (smolyay.basis.ChebyshevSecondKind(4),1.01,-1.01,0),
+        (smolyay.basis.Trigonometric(4),7,-0.01,numpy.pi),
+    ],
+)
 
 # initialization tests
 @pytest.mark.parametrize(
@@ -158,36 +166,30 @@ def test_trig_initial():
 
 
 # Test outside of valid domain
-@pytest.mark.parametrize(
-    "basis_fun",
-    [
-        smolyay.basis.ChebyshevFirstKind(4),
-        smolyay.basis.ChebyshevSecondKind(4),
-        smolyay.basis.Trigonometric(4),
-    ],
-)
-def test_outside_domain_error(basis_fun):
+@basis_outside_domain
+def test_call_outside_domain_error(basis_fun,too_large,too_small,valid_input):
     """Test call and derivative raise error for input outside domain [-1, 1]"""
-    midpoint = (basis_fun.domain[0] + basis_fun.domain[1])/2
-    too_low = basis_fun.domain[0] - 0.01
-    too_big = basis_fun.domain[1] + 0.01
     with pytest.raises(ValueError):
-        basis_fun(too_big)
+        basis_fun(too_large)
     with pytest.raises(ValueError):
-        basis_fun(too_low)
+        basis_fun(too_small)
     with pytest.raises(ValueError):
-        basis_fun([midpoint, too_low, midpoint])
+        basis_fun([valid_input, too_small, valid_input])
     with pytest.raises(ValueError):
-        basis_fun([[midpoint, too_big, midpoint],[midpoint, midpoint, midpoint]])
-    with pytest.raises(ValueError):
-        basis_fun.derivative(too_big)
-    with pytest.raises(ValueError):
-        basis_fun.derivative(too_low)
-    with pytest.raises(ValueError):
-        basis_fun.derivative([midpoint, too_low, midpoint])
-    with pytest.raises(ValueError):
-        basis_fun.derivative([[midpoint, too_big, midpoint],[midpoint, midpoint, midpoint]])
+        basis_fun([[valid_input, too_large, valid_input],[valid_input, valid_input, valid_input]])
 
+
+@basis_outside_domain
+def test_derivative_outside_domain_error(basis_fun,too_large,too_small,valid_input):
+    """Test call and derivative raise error for input outside domain [-1, 1]"""
+    with pytest.raises(ValueError):
+        basis_fun.derivative(too_large)
+    with pytest.raises(ValueError):
+        basis_fun.derivative(too_small)
+    with pytest.raises(ValueError):
+        basis_fun.derivative([valid_input, too_small, valid_input])
+    with pytest.raises(ValueError):
+        basis_fun.derivative([[valid_input, too_large, valid_input],[valid_input, valid_input, valid_input]])
 
 # Test call function correctness
 @basis_call_answer_key
