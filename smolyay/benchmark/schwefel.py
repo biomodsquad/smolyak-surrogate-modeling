@@ -14,7 +14,7 @@ class schwefel(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [ 0.0714072734, 0.0714072734, 0.0714073339, 0.0714073339, 0.0714073339]
+        return [ 0, 0, 0, 0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [2])
