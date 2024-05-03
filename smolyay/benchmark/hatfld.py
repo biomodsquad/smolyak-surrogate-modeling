@@ -33,7 +33,7 @@ class hatflda(_hatfld):
     
     @property
     def global_minimum_location(self):
-        return [0.999999997, 0.9999999714, 0.9999999281, 0.9999998559]
+        return [1, 1, 1, 1]
 
 class hatfldb(_hatfld):
     @property
@@ -60,7 +60,7 @@ class hatfldc(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [0.9999999998, 1.0000000015, 1.000000002, 1.0000000022]
+        return [1, 1, 1, 1]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
