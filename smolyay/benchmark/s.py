@@ -1802,7 +1802,7 @@ class s274(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [-5.2e-09, -2.6e-09]
+        return [0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
