@@ -13,7 +13,7 @@ class humps(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [-2.9e-09, -4e-09]
+        return [0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
