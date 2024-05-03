@@ -582,7 +582,7 @@ class s258(_wood):
     
     @property
     def global_minimum_location(self):
-        return [1, 1, 1, 1.0000000001]
+        return [1, 1, 1, 1]
 
 class s259(BenchmarkFunction):
     @property
