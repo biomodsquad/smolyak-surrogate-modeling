@@ -13,7 +13,7 @@ class himmelbb(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [ 0.2997537652, 0.70097204 ]
+        return [0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
