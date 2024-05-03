@@ -127,6 +127,7 @@ basis_derivative_answer_key = pytest.mark.parametrize(
 )
 
 
+# initialization tests
 @pytest.mark.parametrize(
     "basis_fun",
     [
@@ -135,7 +136,7 @@ basis_derivative_answer_key = pytest.mark.parametrize(
     ],
 )
 def test_cheb_initial(basis_fun):
-    """test degrees returns correctly"""
+    """test degrees and domain return correctly"""
     f2 = basis_fun(2)
     assert f2.degree == 2
     assert isinstance(f2.degree, int)
@@ -145,6 +146,81 @@ def test_cheb_initial(basis_fun):
     assert isinstance(f2.degree, int)
 
 
+def test_trig_initial():
+    """test frequency and domain return correctly"""
+    f2 = smolyay.basis.Trigonometric(2)
+    assert f2.frequency == 2
+    assert isinstance(f2.frequency, int)
+    assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
+    f2.frequency = float(3)
+    assert f2.frequency == 3
+    assert isinstance(f2.frequency, int)
+
+
+# Test outside of valid domain
+@pytest.mark.parametrize(
+    "cheb_function",
+    [
+        smolyay.basis.ChebyshevFirstKind(4),
+        smolyay.basis.ChebyshevSecondKind(4),
+    ],
+)
+def test_cheb_call_invalid_input(cheb_function):
+    """Test call raises error if input is outside domain [-1, 1]"""
+    with pytest.raises(ValueError):
+        cheb_function(2)
+    with pytest.raises(ValueError):
+        cheb_function(-2)
+    with pytest.raises(ValueError):
+        cheb_function([0.5, 0.7, 3, 0.8])
+    with pytest.raises(ValueError):
+        cheb_function([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+
+
+@pytest.mark.parametrize(
+    "cheb_function",
+    [
+        smolyay.basis.ChebyshevFirstKind(4),
+        smolyay.basis.ChebyshevSecondKind(4),
+    ],
+)
+def test_cheb_derivative_invalid_input(cheb_function):
+    """Test call raises error if input is outside domain [-1, 1]"""
+    with pytest.raises(ValueError):
+        cheb_function.derivative(2)
+    with pytest.raises(ValueError):
+        cheb_function.derivative(-2)
+    with pytest.raises(ValueError):
+        cheb_function.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+
+
+def test_trig_call_invalid_input():
+    """Test call raises error if input is outside domain [0, 2pi]"""
+    f = smolyay.basis.Trigonometric(4)
+    with pytest.raises(ValueError):
+        f(6.5)
+    with pytest.raises(ValueError):
+        f(-1)
+    with pytest.raises(ValueError):
+        f([0.5, 0.7, 3, -0.8])
+    with pytest.raises(ValueError):
+        f([[0.5, 0.7, -3, 0.8], [0.5, 0.7, 0.8, 0.5]])
+
+
+def test_trig_derivative_invalid_input():
+    """Test call raises error if input is outside domain [0, 2pi]"""
+    f = smolyay.basis.Trigonometric(4)
+    with pytest.raises(ValueError):
+        f.derivative(-0.04)
+    with pytest.raises(ValueError):
+        f.derivative(6.5)
+    with pytest.raises(ValueError):
+        f.derivative([0.5, 0.7, 3, -0.8])
+    with pytest.raises(ValueError):
+        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+
+
+# Test call function correctness
 @basis_call_answer_key
 def test_call(basis_fun, answer_key):
     """Test basis function call"""
@@ -244,25 +320,7 @@ def test_call_3D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun(xs8), answer8)
 
 
-@pytest.mark.parametrize(
-    "cheb_function",
-    [
-        smolyay.basis.ChebyshevFirstKind(4),
-        smolyay.basis.ChebyshevSecondKind(4),
-    ],
-)
-def test_cheb_call_invalid_input(cheb_function):
-    """Test call raises error if input is outside domain [-1, 1]"""
-    with pytest.raises(ValueError):
-        cheb_function(2)
-    with pytest.raises(ValueError):
-        cheb_function(-2)
-    with pytest.raises(ValueError):
-        cheb_function([0.5, 0.7, 3, 0.8])
-    with pytest.raises(ValueError):
-        cheb_function([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
+# Test derivative function correctness
 @basis_derivative_answer_key
 def test_derivative(basis_fun, answer_key):
     """Test basis function derivative"""
@@ -360,23 +418,7 @@ def test_derivative_3D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun.derivative(xs8), answer8)
 
 
-@pytest.mark.parametrize(
-    "cheb_function",
-    [
-        smolyay.basis.ChebyshevFirstKind(4),
-        smolyay.basis.ChebyshevSecondKind(4),
-    ],
-)
-def test_cheb_derivative_invalid_input(cheb_function):
-    """Test call raises error if input is outside domain [-1, 1]"""
-    with pytest.raises(ValueError):
-        cheb_function.derivative(2)
-    with pytest.raises(ValueError):
-        cheb_function.derivative(-2)
-    with pytest.raises(ValueError):
-        cheb_function.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
+# Test call correctness at points that are special to a basis function
 def test_cheb_call_extrema_points():
     """Test chebyshev polynomial at extrema"""
     f = smolyay.basis.ChebyshevFirstKind(4)
@@ -404,43 +446,7 @@ def test_cheb_2nd_call_root_points():
     assert numpy.allclose(f(root_points), numpy.zeros(3))
 
 
-def test_trig_initial():
-    """test degrees returns correctly"""
-    f2 = smolyay.basis.Trigonometric(2)
-    assert f2.frequency == 2
-    assert isinstance(f2.frequency, int)
-    assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
-    f2.frequency = float(3)
-    assert f2.frequency == 3
-    assert isinstance(f2.frequency, int)
-
-
-def test_trig_call_invalid_input():
-    """Test call raises error if input is outside domain [0, 2pi]"""
-    f = smolyay.basis.Trigonometric(4)
-    with pytest.raises(ValueError):
-        f(6.5)
-    with pytest.raises(ValueError):
-        f(-1)
-    with pytest.raises(ValueError):
-        f([0.5, 0.7, 3, -0.8])
-    with pytest.raises(ValueError):
-        f([[0.5, 0.7, -3, 0.8], [0.5, 0.7, 0.8, 0.5]])
-
-
-def test_trig_derivative_invalid_input():
-    """Test call raises error if input is outside domain [0, 2pi]"""
-    f = smolyay.basis.Trigonometric(4)
-    with pytest.raises(ValueError):
-        f.derivative(-0.04)
-    with pytest.raises(ValueError):
-        f.derivative(6.5)
-    with pytest.raises(ValueError):
-        f.derivative([0.5, 0.7, 3, -0.8])
-    with pytest.raises(ValueError):
-        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
+# Test a set of basis functions
 def test_set_initialize():
     """Check BasisFunctionSet correctly initializes"""
     f = smolyay.basis.BasisFunctionSet([])
