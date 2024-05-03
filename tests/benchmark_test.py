@@ -236,5 +236,4 @@ def test_functions_call_shape(fun):
 @pytest.mark.parametrize("fun",functions)
 def test_functions_optimum(fun):
     """Test all functions optimums are at their locations"""
-    print(fun.name)
     assert numpy.isclose(fun(fun.global_minimum_location),fun.global_minimum)
