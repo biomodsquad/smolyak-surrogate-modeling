@@ -13,7 +13,7 @@ class genhumps(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [1e-09, -1.7e-09, -9.5e-09, 1.1e-09, -2.7e-09]
+        return [0, 0, 0, 0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
