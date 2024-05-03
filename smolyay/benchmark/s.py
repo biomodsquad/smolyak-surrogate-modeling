@@ -523,7 +523,7 @@ class s256(_powell):
     
     @property
     def global_minimum_location(self):
-        return [0.0018620114, -0.0001862011, 0.0005488955, 0.0005488952]
+        return [0, 0, 0, 0]
 
 class s257(BenchmarkFunction):
     @property
