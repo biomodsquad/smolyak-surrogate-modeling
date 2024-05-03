@@ -48,7 +48,7 @@ class hs001(_rosenbrock):
     
     @property
     def global_minimum_location(self):
-        return [0.9999999914, 0.9999999828]
+        return [1, 1]
 
 class hs002(_rosenbrock):
     @property
@@ -164,7 +164,7 @@ class hs038(_wood):
     
     @property
     def global_minimum_location(self):
-        return [1, 1, 0.9999999999, 0.9999999999]
+        return [1, 1, 1, 1]
 
 class hs045(BenchmarkFunction):
     @property
