@@ -159,49 +159,34 @@ def test_trig_initial():
 
 # Test outside of valid domain
 @pytest.mark.parametrize(
-    "cheb_function",
+    "basis_fun",
     [
         smolyay.basis.ChebyshevFirstKind(4),
         smolyay.basis.ChebyshevSecondKind(4),
+        smolyay.basis.Trigonometric(4),
     ],
 )
-def test_cheb_outside_domain_error(cheb_function):
+def test_outside_domain_error(basis_fun):
     """Test call and derivative raise error for input outside domain [-1, 1]"""
+    midpoint = (basis_fun.domain[0] + basis_fun.domain[1])/2
+    too_low = basis_fun.domain[0] - 0.01
+    too_big = basis_fun.domain[1] + 0.01
     with pytest.raises(ValueError):
-        cheb_function(2)
+        basis_fun(too_big)
     with pytest.raises(ValueError):
-        cheb_function(-2)
+        basis_fun(too_low)
     with pytest.raises(ValueError):
-        cheb_function([0.5, 0.7, 3, 0.8])
+        basis_fun([midpoint, too_low, midpoint])
     with pytest.raises(ValueError):
-        cheb_function([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+        basis_fun([[midpoint, too_big, midpoint],[midpoint, midpoint, midpoint]])
     with pytest.raises(ValueError):
-        cheb_function.derivative(2)
+        basis_fun.derivative(too_big)
     with pytest.raises(ValueError):
-        cheb_function.derivative(-2)
+        basis_fun.derivative(too_low)
     with pytest.raises(ValueError):
-        cheb_function.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
-def test_trig_outside_domain_error():
-    """Test call and derivative raise error for input outside domain [0, 2pi]"""
-    f = smolyay.basis.Trigonometric(4)
+        basis_fun.derivative([midpoint, too_low, midpoint])
     with pytest.raises(ValueError):
-        f(6.5)
-    with pytest.raises(ValueError):
-        f(-1)
-    with pytest.raises(ValueError):
-        f([0.5, 0.7, 3, -0.8])
-    with pytest.raises(ValueError):
-        f([[0.5, 0.7, -3, 0.8], [0.5, 0.7, 0.8, 0.5]])
-    with pytest.raises(ValueError):
-        f.derivative(-0.04)
-    with pytest.raises(ValueError):
-        f.derivative(6.5)
-    with pytest.raises(ValueError):
-        f.derivative([0.5, 0.7, 3, -0.8])
-    with pytest.raises(ValueError):
-        f.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
+        basis_fun.derivative([[midpoint, too_big, midpoint],[midpoint, midpoint, midpoint]])
 
 
 # Test call function correctness
