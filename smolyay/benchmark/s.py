@@ -143,7 +143,7 @@ class s208(_rosenbrock):
     
     @property
     def global_minimum_location(self):
-        return [1, 0.9999999999]
+        return [1, 1]
 
 class s209(BenchmarkFunction):
     @property
