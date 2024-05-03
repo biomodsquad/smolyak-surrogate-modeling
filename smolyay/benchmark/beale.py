@@ -37,4 +37,4 @@ class beale(_beale):
     
     @property
     def global_minimum_location(self):
-        return [2.9999999992, 0.4999999998]
+        return [3, 0.5]
