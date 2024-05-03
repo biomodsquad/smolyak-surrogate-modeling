@@ -165,8 +165,8 @@ def test_trig_initial():
         smolyay.basis.ChebyshevSecondKind(4),
     ],
 )
-def test_cheb_call_invalid_input(cheb_function):
-    """Test call raises error if input is outside domain [-1, 1]"""
+def test_cheb_outside_domain_error(cheb_function):
+    """Test call and derivative raise error for input outside domain [-1, 1]"""
     with pytest.raises(ValueError):
         cheb_function(2)
     with pytest.raises(ValueError):
@@ -175,17 +175,6 @@ def test_cheb_call_invalid_input(cheb_function):
         cheb_function([0.5, 0.7, 3, 0.8])
     with pytest.raises(ValueError):
         cheb_function([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
-
-
-@pytest.mark.parametrize(
-    "cheb_function",
-    [
-        smolyay.basis.ChebyshevFirstKind(4),
-        smolyay.basis.ChebyshevSecondKind(4),
-    ],
-)
-def test_cheb_derivative_invalid_input(cheb_function):
-    """Test call raises error if input is outside domain [-1, 1]"""
     with pytest.raises(ValueError):
         cheb_function.derivative(2)
     with pytest.raises(ValueError):
@@ -194,8 +183,8 @@ def test_cheb_derivative_invalid_input(cheb_function):
         cheb_function.derivative([[0.5, 0.7, 3, 0.8], [0.5, 0.7, 0.8, -0.5]])
 
 
-def test_trig_call_invalid_input():
-    """Test call raises error if input is outside domain [0, 2pi]"""
+def test_trig_outside_domain_error():
+    """Test call and derivative raise error for input outside domain [0, 2pi]"""
     f = smolyay.basis.Trigonometric(4)
     with pytest.raises(ValueError):
         f(6.5)
@@ -205,11 +194,6 @@ def test_trig_call_invalid_input():
         f([0.5, 0.7, 3, -0.8])
     with pytest.raises(ValueError):
         f([[0.5, 0.7, -3, 0.8], [0.5, 0.7, 0.8, 0.5]])
-
-
-def test_trig_derivative_invalid_input():
-    """Test call raises error if input is outside domain [0, 2pi]"""
-    f = smolyay.basis.Trigonometric(4)
     with pytest.raises(ValueError):
         f.derivative(-0.04)
     with pytest.raises(ValueError):
