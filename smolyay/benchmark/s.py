@@ -1827,7 +1827,7 @@ class s275(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [7.2451e-06, -8.1616e-05, 0.000196518, -0.0001277807]
+        return [0, 0, 0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
