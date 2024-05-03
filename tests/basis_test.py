@@ -6,7 +6,7 @@ import smolyay
 
 
 basis_call_answer_key = pytest.mark.parametrize(
-    "cheb_function,answer_key",
+    "basis_fun,answer_key",
     [
         (
             smolyay.basis.ChebyshevFirstKind(0),
@@ -37,7 +37,7 @@ basis_call_answer_key = pytest.mark.parametrize(
 
 
 basis_derivative_answer_key = pytest.mark.parametrize(
-    "cheb_function,answer_key",
+    "basis_fun,answer_key",
     [
         (
             smolyay.basis.ChebyshevFirstKind(0),
@@ -68,15 +68,15 @@ basis_derivative_answer_key = pytest.mark.parametrize(
 
 
 @pytest.mark.parametrize(
-    "cheb_function",
+    "basis_fun",
     [
         smolyay.basis.ChebyshevFirstKind,
         smolyay.basis.ChebyshevSecondKind,
     ],
 )
-def test_cheb_initial(cheb_function):
+def test_cheb_initial(basis_fun):
     """test degrees returns correctly"""
-    f2 = cheb_function(2)
+    f2 = basis_fun(2)
     assert f2.degree == 2
     assert isinstance(f2.degree, int)
     assert numpy.array_equal(f2.domain, [-1, 1])
@@ -86,125 +86,100 @@ def test_cheb_initial(cheb_function):
 
 
 @basis_call_answer_key
-def test_cheb_call(cheb_function, answer_key):
+def test_cheb_call(basis_fun, answer_key):
     """Test chebyshev polynomial call"""
-    assert cheb_function(0.5) == pytest.approx(answer_key[0.5])
-    assert cheb_function(1) == pytest.approx(answer_key[1])
-    assert cheb_function(-1) == pytest.approx(answer_key[-1])
-    assert cheb_function(-0.25) == pytest.approx(answer_key[-0.25])
-    assert cheb_function(-0.5) == pytest.approx(answer_key[-0.5])
+    for x,y in answer_key.items():
+        assert basis_fun(x) == pytest.approx(y)
 
 
 @basis_call_answer_key
-def test_cheb_call_1D(cheb_function, answer_key):
+def test_cheb_call_1D(basis_fun, answer_key):
     """Test chebyshev polynomial call with a 1D array"""
-    xs = [0.5, 1, -1, -0.25, -0.5]
+    xs = list(answer_key.keys())
     answers = [answer_key[x] for x in xs]
-    assert numpy.shape(cheb_function(xs)) == numpy.shape(xs)
-    assert numpy.allclose(cheb_function(xs), answers)
+    assert numpy.shape(basis_fun(xs)) == numpy.shape(xs)
+    assert numpy.allclose(basis_fun(xs), answers)
 
     xs1 = numpy.ones((1, 1)) * xs[0]
     answer1 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(cheb_function(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(cheb_function(xs1), answer1)
+    assert numpy.shape(basis_fun(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun(xs1), answer1)
 
 
 @basis_call_answer_key
-def test_cheb_call_2D(cheb_function, answer_key):
+def test_cheb_call_2D(basis_fun, answer_key):
     """Test chebyshev polynomial call with a 2D array"""
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs,(8,)))
     answers = [answer_key[x] for x in xs]
+
     xs1 = numpy.reshape(xs, (2, 4))
     answer1 = numpy.reshape(answers, (2, 4))
-    assert numpy.shape(cheb_function(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(cheb_function(xs1), answer1)
+    assert numpy.shape(basis_fun(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun(xs1), answer1)
 
     xs2 = numpy.reshape(xs, (1, 8))
     answer2 = numpy.reshape(answers, (1, 8))
-    assert numpy.shape(cheb_function(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(cheb_function(xs2), answer2)
+    assert numpy.shape(basis_fun(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun(xs2), answer2)
 
     xs3 = numpy.reshape(xs, (8, 1))
     answer3 = numpy.reshape(answers, (8, 1))
-    assert numpy.shape(cheb_function(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(cheb_function(xs3), answer3)
+    assert numpy.shape(basis_fun(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun(xs3), answer3)
 
     xs4 = numpy.ones((1, 1)) * xs[0]
     answer4 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(cheb_function(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(cheb_function(xs4), answer4)
+    assert numpy.shape(basis_fun(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun(xs4), answer4)
 
 
 @basis_call_answer_key
-def test_cheb_call_3D(cheb_function, answer_key):
+def test_cheb_call_3D(basis_fun, answer_key):
     """Test chebyshev polynomial call with a 3D array"""
-    xs = [
-        0.5,
-        1,
-        -1,
-        -0.25,
-        -0.5,
-        -1,
-        1,
-        -0.25,
-        -0.25,
-        1,
-        -1,
-        0.5,
-        0.5,
-        1,
-        1,
-        -0.25,
-        -0.5,
-        -1,
-        1,
-        -0.25,
-        -0.25,
-        1,
-        1,
-        0.5,
-    ]
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs,(24,)))
     answers = [answer_key[x] for x in xs]
 
     xs1 = numpy.reshape(xs, (2, 3, 4))
     answer1 = numpy.reshape(answers, (2, 3, 4))
-    assert numpy.shape(cheb_function(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(cheb_function(xs1), answer1)
+    assert numpy.shape(basis_fun(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun(xs1), answer1)
 
     xs2 = numpy.reshape(xs, (1, 1, 24))
     answer2 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(cheb_function(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(cheb_function(xs2), answer2)
+    assert numpy.shape(basis_fun(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun(xs2), answer2)
 
     xs3 = numpy.reshape(xs, (1, 24, 1))
     answer3 = numpy.reshape(answers, (1, 24, 1))
-    assert numpy.shape(cheb_function(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(cheb_function(xs3), answer3)
+    assert numpy.shape(basis_fun(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun(xs3), answer3)
 
     xs4 = numpy.reshape(xs, (1, 1, 24))
     answer4 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(cheb_function(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(cheb_function(xs4), answer4)
+    assert numpy.shape(basis_fun(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun(xs4), answer4)
 
     xs5 = numpy.reshape(xs, (1, 6, 4))
     answer5 = numpy.reshape(answers, (1, 6, 4))
-    assert numpy.shape(cheb_function(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(cheb_function(xs5), answer5)
+    assert numpy.shape(basis_fun(xs5)) == numpy.shape(xs5)
+    assert numpy.allclose(basis_fun(xs5), answer5)
 
     xs6 = numpy.reshape(xs, (6, 4, 1))
     answer6 = numpy.reshape(answers, (6, 4, 1))
-    assert numpy.shape(cheb_function(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(cheb_function(xs6), answer6)
+    assert numpy.shape(basis_fun(xs6)) == numpy.shape(xs6)
+    assert numpy.allclose(basis_fun(xs6), answer6)
 
     xs7 = numpy.reshape(xs, (6, 1, 4))
     answer7 = numpy.reshape(answers, (6, 1, 4))
-    assert numpy.shape(cheb_function(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(cheb_function(xs7), answer7)
+    assert numpy.shape(basis_fun(xs7)) == numpy.shape(xs7)
+    assert numpy.allclose(basis_fun(xs7), answer7)
 
     xs8 = numpy.ones((1, 1, 1)) * xs[0]
     answer8 = numpy.ones((1, 1, 1)) * answers[0]
-    assert numpy.shape(cheb_function(xs8)) == numpy.shape(xs8)
-    assert numpy.allclose(cheb_function(xs8), answer8)
+    assert numpy.shape(basis_fun(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(basis_fun(xs8), answer8)
 
 
 @pytest.mark.parametrize(
@@ -227,125 +202,100 @@ def test_cheb_call_invalid_input(cheb_function):
 
 
 @basis_derivative_answer_key
-def test_cheb_derivative(cheb_function, answer_key):
+def test_cheb_derivative(basis_fun, answer_key):
     """Test chebyshev polynomial derivative"""
-    assert cheb_function.derivative(0.5) == pytest.approx(answer_key[0.5])
-    assert cheb_function.derivative(1) == pytest.approx(answer_key[1])
-    assert cheb_function.derivative(-1) == pytest.approx(answer_key[-1])
-    assert cheb_function.derivative(-0.25) == pytest.approx(answer_key[-0.25])
-    assert cheb_function.derivative(-0.5) == pytest.approx(answer_key[-0.5])
+    for x,y in answer_key.items():
+        assert basis_fun.derivative(x) == pytest.approx(y)
 
 
 @basis_derivative_answer_key
-def test_cheb_derivative_1D(cheb_function, answer_key):
+def test_cheb_derivative_1D(basis_fun, answer_key):
     """Test chebyshev polynomial derivative with a 1D array"""
-    xs = [0.5, 1, -1, -0.25, -0.5]
+    xs = list(answer_key.keys())
     answers = [answer_key[x] for x in xs]
-    assert numpy.shape(cheb_function.derivative(xs)) == numpy.shape(xs)
-    assert numpy.allclose(cheb_function.derivative(xs), answers)
+    assert numpy.shape(basis_fun.derivative(xs)) == numpy.shape(xs)
+    assert numpy.allclose(basis_fun.derivative(xs), answers)
 
     xs1 = numpy.ones((1, 1)) * xs[0]
     answer1 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(cheb_function.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(cheb_function.derivative(xs1), answer1)
+    assert numpy.shape(basis_fun.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun.derivative(xs1), answer1)
 
 
 @basis_derivative_answer_key
-def test_cheb_derivative_2D(cheb_function, answer_key):
+def test_cheb_derivative_2D(basis_fun, answer_key):
     """Test chebyshev polynomial derivative with a 2D array"""
-    xs = [0.5, 1, -1, -0.25, -0.5, -1, 1, -0.25]
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs,(8,)))
     answers = [answer_key[x] for x in xs]
+
     xs1 = numpy.reshape(xs, (2, 4))
     answer1 = numpy.reshape(answers, (2, 4))
-    assert numpy.shape(cheb_function.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(cheb_function.derivative(xs1), answer1)
+    assert numpy.shape(basis_fun.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun.derivative(xs1), answer1)
 
     xs2 = numpy.reshape(xs, (1, 8))
     answer2 = numpy.reshape(answers, (1, 8))
-    assert numpy.shape(cheb_function.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(cheb_function.derivative(xs2), answer2)
+    assert numpy.shape(basis_fun.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun.derivative(xs2), answer2)
 
     xs3 = numpy.reshape(xs, (8, 1))
     answer3 = numpy.reshape(answers, (8, 1))
-    assert numpy.shape(cheb_function.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(cheb_function.derivative(xs3), answer3)
+    assert numpy.shape(basis_fun.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun.derivative(xs3), answer3)
 
     xs4 = numpy.ones((1, 1)) * xs[0]
     answer4 = numpy.ones((1, 1)) * answers[0]
-    assert numpy.shape(cheb_function.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(cheb_function.derivative(xs4), answer4)
+    assert numpy.shape(basis_fun.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun.derivative(xs4), answer4)
 
 
 @basis_derivative_answer_key
-def test_cheb_derivative_3D(cheb_function, answer_key):
+def test_cheb_derivative_3D(basis_fun, answer_key):
     """Test chebyshev polynomial derivative with a 3D array"""
-    xs = [
-        0.5,
-        1,
-        -1,
-        -0.25,
-        -0.5,
-        -1,
-        1,
-        -0.25,
-        -0.25,
-        1,
-        -1,
-        0.5,
-        0.5,
-        1,
-        1,
-        -0.25,
-        -0.5,
-        -1,
-        1,
-        -0.25,
-        -0.25,
-        1,
-        1,
-        0.5,
-    ]
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs,(24,)))
     answers = [answer_key[x] for x in xs]
 
     xs1 = numpy.reshape(xs, (2, 3, 4))
     answer1 = numpy.reshape(answers, (2, 3, 4))
-    assert numpy.shape(cheb_function.derivative(xs1)) == numpy.shape(xs1)
-    assert numpy.allclose(cheb_function.derivative(xs1), answer1)
+    assert numpy.shape(basis_fun.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun.derivative(xs1), answer1)
 
     xs2 = numpy.reshape(xs, (1, 1, 24))
     answer2 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(cheb_function.derivative(xs2)) == numpy.shape(xs2)
-    assert numpy.allclose(cheb_function.derivative(xs2), answer2)
+    assert numpy.shape(basis_fun.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun.derivative(xs2), answer2)
 
     xs3 = numpy.reshape(xs, (1, 24, 1))
     answer3 = numpy.reshape(answers, (1, 24, 1))
-    assert numpy.shape(cheb_function.derivative(xs3)) == numpy.shape(xs3)
-    assert numpy.allclose(cheb_function.derivative(xs3), answer3)
+    assert numpy.shape(basis_fun.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun.derivative(xs3), answer3)
 
     xs4 = numpy.reshape(xs, (1, 1, 24))
     answer4 = numpy.reshape(answers, (1, 1, 24))
-    assert numpy.shape(cheb_function.derivative(xs4)) == numpy.shape(xs4)
-    assert numpy.allclose(cheb_function.derivative(xs4), answer4)
+    assert numpy.shape(basis_fun.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun.derivative(xs4), answer4)
 
     xs5 = numpy.reshape(xs, (1, 6, 4))
     answer5 = numpy.reshape(answers, (1, 6, 4))
-    assert numpy.shape(cheb_function.derivative(xs5)) == numpy.shape(xs5)
-    assert numpy.allclose(cheb_function.derivative(xs5), answer5)
+    assert numpy.shape(basis_fun.derivative(xs5)) == numpy.shape(xs5)
+    assert numpy.allclose(basis_fun.derivative(xs5), answer5)
 
     xs6 = numpy.reshape(xs, (6, 4, 1))
     answer6 = numpy.reshape(answers, (6, 4, 1))
-    assert numpy.shape(cheb_function.derivative(xs6)) == numpy.shape(xs6)
-    assert numpy.allclose(cheb_function.derivative(xs6), answer6)
+    assert numpy.shape(basis_fun.derivative(xs6)) == numpy.shape(xs6)
+    assert numpy.allclose(basis_fun.derivative(xs6), answer6)
 
     xs7 = numpy.reshape(xs, (6, 1, 4))
     answer7 = numpy.reshape(answers, (6, 1, 4))
-    assert numpy.shape(cheb_function.derivative(xs7)) == numpy.shape(xs7)
-    assert numpy.allclose(cheb_function.derivative(xs7), answer7)
+    assert numpy.shape(basis_fun.derivative(xs7)) == numpy.shape(xs7)
+    assert numpy.allclose(basis_fun.derivative(xs7), answer7)
 
     xs8 = numpy.ones((1, 1, 1)) * xs[0]
     answer8 = numpy.ones((1, 1, 1)) * answers[0]
-    assert numpy.shape(cheb_function.derivative(xs8)) == numpy.shape(xs8)
-    assert numpy.allclose(cheb_function.derivative(xs8), answer8)
+    assert numpy.shape(basis_fun.derivative(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(basis_fun.derivative(xs8), answer8)
 
 
 @pytest.mark.parametrize(
