@@ -718,7 +718,7 @@ class s266(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [9.3e-09, -9e-10, -2.71e-08, 0, 1.95e-08]
+        return [0, 0, 0, 0, 0]
 
     def _function(self, x):
         return -(
