@@ -41,4 +41,4 @@ class powell(_powell):
     
     @property
     def global_minimum_location(self):
-        return [0.0015780539, -0.0001578054, 0.0008014333, 0.0008014333]
+        return [0, 0, 0, 0]
