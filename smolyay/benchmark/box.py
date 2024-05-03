@@ -14,7 +14,7 @@ class box2(BenchmarkFunction):
     
     @property
     def global_minimum_location(self):
-        return [ 0.9999999991, 9.9999999977 ]
+        return [1, 10]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
