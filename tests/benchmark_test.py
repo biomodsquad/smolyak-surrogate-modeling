@@ -40,11 +40,13 @@ class TestClass3D(BenchmarkFunction):
 
 """List of non-abstract class objects used as benchmark functions"""
 functions = []
+fun_ids = []
 for name, cls in inspect.getmembers(
         importlib.import_module("smolyay.benchmark"), inspect.isclass):
     if not inspect.isabstract(cls):
         f = cls()
         functions.append(f)
+        fun_ids.append(f.name)
 
 @pytest.fixture
 def test_class_1():
@@ -80,7 +82,7 @@ def test_dimension(test_class_1,test_class_3):
     assert test_class_3.dimension == 3
 
 @pytest.mark.filterwarnings("error")
-def test_call_no_error_1(test_class_1,test_class_3):
+def test_call_no_error_1(test_class_1):
     """Test valid inputs of call give no errors for 1D functions"""
     x_1d = numpy.linspace(test_class_1.lower_bounds,test_class_1.upper_bounds)
     for x in x_1d:
@@ -188,20 +190,20 @@ def test_call_error_3D_multi_input(test_class_3):
     with pytest.raises(ValueError):
         test_class_3([[5,-2,24],[1,-2,11]])
 
-@pytest.mark.parametrize("fun",functions)
+@pytest.mark.parametrize("fun",functions,ids=fun_ids)
 def test_functions_domain_match_dimension(fun):
     """Test that all domains are the correct shape"""
     assert len(fun.domain) == fun.dimension
     for bound in fun.domain:
         assert len(bound) == 2
 
-@pytest.mark.parametrize("fun",functions)
+@pytest.mark.parametrize("fun",functions,ids=fun_ids)
 def test_functions_good_bounds(fun):
     """Test if all lower bounds are lower than upper bounds"""
     for bound in fun.domain:
         assert bound[0] < bound[1]
 
-@pytest.mark.parametrize("fun",functions)
+@pytest.mark.parametrize("fun",functions,ids=fun_ids)
 @pytest.mark.filterwarnings("error")
 def test_functions_call(fun):
     """Test all functions do not raise error or warning for inputs in bounds"""
@@ -210,21 +212,21 @@ def test_functions_call(fun):
     y_call_multi = fun(x_list)
     assert numpy.array_equiv(y_call,y_call_multi)
 
-@pytest.mark.parametrize("fun",functions)
+@pytest.mark.parametrize("fun",functions,ids=fun_ids)
 def test_functions_call_error_lower(fun):
     """Test all functions error for inputs below bounds"""
     below_bounds = numpy.add(fun.lower_bounds, -5)
     with pytest.raises(ValueError):
         fun(below_bounds)
 
-@pytest.mark.parametrize("fun",functions)
+@pytest.mark.parametrize("fun",functions,ids=fun_ids)
 def test_functions_call_error_above(fun):
     """Test all functions error for inputs above bounds"""
     above_bounds = numpy.add(fun.upper_bounds,5)
     with pytest.raises(ValueError):
         fun(above_bounds)
 
-@pytest.mark.parametrize("fun",functions)
+@pytest.mark.parametrize("fun",functions,ids=fun_ids)
 def test_functions_call_shape(fun):
     """Test all functions give the correct shape"""
     x_list = numpy.zeros((2,50,fun.dimension))
@@ -233,7 +235,7 @@ def test_functions_call_shape(fun):
     x_list[1] = numpy.linspace(mid_point,fun.upper_bounds,50)
     assert fun(x_list).shape == (2,50)
 
-@pytest.mark.parametrize("fun",functions)
+@pytest.mark.parametrize("fun",functions,ids=fun_ids)
 def test_functions_optimum(fun):
     """Test all functions optimums are at their locations"""
     assert numpy.isclose(fun(fun.global_minimum_location),fun.global_minimum)
