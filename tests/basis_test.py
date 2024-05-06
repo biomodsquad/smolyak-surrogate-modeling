@@ -5,135 +5,125 @@ import numpy
 import smolyay
 
 
-basis_call_answer_key = pytest.mark.parametrize(
-    "basis_fun,answer_key",
-    [
-        (
-            smolyay.basis.ChebyshevFirstKind(0),
-            {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
-        ),
-        (
-            smolyay.basis.ChebyshevFirstKind(1),
-            {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5},
-        ),
-        (
-            smolyay.basis.ChebyshevFirstKind(2),
-            {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5},
-        ),
-        (
-            smolyay.basis.ChebyshevSecondKind(0),
-            {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
-        ),
-        (
-            smolyay.basis.ChebyshevSecondKind(1),
-            {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1},
-        ),
-        (
-            smolyay.basis.ChebyshevSecondKind(2),
-            {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0},
-        ),
-        (
-            smolyay.basis.Trigonometric(0),
-            {
-                0: 1,
-                numpy.pi / 3: 1,
-                3 * numpy.pi / 2: 1,
-                numpy.pi / 6: 1,
-                2 * numpy.pi: 1,
-            },
-        ),
-        (
-            smolyay.basis.Trigonometric(1),
-            {
-                0: 1,
-                numpy.pi / 3: numpy.exp(numpy.pi / 3 * 1j),
-                3 * numpy.pi / 2: numpy.exp(3 * numpy.pi / 2 * 1j),
-                numpy.pi / 6: numpy.exp(numpy.pi / 6 * 1j),
-                2 * numpy.pi: numpy.exp(2 * numpy.pi * 1j),
-            },
-        ),
-        (
-            smolyay.basis.Trigonometric(-1),
-            {
-                0: 1,
-                numpy.pi / 3: numpy.exp(numpy.pi / 3 * 1j * -1),
-                3 * numpy.pi / 2: numpy.exp(3 * numpy.pi / 2 * 1j * -1),
-                numpy.pi / 6: numpy.exp(numpy.pi / 6 * 1j * -1),
-                2 * numpy.pi: numpy.exp(2 * numpy.pi * 1j * -1),
-            },
-        ),
-    ],
-)
+basis_call_answer_key = [
+    (
+        smolyay.basis.ChebyshevFirstKind(0),
+        {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(1),
+        {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(2),
+        {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(0),
+        {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(1),
+        {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(2),
+        {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0},
+    ),
+    (
+        smolyay.basis.Trigonometric(0),
+        {
+            0: 1,numpy.pi / 3: 1,
+            3 * numpy.pi / 2: 1,
+            numpy.pi / 6: 1,
+            2 * numpy.pi: 1,
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(1),
+        {
+            0: 1,
+            numpy.pi / 3: numpy.exp(numpy.pi / 3 * 1j),
+            3 * numpy.pi / 2: numpy.exp(3 * numpy.pi / 2 * 1j),
+            numpy.pi / 6: numpy.exp(numpy.pi / 6 * 1j),
+            2 * numpy.pi: numpy.exp(2 * numpy.pi * 1j),
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(-1),
+        {
+            0: 1,
+            numpy.pi / 3: numpy.exp(numpy.pi / 3 * 1j * -1),
+            3 * numpy.pi / 2: numpy.exp(3 * numpy.pi / 2 * 1j * -1),
+            numpy.pi / 6: numpy.exp(numpy.pi / 6 * 1j * -1),
+            2 * numpy.pi: numpy.exp(2 * numpy.pi * 1j * -1),
+        },
+    ),
+]
 
 
-basis_derivative_answer_key = pytest.mark.parametrize(
-    "basis_fun,answer_key",
-    [
-        (
-            smolyay.basis.ChebyshevFirstKind(0),
-            {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
-        ),
-        (
-            smolyay.basis.ChebyshevFirstKind(1),
-            {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
-        ),
-        (
-            smolyay.basis.ChebyshevFirstKind(2),
-            {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2},
-        ),
-        (
-            smolyay.basis.ChebyshevSecondKind(0),
-            {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
-        ),
-        (
-            smolyay.basis.ChebyshevSecondKind(1),
-            {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2},
-        ),
-        (
-            smolyay.basis.ChebyshevSecondKind(2),
-            {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4},
-        ),
-        (
-            smolyay.basis.Trigonometric(0),
-            {
-                0: 0,
-                numpy.pi / 3: 0,
-                3 * numpy.pi / 2: 0,
-                numpy.pi / 6: 0,
-                2 * numpy.pi: 0,
-            },
-        ),
-        (
-            smolyay.basis.Trigonometric(1),
-            {
-                0: 1j,
-                numpy.pi / 3: 1j * numpy.exp(numpy.pi / 3 * 1j),
-                3 * numpy.pi / 2: 1j * numpy.exp(3 * numpy.pi / 2 * 1j),
-                numpy.pi / 6: 1j * numpy.exp(numpy.pi / 6 * 1j),
-                2 * numpy.pi: 1j * numpy.exp(2 * numpy.pi * 1j),
-            },
-        ),
-        (
-            smolyay.basis.Trigonometric(-1),
-            {
-                0: -1j,
-                numpy.pi / 3: -1j * numpy.exp(numpy.pi / 3 * 1j * -1),
-                3 * numpy.pi / 2: -1j * numpy.exp(3 * numpy.pi / 2 * 1j * -1),
-                numpy.pi / 6: -1j * numpy.exp(numpy.pi / 6 * 1j * -1),
-                2 * numpy.pi: -1j * numpy.exp(2 * numpy.pi * 1j * -1),
-            },
-        ),
-    ],
-)
+basis_derivative_answer_key = [
+    (
+        smolyay.basis.ChebyshevFirstKind(0),
+        {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(1),
+        {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(2),
+        {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(0),
+        {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(1),
+        {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(2),
+        {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4},
+    ),
+    (
+        smolyay.basis.Trigonometric(0),
+        {
+            0: 0,
+            numpy.pi / 3: 0,
+            3 * numpy.pi / 2: 0,
+            numpy.pi / 6: 0,
+            2 * numpy.pi: 0,
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(1),
+        {
+            0: 1j,
+            numpy.pi / 3: 1j * numpy.exp(numpy.pi / 3 * 1j),
+            3 * numpy.pi / 2: 1j * numpy.exp(3 * numpy.pi / 2 * 1j),
+            numpy.pi / 6: 1j * numpy.exp(numpy.pi / 6 * 1j),
+            2 * numpy.pi: 1j * numpy.exp(2 * numpy.pi * 1j),
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(-1),
+        {
+            0: -1j,
+            numpy.pi / 3: -1j * numpy.exp(numpy.pi / 3 * 1j * -1),
+            3 * numpy.pi / 2: -1j * numpy.exp(3 * numpy.pi / 2 * 1j * -1),
+            numpy.pi / 6: -1j * numpy.exp(numpy.pi / 6 * 1j * -1),
+            2 * numpy.pi: -1j * numpy.exp(2 * numpy.pi * 1j * -1),
+        },
+    ),
+]
 
-basis_outside_domain = pytest.mark.parametrize(
-    "basis_fun,too_large,too_small,valid_input",
-    [
-        (smolyay.basis.ChebyshevFirstKind(4), 1.01, -1.01, 0),
-        (smolyay.basis.ChebyshevSecondKind(4), 1.01, -1.01, 0),
-        (smolyay.basis.Trigonometric(4), 7, -0.01, numpy.pi),
-    ],
-)
+basis_outside_domain = [
+    (smolyay.basis.ChebyshevFirstKind(4), 1.01, -1.01, 0),
+    (smolyay.basis.ChebyshevSecondKind(4), 1.01, -1.01, 0),
+    (smolyay.basis.Trigonometric(4), 7, -0.01, numpy.pi),
+]
 
 
 # initialization tests
@@ -167,7 +157,9 @@ def test_trig_initial():
 
 
 # Test outside of valid domain
-@basis_outside_domain
+@pytest.mark.parametrize(
+    "basis_fun,too_large,too_small,valid_input", basis_outside_domain
+)
 def test_call_outside_domain_error(basis_fun, too_large, too_small, valid_input):
     """Test call raises error for input outside domain"""
     with pytest.raises(ValueError):
@@ -185,7 +177,9 @@ def test_call_outside_domain_error(basis_fun, too_large, too_small, valid_input)
         )
 
 
-@basis_outside_domain
+@pytest.mark.parametrize(
+    "basis_fun,too_large,too_small,valid_input", basis_outside_domain
+)
 def test_derivative_outside_domain_error(basis_fun, too_large, too_small, valid_input):
     """Test derivative raises error for input outside domain"""
     with pytest.raises(ValueError):
@@ -204,16 +198,14 @@ def test_derivative_outside_domain_error(basis_fun, too_large, too_small, valid_
 
 
 # Test call function correctness
-@basis_call_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
 def test_call(basis_fun, answer_key):
     """Test basis function call"""
-    print(basis_fun)
-    print(answer_key)
     for x, y in answer_key.items():
         assert basis_fun(x) == pytest.approx(y)
 
 
-@basis_call_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
 def test_call_1D(basis_fun, answer_key):
     """Test basis function call with a 1D array"""
     xs = list(answer_key.keys())
@@ -227,7 +219,7 @@ def test_call_1D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun(xs1), answer1)
 
 
-@basis_call_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
 def test_call_2D(basis_fun, answer_key):
     """Test basis function call with a 2D array"""
     unique_inputs = list(answer_key.keys())
@@ -255,7 +247,7 @@ def test_call_2D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun(xs4), answer4)
 
 
-@basis_call_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
 def test_call_3D(basis_fun, answer_key):
     """Test basis function call with a 3D array"""
     unique_inputs = list(answer_key.keys())
@@ -304,14 +296,14 @@ def test_call_3D(basis_fun, answer_key):
 
 
 # Test derivative function correctness
-@basis_derivative_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
 def test_derivative(basis_fun, answer_key):
     """Test basis function derivative"""
     for x, y in answer_key.items():
         assert basis_fun.derivative(x) == pytest.approx(y)
 
 
-@basis_derivative_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
 def test_derivative_1D(basis_fun, answer_key):
     """Test basis function derivative with a 1D array"""
     xs = list(answer_key.keys())
@@ -325,7 +317,7 @@ def test_derivative_1D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun.derivative(xs1), answer1)
 
 
-@basis_derivative_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
 def test_derivative_2D(basis_fun, answer_key):
     """Test basis function derivative with a 2D array"""
     unique_inputs = list(answer_key.keys())
@@ -353,7 +345,7 @@ def test_derivative_2D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun.derivative(xs4), answer4)
 
 
-@basis_derivative_answer_key
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
 def test_derivative_3D(basis_fun, answer_key):
     """Test basis function derivative with a 3D array"""
     unique_inputs = list(answer_key.keys())
