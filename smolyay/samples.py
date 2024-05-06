@@ -56,7 +56,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     of quadrature rules that are used in numerical integration and in
     approximation.
 
-    The number of unique points is controlled by `num_points`, which describes 
+    The number of unique points is controlled by `num_points`, which describes
     the amount of points added by each level.
     `points` describes the unique points added as the number of levels increase,
     and the order of elements is reflective of the level each element first
@@ -94,7 +94,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
             self._create()
         self._valid_cache = False
         return self._num_points
-    
+
     @property
     def start_level(self):
         """list: the starting index of each level."""
@@ -102,7 +102,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
             self._create()
         self._valid_cache = False
         return self._start_level
-    
+
     @property
     def end_level(self):
         """list: the ending index of each level."""
@@ -215,7 +215,9 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         """
         # create properties for levels
         rule = lambda x: 1 if x == 0 else 2**x + 1
-        self._num_points = [rule(0)] + [rule(i)-rule(i-1) for i in range(1,self.max_level+1)]
+        self._num_points = [rule(0)] + [
+            rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
+        ]
         self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
         self._end_level = numpy.cumsum(list(self._num_points))
         # points
@@ -236,15 +238,17 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 
 class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     """Set for Clenshaw Curtis slow exponential growth"""
-    
+
     def _create(self):
         r"""Generating the points
 
         Generating nested extrema of chebyshev polynomials of the first kind.
         """
         # create properties for levels
-        rule = lambda x : 1 if x==0 else int(2**(numpy.ceil(numpy.log2(x))+1) + 1)
-        self._num_points = [rule(0)] + [rule(i)-rule(i-1) for i in range(1,self.max_level+1)]
+        rule = lambda x: 1 if x == 0 else int(2 ** (numpy.ceil(numpy.log2(x)) + 1) + 1)
+        self._num_points = [rule(0)] + [
+            rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
+        ]
         self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
         self._end_level = numpy.cumsum(list(self._num_points))
         # points
@@ -261,6 +265,7 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
         self._points = points
+
 
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
@@ -331,16 +336,18 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
     def domain(self):
         """numpy.ndarray: Domain the sample points come from."""
         return numpy.array([0, 2 * numpy.pi])
-    
+
     def _create(self):
         r"""Generating the points
 
         Generating the trignometric points using the frequencies
         :math:1, 3, 9, ..., 3^{i} where i is an integer.
         """
-            # create properties for levels
+        # create properties for levels
         rule = lambda x: 3**x
-        self._num_points = [rule(0)] + [rule(i)-rule(i-1) for i in range(1,self.max_level+1)]
+        self._num_points = [rule(0)] + [
+            rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
+        ]
         self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
         self._end_level = numpy.cumsum(list(self._num_points))
         # points

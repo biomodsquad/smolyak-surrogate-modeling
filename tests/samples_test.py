@@ -215,6 +215,7 @@ def test_generate_points(samples, points):
     assert numpy.allclose(samples.points, points, atol=1e-10)
     assert samples._valid_cache == False
 
+
 @pytest.mark.parametrize(
     "nested_samples,num_points",
     [
