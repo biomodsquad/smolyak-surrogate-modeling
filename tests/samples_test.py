@@ -125,6 +125,20 @@ sample_points_ids = [
     "Nested Trig [2]",
 ]
 
+nested_sample_ids = [
+    "Nested Cheb [0]",
+    "Nested Cheb [1]",
+    "Nested Cheb [3]",
+    "Nested Slow Cheb [0]",
+    "Nested Slow Cheb [1]",
+    "Nested Slow Cheb [3]",
+    "Nested Slow Cheb [4]",
+    "Nested Slow Cheb [5]",
+    "Nested Trig [0]",
+    "Nested Trig [1]",
+    "Nested Trig [2]",
+]
+
 
 def test_clenshaw_initial():
     """test default properties"""
@@ -147,6 +161,7 @@ def test_trig_initial():
         (smolyay.samples.SlowNestedClenshawCurtisPointSet, [-1, 1]),
         (smolyay.samples.NestedTrigonometricPointSet, [0, 2 * numpy.pi]),
     ],
+    ids=["Nested Cheb", "Nested Slow Cheb", "Nested Trig"],
 )
 def test_nested_initial(nested_samples, domain):
     """test default properties"""
@@ -179,6 +194,7 @@ def test_generate_points(object, points):
         (smolyay.samples.NestedTrigonometricPointSet(1), [1, 2]),
         (smolyay.samples.NestedTrigonometricPointSet(2), [1, 2, 6]),
     ],
+    ids=nested_sample_ids,
 )
 def test_nested_num_points_per_level(nested_samples, num_points):
     """test number of points per level"""
@@ -200,6 +216,7 @@ def test_nested_num_points_per_level(nested_samples, num_points):
         (smolyay.samples.NestedTrigonometricPointSet(1), [0, 1]),
         (smolyay.samples.NestedTrigonometricPointSet(2), [0, 1, 3]),
     ],
+    ids=nested_sample_ids,
 )
 def test_nested_start_level(nested_samples, start_level):
     """test number of points per level"""
@@ -221,6 +238,7 @@ def test_nested_start_level(nested_samples, start_level):
         (smolyay.samples.NestedTrigonometricPointSet(1), [1, 3]),
         (smolyay.samples.NestedTrigonometricPointSet(2), [1, 3, 9]),
     ],
+    ids=nested_sample_ids,
 )
 def test_nested_end_level(nested_samples, end_level):
     """test number of points per level"""
