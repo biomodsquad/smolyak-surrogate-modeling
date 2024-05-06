@@ -133,12 +133,6 @@ def test_clenshaw_initial():
     assert f.degree == 7
 
 
-@pytest.mark.parametrize("object,points",sample_points_answers,ids=sample_points_ids)
-def test_generate_points(object, points):
-    """test the points of initialized UnidimensionalPointSet"""
-    assert numpy.allclose(object.points, points, atol=1e-10)
-
-
 def test_trig_initial():
     """test default properties"""
     f = smolyay.samples.TrigonometricPointSet(7)
@@ -162,6 +156,12 @@ def test_nested_initial(nested_samples, domain):
     assert f._valid_cache == True
     f.points
     assert f._valid_cache == False
+
+
+@pytest.mark.parametrize("object,points", sample_points_answers, ids=sample_points_ids)
+def test_generate_points(object, points):
+    """test the points of initialized UnidimensionalPointSet"""
+    assert numpy.allclose(object.points, points, atol=1e-10)
 
 
 @pytest.mark.parametrize(
