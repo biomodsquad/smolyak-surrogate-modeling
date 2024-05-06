@@ -33,7 +33,8 @@ basis_call_answer_key = [
     (
         smolyay.basis.Trigonometric(0),
         {
-            0: 1,numpy.pi / 3: 1,
+            0: 1,
+            numpy.pi / 3: 1,
             3 * numpy.pi / 2: 1,
             numpy.pi / 6: 1,
             2 * numpy.pi: 1,
@@ -125,6 +126,18 @@ basis_outside_domain = [
     (smolyay.basis.Trigonometric(4), 7, -0.01, numpy.pi),
 ]
 
+basis_id = [
+    "1st Cheb [0]",
+    "1st Cheb [1]",
+    "1st Cheb [2]",
+    "2nd Cheb [0]",
+    "2nd Cheb [1]",
+    "2nd Cheb [2]",
+    "Trig [0]",
+    "Trig [1]",
+    "Trig [-1]",
+]
+
 
 # initialization tests
 @pytest.mark.parametrize(
@@ -133,6 +146,7 @@ basis_outside_domain = [
         smolyay.basis.ChebyshevFirstKind,
         smolyay.basis.ChebyshevSecondKind,
     ],
+    ids=["1st Cheb", "2nd Cheb"],
 )
 def test_cheb_initial(basis_fun):
     """test degrees and domain return correctly"""
@@ -158,7 +172,9 @@ def test_trig_initial():
 
 # Test outside of valid domain
 @pytest.mark.parametrize(
-    "basis_fun,too_large,too_small,valid_input", basis_outside_domain
+    "basis_fun,too_large,too_small,valid_input",
+    basis_outside_domain,
+    ids=["1st Cheb", "2nd Cheb", "Trig"],
 )
 def test_call_outside_domain_error(basis_fun, too_large, too_small, valid_input):
     """Test call raises error for input outside domain"""
@@ -178,7 +194,9 @@ def test_call_outside_domain_error(basis_fun, too_large, too_small, valid_input)
 
 
 @pytest.mark.parametrize(
-    "basis_fun,too_large,too_small,valid_input", basis_outside_domain
+    "basis_fun,too_large,too_small,valid_input",
+    basis_outside_domain,
+    ids=["1st Cheb", "2nd Cheb", "Trig"],
 )
 def test_derivative_outside_domain_error(basis_fun, too_large, too_small, valid_input):
     """Test derivative raises error for input outside domain"""
@@ -198,14 +216,14 @@ def test_derivative_outside_domain_error(basis_fun, too_large, too_small, valid_
 
 
 # Test call function correctness
-@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
 def test_call(basis_fun, answer_key):
     """Test basis function call"""
     for x, y in answer_key.items():
         assert basis_fun(x) == pytest.approx(y)
 
 
-@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
 def test_call_1D(basis_fun, answer_key):
     """Test basis function call with a 1D array"""
     xs = list(answer_key.keys())
@@ -219,7 +237,7 @@ def test_call_1D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun(xs1), answer1)
 
 
-@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
 def test_call_2D(basis_fun, answer_key):
     """Test basis function call with a 2D array"""
     unique_inputs = list(answer_key.keys())
@@ -247,7 +265,7 @@ def test_call_2D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun(xs4), answer4)
 
 
-@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
 def test_call_3D(basis_fun, answer_key):
     """Test basis function call with a 3D array"""
     unique_inputs = list(answer_key.keys())
@@ -296,14 +314,14 @@ def test_call_3D(basis_fun, answer_key):
 
 
 # Test derivative function correctness
-@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id)
 def test_derivative(basis_fun, answer_key):
     """Test basis function derivative"""
     for x, y in answer_key.items():
         assert basis_fun.derivative(x) == pytest.approx(y)
 
 
-@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id)
 def test_derivative_1D(basis_fun, answer_key):
     """Test basis function derivative with a 1D array"""
     xs = list(answer_key.keys())
@@ -317,7 +335,7 @@ def test_derivative_1D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun.derivative(xs1), answer1)
 
 
-@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id)
 def test_derivative_2D(basis_fun, answer_key):
     """Test basis function derivative with a 2D array"""
     unique_inputs = list(answer_key.keys())
@@ -345,7 +363,7 @@ def test_derivative_2D(basis_fun, answer_key):
     assert numpy.allclose(basis_fun.derivative(xs4), answer4)
 
 
-@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key)
+@pytest.mark.parametrize("basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id)
 def test_derivative_3D(basis_fun, answer_key):
     """Test basis function derivative with a 3D array"""
     unique_inputs = list(answer_key.keys())
