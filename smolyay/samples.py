@@ -58,8 +58,10 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     @max_level.setter
     def max_level(self, value):
-        self._max_level = value
-        self._valid_cache = False
+        max_level = int(value)
+        if max_level != self._max_level:
+            self._max_level = max_level
+            self._valid_cache = False
 
     @property
     def num_points(self):
@@ -106,6 +108,8 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
     def __init__(self, degree):
         super().__init__()
+        self._degree = None
+
         self.degree = degree
 
     @property
@@ -120,8 +124,10 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
     @degree.setter
     def degree(self, value):
-        self._degree = value
-        self._valid_cache = False
+        degree = int(value)
+        if degree != self._degree:
+            self._degree = degree
+            self._valid_cache = False
 
     def _create(self):
         r"""Create the points in the set.
@@ -196,7 +202,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 
         self._start_level = numpy.zeros_like(self._num_points)
         self._start_level[1:] = numpy.cumsum(self._num_points[:-1])
-        
+
         self._end_level = self._start_level + self._num_points
         # points
         points = [0]
@@ -305,6 +311,8 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     def __init__(self, frequency):
         super().__init__()
+        self._frequency = None
+        
         self.frequency = frequency
 
     @property
@@ -319,8 +327,10 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     @frequency.setter
     def frequency(self, value):
-        self._frequency = value
-        self._valid_cache = False
+        frequency = int(value)
+        if frequency != self._frequency:
+            self._frequency = frequency
+            self._valid_cache = False
 
     def _create(self):
         r"""Create the points in the set.
