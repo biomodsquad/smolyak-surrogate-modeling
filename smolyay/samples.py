@@ -44,10 +44,12 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     def __init__(self, max_level):
         super().__init__()
-        self.max_level = max_level
+        self._max_level = None
         self._num_points = None
         self._start_level = None
         self._end_level = None
+
+        self.max_level = max_level
 
     @property
     def max_level(self):
