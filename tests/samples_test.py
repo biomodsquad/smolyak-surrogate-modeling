@@ -238,7 +238,7 @@ def test_generate_points(samples, points):
 def test_nested_num_points_per_level(nested_samples, num_points):
     """test number of points per level"""
     assert nested_samples._valid_cache == False
-    assert nested_samples.num_points == num_points
+    assert numpy.array_equal(nested_samples.num_points, num_points)
     assert nested_samples._valid_cache == True
 
 
