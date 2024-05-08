@@ -217,7 +217,7 @@ def test_generate_points(samples, points):
 
 
 @pytest.mark.parametrize(
-    "nested_samples,num_points",
+    "nested_samples,num_points_per_level",
     [
         (smolyay.samples.NestedClenshawCurtisPointSet(0), [1]),
         (smolyay.samples.NestedClenshawCurtisPointSet(1), [1, 2]),
@@ -235,10 +235,10 @@ def test_generate_points(samples, points):
     ],
     ids=nested_sample_ids,
 )
-def test_nested_num_points_per_level(nested_samples, num_points):
+def test_nested_num_points_per_level(nested_samples, num_points_per_level):
     """test number of points per level"""
     assert nested_samples._valid_cache == False
-    assert numpy.array_equal(nested_samples.num_points, num_points)
+    assert numpy.array_equal(nested_samples.num_points_per_level, num_points_per_level)
     assert nested_samples._valid_cache == True
 
 

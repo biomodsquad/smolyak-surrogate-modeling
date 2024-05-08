@@ -45,7 +45,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     def __init__(self, max_level):
         super().__init__()
         self._max_level = None
-        self._num_points = None
+        self._num_points_per_level = None
         self._start_level = None
         self._end_level = None
 
@@ -64,12 +64,12 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
             self._valid_cache = False
 
     @property
-    def num_points(self):
+    def num_points_per_level(self):
         """numpy.ndarray: number of points per level."""
         if not self._valid_cache:
             self._create()
         self._valid_cache = True
-        return self._num_points
+        return self._num_points_per_level
 
     @property
     def start_level(self):
@@ -197,17 +197,17 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         """
         # create properties for levels
         rule = lambda x: 1 if x == 0 else 2**x + 1
-        self._num_points = numpy.ones(self.max_level + 1, dtype=int)
-        self._num_points[1:] = [
+        self._num_points_per_level = numpy.ones(self.max_level + 1, dtype=int)
+        self._num_points_per_level[1:] = [
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
 
-        self._start_level = numpy.zeros_like(self._num_points)
-        self._start_level[1:] = numpy.cumsum(self._num_points[:-1])
+        self._start_level = numpy.zeros_like(self._num_points_per_level)
+        self._start_level[1:] = numpy.cumsum(self._num_points_per_level[:-1])
 
-        self._end_level = self._start_level + self._num_points
+        self._end_level = self._start_level + self._num_points_per_level
         # points
-        points = numpy.zeros(numpy.sum(self._num_points))
+        points = numpy.zeros(numpy.sum(self._num_points_per_level))
         degree = 0
         num_levels = self.max_level + 1
         for i in range(1, num_levels):
@@ -277,16 +277,16 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         """
         # create properties for levels
         rule = lambda x: 1 if x == 0 else int(2 ** (numpy.ceil(numpy.log2(x)) + 1) + 1)
-        self._num_points = [rule(0)] + [
+        self._num_points_per_level = [rule(0)] + [
             rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
         ]
-        self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
-        self._end_level = numpy.cumsum(list(self._num_points))
+        self._start_level = numpy.cumsum([0] + list(self._num_points_per_level))[:-1]
+        self._end_level = numpy.cumsum(list(self._num_points_per_level))
         nonempty_index = lambda x: 0 if x == 0 else int(2 ** (x - 2)) + 1
         # points
-        points = numpy.zeros(numpy.sum(self._num_points))
+        points = numpy.zeros(numpy.sum(self._num_points_per_level))
         degree = 0
-        num_levels = numpy.sum(numpy.array(self._num_points) != 0)
+        num_levels = numpy.sum(numpy.array(self._num_points_per_level) != 0)
         for i in range(1, num_levels):
             degree = 2**i
             # find indexes of extrema not already found. Fraction index/degree
@@ -389,11 +389,11 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         """
         # create properties for levels
         rule = lambda x: 3**x
-        self._num_points = [rule(0)] + [
+        self._num_points_per_level = [rule(0)] + [
             rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
         ]
-        self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
-        self._end_level = numpy.cumsum(list(self._num_points))
+        self._start_level = numpy.cumsum([0] + list(self._num_points_per_level))[:-1]
+        self._end_level = numpy.cumsum(list(self._num_points_per_level))
         # points
         points = []
         degree = 0
