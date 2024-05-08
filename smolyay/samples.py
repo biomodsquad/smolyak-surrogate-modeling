@@ -20,7 +20,7 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __init__(self):
         self._points = None
-        self._valid_cache = True
+        self._valid_cache = False
 
     @property
     @abc.abstractmethod
@@ -31,9 +31,9 @@ class UnidimensionalPointSet(abc.ABC):
     @property
     def points(self):
         """list: Points stored by the set."""
-        if self._valid_cache:
+        if not self._valid_cache:
             self._create()
-        self._valid_cache = False
+        self._valid_cache = True
         return self._points
 
     @abc.abstractmethod
@@ -85,30 +85,30 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     @max_level.setter
     def max_level(self, value):
         self._max_level = value
-        self._valid_cache = True
+        self._valid_cache = False
 
     @property
     def num_points(self):
         """list: number of points per level."""
-        if self._valid_cache:
+        if not self._valid_cache:
             self._create()
-        self._valid_cache = False
+        self._valid_cache = True
         return self._num_points
 
     @property
     def start_level(self):
         """list: the starting index of each level."""
-        if self._valid_cache:
+        if not self._valid_cache:
             self._create()
-        self._valid_cache = False
+        self._valid_cache = True
         return self._start_level
 
     @property
     def end_level(self):
         """list: the ending index of each level."""
-        if self._valid_cache:
+        if not self._valid_cache:
             self._create()
-        self._valid_cache = False
+        self._valid_cache = True
         return self._end_level
 
 
@@ -147,7 +147,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
     @degree.setter
     def degree(self, value):
         self._degree = value
-        self._valid_cache = True
+        self._valid_cache = False
 
     def _create(self):
         r"""Generating the points
@@ -300,7 +300,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
     @frequency.setter
     def frequency(self, value):
         self._frequency = value
-        self._valid_cache = True
+        self._valid_cache = False
 
     def _create(self):
         r"""Generating the points
