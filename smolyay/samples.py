@@ -61,7 +61,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     @property
     def num_points(self):
-        """list: number of points per level."""
+        """numpy.ndarray: number of points per level."""
         if not self._valid_cache:
             self._create()
         self._valid_cache = True
