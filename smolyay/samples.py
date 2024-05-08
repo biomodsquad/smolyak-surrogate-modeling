@@ -33,7 +33,7 @@ class UnidimensionalPointSet(abc.ABC):
 
 
 class NestedUnidimensionalPointSet(UnidimensionalPointSet):
-    """Set of unidimensional points with levels
+    """Set of unidimensional points assigned to levels.
 
     A set of unique unidimensional points to be used as the sampling points
     in a tensor product grid or sparse grid. These unidimensional points are
