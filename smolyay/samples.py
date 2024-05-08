@@ -198,7 +198,9 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         # create properties for levels
         rule = lambda x: 1 if x == 0 else 2**x + 1
         self._num_points = numpy.ones(self.max_level + 1, dtype=int)
-        self._num_points[1:] = [rule(i) - rule((i-1)) for i in range(1, self.max_level + 1)]
+        self._num_points[1:] = [
+            rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
+        ]
 
         self._start_level = numpy.zeros_like(self._num_points)
         self._start_level[1:] = numpy.cumsum(self._num_points[:-1])
@@ -211,9 +213,9 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         for i in range(1, num_levels):
             degree = 2**i
             if i == 1:
-                indexes = numpy.linspace(0, degree, 2, dtype=int)
+                indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
-                indexes = numpy.linspace(1, degree - 1, degree - 1, dtype=int)
+                indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
@@ -284,9 +286,9 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         for i in range(1, num_levels):
             degree = 2**i
             if i == 1:
-                indexes = numpy.linspace(0, degree, 2, dtype=int)
+                indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
-                indexes = numpy.linspace(1, degree - 1, degree - 1, dtype=int)
+                indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
@@ -312,7 +314,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
     def __init__(self, frequency):
         super().__init__()
         self._frequency = None
-        
+
         self.frequency = frequency
 
     @property
@@ -338,7 +340,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         Generating trigonometic points at a given frequency.
         """
         if self.frequency > 0:
-            idx = numpy.linspace(1, self.frequency, self.frequency)
+            idx = numpy.arange(1, self.frequency + 1, 1, dtype=int)
             points = (idx - 1) * 2 * numpy.pi / self.frequency
         else:
             points = numpy.zeros(1)
