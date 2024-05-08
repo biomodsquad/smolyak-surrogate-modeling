@@ -35,20 +35,6 @@ class UnidimensionalPointSet(abc.ABC):
 class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     """Set of unidimensional points assigned to levels.
 
-    A set of unique unidimensional points to be used as the sampling points
-    in a tensor product grid or sparse grid. These unidimensional points are
-    associated with certain polynomial families, and the combination of
-    unique points and polynomial families are the basis for different types
-    of quadrature rules that are used in numerical integration and in
-    approximation.
-
-    The number of unique points is controlled by `num_points`, which describes
-    the amount of points added by each level.
-    `points` describes the unique points added as the number of levels increase,
-    and the order of elements is reflective of the level each element first
-    appears in. Some point set are nested, meaning that the points in a previous
-    level reappear in following levels. However, `points` does not attempt to
-    capture this behavior and should be free of duplicates.
 
     Parameters
     ----------
