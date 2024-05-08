@@ -71,7 +71,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     @property
     def start_level(self):
-        """list: the starting index of each level."""
+        """numpy.ndarray: the starting index of each level."""
         if not self._valid_cache:
             self._create()
         self._valid_cache = True
@@ -79,7 +79,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     @property
     def end_level(self):
-        """list: the ending index of each level."""
+        """numpy.ndarray: the ending index of each level."""
         if not self._valid_cache:
             self._create()
         self._valid_cache = True
@@ -139,7 +139,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
 
 class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
-    r"""Generate nested Clenshaw Curtis points in accordance with a growth rule
+    r"""Generate nested Clenshaw Curtis points
 
     The :attr:`points` for this interpolation scheme are the extrema of the
     Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
@@ -151,22 +151,24 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
 
     The nested Clenshaw Curtis points come from the nested extrema of the
-    Chebyshev polynomials of the first kind :math:0, 2, 2^{k} where k is an
-    integer.
+    Chebyshev polynomials of the first kind :math:`n` where n is part of a 
+    sequence
+     
+    .. math::
 
-    These extrema are symmetric about 0. When generating levels of points, each
-    level with contain a certain number of symmetric pairs except the first which
-    also includes 0. The number of points assigned to each level can vary.
-    The default, exponential growth adds points such that the new extrema
-    calculated from a Chebyshev polynomial 2^{k} is given its own level k-1.
-    Alternative growth rules may delay the addition of new extrema and have
-    intermediary empty levels, but the general order that points are added to
-    levels remains the same.
+    n = \begin{cases}
+         0 & \text{ if } L = 0\\ 
+         2^{L} & \text{ if } L > 0 
+    \end{cases}
 
-    This class will generate the nested extrema in the order that corresponds
-    to the exponential growth. For increasing k, the unique extrema of Chebyshev
-    polynomial with degree 2^{k - 1} will be added followed by the extrema of the
-    polynomial with degree 2^{k} , then 2^{k + 1} , then 2^{k + 2} and so on.
+    where L is a whole number.
+
+    As the extrema of the Chebyshev polynomials of degree :math:`n` are nested,
+    meaning any :math:`n` will have extrema at the same points as every n that
+    precedes it in the sequence. The extrema are organized into levels such that
+    a level L will contain the extrema of Chebyshev polynomial n(L) that are
+    not the extrema of any Chebyshev polynomial n(k) where k is a whole number
+    and k < L.
 
     Parameters
     ----------
@@ -211,7 +213,49 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 
 
 class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
-    """Set for Clenshaw Curtis slow exponential growth"""
+    r"""Set for Clenshaw Curtis slow exponential growth.
+
+    The :attr:`points` for this interpolation scheme are the extrema of the
+    Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
+
+    .. math::
+
+        x_i^* = -\cos(\pi i/n), i = 0,...,n
+
+    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+
+    The nested Clenshaw Curtis points come from the nested extrema of the
+    Chebyshev polynomials of the first kind :math:`n` where n is part of a 
+    sequence
+     
+    .. math::
+
+    n = \begin{cases}
+         0 & \text{ if } k = 0\\ 
+         2^{k} & \text{ if } k > 0 
+    \end{cases}
+
+    where k is a whole number. 
+
+    As the extrema of the Chebyshev polynomials of degree :math:`n` are nested,
+    meaning any :math:`n` will have extrema at the same points as every n that
+    precedes it in the sequence. The extrema are organized into levels such that
+    a level L that is nonempty will contain extrema of some degree n that are
+    not found in any preceding n.
+
+    The total number of unique points increases exponentially with increasing n.
+    To limit the rate of increasing points with increasing level L to a linear
+    rate :math:`2*L + 1`, the relationship between k and L is described by the
+    following equation:
+
+    ..math:
+
+        k = \left \lceil \log_{2}(L) \right \rceil + 1
+
+    As k does not always increase when L increases, the rate of new, unique 
+    points remains linear with respect to L.
+
+    """
 
     def _create(self):
         r"""Create the points in the set.
