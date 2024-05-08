@@ -212,11 +212,14 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         num_levels = self.max_level + 1
         for i in range(1, num_levels):
             degree = 2**i
+            # find indexes of extrema not already found. Fraction index/degree
+            # cannot be further simplified
             if i == 1:
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+            # generate extrema
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
         self._points = points
@@ -285,11 +288,14 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         num_levels = numpy.sum(numpy.array(self._num_points) != 0)
         for i in range(1, num_levels):
             degree = 2**i
+            # find indexes of extrema not already found. Fraction index/degree
+            # cannot be further simplified
             if i == 1:
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+            # generate extrema
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points.extend(new_points)
         self._points = points
