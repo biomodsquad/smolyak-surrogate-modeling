@@ -190,12 +190,13 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         Generating nested extrema of chebyshev polynomials of the first kind.
         """
         # create properties for levels
-        rule = lambda x: 1 if x == 0 else 2**x + 1
-        self._num_points = [rule(0)] + [
-            rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
-        ]
-        self._start_level = numpy.cumsum([0] + list(self._num_points))[:-1]
-        self._end_level = numpy.cumsum(list(self._num_points))
+        self._num_points = numpy.ones(self.max_level + 1, dtype=int)
+        self._num_points[1:] = [2**i - 2**(i-1) for i in range(1, self.max_level + 1)]
+
+        self._start_level = numpy.zeros_like(self._num_points)
+        self._start_level[1:] = numpy.cumsum(self._num_points)
+
+        self._end_level = self._start_level + self._num_points
         # points
         points = [0]
         degree = 0
