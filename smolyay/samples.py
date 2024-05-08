@@ -277,16 +277,20 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         """
         # create properties for levels
         rule = lambda x: 1 if x == 0 else int(2 ** (numpy.ceil(numpy.log2(x)) + 1) + 1)
-        self._num_points_per_level = [rule(0)] + [
-            rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
+        self._num_points_per_level = numpy.ones(self.max_level + 1, dtype=int)
+        self._num_points_per_level[1:] = [
+            rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
-        self._start_level = numpy.cumsum([0] + list(self._num_points_per_level))[:-1]
-        self._end_level = numpy.cumsum(list(self._num_points_per_level))
-        nonempty_index = lambda x: 0 if x == 0 else int(2 ** (x - 2)) + 1
+
+        self._start_level = numpy.zeros_like(self._num_points_per_level)
+        self._start_level[1:] = numpy.cumsum(self._num_points_per_level[:-1])
+
+        self._end_level = self._start_level + self._num_points_per_level
         # points
         points = numpy.zeros(numpy.sum(self._num_points_per_level))
         degree = 0
         num_levels = numpy.sum(numpy.array(self._num_points_per_level) != 0)
+        nonempty_index = lambda x: 0 if x == 0 else int(2 ** (x - 2)) + 1
         for i in range(1, num_levels):
             degree = 2**i
             # find indexes of extrema not already found. Fraction index/degree
@@ -389,11 +393,15 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         """
         # create properties for levels
         rule = lambda x: 3**x
-        self._num_points_per_level = [rule(0)] + [
-            rule(i) - rule(i - 1) for i in range(1, self.max_level + 1)
+        self._num_points_per_level = numpy.ones(self.max_level + 1, dtype=int)
+        self._num_points_per_level[1:] = [
+            rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
-        self._start_level = numpy.cumsum([0] + list(self._num_points_per_level))[:-1]
-        self._end_level = numpy.cumsum(list(self._num_points_per_level))
+
+        self._start_level = numpy.zeros_like(self._num_points_per_level)
+        self._start_level[1:] = numpy.cumsum(self._num_points_per_level[:-1])
+
+        self._end_level = self._start_level + self._num_points_per_level
         # points
         points = []
         degree = 0
