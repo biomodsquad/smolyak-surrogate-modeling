@@ -210,6 +210,29 @@ def test_nested_initial(nested_samples):
     assert f.max_level == 7
     assert f._valid_cache == False
 
+@pytest.mark.parametrize(
+    "samples",
+    [
+        smolyay.samples.ClenshawCurtisPointSet,
+        smolyay.samples.TrigonometricPointSet,
+        smolyay.samples.NestedClenshawCurtisPointSet,
+        smolyay.samples.SlowNestedClenshawCurtisPointSet,
+        smolyay.samples.NestedTrigonometricPointSet,
+    ], ids=[
+        "Unnested Cheb",
+        "Unnested Trig",
+        "Nested Cheb",
+        "Nested Slow Cheb",
+        "Nested Trig"],
+)
+def test_set_domain(samples):
+    """test default properties"""
+    f = samples([-10, 10],7)
+    f.points
+    assert f._valid_cache == True
+    f.domain = [-100, 100]
+    assert f._valid_cache == False
+    assert numpy.array_equal(f.domain, [-100, 100])
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
 def test_generate_points(samples, points):

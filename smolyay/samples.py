@@ -10,13 +10,26 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __init__(self, domain):
         self._points = None
-        self._domain = numpy.array(domain, dtype=float)
+        self._domain = None
+        
+        self.domain = numpy.array(domain, dtype=float)
         self._valid_cache = False
 
     @property
     def domain(self):
         """numpy.ndarray: Domain of the `points`."""
         return self._domain
+
+    @domain.setter
+    def domain(self, value):
+        domain = numpy.array(value, dtype=float)
+        if len(domain) != 2 or domain.ndim != 1:
+            raise TypeError('Domain must be array with 2 elements')
+        if domain[0] >= domain[1]:
+            raise ValueError('Lower bound must be less than upper bound')
+        if not numpy.array_equal(domain,self._domain):
+            self._domain = domain
+            self._valid_cache = False
 
     @property
     def points(self):
