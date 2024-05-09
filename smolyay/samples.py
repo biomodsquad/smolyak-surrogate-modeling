@@ -8,15 +8,15 @@ class UnidimensionalPointSet(abc.ABC):
     A set of unique unidimensional points within a domain.
     """
 
-    def __init__(self):
+    def __init__(self, domain):
         self._points = None
+        self._domain = numpy.array(domain)
         self._valid_cache = False
 
     @property
-    @abc.abstractmethod
     def domain(self):
         """numpy.ndarray: Domain of the `points`."""
-        pass
+        return self._domain
 
     @property
     def points(self):
@@ -31,6 +31,15 @@ class UnidimensionalPointSet(abc.ABC):
         """Create the points in the set."""
         pass
 
+    @staticmethod
+    def scale_to_domain(x, old, new):
+        print(x)
+        new_x = new[0] + (new[1] - new[0]) * ((x - old[0]) / (old[1] - old[0]))
+        numpy.clip(new_x, new[0], new[1], out=new_x)
+        print(new_x)
+        return new_x
+    
+
 
 class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     """Set of unidimensional points assigned to levels.
@@ -42,8 +51,8 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
         the maximum level the points are used for
     """
 
-    def __init__(self, max_level):
-        super().__init__()
+    def __init__(self, domain, max_level):
+        super().__init__(domain)
         self._max_level = None
         self._num_points_per_level = None
         self._start_level = None
@@ -106,8 +115,8 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         degree of the Chebyshev polynomial of the first kind to get extrema from
     """
 
-    def __init__(self, degree):
-        super().__init__()
+    def __init__(self, domain, degree):
+        super().__init__(domain)
         self._degree = None
 
         self.degree = degree
@@ -141,7 +150,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
             )
         else:
             points = numpy.zeros(1)
-        self._points = points
+        self._points = self.scale_to_domain(points, [-1, 1], self.domain)
 
 
 class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
@@ -182,13 +191,8 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         the maximum level the points are used for
     """
 
-    def __init__(self, max_level):
-        super().__init__(max_level)
-
-    @property
-    def domain(self):
-        """numpy.ndarray: Domain of the `points`."""
-        return numpy.array([-1, 1])
+    def __init__(self, domain, max_level):
+        super().__init__(domain, max_level)
 
     def _create(self):
         r"""Create the points in the set.
@@ -222,7 +226,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
             # generate extrema
             new_points = list(-numpy.cos(numpy.pi * indexes / degree))
             points[self._start_level[i] : self._end_level[i]] = new_points
-        self._points = points
+        self._points = self.scale_to_domain(points, [-1, 1], self.domain)
 
 
 class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
@@ -308,7 +312,7 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
                     nonempty_index(i)
                 ]
             ] = new_points
-        self._points = points
+        self._points = self.scale_to_domain(points, [-1, 1], self.domain)
 
 
 class TrigonometricPointSet(UnidimensionalPointSet):
@@ -327,16 +331,11 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         the frequency to take points from
     """
 
-    def __init__(self, frequency):
-        super().__init__()
+    def __init__(self, domain, frequency):
+        super().__init__(domain)
         self._frequency = None
 
         self.frequency = frequency
-
-    @property
-    def domain(self):
-        """numpy.ndarray: Domain of the `points`."""
-        return numpy.array([0, 2 * numpy.pi])
 
     @property
     def frequency(self):
@@ -377,13 +376,8 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
     `points` corresponds to the indices in `levels`.
     """
 
-    def __init__(self, max_level):
-        super().__init__(max_level)
-
-    @property
-    def domain(self):
-        """numpy.ndarray: Domain of the `points`."""
-        return numpy.array([0, 2 * numpy.pi])
+    def __init__(self, domain, max_level):
+        super().__init__(domain, max_level)
 
     def _create(self):
         r"""Create the points in the set.
@@ -411,4 +405,5 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
                 point = (idx - 1) * 2 * numpy.pi / degree
                 if not numpy.isclose(points, point).any():
                     points.append(point)
-        self._points = points
+        points = numpy.array(points)
+        self._points = self.scale_to_domain(points, [0, 2 * numpy.pi], self.domain)
