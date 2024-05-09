@@ -23,7 +23,7 @@ class UnidimensionalPointSet(abc.ABC):
         """numpy.ndarray: Points in the set."""
         if not self._valid_cache:
             self._create()
-        self._valid_cache = True
+            self._valid_cache = True
         return self._points
 
     @abc.abstractmethod
