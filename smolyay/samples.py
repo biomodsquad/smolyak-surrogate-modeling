@@ -10,7 +10,7 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __init__(self, domain):
         self._points = None
-        self._domain = numpy.array(domain)
+        self._domain = numpy.array(domain, dtype=float)
         self._valid_cache = False
 
     @property
