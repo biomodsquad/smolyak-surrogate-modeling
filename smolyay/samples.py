@@ -74,7 +74,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
         """numpy.ndarray: number of points per level."""
         if not self._valid_cache:
             self._create()
-        self._valid_cache = True
+            self._valid_cache = True
         return self._num_points_per_level
 
     @property
@@ -82,7 +82,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
         """numpy.ndarray: the starting index of each level."""
         if not self._valid_cache:
             self._create()
-        self._valid_cache = True
+            self._valid_cache = True
         return self._start_level
 
     @property
@@ -90,7 +90,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
         """numpy.ndarray: the ending index of each level."""
         if not self._valid_cache:
             self._create()
-        self._valid_cache = True
+            self._valid_cache = True
         return self._end_level
 
 
