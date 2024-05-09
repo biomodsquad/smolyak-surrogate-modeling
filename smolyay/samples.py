@@ -216,9 +216,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
-            # generate extrema
-            new_points = list(-numpy.cos(numpy.pi * indexes / degree))
-            points[self._start_level[i] : self._end_level[i]] = new_points
+            points[self._start_level[i] : self._end_level[i]] = -numpy.cos(numpy.pi * indexes / degree)
         self._points = self.scale_to_domain(points, [-1, 1], self.domain)
 
 
