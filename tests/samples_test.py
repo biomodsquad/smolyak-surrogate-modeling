@@ -219,6 +219,11 @@ def test_generate_points(samples, points):
     assert samples._valid_cache == True
 
 
+@pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
+def test_len(samples, points):
+    """test the len method of UnidimensionalPointSet objects"""
+    assert len(samples) == len(points)
+
 @pytest.mark.parametrize(
     "nested_samples,num_points_per_level",
     [

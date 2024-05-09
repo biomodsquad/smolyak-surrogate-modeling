@@ -26,6 +26,9 @@ class UnidimensionalPointSet(abc.ABC):
             self._valid_cache = True
         return self._points
 
+    def __len__(self):
+        return len(self.points)
+    
     @abc.abstractmethod
     def _create(self):
         """Create the points in the set."""
