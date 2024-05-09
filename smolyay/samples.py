@@ -121,10 +121,6 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
         self.degree = degree
 
-    @property
-    def domain(self):
-        """numpy.ndarray: Domain the sample points come from."""
-        return numpy.array([-1, 1])
 
     @property
     def degree(self):
