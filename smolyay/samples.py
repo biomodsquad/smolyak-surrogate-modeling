@@ -207,7 +207,8 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 
         self._end_level = self._start_level + self._num_points_per_level
         # points
-        points = numpy.zeros(numpy.sum(self._num_points_per_level))
+        num_points = self._end_level[-1]
+        points = numpy.zeros(num_points, dtype=float)
         degree = 0
         num_levels = self.max_level + 1
         for i in range(1, num_levels):
