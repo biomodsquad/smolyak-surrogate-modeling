@@ -31,13 +31,10 @@ class UnidimensionalPointSet(abc.ABC):
         """Create the points in the set."""
         pass
 
-    @staticmethod
-    def scale_to_domain(x, old, new):
-        print(x)
-        new_x = new[0] + (new[1] - new[0]) * ((x - old[0]) / (old[1] - old[0]))
-        numpy.clip(new_x, new[0], new[1], out=new_x)
-        print(new_x)
-        return new_x
+    def _scale_to_domain(self,points,old_domain):
+        points = self.domain[0] + (self.domain[1] - self.domain[0]) * ((points - old_domain[0]) / (old_domain[1] - old_domain[0]))
+        numpy.clip(points, self.domain[0], self.domain[1],out=points)
+        return points
     
 
 
@@ -146,7 +143,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
             )
         else:
             points = numpy.zeros(1)
-        self._points = self.scale_to_domain(points, [-1, 1], self.domain)
+        self._points = self._scale_to_domain(points, [-1, 1])
 
 
 class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
@@ -218,7 +215,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
                 divisible_indexes = numpy.gcd(indexes, degree) > 1
                 indexes = indexes[~divisible_indexes]
             points[self._start_level[i] : self._end_level[i]] = -numpy.cos(numpy.pi * indexes / degree)
-        self._points = self.scale_to_domain(points, [-1, 1], self.domain)
+        self._points = self._scale_to_domain(points, [-1, 1])
 
 
 class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
@@ -304,7 +301,7 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
                     nonempty_index(i)
                 ]
             ] = new_points
-        self._points = self.scale_to_domain(points, [-1, 1], self.domain)
+        self._points = self._scale_to_domain(points, [-1, 1])
 
 
 class TrigonometricPointSet(UnidimensionalPointSet):
@@ -352,6 +349,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         else:
             points = numpy.zeros(1)
         self._points = points
+        self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
 
 
 class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
@@ -398,4 +396,4 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
                 if not numpy.isclose(points, point).any():
                     points.append(point)
         points = numpy.array(points)
-        self._points = self.scale_to_domain(points, [0, 2 * numpy.pi], self.domain)
+        self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
