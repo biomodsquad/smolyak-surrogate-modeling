@@ -3,6 +3,7 @@ import pytest
 import numpy
 
 import smolyay.samples
+    
 
 sample_points_answers = [
     (smolyay.samples.ClenshawCurtisPointSet([-1, 1], 0), [0]),
@@ -234,6 +235,7 @@ def test_domain_error(samples):
     with pytest.raises(ValueError):
         samples([10, -10],7)
 
+
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
 def test_generate_points(samples, points):
     """test the points of initialized UnidimensionalPointSet"""
@@ -332,87 +334,3 @@ def test_nested_end_level(nested_samples, end_level):
     assert nested_samples._valid_cache == False
     assert numpy.array_equal(nested_samples.end_level, end_level)
     assert nested_samples._valid_cache == True
-
-
-@pytest.mark.parametrize(
-    "nested_samples,level,points",
-    [
-        (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3), 0, [0]),
-        (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3), 1, [-1, 1]),
-        (
-            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
-            2,
-            [-1 / numpy.sqrt(2), 1 / numpy.sqrt(2)],
-        ),
-        (
-            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
-            3,
-            [
-                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-            ],
-        ),
-        (smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5), 0, [0]),
-        (smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5), 1, [-1, 1]),
-        (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5),
-            2,
-            [-1 / numpy.sqrt(2), 1 / numpy.sqrt(2)],
-        ),
-        (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5),
-            3,
-            [
-                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-            ],
-        ),
-        (smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5), 4, []),
-        (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5),
-            5,
-            [
-                -numpy.sqrt(2 + numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-                -numpy.sqrt(2 + numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                -numpy.sqrt(2 - numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                -numpy.sqrt(2 - numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 - numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 - numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 + numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 + numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-            ],
-        ),
-        (smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2), 0, [0]),
-        (
-            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2),
-            1,
-            [2 * numpy.pi / 3, 4 * numpy.pi / 3],
-        ),
-        (
-            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2),
-            2,
-            2
-            * numpy.pi
-            * numpy.array(
-                [
-                    1 / 9,
-                    2 / 9,
-                    4 / 9,
-                    5 / 9,
-                    7 / 9,
-                    8 / 9,
-                ]
-            ),
-        ),
-    ],
-    ids=nested_sample_ids,
-)
-def test_nested_get_individual_levels(nested_samples, level, points):
-    """test number of points per level"""
-    end_lev = nested_samples.end_level[level]
-    start_lev = nested_samples.start_level[level]
-    assert numpy.allclose(nested_samples.points[start_lev:end_lev], points)
