@@ -180,16 +180,16 @@ nested_sample_ids = [
 
 def test_clenshaw_initial():
     """test default properties"""
-    f = smolyay.samples.ClenshawCurtisPointSet([-1, 1], 7)
-    assert numpy.array_equal(f.domain, [-1, 1])
+    f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 7)
+    assert numpy.array_equal(f.domain, [-2, 1])
     assert f.degree == 7
     assert f._valid_cache == False
 
 
 def test_trig_initial():
     """test default properties"""
-    f = smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 7)
-    assert numpy.array_equal(f.domain, [0, 2 * numpy.pi])
+    f = smolyay.samples.TrigonometricPointSet([0, 4 * numpy.pi], 7)
+    assert numpy.array_equal(f.domain, [0, 4 * numpy.pi])
     assert f.frequency == 7
     assert f._valid_cache == False
 
@@ -217,6 +217,16 @@ def test_generate_points(samples, points):
     assert samples._valid_cache == False
     assert numpy.allclose(samples.points, points, atol=1e-10)
     assert samples._valid_cache == True
+
+
+@pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
+def test_generate_points_set_domain(samples, points):
+    """test point correctness after setting a new domain"""
+    new_points = numpy.array(points) * 5 + 10
+    new_domain = samples.domain * 5 + 10
+    samples.domain = new_domain
+    assert numpy.array_equal(samples.domain, new_domain)
+    assert numpy.allclose(samples.points, new_points, atol=1e-10)
 
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
