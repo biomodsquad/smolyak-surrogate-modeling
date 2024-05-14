@@ -11,7 +11,7 @@ class UnidimensionalPointSet(abc.ABC):
     def __init__(self, domain):
         self._points = None
         self._domain = None
-        
+
         self.domain = numpy.array(domain, dtype=float)
         self._valid_cache = False
 
@@ -289,10 +289,8 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
 
-        self._start_level = numpy.zeros_like(self._num_points_per_level)
-        self._start_level[1:] = numpy.cumsum(self._num_points_per_level[:-1])
-
-        self._end_level = self._start_level + self._num_points_per_level
+        self._end_level = numpy.cumsum(self._num_points_per_level)
+        self._start_level = self._end_level - self._num_points_per_level
         # points
         points = numpy.zeros(numpy.sum(self._num_points_per_level))
         degree = 0
@@ -396,10 +394,8 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
 
-        self._start_level = numpy.zeros_like(self._num_points_per_level)
-        self._start_level[1:] = numpy.cumsum(self._num_points_per_level[:-1])
-
-        self._end_level = self._start_level + self._num_points_per_level
+        self._end_level = numpy.cumsum(self._num_points_per_level)
+        self._start_level = self._end_level - self._num_points_per_level
         # points
         points = []
         degree = 0
