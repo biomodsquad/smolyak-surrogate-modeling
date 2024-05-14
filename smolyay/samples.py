@@ -19,13 +19,13 @@ class UnidimensionalPointSet(abc.ABC):
     def domain(self):
         """numpy.ndarray: Domain of the `points`."""
         return self._domain
-    
+
     @domain.setter
     def domain(self, value):
         domain = numpy.array(value, dtype=float)
         if domain.ndim != 1 or len(domain) != 2:
-            raise TypeError('Domain must be array with two variables')
-        if not numpy.array_equal(self._domain,domain):
+            raise TypeError("Domain must be array with two variables")
+        if not numpy.array_equal(self._domain, domain):
             self._domain = domain
             self._valid_cache = False
 
@@ -39,17 +39,18 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __len__(self):
         return len(self.points)
-    
+
     @abc.abstractmethod
     def _create(self):
         """Create the points in the set."""
         pass
 
-    def _scale_to_domain(self,points,old_domain):
-        points = self.domain[0] + (self.domain[1] - self.domain[0]) * ((points - old_domain[0]) / (old_domain[1] - old_domain[0]))
-        numpy.clip(points, self.domain[0], self.domain[1],out=points)
+    def _scale_to_domain(self, points, old_domain):
+        points = self.domain[0] + (self.domain[1] - self.domain[0]) * (
+            (points - old_domain[0]) / (old_domain[1] - old_domain[0])
+        )
+        numpy.clip(points, self.domain[0], self.domain[1], out=points)
         return points
-    
 
 
 class NestedUnidimensionalPointSet(UnidimensionalPointSet):
@@ -131,7 +132,6 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         self._degree = None
 
         self.degree = degree
-
 
     @property
     def degree(self):
@@ -228,7 +228,10 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
                 indexes = numpy.arange(1, degree, 2, dtype=int)
                 divisible_indexes = numpy.gcd(indexes, degree) > 1
                 indexes = indexes[~divisible_indexes]
-            points[self._start_level[i] : self._end_level[i]] = -numpy.cos(numpy.pi * indexes / degree)
+            # calculate new points
+            points[self._start_level[i] : self._end_level[i]] = -numpy.cos(
+                numpy.pi * indexes / degree
+            )
         self._points = self._scale_to_domain(points, [-1, 1])
 
 
@@ -305,14 +308,12 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
-            # generate extrema
-            new_points = list(-numpy.cos(numpy.pi * indexes / degree))
-
+            # calculate new points
             points[
                 self._start_level[nonempty_index(i)] : self._end_level[
                     nonempty_index(i)
                 ]
-            ] = new_points
+            ] = -numpy.cos(numpy.pi * indexes / degree)
         self._points = self._scale_to_domain(points, [-1, 1])
 
 
@@ -397,13 +398,18 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         self._end_level = numpy.cumsum(self._num_points_per_level)
         self._start_level = self._end_level - self._num_points_per_level
         # points
-        points = []
+        points = numpy.zeros(numpy.sum(self._num_points_per_level))
         degree = 0
         for i in range(self.max_level + 1):
             degree = 3**i
-            for idx in range(1, degree + 1):
-                point = (idx - 1) * 2 * numpy.pi / degree
-                if not numpy.isclose(points, point).any():
-                    points.append(point)
-        points = numpy.array(points)
+            # find fraction index/degree that cannot be further simplified
+            if i == 0:
+                indexes = numpy.arange(0, degree, dtype=int)
+            else:
+                indexes = numpy.arange(1, degree + 1, 1, dtype=int)
+                indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+            # calculate new points
+            points[self._start_level[i] : self._end_level[i]] = (
+                (indexes) * 2 * numpy.pi / degree
+            )
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
