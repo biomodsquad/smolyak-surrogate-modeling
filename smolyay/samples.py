@@ -355,22 +355,20 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
         degree = 0
-        num_levels = numpy.sum(numpy.array(self._num_per_level) != 0)
-        nonempty_index = lambda x: 0 if x == 0 else int(2 ** (x - 2)) + 1
-        for i in range(1, num_levels):
+        for i in range(1, self.max_level + 1):
+            if self._num_per_level[i] == 0:
+                continue
             # find indexes of extrema not already found. Fraction index/degree
             # cannot be further simplified
-            degree = 2**i
+            degree = int(2**(numpy.ceil(numpy.log2(i)) + 1))
             if i == 1:
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
-            points[
-                self._start_level[nonempty_index(i)] : self._end_level[
-                    nonempty_index(i)
-                ]
-            ] = -numpy.cos(numpy.pi * indexes / degree)
+            points[self._start_level[i] : self._end_level[i]] = -numpy.cos(
+                numpy.pi * indexes / degree
+            )
         self._points = self._scale_to_domain(points, [-1, 1])
 
 
