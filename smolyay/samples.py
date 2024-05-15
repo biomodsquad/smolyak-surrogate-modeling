@@ -199,8 +199,6 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         the maximum level the points are used for
     """
 
-    def __init__(self, domain, max_level):
-        super().__init__(domain, max_level)
 
     def _create(self):
         r"""Create the points in the set.
