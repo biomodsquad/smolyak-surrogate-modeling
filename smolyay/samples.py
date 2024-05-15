@@ -156,6 +156,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
                 numpy.pi * numpy.linspace(0, self.degree, self.degree + 1) / self.degree
             )
         else:
+            # special case where degree == 0
             points = numpy.zeros(1)
         self._points = self._scale_to_domain(points, [-1, 1])
 
