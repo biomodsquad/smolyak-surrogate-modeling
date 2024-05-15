@@ -467,7 +467,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         Generating the trignometric points using the frequencies
         :math:1, 3, 9, ..., 3^{i} where i is an integer.
         """
-        # create properties for levels
+        # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 3**x
         self._num_per_level = numpy.ones(self.max_level + 1, dtype=int)
         self._num_per_level[1:] = [
@@ -476,18 +476,17 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
-        # points
+        # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
         degree = 0
         for i in range(self.max_level + 1):
-            degree = 3**i
             # find fraction index/degree that cannot be further simplified
+            degree = 3**i
             if i == 0:
                 indexes = numpy.arange(0, degree, dtype=int)
             else:
                 indexes = numpy.arange(1, degree + 1, 1, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
-            # calculate new points
             points[self._start_level[i] : self._end_level[i]] = (
                 (indexes) * 2 * numpy.pi / degree
             )
