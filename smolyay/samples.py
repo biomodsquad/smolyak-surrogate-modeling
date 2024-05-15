@@ -227,7 +227,6 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
                 indexes = numpy.arange(1, degree, 2, dtype=int)
                 divisible_indexes = numpy.gcd(indexes, degree) > 1
                 indexes = indexes[~divisible_indexes]
-            # calculate new points
             points[self._start_level[i] : self._end_level[i]] = -numpy.cos(
                 numpy.pi * indexes / degree
             )
