@@ -190,10 +190,10 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
      
     .. math::
 
-    n = \begin{cases}
-         0 & \text{ if } L = 0\\ 
-         2^{L} & \text{ if } L > 0 
-    \end{cases}
+        n = \begin{cases}
+            0 & \text{ if } L = 0\\ 
+            2^{L} & \text{ if } L > 0 
+        \end{cases}
 
     where L is a whole number.
 
@@ -204,6 +204,25 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     not the extrema of any Chebyshev polynomial n(k) where k is a whole number
     and k < L.
 
+    The order :math:`o(L) of the nested Clenshaw Curtis set, which describes the
+    number of cummulative points at each level, is used to determine the 
+    number of points at each individual level. The order of the Clenshaw Curtis
+    set is described by the following rule:
+
+    .. math::
+
+        o(L) = \begin{cases}
+                1 & \text{ if } L = 0\\ 
+                2^{L} + 1 & \text{ if } L > 0 
+        \end{cases}
+
+    which leads to a sequence :math:`{1, 3, 5, 9, 17, ...}`.
+
+    Determining the number of points each level is then
+
+    .. math::
+        num_per_level(L) = o(L) - o(L - 1)
+
     Parameters
     ----------
     domain: list
@@ -212,7 +231,6 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     max_level ; int
         The maximum level the points are used for.
     """
-
 
     def _create(self):
         r"""Create the points in the set.
@@ -276,9 +294,9 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     meaning any :math:`n` will have extrema at the same points as every n that
     precedes it in the sequence. The extrema are organized into levels such that
     a level L that is nonempty will contain extrema of some degree n that are
-    not found in any preceding n.
-
-    The total number of unique points increases exponentially with increasing n.
+    not found in any preceding n. The total number of unique points increases 
+    exponentially with increasing n.
+    
     To limit the rate of increasing points with increasing level L to a linear
     rate :math:`2*L + 1`, the relationship between k and L is described by the
     following equation:
@@ -288,7 +306,29 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         k = \left \lceil \log_{2}(L) \right \rceil + 1
 
     As k does not always increase when L increases, the rate of new, unique 
-    points remains linear with respect to L.
+    points is capped at a rate less than or equal to :math:`2*L + 1`
+
+    The order :math:`o(L) of the slow nested Clenshaw Curtis set, which 
+    describes the number of cummulative points at each level, is used to 
+    determine the number of points at each individual level. The order of the 
+    Clenshaw Curtis set is described by the following rule:
+
+    .. math::
+
+        o(L) = \begin{cases}
+                1 & \text{ if } L = 0\\ 
+                2^{k} + 1 & \text{ if } L > 0 
+        \end{cases}
+
+        where k = \left \lceil \log_{2}(L) \right \rceil + 1
+
+    The sequence of o(L) is then :math:`{1, 3, 5, 9, 9, 17, ...}`.
+    
+    Since the points are nested, the number of unique points at
+    a level L is 
+    
+    .. math::
+        num_per_level(L) = o(L) - o(L - 1)    
 
     Parameters
     ----------
@@ -304,30 +344,28 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
 
         Generating nested extrema of chebyshev polynomials of the first kind.
         """
-        # create properties for levels
+        # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 1 if x == 0 else int(2 ** (numpy.ceil(numpy.log2(x)) + 1) + 1)
         self._num_per_level = numpy.ones(self.max_level + 1, dtype=int)
         self._num_per_level[1:] = [
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
-
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
-        # points
+        # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
         degree = 0
         num_levels = numpy.sum(numpy.array(self._num_per_level) != 0)
         nonempty_index = lambda x: 0 if x == 0 else int(2 ** (x - 2)) + 1
         for i in range(1, num_levels):
-            degree = 2**i
             # find indexes of extrema not already found. Fraction index/degree
             # cannot be further simplified
+            degree = 2**i
             if i == 1:
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
-            # calculate new points
             points[
                 self._start_level[nonempty_index(i)] : self._end_level[
                     nonempty_index(i)
@@ -398,6 +436,21 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
     These points are nested, such that the order of elements in
     `points` corresponds to the indices in `levels`.
+
+    To determine the number of points per level, an order(L) is
+    used to describe the number of points at each level L. For
+    the Trigonometric points, this rule is
+
+    .. math::
+
+        o(L) = 3^{L}
+
+    Since the points are nested, the number of unique points at
+    a level L is
+
+    .. math::
+        num_per_level(L) = o(L) - o(L - 1)
+
 
     Parameters
     ----------
