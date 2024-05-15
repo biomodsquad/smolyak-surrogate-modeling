@@ -203,9 +203,34 @@ def test_trig_initial():
 )
 def test_nested_initial(nested_samples):
     """test default properties"""
-    f = nested_samples([-10, 10],7)
+    f = nested_samples([-10, 10], 7)
     assert numpy.array_equal(f.domain, [-10, 10])
     assert f.max_level == 7
+
+
+@pytest.mark.parametrize(
+    "samples",
+    [
+        smolyay.samples.ClenshawCurtisPointSet,
+        smolyay.samples.TrigonometricPointSet,
+        smolyay.samples.NestedClenshawCurtisPointSet,
+        smolyay.samples.SlowNestedClenshawCurtisPointSet,
+        smolyay.samples.NestedTrigonometricPointSet,
+    ],
+    ids=[
+        "ClenshawCurtis",
+        "Trigonometric",
+        "NestedClenshawCurtis",
+        "SlowNestedClenshawCurtis",
+        "NestedTrigonometric",
+    ],
+)
+def test_domain_error(samples):
+    """test default properties"""
+    with pytest.raises(TypeError):
+        samples([-10, 10, 20], 7)
+    with pytest.raises(TypeError):
+        samples([[-10, 10], [-10, 10]], 7)
 
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
@@ -228,6 +253,7 @@ def test_generate_points_set_domain(samples, points):
 def test_len(samples, points):
     """test the len method of UnidimensionalPointSet objects"""
     assert len(samples) == len(points)
+
 
 @pytest.mark.parametrize(
     "nested_samples,num_per_level",
