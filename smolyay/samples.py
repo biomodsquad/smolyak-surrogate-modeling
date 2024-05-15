@@ -359,7 +359,6 @@ class TrigonometricPointSet(UnidimensionalPointSet):
             points = (idx - 1) * 2 * numpy.pi / self.frequency
         else:
             points = numpy.zeros(1)
-        self._points = points
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
 
 
