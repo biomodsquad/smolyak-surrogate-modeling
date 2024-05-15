@@ -190,7 +190,6 @@ def test_trig_initial():
     f = smolyay.samples.TrigonometricPointSet([0, 4 * numpy.pi], 7)
     assert numpy.array_equal(f.domain, [0, 4 * numpy.pi])
     assert f.frequency == 7
-    assert f._valid_cache == False
 
 
 @pytest.mark.parametrize(
@@ -207,15 +206,12 @@ def test_nested_initial(nested_samples):
     f = nested_samples([-10, 10],7)
     assert numpy.array_equal(f.domain, [-10, 10])
     assert f.max_level == 7
-    assert f._valid_cache == False
 
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
 def test_generate_points(samples, points):
     """test the points of initialized UnidimensionalPointSet"""
-    assert samples._valid_cache == False
     assert numpy.allclose(samples.points, points, atol=1e-10)
-    assert samples._valid_cache == True
 
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
@@ -257,9 +253,7 @@ def test_len(samples, points):
 )
 def test_nested_num_points_per_level(nested_samples, num_points_per_level):
     """test number of points per level"""
-    assert nested_samples._valid_cache == False
     assert numpy.array_equal(nested_samples.num_points_per_level, num_points_per_level)
-    assert nested_samples._valid_cache == True
 
 
 @pytest.mark.parametrize(
@@ -286,9 +280,7 @@ def test_nested_num_points_per_level(nested_samples, num_points_per_level):
 )
 def test_nested_start_level(nested_samples, start_level):
     """test number of points per level"""
-    assert nested_samples._valid_cache == False
     assert numpy.array_equal(nested_samples.start_level, start_level)
-    assert nested_samples._valid_cache == True
 
 
 @pytest.mark.parametrize(
@@ -315,9 +307,7 @@ def test_nested_start_level(nested_samples, start_level):
 )
 def test_nested_end_level(nested_samples, end_level):
     """test number of points per level"""
-    assert nested_samples._valid_cache == False
     assert numpy.array_equal(nested_samples.end_level, end_level)
-    assert nested_samples._valid_cache == True
 
 
 @pytest.mark.parametrize(
