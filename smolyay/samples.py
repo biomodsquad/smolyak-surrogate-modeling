@@ -6,6 +6,11 @@ class UnidimensionalPointSet(abc.ABC):
     """Set of unidimensional points
 
     A set of unique unidimensional points within a domain.
+
+    Parameters
+    ----------
+    domain: list
+        Domain of the sample points.
     """
 
     def __init__(self, domain):
@@ -59,8 +64,11 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     Parameters
     ----------
+    domain: list
+        Domain of the sample points.
+
     max_level ; int
-        the maximum level the points are used for
+        The maximum level the points are used for.
     """
 
     def __init__(self, domain, max_level):
@@ -123,8 +131,11 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
     Parameters
     ----------
+    domain: list
+        Domain of the sample points.
+
     degree : int
-        degree of the Chebyshev polynomial of the first kind to get extrema from
+        Degree of the Chebyshev polynomial of the first kind to get extrema from.
     """
 
     def __init__(self, domain, degree):
@@ -195,8 +206,11 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 
     Parameters
     ----------
+    domain: list
+        Domain of the sample points.
+
     max_level ; int
-        the maximum level the points are used for
+        The maximum level the points are used for.
     """
 
 
@@ -276,6 +290,13 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     As k does not always increase when L increases, the rate of new, unique 
     points remains linear with respect to L.
 
+    Parameters
+    ----------
+    domain: list
+        Domain of the sample points.
+
+    max_level ; int
+        The maximum level the points are used for.
     """
 
     def _create(self):
@@ -327,8 +348,11 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     Parameters
     ----------
+    domain: list
+        Domain of the sample points.
+
     frequency : int
-        the frequency to take points from
+        The frequency to take points from.
     """
 
     def __init__(self, domain, frequency):
@@ -374,6 +398,14 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
     These points are nested, such that the order of elements in
     `points` corresponds to the indices in `levels`.
+
+    Parameters
+    ----------
+    domain: list
+        Domain of the sample points.
+
+    max_level ; int
+        The maximum level the points are used for.
     """
 
     def __init__(self, domain, max_level):
