@@ -230,7 +230,7 @@ def test_len(samples, points):
     assert len(samples) == len(points)
 
 @pytest.mark.parametrize(
-    "nested_samples,num_points_per_level",
+    "nested_samples,num_per_level",
     [
         (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 0), [1]),
         (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1), [1, 2]),
@@ -251,9 +251,9 @@ def test_len(samples, points):
     ],
     ids=nested_sample_ids,
 )
-def test_nested_num_points_per_level(nested_samples, num_points_per_level):
+def test_nested_num_per_level(nested_samples, num_per_level):
     """test number of points per level"""
-    assert numpy.array_equal(nested_samples.num_points_per_level, num_points_per_level)
+    assert numpy.array_equal(nested_samples.num_per_level, num_per_level)
 
 
 @pytest.mark.parametrize(
