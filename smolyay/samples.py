@@ -23,7 +23,7 @@ class UnidimensionalPointSet(abc.ABC):
     @domain.setter
     def domain(self, value):
         domain = numpy.array(value, dtype=float)
-        if domain.ndim != 1 or len(domain) != 2:
+        if domain.shape != (2,):
             raise TypeError("Domain must be array with two variables")
         if not numpy.array_equal(self._domain, domain):
             self._domain = domain
