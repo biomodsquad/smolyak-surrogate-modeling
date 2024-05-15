@@ -11,9 +11,9 @@ class UnidimensionalPointSet(abc.ABC):
     def __init__(self, domain):
         self._points = None
         self._domain = None
-
-        self.domain = numpy.array(domain, dtype=float)
         self._valid_cache = False
+
+        self.domain = domain
 
     @property
     def domain(self):
