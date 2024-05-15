@@ -254,6 +254,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
             # cannot be further simplified
             degree = 2**i
             if i == 1:
+                # special case for level == 1
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = numpy.arange(1, degree, 2, dtype=int)
@@ -352,6 +353,7 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         ]
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
+
         # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
         degree = 0
@@ -362,6 +364,7 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
             # cannot be further simplified
             degree = int(2**(numpy.ceil(numpy.log2(i)) + 1))
             if i == 1:
+                # special case for level == 1
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
@@ -482,6 +485,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
             # find fraction index/degree that cannot be further simplified
             degree = 3**i
             if i == 0:
+                # special case where level == 0
                 indexes = numpy.arange(0, degree, dtype=int)
             else:
                 indexes = numpy.arange(1, degree + 1, 1, dtype=int)
