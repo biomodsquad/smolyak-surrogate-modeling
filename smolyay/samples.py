@@ -418,6 +418,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
             idx = numpy.arange(1, self.frequency + 1, 1, dtype=int)
             points = (idx - 1) * 2 * numpy.pi / self.frequency
         else:
+            # special case where degree == 0
             points = numpy.zeros(1)
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
 
