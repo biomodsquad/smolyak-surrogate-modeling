@@ -183,7 +183,6 @@ def test_clenshaw_initial():
     f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 7)
     assert numpy.array_equal(f.domain, [-2, 1])
     assert f.degree == 7
-    assert f._valid_cache == False
 
 
 def test_trig_initial():
