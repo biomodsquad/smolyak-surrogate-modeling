@@ -218,9 +218,9 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         num_points = self._end_level[-1]
         points = numpy.zeros(num_points, dtype=float)
         for i in range(1, self.max_level + 1):
-            degree = 2**i
             # find indexes of extrema not already found. Fraction index/degree
             # cannot be further simplified
+            degree = 2**i
             if i == 1:
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
