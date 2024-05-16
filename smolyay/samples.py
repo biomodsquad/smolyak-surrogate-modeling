@@ -228,7 +228,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     domain: list
         Domain of the sample points.
 
-    max_level ; int
+    max_level: int
         The maximum level the points are used for.
     """
 
@@ -336,7 +336,7 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     domain: list
         Domain of the sample points.
 
-    max_level ; int
+    max_level: int
         The maximum level the points are used for.
     """
 
@@ -356,7 +356,6 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
 
         # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
-        degree = 0
         for i in range(1, self.max_level + 1):
             if self._num_per_level[i] == 0:
                 continue
@@ -459,7 +458,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
     domain: list
         Domain of the sample points.
 
-    max_level ; int
+    max_level: int
         The maximum level the points are used for.
     """
 
@@ -475,12 +474,11 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         self._num_per_level[1:] = [
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
-
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
+
         # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
-        degree = 0
         for i in range(self.max_level + 1):
             # find fraction index/degree that cannot be further simplified
             degree = 3**i
