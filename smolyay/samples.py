@@ -480,7 +480,6 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
         # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
-        degree = 0
         for i in range(self.max_level + 1):
             # find fraction index/degree that cannot be further simplified
             degree = 3**i
