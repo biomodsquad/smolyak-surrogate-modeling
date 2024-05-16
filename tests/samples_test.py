@@ -2,7 +2,7 @@ import pytest
 
 import numpy
 
-import smolyay.samples
+import smolyay
 
 sample_points_answers = [
     (smolyay.samples.ClenshawCurtisPointSet([-1, 1], 0), [0]),
