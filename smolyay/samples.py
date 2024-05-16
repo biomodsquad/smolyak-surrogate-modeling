@@ -67,7 +67,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     domain: list
         Domain of the sample points.
 
-    max_level ; int
+    max_level: int
         The maximum level the points are used for.
     """
 
@@ -129,12 +129,15 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
     For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
 
+    The points are then scaled from the domain :math:`[-1, 1]` to the domain
+    specified by the parameter `domain`.
+
     Parameters
     ----------
     domain: list
         Domain of the sample points.
 
-    degree : int
+    degree: int
         Degree of the Chebyshev polynomial of the first kind to get extrema from.
     """
 
@@ -175,18 +178,9 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     r"""Generate nested Clenshaw Curtis points
 
-    The :attr:`points` for this interpolation scheme are the extrema of the
-    Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
-
-    .. math::
-
-        x_i^* = -\cos(\pi i/n), i = 0,...,n
-
-    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
-
-    The nested Clenshaw Curtis points come from the nested extrema of the
-    Chebyshev polynomials of the first kind :math:`n` where n is part of a 
-    sequence
+    The :attr:`points` for this interpolation scheme are the nested Clenshaw
+    Curtis points, which are the extrema of the Chebyshev polynomials of the
+    first kind with degree :math:`n` where n is part of a sequence
      
     .. math::
 
@@ -207,7 +201,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     The order :math:`o(L) of the nested Clenshaw Curtis set, which describes the
     number of cummulative points at each level, is used to determine the 
     number of points at each individual level. The order of the Clenshaw Curtis
-    set is described by the following rule:
+    set is described by the following equation:
 
     .. math::
 
@@ -222,6 +216,9 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 
     .. math::
         num_per_level(L) = o(L) - o(L - 1)
+
+    The points are then scaled from the domain :math:`[-1, 1]` to the domain
+    specified by the :attr:`domain`.
 
     Parameters
     ----------
@@ -269,50 +266,26 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     r"""Set for Clenshaw Curtis slow exponential growth.
 
-    The :attr:`points` for this interpolation scheme are the extrema of the
-    Chebyshev polynomials of the first kind on the domain :math:`[-1, 1]`:
+    The :attr:`points` for this interpolation scheme are the nested Clenshaw
+    Curtis points.
 
-    .. math::
-
-        x_i^* = -\cos(\pi i/n), i = 0,...,n
-
-    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
-
-    The nested Clenshaw Curtis points come from the nested extrema of the
-    Chebyshev polynomials of the first kind :math:`n` where n is part of a 
-    sequence
-     
-    .. math::
-
-    n = \begin{cases}
-         0 & \text{ if } k = 0\\ 
-         2^{k} & \text{ if } k > 0 
-    \end{cases}
-
-    where k is a whole number. 
-
-    As the extrema of the Chebyshev polynomials of degree :math:`n` are nested,
-    meaning any :math:`n` will have extrema at the same points as every n that
-    precedes it in the sequence. The extrema are organized into levels such that
-    a level L that is nonempty will contain extrema of some degree n that are
-    not found in any preceding n. The total number of unique points increases 
+    As the extrema of the Chebyshev polynomials are organized into levels such
+    that a level L that is nonempty will contain extrema of some degree n that
+    are not found in a preceding n. The total number of unique points increases 
     exponentially with increasing n.
     
-    To limit the rate of increasing points with increasing level L to a linear
-    rate :math:`2*L + 1`, the relationship between k and L is described by the
-    following equation:
+    While the total number of unique points increases exponentially with
+    increasing n, the rate of increasing points with respect to level L can be
+    limited at or below a linear :math:`2*L + 1`. To do this, if adding the
+    next set of points at a level L causes the rate of new points to go above
+    :math:`2*L + 1`, then the points will not be added and the level will be
+    empty.
 
-    ..math:
-
-        k = \left \lceil \log_{2}(L) \right \rceil + 1
-
-    As k does not always increase when L increases, the rate of new, unique 
-    points is capped at a rate less than or equal to :math:`2*L + 1`
-
-    The order :math:`o(L) of the slow nested Clenshaw Curtis set, which 
-    describes the number of cummulative points at each level, is used to 
-    determine the number of points at each individual level. The order of the 
-    Clenshaw Curtis set is described by the following rule:
+    The order :math:`o(L) of the slow nested Clenshaw Curtis set describes
+    the number of cummulative points at each level to account for the limiting
+    rate :math:`2*L + 1`. Then is used to determine the number of points at
+    each individual level. The order of the slow Clenshaw Curtis set is
+    described by the following equation:
 
     .. math::
 
@@ -330,6 +303,9 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     
     .. math::
         num_per_level(L) = o(L) - o(L - 1)    
+
+    The points are then scaled from the domain :math:`[-1, 1]` to the domain
+    specified by the :attr:`domain`.
 
     Parameters
     ----------
@@ -384,12 +360,15 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         x^l_j = \frac{j-1}{m(l)},  1 \leq j \leq m(l), l \geq 0
 
+    The points are then scaled from the domain :math:`[0, 2\pi]`
+    to the domain specified by the parameter `domain`.
+    
     Parameters
     ----------
     domain: list
         Domain of the sample points.
 
-    frequency : int
+    frequency: int
         The frequency to take points from.
     """
 
@@ -440,7 +419,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
     To determine the number of points per level, an order(L) is
     used to describe the number of points at each level L. For
-    the Trigonometric points, this rule is
+    the Trigonometric points, this order equation is
 
     .. math::
 
@@ -452,7 +431,9 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
     .. math::
         num_per_level(L) = o(L) - o(L - 1)
 
-
+    The points are then scaled from the domain :math:`[0, 2\pi]`
+    to the domain specified by the :attr:`domain`.
+    
     Parameters
     ----------
     domain: list
