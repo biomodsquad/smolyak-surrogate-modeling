@@ -336,7 +336,7 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     domain: list
         Domain of the sample points.
 
-    max_level ; int
+    max_level: int
         The maximum level the points are used for.
     """
 
