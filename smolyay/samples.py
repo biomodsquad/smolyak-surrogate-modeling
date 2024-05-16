@@ -263,7 +263,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         self._points = self._scale_to_domain(points, [-1, 1])
 
 
-class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
+class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     r"""Set for Clenshaw Curtis slow exponential growth.
 
     The :attr:`points` for this interpolation scheme are the nested Clenshaw
