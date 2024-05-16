@@ -356,7 +356,6 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
 
         # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
-        degree = 0
         for i in range(1, self.max_level + 1):
             if self._num_per_level[i] == 0:
                 continue
