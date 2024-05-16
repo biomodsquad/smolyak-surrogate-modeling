@@ -6,14 +6,19 @@ class UnidimensionalPointSet(abc.ABC):
     """Set of unidimensional points
 
     A set of unique unidimensional points within a domain.
+
+    Parameters
+    ----------
+    domain: list
+        Domain of the sample points.
     """
 
     def __init__(self, domain):
         self._points = None
         self._domain = None
-        
-        self.domain = numpy.array(domain, dtype=float)
         self._valid_cache = False
+
+        self.domain = domain
 
     @property
     def domain(self):
@@ -23,11 +28,9 @@ class UnidimensionalPointSet(abc.ABC):
     @domain.setter
     def domain(self, value):
         domain = numpy.array(value, dtype=float)
-        if len(domain) != 2 or domain.ndim != 1:
-            raise TypeError('Domain must be array with 2 elements')
-        if domain[0] >= domain[1]:
-            raise ValueError('Lower bound must be less than upper bound')
-        if not numpy.array_equal(domain,self._domain):
+        if domain.shape != (2,):
+            raise TypeError("Domain must be array with two variables")
+        if not numpy.array_equal(self._domain, domain):
             self._domain = domain
             self._valid_cache = False
 
@@ -41,17 +44,18 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __len__(self):
         return len(self.points)
-    
+
     @abc.abstractmethod
     def _create(self):
         """Create the points in the set."""
         pass
 
-    def _scale_to_domain(self,points,old_domain):
-        points = self.domain[0] + (self.domain[1] - self.domain[0]) * ((points - old_domain[0]) / (old_domain[1] - old_domain[0]))
-        numpy.clip(points, self.domain[0], self.domain[1],out=points)
+    def _scale_to_domain(self, points, old_domain):
+        points = self.domain[0] + (self.domain[1] - self.domain[0]) * (
+            (points - old_domain[0]) / (old_domain[1] - old_domain[0])
+        )
+        numpy.clip(points, self.domain[0], self.domain[1], out=points)
         return points
-    
 
 
 class NestedUnidimensionalPointSet(UnidimensionalPointSet):
@@ -60,14 +64,17 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     Parameters
     ----------
+    domain: list
+        Domain of the sample points.
+
     max_level ; int
-        the maximum level the points are used for
+        The maximum level the points are used for.
     """
 
     def __init__(self, domain, max_level):
         super().__init__(domain)
         self._max_level = None
-        self._num_points_per_level = None
+        self._num_per_level = None
         self._start_level = None
         self._end_level = None
 
@@ -86,12 +93,12 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
             self._valid_cache = False
 
     @property
-    def num_points_per_level(self):
+    def num_per_level(self):
         """numpy.ndarray: number of points per level."""
         if not self._valid_cache:
             self._create()
             self._valid_cache = True
-        return self._num_points_per_level
+        return self._num_per_level
 
     @property
     def start_level(self):
@@ -124,8 +131,11 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
 
     Parameters
     ----------
+    domain: list
+        Domain of the sample points.
+
     degree : int
-        degree of the Chebyshev polynomial of the first kind to get extrema from
+        Degree of the Chebyshev polynomial of the first kind to get extrema from.
     """
 
     def __init__(self, domain, degree):
@@ -133,7 +143,6 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
         self._degree = None
 
         self.degree = degree
-
 
     @property
     def degree(self):
@@ -158,6 +167,7 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
                 numpy.pi * numpy.linspace(0, self.degree, self.degree + 1) / self.degree
             )
         else:
+            # special case where degree == 0
             points = numpy.zeros(1)
         self._points = self._scale_to_domain(points, [-1, 1])
 
@@ -180,10 +190,10 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
      
     .. math::
 
-    n = \begin{cases}
-         0 & \text{ if } L = 0\\ 
-         2^{L} & \text{ if } L > 0 
-    \end{cases}
+        n = \begin{cases}
+            0 & \text{ if } L = 0\\ 
+            2^{L} & \text{ if } L > 0 
+        \end{cases}
 
     where L is a whole number.
 
@@ -194,43 +204,65 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     not the extrema of any Chebyshev polynomial n(k) where k is a whole number
     and k < L.
 
+    The order :math:`o(L) of the nested Clenshaw Curtis set, which describes the
+    number of cummulative points at each level, is used to determine the 
+    number of points at each individual level. The order of the Clenshaw Curtis
+    set is described by the following rule:
+
+    .. math::
+
+        o(L) = \begin{cases}
+                1 & \text{ if } L = 0\\ 
+                2^{L} + 1 & \text{ if } L > 0 
+        \end{cases}
+
+    which leads to a sequence :math:`{1, 3, 5, 9, 17, ...}`.
+
+    Determining the number of points each level is then
+
+    .. math::
+        num_per_level(L) = o(L) - o(L - 1)
+
     Parameters
     ----------
-    max_level ; int
-        the maximum level the points are used for
-    """
+    domain: list
+        Domain of the sample points.
 
-    def __init__(self, domain, max_level):
-        super().__init__(domain, max_level)
+    max_level ; int
+        The maximum level the points are used for.
+    """
 
     def _create(self):
         r"""Create the points in the set.
 
         Generating nested extrema of chebyshev polynomials of the first kind.
         """
-        # create properties for levels
+        # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 1 if x == 0 else 2**x + 1
-        self._num_points_per_level = numpy.ones(self.max_level + 1, dtype=int)
-        self._num_points_per_level[1:] = [
+        self._num_per_level = numpy.ones(self.max_level + 1, dtype=int)
+        self._num_per_level[1:] = [
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
+        self._end_level = numpy.cumsum(self._num_per_level)
+        self._start_level = self._end_level - self._num_per_level
 
-        self._end_level = numpy.cumsum(self._num_points_per_level)
-        self._start_level = self._end_level - self._num_points_per_level
-        # points
+        # points, level 0 is a special case only 0 as a point
         num_points = self._end_level[-1]
         points = numpy.zeros(num_points, dtype=float)
         for i in range(1, self.max_level + 1):
-            degree = 2**i
             # find indexes of extrema not already found. Fraction index/degree
             # cannot be further simplified
+            degree = 2**i
             if i == 1:
+                # special case for level == 1
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = numpy.arange(1, degree, 2, dtype=int)
                 divisible_indexes = numpy.gcd(indexes, degree) > 1
                 indexes = indexes[~divisible_indexes]
-            points[self._start_level[i] : self._end_level[i]] = -numpy.cos(numpy.pi * indexes / degree)
+            points[self._start_level[i] : self._end_level[i]] = -numpy.cos(
+                numpy.pi * indexes / degree
+            )
         self._points = self._scale_to_domain(points, [-1, 1])
 
 
@@ -263,9 +295,9 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
     meaning any :math:`n` will have extrema at the same points as every n that
     precedes it in the sequence. The extrema are organized into levels such that
     a level L that is nonempty will contain extrema of some degree n that are
-    not found in any preceding n.
-
-    The total number of unique points increases exponentially with increasing n.
+    not found in any preceding n. The total number of unique points increases 
+    exponentially with increasing n.
+    
     To limit the rate of increasing points with increasing level L to a linear
     rate :math:`2*L + 1`, the relationship between k and L is described by the
     following equation:
@@ -275,8 +307,37 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
         k = \left \lceil \log_{2}(L) \right \rceil + 1
 
     As k does not always increase when L increases, the rate of new, unique 
-    points remains linear with respect to L.
+    points is capped at a rate less than or equal to :math:`2*L + 1`
 
+    The order :math:`o(L) of the slow nested Clenshaw Curtis set, which 
+    describes the number of cummulative points at each level, is used to 
+    determine the number of points at each individual level. The order of the 
+    Clenshaw Curtis set is described by the following rule:
+
+    .. math::
+
+        o(L) = \begin{cases}
+                1 & \text{ if } L = 0\\ 
+                2^{k} + 1 & \text{ if } L > 0 
+        \end{cases}
+
+        where k = \left \lceil \log_{2}(L) \right \rceil + 1
+
+    The sequence of o(L) is then :math:`{1, 3, 5, 9, 9, 17, ...}`.
+    
+    Since the points are nested, the number of unique points at
+    a level L is 
+    
+    .. math::
+        num_per_level(L) = o(L) - o(L - 1)    
+
+    Parameters
+    ----------
+    domain: list
+        Domain of the sample points.
+
+    max_level ; int
+        The maximum level the points are used for.
     """
 
     def _create(self):
@@ -284,37 +345,33 @@ class SlowNestedClenshawCurtisPointSet(NestedClenshawCurtisPointSet):
 
         Generating nested extrema of chebyshev polynomials of the first kind.
         """
-        # create properties for levels
+        # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 1 if x == 0 else int(2 ** (numpy.ceil(numpy.log2(x)) + 1) + 1)
-        self._num_points_per_level = numpy.ones(self.max_level + 1, dtype=int)
-        self._num_points_per_level[1:] = [
+        self._num_per_level = numpy.ones(self.max_level + 1, dtype=int)
+        self._num_per_level[1:] = [
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
+        self._end_level = numpy.cumsum(self._num_per_level)
+        self._start_level = self._end_level - self._num_per_level
 
-        self._start_level = numpy.zeros_like(self._num_points_per_level)
-        self._start_level[1:] = numpy.cumsum(self._num_points_per_level[:-1])
-
-        self._end_level = self._start_level + self._num_points_per_level
-        # points
-        points = numpy.zeros(numpy.sum(self._num_points_per_level))
+        # points, level 0 is a special case only 0 as a point
+        points = numpy.zeros(numpy.sum(self._num_per_level))
         degree = 0
-        num_levels = numpy.sum(numpy.array(self._num_points_per_level) != 0)
-        nonempty_index = lambda x: 0 if x == 0 else int(2 ** (x - 2)) + 1
-        for i in range(1, num_levels):
-            degree = 2**i
+        for i in range(1, self.max_level + 1):
+            if self._num_per_level[i] == 0:
+                continue
             # find indexes of extrema not already found. Fraction index/degree
             # cannot be further simplified
+            degree = int(2**(numpy.ceil(numpy.log2(i)) + 1))
             if i == 1:
+                # special case for level == 1
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
-            # generate extrema
-            points[
-                self._start_level[nonempty_index(i)] : self._end_level[
-                    nonempty_index(i)
-                ]
-            ] = -numpy.cos(numpy.pi * indexes / degree)
+            points[self._start_level[i] : self._end_level[i]] = -numpy.cos(
+                numpy.pi * indexes / degree
+            )
         self._points = self._scale_to_domain(points, [-1, 1])
 
 
@@ -330,8 +387,11 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     Parameters
     ----------
+    domain: list
+        Domain of the sample points.
+
     frequency : int
-        the frequency to take points from
+        The frequency to take points from.
     """
 
     def __init__(self, domain, frequency):
@@ -361,8 +421,8 @@ class TrigonometricPointSet(UnidimensionalPointSet):
             idx = numpy.arange(1, self.frequency + 1, 1, dtype=int)
             points = (idx - 1) * 2 * numpy.pi / self.frequency
         else:
+            # special case where degree == 0
             points = numpy.zeros(1)
-        self._points = points
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
 
 
@@ -378,10 +438,30 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
     These points are nested, such that the order of elements in
     `points` corresponds to the indices in `levels`.
-    """
 
-    def __init__(self, domain, max_level):
-        super().__init__(domain, max_level)
+    To determine the number of points per level, an order(L) is
+    used to describe the number of points at each level L. For
+    the Trigonometric points, this rule is
+
+    .. math::
+
+        o(L) = 3^{L}
+
+    Since the points are nested, the number of unique points at
+    a level L is
+
+    .. math::
+        num_per_level(L) = o(L) - o(L - 1)
+
+
+    Parameters
+    ----------
+    domain: list
+        Domain of the sample points.
+
+    max_level ; int
+        The maximum level the points are used for.
+    """
 
     def _create(self):
         r"""Create the points in the set.
@@ -389,25 +469,28 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         Generating the trignometric points using the frequencies
         :math:1, 3, 9, ..., 3^{i} where i is an integer.
         """
-        # create properties for levels
+        # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 3**x
-        self._num_points_per_level = numpy.ones(self.max_level + 1, dtype=int)
-        self._num_points_per_level[1:] = [
+        self._num_per_level = numpy.ones(self.max_level + 1, dtype=int)
+        self._num_per_level[1:] = [
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
 
-        self._start_level = numpy.zeros_like(self._num_points_per_level)
-        self._start_level[1:] = numpy.cumsum(self._num_points_per_level[:-1])
-
-        self._end_level = self._start_level + self._num_points_per_level
-        # points
-        points = []
+        self._end_level = numpy.cumsum(self._num_per_level)
+        self._start_level = self._end_level - self._num_per_level
+        # points, level 0 is a special case only 0 as a point
+        points = numpy.zeros(numpy.sum(self._num_per_level))
         degree = 0
         for i in range(self.max_level + 1):
+            # find fraction index/degree that cannot be further simplified
             degree = 3**i
-            for idx in range(1, degree + 1):
-                point = (idx - 1) * 2 * numpy.pi / degree
-                if not numpy.isclose(points, point).any():
-                    points.append(point)
-        points = numpy.array(points)
+            if i == 0:
+                # special case where level == 0
+                indexes = numpy.arange(0, degree, dtype=int)
+            else:
+                indexes = numpy.arange(1, degree + 1, 1, dtype=int)
+                indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+            points[self._start_level[i] : self._end_level[i]] = (
+                (indexes) * 2 * numpy.pi / degree
+            )
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])

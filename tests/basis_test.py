@@ -1,330 +1,456 @@
 import pytest
 
 import numpy
-from scipy import special
 
-from smolyay.basis import (BasisFunction, ChebyshevFirstKind,
-        ChebyshevSecondKind, BasisFunctionSet, NestedBasisFunctionSet)
-
-@pytest.fixture
-def expected_points_3_set():
-    """extrema for exactness = 8"""
-    return [0, -1.0, 1.0, -1/numpy.sqrt(2), 1/numpy.sqrt(2),
-            -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
-            -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
-            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
-            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
-
-def test_cheb_initial_zero():
-    """test degree of zero"""
-    f = ChebyshevFirstKind(0)
-    assert f.n == 0
-    assert f.points == [0]
-
-def test_cheb_initial_1():
-    """test initial when degree is 1"""
-    f = ChebyshevFirstKind(1)
-    assert f.n == 1
-    assert f.points == [-1, 1]
-
-def test_cheb_initial_2():
-    """test initial when degree is 2"""
-    f = ChebyshevFirstKind(2)
-    assert f.n == 2
-    assert numpy.allclose(f.points,[-1, 0, 1],atol=1e-10)
-
-def test_cheb_initial_4():
-    """test initial when degree is 4"""
-    expected_points = [-1, -1/numpy.sqrt(2), 0, 1/numpy.sqrt(2), 1]
-    f = ChebyshevFirstKind(4)
-    assert f.n == 4
-    assert numpy.allclose(f.points,expected_points,atol=1e-10)
-
-def test_cheb_initial_8():
-    """test initial when degree is 8"""
-    expected_points = [-1, -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
-            -1/numpy.sqrt(2), -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 0,
-            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 1/numpy.sqrt(2),
-            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75), 1]
-    f = ChebyshevFirstKind(8)
-    assert f.n == 8
-    assert numpy.allclose(f.points,expected_points,atol=1e-10)
-
-def test_cheb_call_degree_0_1():
-    """Chebyshev polynomial degree 0 is always 1 and degree 1 returns input"""
-    f0 = ChebyshevFirstKind(0)
-    f1 = ChebyshevFirstKind(1)
-    for i in [-1, -0.5, 0, 0.5, 1]:
-        assert f0(i) == 1
-        assert f1(i) == i
-
-def test_cheb_call_random_points():
-    """Test chebyshev polynomial at some degree at some input"""
-    numpy.random.seed(567)
-    ns = numpy.random.randint(20,size = 20)
-    xs = numpy.random.rand(20) * 2 - 1
-    for n,x in zip(ns,xs):
-        f = ChebyshevFirstKind(n)
-        assert numpy.isclose(f(x),special.eval_chebyt(n,x))
-
-def test_cheb_call_random_points_multi_input():
-    """Test that chebyshev polynomial call handles multiple x inputs"""
-    numpy.random.seed(567)
-    xs = numpy.random.rand(20) * 2 - 1
-    f0 = ChebyshevFirstKind(0)
-    f1 = ChebyshevFirstKind(1)
-    fn = ChebyshevFirstKind(5)
-    assert numpy.allclose(f0(xs),special.eval_chebyt(0,xs))
-    assert numpy.allclose(f1(xs),special.eval_chebyt(1,xs))
-    assert numpy.allclose(fn(xs),special.eval_chebyt(5,xs))
+import smolyay
 
 
-def test_cheb_derivative():
-    """Test if the correct derivative is generated."""
-    f0 = ChebyshevFirstKind(0)
-    f1 = ChebyshevFirstKind(1)
-    f2 = ChebyshevFirstKind(2)
-    assert f0.derivative(1) == pytest.approx(0)
-    assert f1.derivative(1) == pytest.approx(1)
-    assert f2.derivative(1) == pytest.approx(4)
-    
-    assert f0.derivative(-0.5) == pytest.approx(0)
-    assert f1.derivative(-0.5) == pytest.approx(1)
-    assert f2.derivative(-0.5) == pytest.approx(-2)
+basis_call_answer_key = [
+    (
+        smolyay.basis.ChebyshevFirstKind(0),
+        {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(1),
+        {0.5: 0.5, 1: 1, -1: -1, -0.25: -0.25, -0.5: -0.5},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(2),
+        {0.5: -0.5, 1: 1, -1: 1, -0.25: -0.875, -0.5: -0.5},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(0),
+        {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(1),
+        {0.5: 1, 1: 2, -1: -2, -0.25: -0.5, -0.5: -1},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(2),
+        {0.5: 0, 1: 3, -1: 3, -0.25: -0.75, -0.5: 0},
+    ),
+    (
+        smolyay.basis.Trigonometric(0),
+        {
+            0: 1,
+            numpy.pi / 3: 1,
+            3 * numpy.pi / 2: 1,
+            numpy.pi / 6: 1,
+            2 * numpy.pi: 1,
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(1),
+        {
+            0: 1,
+            numpy.pi / 3: numpy.exp(numpy.pi / 3 * 1j),
+            3 * numpy.pi / 2: numpy.exp(3 * numpy.pi / 2 * 1j),
+            numpy.pi / 6: numpy.exp(numpy.pi / 6 * 1j),
+            2 * numpy.pi: numpy.exp(2 * numpy.pi * 1j),
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(-1),
+        {
+            0: 1,
+            numpy.pi / 3: numpy.exp(numpy.pi / 3 * 1j * -1),
+            3 * numpy.pi / 2: numpy.exp(3 * numpy.pi / 2 * 1j * -1),
+            numpy.pi / 6: numpy.exp(numpy.pi / 6 * 1j * -1),
+            2 * numpy.pi: numpy.exp(2 * numpy.pi * 1j * -1),
+        },
+    ),
+]
 
-    assert numpy.isclose(f0.derivative([1,-0.5]),[0,0]).all()
-    assert numpy.isclose(f1.derivative([1,-0.5]),[1,1]).all()
-    assert numpy.isclose(f2.derivative([1,-0.5]),[4,-2]).all()
+
+basis_derivative_answer_key = [
+    (
+        smolyay.basis.ChebyshevFirstKind(0),
+        {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(1),
+        {0.5: 1, 1: 1, -1: 1, -0.25: 1, -0.5: 1},
+    ),
+    (
+        smolyay.basis.ChebyshevFirstKind(2),
+        {0.5: 2, 1: 4, -1: -4, -0.25: -1, -0.5: -2},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(0),
+        {0.5: 0, 1: 0, -1: 0, -0.25: 0, -0.5: 0},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(1),
+        {0.5: 2, 1: 2, -1: 2, -0.25: 2, -0.5: 2},
+    ),
+    (
+        smolyay.basis.ChebyshevSecondKind(2),
+        {0.5: 4, 1: 8, -1: -8, -0.25: -2, -0.5: -4},
+    ),
+    (
+        smolyay.basis.Trigonometric(0),
+        {
+            0: 0,
+            numpy.pi / 3: 0,
+            3 * numpy.pi / 2: 0,
+            numpy.pi / 6: 0,
+            2 * numpy.pi: 0,
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(1),
+        {
+            0: 1j,
+            numpy.pi / 3: 1j * numpy.exp(numpy.pi / 3 * 1j),
+            3 * numpy.pi / 2: 1j * numpy.exp(3 * numpy.pi / 2 * 1j),
+            numpy.pi / 6: 1j * numpy.exp(numpy.pi / 6 * 1j),
+            2 * numpy.pi: 1j * numpy.exp(2 * numpy.pi * 1j),
+        },
+    ),
+    (
+        smolyay.basis.Trigonometric(-1),
+        {
+            0: -1j,
+            numpy.pi / 3: -1j * numpy.exp(numpy.pi / 3 * 1j * -1),
+            3 * numpy.pi / 2: -1j * numpy.exp(3 * numpy.pi / 2 * 1j * -1),
+            numpy.pi / 6: -1j * numpy.exp(numpy.pi / 6 * 1j * -1),
+            2 * numpy.pi: -1j * numpy.exp(2 * numpy.pi * 1j * -1),
+        },
+    ),
+]
+
+basis_outside_domain = [
+    (smolyay.basis.ChebyshevFirstKind(4), 1.01, -1.01, 0),
+    (smolyay.basis.ChebyshevSecondKind(4), 1.01, -1.01, 0),
+    (smolyay.basis.Trigonometric(4), 7, -0.01, numpy.pi),
+]
+
+basis_id = [
+    "1st Cheb [0]",
+    "1st Cheb [1]",
+    "1st Cheb [2]",
+    "2nd Cheb [0]",
+    "2nd Cheb [1]",
+    "2nd Cheb [2]",
+    "Trig [0]",
+    "Trig [1]",
+    "Trig [-1]",
+]
 
 
-def test_cheb_2nd_derivative():
-    """Test if the correct derivative is generated."""
-    u0 = ChebyshevSecondKind(0)
-    u1 = ChebyshevSecondKind(1)
-    u2 = ChebyshevSecondKind(2)
-    assert u0.derivative(1) == pytest.approx(0)
-    assert u1.derivative(1) == pytest.approx(2)
-    assert u2.derivative(1) == pytest.approx(8)
-
-    assert u0.derivative(-1) == pytest.approx(0)
-    assert u1.derivative(-1) == pytest.approx(2)
-    assert u2.derivative(-1) == pytest.approx(-8)
-
-    assert u0.derivative(0.5) == pytest.approx(0)
-    assert u1.derivative(0.5) == pytest.approx(2)
-    assert u2.derivative(0.5) == pytest.approx(4)
-
-    assert numpy.isclose(u0.derivative([1,-1,0.5]),[0,0,0]).all()
-    assert numpy.isclose(u1.derivative([1,-1,0.5]),[2,2,2]).all()
-    assert numpy.isclose(u2.derivative([1,-1,0.5]),[8,-8,4]).all()
+# initialization tests
+@pytest.mark.parametrize(
+    "basis_fun",
+    [
+        smolyay.basis.ChebyshevFirstKind,
+        smolyay.basis.ChebyshevSecondKind,
+    ],
+    ids=["1st Cheb", "2nd Cheb"],
+)
+def test_cheb_initial(basis_fun):
+    """test degrees and domain return correctly"""
+    f2 = basis_fun(2)
+    assert f2.degree == 2
+    assert isinstance(f2.degree, int)
+    assert numpy.array_equal(f2.domain, [-1, 1])
+    f2.degree = float(3)
+    assert f2.degree == 3
+    assert isinstance(f2.degree, int)
 
 
+def test_trig_initial():
+    """test frequency and domain return correctly"""
+    f2 = smolyay.basis.Trigonometric(2)
+    assert f2.frequency == 2
+    assert isinstance(f2.frequency, int)
+    assert numpy.array_equal(f2.domain, [0, 2 * numpy.pi])
+    f2.frequency = float(3)
+    assert f2.frequency == 3
+    assert isinstance(f2.frequency, int)
 
-def test_cheb_call_invalid_input():
-    """Test call raises error if input is outside domain [-1,1]"""
-    f = ChebyshevFirstKind(4)
+
+# Test outside of valid domain
+@pytest.mark.parametrize(
+    "basis_fun,too_large,too_small,valid_input",
+    basis_outside_domain,
+    ids=["1st Cheb", "2nd Cheb", "Trig"],
+)
+def test_call_outside_domain_error(basis_fun, too_large, too_small, valid_input):
+    """Test call raises error for input outside domain"""
     with pytest.raises(ValueError):
-        f(2)
+        basis_fun(too_large)
     with pytest.raises(ValueError):
-        f(-2)
+        basis_fun(too_small)
     with pytest.raises(ValueError):
-        f([0.5,0.7,3,0.8])
-
-
-def test_cheb_derivative_invalid_input():
-    """Test call raises error if input is outside domain [-1,1]"""
-    f = ChebyshevFirstKind(4)
+        basis_fun([valid_input, too_small, valid_input])
     with pytest.raises(ValueError):
-        f.derivative(2)
+        basis_fun(
+            [
+                [valid_input, too_large, valid_input],
+                [valid_input, valid_input, valid_input],
+            ]
+        )
+
+
+@pytest.mark.parametrize(
+    "basis_fun,too_large,too_small,valid_input",
+    basis_outside_domain,
+    ids=["1st Cheb", "2nd Cheb", "Trig"],
+)
+def test_derivative_outside_domain_error(basis_fun, too_large, too_small, valid_input):
+    """Test derivative raises error for input outside domain"""
     with pytest.raises(ValueError):
-        f.derivative(-2)
-
-
-def test_cheb_2nd_initial_zero():
-    """test degree of zero"""
-    f = ChebyshevSecondKind(0)
-    assert f.n == 0
-    assert f.points == [0]
-
-
-def test_cheb_2nd_initial_1():
-    """test initial when degree is 1"""
-    f = ChebyshevSecondKind(1)
-    assert f.n == 1
-    assert f.points == [0]
-
-def test_cheb_2nd_initial_2():
-    """test initial when degree is 2"""
-    f = ChebyshevSecondKind(2)
-    assert f.n == 2
-    assert numpy.allclose(f.points,[-0.5, 0.5],atol=1e-10)
-
-def test_cheb_2nd_initial_3():
-    """test initial when degree is 3"""
-    expected_points = [-1/numpy.sqrt(2), 0, 1/numpy.sqrt(2)]
-    f = ChebyshevSecondKind(3)
-    assert f.n == 3
-    assert numpy.allclose(f.points,expected_points,atol=1e-10)
-
-def test_cheb_2nd_initial_7():
-    """test initial when degree is 7"""
-    expected_points = [-numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
-            -1/numpy.sqrt(2), -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 0,
-            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75), 1/numpy.sqrt(2),
-            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
-    f = ChebyshevSecondKind(7)
-    assert f.n == 7
-    assert numpy.allclose(f.points,expected_points,atol=1e-10)
-
-def test_cheb_2nd_call_degree_0_1():
-    """Chebyshev polynomial degree 0 is always 1 and degree 1 returns 2*input"""
-    f0 = ChebyshevSecondKind(0)
-    f1 = ChebyshevSecondKind(1)
-    for i in [-1, -0.5, 0, 0.5, 1]:
-        assert f0(i) == 1
-        assert f1(i) == i*2
-
-def test_cheb_2nd_call_random_points():
-    """Test chebyshev polynomial at some degree at some input"""
-    numpy.random.seed(567)
-    ns = numpy.random.randint(20,size = 20)
-    xs = numpy.random.rand(20) * 2 - 1
-    for n,x in zip(ns,xs):
-        f = ChebyshevSecondKind(n)
-        assert numpy.isclose(f(x),special.eval_chebyu(n,x))
-
-def test_cheb_2nd_call_random_points_multi_input():
-    """Test that chebyshev polynomial call handles multiple x inputs"""
-    numpy.random.seed(567)
-    xs = numpy.random.rand(20) * 2 - 1
-    f0 = ChebyshevSecondKind(0)
-    f1 = ChebyshevSecondKind(1)
-    fn = ChebyshevSecondKind(5)
-    assert numpy.allclose(f0(xs),special.eval_chebyu(0,xs))
-    assert numpy.allclose(f1(xs),special.eval_chebyu(1,xs))
-    assert numpy.allclose(fn(xs),special.eval_chebyu(5,xs))
-
-
-def test_cheb_2nd_call_invalid_input():
-    """Test call raises error if input is outside domain [-1,1]"""
-    f = ChebyshevSecondKind(4)
+        basis_fun.derivative(too_large)
     with pytest.raises(ValueError):
-        f(2)
+        basis_fun.derivative(too_small)
     with pytest.raises(ValueError):
-        f(-2)
+        basis_fun.derivative([valid_input, too_small, valid_input])
     with pytest.raises(ValueError):
-        f([0.5,0.7,3,0.8])
+        basis_fun.derivative(
+            [
+                [valid_input, too_large, valid_input],
+                [valid_input, valid_input, valid_input],
+            ]
+        )
 
 
-def test_cheb_2nd_derivative_invalid_input():
-    """Test call raises error if input is outside domain [-1,1]"""
-    f = ChebyshevSecondKind(4)
-    with pytest.raises(ValueError):
-        f.derivative(2)
-    with pytest.raises(ValueError):
-        f.derivative(-2)
-    with pytest.raises(ValueError):
-        f.derivative([0.5,0.7,3,0.8])
+# Test call function correctness
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
+def test_call(basis_fun, answer_key):
+    """Test basis function call"""
+    for x, y in answer_key.items():
+        assert basis_fun(x) == pytest.approx(y)
 
 
-def test_set_initialize_empty():
-    """Check BasisFunctionSet initializes with empty set"""
-    basis_functions = []
-    points = []
-    f = BasisFunctionSet(points,basis_functions)
-    assert f.points == []
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
+def test_call_1D(basis_fun, answer_key):
+    """Test basis function call with a 1D array"""
+    xs = list(answer_key.keys())
+    answers = [answer_key[x] for x in xs]
+    assert numpy.shape(basis_fun(xs)) == numpy.shape(xs)
+    assert numpy.allclose(basis_fun(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(basis_fun(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun(xs1), answer1)
+
+
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
+def test_call_2D(basis_fun, answer_key):
+    """Test basis function call with a 2D array"""
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs, (8,)))
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(basis_fun(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(basis_fun(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(basis_fun(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(basis_fun(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun(xs4), answer4)
+
+
+@pytest.mark.parametrize("basis_fun,answer_key", basis_call_answer_key, ids=basis_id)
+def test_call_3D(basis_fun, answer_key):
+    """Test basis function call with a 3D array"""
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs, (24,)))
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(basis_fun(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
+    assert numpy.shape(basis_fun(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
+    assert numpy.shape(basis_fun(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
+    assert numpy.shape(basis_fun(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
+    assert numpy.shape(basis_fun(xs5)) == numpy.shape(xs5)
+    assert numpy.allclose(basis_fun(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
+    assert numpy.shape(basis_fun(xs6)) == numpy.shape(xs6)
+    assert numpy.allclose(basis_fun(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
+    assert numpy.shape(basis_fun(xs7)) == numpy.shape(xs7)
+    assert numpy.allclose(basis_fun(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(basis_fun(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(basis_fun(xs8), answer8)
+
+
+# Test derivative function correctness
+@pytest.mark.parametrize(
+    "basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id
+)
+def test_derivative(basis_fun, answer_key):
+    """Test basis function derivative"""
+    for x, y in answer_key.items():
+        assert basis_fun.derivative(x) == pytest.approx(y)
+
+
+@pytest.mark.parametrize(
+    "basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id
+)
+def test_derivative_1D(basis_fun, answer_key):
+    """Test basis function derivative with a 1D array"""
+    xs = list(answer_key.keys())
+    answers = [answer_key[x] for x in xs]
+    assert numpy.shape(basis_fun.derivative(xs)) == numpy.shape(xs)
+    assert numpy.allclose(basis_fun.derivative(xs), answers)
+
+    xs1 = numpy.ones((1, 1)) * xs[0]
+    answer1 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(basis_fun.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun.derivative(xs1), answer1)
+
+
+@pytest.mark.parametrize(
+    "basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id
+)
+def test_derivative_2D(basis_fun, answer_key):
+    """Test basis function derivative with a 2D array"""
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs, (8,)))
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 4))
+    answer1 = numpy.reshape(answers, (2, 4))
+    assert numpy.shape(basis_fun.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 8))
+    answer2 = numpy.reshape(answers, (1, 8))
+    assert numpy.shape(basis_fun.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (8, 1))
+    answer3 = numpy.reshape(answers, (8, 1))
+    assert numpy.shape(basis_fun.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun.derivative(xs3), answer3)
+
+    xs4 = numpy.ones((1, 1)) * xs[0]
+    answer4 = numpy.ones((1, 1)) * answers[0]
+    assert numpy.shape(basis_fun.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun.derivative(xs4), answer4)
+
+
+@pytest.mark.parametrize(
+    "basis_fun,answer_key", basis_derivative_answer_key, ids=basis_id
+)
+def test_derivative_3D(basis_fun, answer_key):
+    """Test basis function derivative with a 3D array"""
+    unique_inputs = list(answer_key.keys())
+    xs = list(numpy.resize(unique_inputs, (24,)))
+    answers = [answer_key[x] for x in xs]
+
+    xs1 = numpy.reshape(xs, (2, 3, 4))
+    answer1 = numpy.reshape(answers, (2, 3, 4))
+    assert numpy.shape(basis_fun.derivative(xs1)) == numpy.shape(xs1)
+    assert numpy.allclose(basis_fun.derivative(xs1), answer1)
+
+    xs2 = numpy.reshape(xs, (1, 1, 24))
+    answer2 = numpy.reshape(answers, (1, 1, 24))
+    assert numpy.shape(basis_fun.derivative(xs2)) == numpy.shape(xs2)
+    assert numpy.allclose(basis_fun.derivative(xs2), answer2)
+
+    xs3 = numpy.reshape(xs, (1, 24, 1))
+    answer3 = numpy.reshape(answers, (1, 24, 1))
+    assert numpy.shape(basis_fun.derivative(xs3)) == numpy.shape(xs3)
+    assert numpy.allclose(basis_fun.derivative(xs3), answer3)
+
+    xs4 = numpy.reshape(xs, (1, 1, 24))
+    answer4 = numpy.reshape(answers, (1, 1, 24))
+    assert numpy.shape(basis_fun.derivative(xs4)) == numpy.shape(xs4)
+    assert numpy.allclose(basis_fun.derivative(xs4), answer4)
+
+    xs5 = numpy.reshape(xs, (1, 6, 4))
+    answer5 = numpy.reshape(answers, (1, 6, 4))
+    assert numpy.shape(basis_fun.derivative(xs5)) == numpy.shape(xs5)
+    assert numpy.allclose(basis_fun.derivative(xs5), answer5)
+
+    xs6 = numpy.reshape(xs, (6, 4, 1))
+    answer6 = numpy.reshape(answers, (6, 4, 1))
+    assert numpy.shape(basis_fun.derivative(xs6)) == numpy.shape(xs6)
+    assert numpy.allclose(basis_fun.derivative(xs6), answer6)
+
+    xs7 = numpy.reshape(xs, (6, 1, 4))
+    answer7 = numpy.reshape(answers, (6, 1, 4))
+    assert numpy.shape(basis_fun.derivative(xs7)) == numpy.shape(xs7)
+    assert numpy.allclose(basis_fun.derivative(xs7), answer7)
+
+    xs8 = numpy.ones((1, 1, 1)) * xs[0]
+    answer8 = numpy.ones((1, 1, 1)) * answers[0]
+    assert numpy.shape(basis_fun.derivative(xs8)) == numpy.shape(xs8)
+    assert numpy.allclose(basis_fun.derivative(xs8), answer8)
+
+
+# Test call correctness at points that are special to a basis function
+def test_cheb_call_extrema_points():
+    """Test chebyshev polynomial at extrema"""
+    f = smolyay.basis.ChebyshevFirstKind(4)
+    extrema_points = [-1.0, -1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2), 1]
+    extrema_output = [1, -1, 1, -1, 1]
+    assert numpy.allclose(f(extrema_points), extrema_output)
+
+
+def test_cheb_call_root_points():
+    """Test chebyshev polynomial at roots"""
+    f = smolyay.basis.ChebyshevFirstKind(4)
+    root_points = [
+        -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+        -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+        numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+        numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+    ]
+    assert numpy.allclose(f(root_points), numpy.zeros(4))
+
+
+def test_cheb_2nd_call_root_points():
+    """Test chebyshev polynomial roots"""
+    f = smolyay.basis.ChebyshevSecondKind(3)
+    root_points = [-1 / numpy.sqrt(2), 0, 1 / numpy.sqrt(2)]
+    assert numpy.allclose(f(root_points), numpy.zeros(3))
+
+
+# Test a set of basis functions
+def test_set_initialize():
+    """Check BasisFunctionSet correctly initializes"""
+    f = smolyay.basis.BasisFunctionSet([])
+    f2 = smolyay.basis.BasisFunctionSet([smolyay.basis.ChebyshevFirstKind(0)])
     assert f.basis_functions == []
-
-def test_set_initialize_0():
-    """Check NestedBasisFunctionSet correctly initializes"""
-    basis_functions = [ChebyshevFirstKind(0)]
-    points = [0]
-    f = BasisFunctionSet(points,basis_functions)
-    assert f.points == [0]
-    assert f.basis_functions[0].n == 0
-
-def test_set_invalid_input():
-    """Check BasisFunctionSet gives error for invalid inputs"""
-    basis_functions = [ChebyshevFirstKind(0)]
-    points = [0,1,2]
-    with pytest.raises(IndexError):
-        f = BasisFunctionSet(points,basis_functions)
-
-def test_set_nested_initialize_empty():
-    """Check NestedBasisFunctionSet initializes with empty set"""
-    levels = []
-    basis_functions = []
-    points = []
-    f = NestedBasisFunctionSet(points,basis_functions,levels)
-    assert f.points == []
-    assert f.levels == []
-    assert f.basis_functions == []
-
-def test_set_nested_initialize_0():
-    """Check NestedBasisFunctionSet correctly initializes"""
-    levels = [[0]]
-    points = [0]
-    f = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
-    assert f.points == [0]
-    assert f.levels == [[0]]
-
-def test_set_nested_change_levels_invalid():
-    """Check NestedBasisFunctionSet does not allow more levels than points"""
-    levels = [[0]]
-    points = [0]
-    f = NestedBasisFunctionSet(points,[ChebyshevFirstKind(0)],levels)
-    with pytest.raises(IndexError):
-        f.levels = [[0],[1,2],[3,4]]
-
-def test_set_nested_change_levels(expected_points_3_set):
-    """Check NestedBasisFunctionSet updates levels correctly"""
-    levels = [[0],[1,2],[3,4],[5,6,7,8]]
-    basis_functions = [ChebyshevFirstKind(i) for i in range(9)]
-    f = NestedBasisFunctionSet(expected_points_3_set,basis_functions,levels)
-    f.levels = [[0],[1,2],[3,4]]
-    assert f.levels == [[0],[1,2],[3,4]]
-
-def test_make_nested_function(expected_points_3_set):
-    """Check make_nested_set creates NestedBasisFunctionSet"""
-    f = ChebyshevFirstKind.make_nested_set(3)
-    assert numpy.allclose(
-            f.points,expected_points_3_set,atol=1e-10)
-    assert f.levels == [[0],[1,2],[3,4],[5,6,7,8]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 9
-    for i in range(0,len(basis_functions)):
-        assert basis_functions[i].n == i
-
-def test_make_nested_empty():
-    """Check make_nested_set makes empty NestedBasisFunctionSet"""
-    f = ChebyshevFirstKind.make_nested_set(0)
-    assert f.points == [0]
-    assert f.levels == [[0]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 1
-    assert basis_functions[0].n == 0
-
-def test_make_nested_function_cheb_2nd(expected_points_3_set):
-    """Check make_nested_set creates NestedBasisFunctionSet"""
-    f = ChebyshevSecondKind.make_nested_set(2)
-    expected_points = [0, 0, -1/numpy.sqrt(2), 1/numpy.sqrt(2),
-            -numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75),
-            -numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
-            numpy.sqrt(numpy.sqrt(2)-1)/(2**0.75),
-            numpy.sqrt(numpy.sqrt(2)+1)/(2**0.75)]
-    assert numpy.allclose(f.points,expected_points,atol=1e-10)
-    assert f.levels == [[0,1],[2,3],[4,5,6,7]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 8
-    for i in range(0,len(basis_functions)):
-        assert basis_functions[i].n == i
-
-def test_make_nested_empty_cheb_2nd():
-    """Check make_nested_set makes empty NestedBasisFunctionSet"""
-    f = ChebyshevSecondKind.make_nested_set(0)
-    assert f.points == [0,0]
-    assert f.levels == [[0,1]]
-    basis_functions = f.basis_functions
-    assert len(basis_functions) == 2
-    assert basis_functions[0].n == 0
-
+    assert f2.basis_functions[0].degree == 0

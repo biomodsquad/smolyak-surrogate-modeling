@@ -1,32 +1,79 @@
 import abc
-import math
 
 import numpy
 import scipy.special
 
+
 class BasisFunction(abc.ABC):
     """Basis function for interpolating data.
 
-     A one-dimensional basis function is defined on the domain
-     :math:`[-1,1]`. The function defines the :attr:`points` at
-     which it should be sampled within this interval for interpolation.
-     The function also has an associated :meth:`__call__` method
-     for evaluating it at a point within its domain. Moreover,
-     the first derivative of the function can be evaluated via
-     :meth:`derivative`.
+    A one-dimensional basis function is defined on some given natural
+    domain. The function defines the :attr:`points` at which it should
+    be sampled within this interval for interpolation. The function also
+    has an associated :meth:`__call__` method for evaluating it at a
+    point within its domain. Moreover, the first derivative of the function
+    can be evaluated via :meth:`derivative`.
     """
-
-    def __init__(self):
-        self._points = []
 
     @property
     @abc.abstractmethod
-    def points(self):
-        """list: Sampling points for interpolation."""
+    def domain(self):
+        """numpy.ndarray: Domain the sample points come from."""
         pass
 
-    @abc.abstractmethod
     def __call__(self, x):
+        """Evaluate the basis function.
+
+        Parameters
+        ----------
+        x : float
+            One-dimensional point.
+
+        Returns
+        -------
+        float
+            Value of basis function.
+        """
+        if not numpy.all(self.in_domain(x)):
+            raise ValueError("Input is outside the domain " + str(self.domain))
+        return self._function(x)
+
+    def derivative(self, x):
+        """Evaluate the first derivative of the basis function.
+
+        Parameters
+        ----------
+        x : float
+            one-dimensional point.
+
+        Returns
+        -------
+        float
+            Value of the derivative of the basis function.
+        """
+        if not numpy.all(self.in_domain(x)):
+            raise ValueError("Input is outside the domain")
+        return self._derivative(x)
+
+    def in_domain(self, x):
+        """Check if the input is within the natural domain.
+
+        Parameters
+        ----------
+        x : float, numpy:ndarray
+            One-dimensional points.
+
+        Returns
+        -------
+        bool
+            True if input was outside domain, False otherwise
+        """
+        return numpy.logical_and(
+            numpy.greater_equal(x, self.domain[0]), numpy.less_equal(x, self.domain[1])
+        )
+
+    @abc.abstractmethod
+    def _function(self, x):
         """Evaluate the basis function.
 
         Parameters
@@ -42,7 +89,7 @@ class BasisFunction(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def derivative(self, x):
+    def _derivative(self, x):
         """Evaluate the first derivative of the basis function.
 
         Parameters
@@ -70,41 +117,34 @@ class ChebyshevFirstKind(BasisFunction):
         T_1(x) = x
         T_{n+1}(x) = 2x T_n(x) - T_{n-1}(x)
 
-    The :attr:`points` for this polynomial are the extrema on the domain
-    :math:`[-1,1]`:
-
-    .. math::
-
-        x_i^* = -\cos(\pi i/n), i = 0,...,n
-
-    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    Their domain is defined to be :math:`-1 \le x \le 1`. The degree *n* is
+    represented by property `degree`.
 
     Parameters
     ----------
-    n : int
+    degree : int
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self, n):
+    def __init__(self, degree):
         super().__init__()
-        self._n = n
-        self._derivative_polynomial = None
-        if n > 0:
-            self._points = [-numpy.cos(numpy.pi*i/n) for i in range(n+1)]
-        else:
-            self._points = [0]
+        self.degree = degree
 
     @property
-    def points(self):
-        """list: Sampling points at extrema of polynomial."""
-        return self._points
+    def domain(self):
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([-1, 1])
 
     @property
-    def n(self):
+    def degree(self):
         """int: Degree of polynomial."""
-        return self._n
+        return self._degree
 
-    def __call__(self, x):
+    @degree.setter
+    def degree(self, value):
+        self._degree = int(value)
+
+    def _function(self, x):
         r"""Evaluate the basis function.
 
         The Chebyshev polynomial is evaluated using the combinatorial formula:
@@ -118,7 +158,7 @@ class ChebyshevFirstKind(BasisFunction):
         Parameters
         ----------
         x : float
-            One-dimensional point on :math:`[-1,1]`.
+            One-dimensional point on :math:`[-1, 1]`.
 
         Returns
         -------
@@ -128,15 +168,12 @@ class ChebyshevFirstKind(BasisFunction):
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1]
+            if input is outside the domain [-1, 1]
 
         """
-        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
-            raise ValueError("Input is outside the domain [-1,1]")
+        return scipy.special.eval_chebyt(self.degree, x)
 
-        return scipy.special.eval_chebyt(self._n,x)
-
-    def derivative(self, x):
+    def _derivative(self, x):
         """Evaluate the derivative of ChebyshevFirstKind.
 
         The first derivative of Chebyshev polynomials of first kind is
@@ -159,67 +196,9 @@ class ChebyshevFirstKind(BasisFunction):
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1].
+            if input is outside the domain [-1, 1].
         """
-        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
-            raise ValueError("Input is outside the domain [-1,1]")
-        if self._derivative_polynomial is None:
-            self._derivative_polynomial = ChebyshevSecondKind(self._n-1)
-        return self.n*self._derivative_polynomial(x)
-
-    @classmethod
-    def make_nested_set(cls, exactness):
-        """Create a nested set of Chebyshev polynomials.
-
-        A nested set is created up to a given level of ``exactness``,
-        which corresponds to a highest-order Chebyshev polynomial of
-        degree ``n = 2**exactness``.
-
-        Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**exactness``, with the first level being a special case. The
-        generating Chebyshev polynomials are hence of degree (0, 2, 4, 8, ...).
-        Each new point added in a level is paired with a basis function of
-        increasing order.
-
-        For example, for an ``exactness`` of 3, the generating polynomials are
-        of degree 0, 2, 4, and 8, at each of 4 levels. There are 1, 2, 2, and 4
-        new points added at each level. The polynomial at level 0 is of degree
-        0, the polynomials at level 1 are of degrees 1 and 2, those at level 2
-        are of degree 3 and 4, and those at level 3 are of degrees 5, 6, 7, and
-        8.
-
-        Parameters
-        ----------
-        exactness : int
-            Level of exactness.
-
-        Returns
-        -------
-        NestedBasisFunctionSet
-            Nested Chebyshev polynomials of the first kind.
-
-        """
-        basis_functions = []
-        levels = []
-        points = []
-        for i in range(0, exactness+1):
-            if i > 1:
-                start_level = 2**(i-1)+1
-                end_level = 2**i
-            elif i == 1:
-                start_level = 1
-                end_level = 2
-            else:
-                start_level = 0
-                end_level = 0
-            level_range = range(start_level, end_level+1)
-
-            basis_functions.extend(ChebyshevFirstKind(n) for n in level_range)
-            levels.append(list(level_range))
-            for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p).any():
-                    points.append(p)
-        return NestedBasisFunctionSet(points, basis_functions, levels)
+        return self.degree * scipy.special.eval_chebyu(self.degree - 1, x)
 
 
 class ChebyshevSecondKind(BasisFunction):
@@ -234,41 +213,34 @@ class ChebyshevSecondKind(BasisFunction):
         U_1(x) = 2x
         U_{n+1}(x) = 2x U_n(x) - U_{n-1}(x)
 
-    The :attr:`points` for this polynomial are the zeros on the domain
-    :math:`[-1,1]`:
-
-    .. math::
-
-        x_i^* = -\cos(\pi i/(n+1)), i = 1,...,n
-
-    For the special case :math:`n = 0`, there is only one point :math:`x_0^* = 0`.
+    Their domain is defined to be :math:`-1 \le x \le 1`. The degree *n* is
+    represented by property `degree`.
 
     Parameters
     ----------
-    n : int
+    degree : int
         Degree of the Chebyshev polynomial.
     """
 
-    def __init__(self, n):
+    def __init__(self, degree):
         super().__init__()
-        self._n = n
-        self._derivative_polynomial = None
-        if n > 1:
-            self._points = [-numpy.cos(k*numpy.pi/(n+1)) for k in range(1, n+1)]
-        else:
-            self._points = [0.]
+        self.degree = degree
 
     @property
-    def points(self):
-        """list: Sampling points at extrema of polynomial."""
-        return self._points
+    def domain(self):
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([-1, 1])
 
     @property
-    def n(self):
-        """int: Degree of polynomial"""
-        return self._n
+    def degree(self):
+        """int: Degree of polynomial."""
+        return self._degree
 
-    def __call__(self,x):
+    @degree.setter
+    def degree(self, value):
+        self._degree = int(value)
+
+    def _function(self, x):
         r"""Evaluate the basis function.
 
         The Chebyshev polynomial is evaluated using the combinatorial formula:
@@ -282,7 +254,7 @@ class ChebyshevSecondKind(BasisFunction):
         Parameters
         ----------
         x : float
-            One-dimensional point on :math:`[-1,1]`.
+            One-dimensional point on :math:`[-1, 1]`.
 
         Returns
         -------
@@ -297,14 +269,12 @@ class ChebyshevSecondKind(BasisFunction):
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1]
+            if input is outside the domain [-1, 1]
 
         """
-        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
-            raise ValueError("Input is outside the domain [-1,1]")
-        return scipy.special.eval_chebyu(self._n,x)
+        return scipy.special.eval_chebyu(self.degree, x)
 
-    def derivative(self, x):
+    def _derivative(self, x):
         r"""Evaluate the derivative of Chebyshev Second Kind.
 
         The first derivative of Chebyshev polynomials of second kind is
@@ -328,80 +298,121 @@ class ChebyshevSecondKind(BasisFunction):
         Returns
         -------
         float
-            Value of the derivative of Chebyshev polynomials of first kind.
+            Value of the derivative of Chebyshev polynomials of second kind.
 
         Raises
         ------
         ValueError
-            if input is outside the domain [-1,1].
+            if input is outside the domain [-1, 1].
         """
-        if numpy.any(numpy.greater(x, 1)) or numpy.any(numpy.less(x, -1)):
-            raise ValueError("Input is outside the domain [-1,1]")
-        if self._derivative_polynomial is None:
-            self._derivative_polynomial = ChebyshevFirstKind(self._n+1)
         x = numpy.asarray(x)
         y = numpy.zeros(x.shape)
-        flag2 = x == 1
-        flag3 = x == -1
-        flag1 = ~(flag2 | flag3)
-        y[flag1] =  ((self._n+1)*self._derivative_polynomial(x[flag1]) -
-                     x[flag1]*self(x[flag1]))/(x[flag1]**2-1)
-        y[flag2] = self._n*(self._n + 1)*(self._n + 2)/3
-        y[flag3] = ((-1)**(self._n+1))*self._n*(self._n + 1)*(self._n + 2)/3
+        u_limit = self.degree * (self.degree + 1) * (self.degree + 2) / 3
+        flag_upper = x == 1
+        y[flag_upper] = u_limit
+
+        flag_lower = x == -1
+        y[flag_lower] = (-1) ** (self.degree + 1) * u_limit
+
+        flag = ~(flag_upper | flag_lower)
+        y[flag] = (
+            (self.degree + 1) * scipy.special.eval_chebyt(self.degree + 1, x[flag])
+            - x[flag] * scipy.special.eval_chebyu(self.degree, x[flag])
+        ) / (x[flag] ** 2 - 1)
         if y.ndim == 0:
             y = y.item()
         return y
 
-    @classmethod
-    def make_nested_set(cls, exactness):
-        """Create a nested set of Chebyshev polynomials.
 
-        A nested set is created up to a given level of ``exactness``,
-        which corresponds to a highest-order Chebyshev polynomial of
-        degree ``n = 2**(exactness + 1) - 1``.
+class Trigonometric(BasisFunction):
+    r"""Trigonometric basis functions.
 
-        Each nesting level corresponds to the increasing powers of 2 going up to
-        ``2**(exactness + 1) - 1``, with the first level being a special case.
-        The generating Chebyshev polynomials are hence of degree (1, 3, 7,
-        15, ...). Each new point added in a level is paired with a basis
-        function of increasing order.
+    The Trigonometric polynomials represents periodic functions
+    as sums of sine and cosine terms, where *n* is the frequency
+    of trigonometric polynomial and is any integer.
 
-        For example, for an ``exactness`` of 3, the generating polynomials are
-        of degree 1, 3, 7, and 16, at each of 4 levels. There are 2, 2, 4, and 8
-        new points added at each level. The polynomials at level 0 are of degree
-        0 and 1, the polynomials at level 1 are of degrees 2 and 3, those at
-        level 2 are of degree 4, 5, 6, and 7, and those at level 3 are of
-        degrees 8, 9, 10, 11, 12, 13, 14, and 15.
+    .. math::
+
+        \phi_n(x) = \exp(xi * n)
+
+    Parameters
+    ----------
+    frequency : int
+        Degree of trigonometric polynomial.
+
+    """
+
+    def __init__(self, frequency):
+        super().__init__()
+        self.frequency = frequency
+
+    @property
+    def domain(self):
+        """numpy.ndarray: Domain the sample points come from."""
+        return numpy.array([0, 2 * numpy.pi])
+
+    @property
+    def frequency(self):
+        """int: frequency of polynomial."""
+        return self._frequency
+
+    @frequency.setter
+    def frequency(self, value):
+        self._frequency = int(value)
+
+    def _function(self, x):
+        r"""Evaluate the basis function.
+
+        The Trigonometric polynomial is evaluated using the following formula:
+
+        .. math::
+
+            \phi_n(x) = \exp(xi * n)
+
+        where *n* is the frequency of the trigonometric polynomial and
+        is any integer.
 
         Parameters
         ----------
-        exactness : int
-            Level of exactness.
+        x : float
+            One-dimensional point on :math:`[0, 2\pi]`.
 
         Returns
         -------
-        NestedBasisFunctionSet
-            Nested Chebyshev polynomials of the first kind.
+        float
+            Value of Trigonometric polynomial.
 
+        Raises
+        ------
+        ValueError
+            If input is outside the domain `[0, 2\pi]`
         """
-        # initialize 0th level to ensure it has 2 points
-        levels = [[0,1]]
-        basis_functions =  [ChebyshevSecondKind(0),ChebyshevSecondKind(1)]
-        points = basis_functions[0].points + basis_functions[1].points
-        for i in range(1, exactness+1):
-            start_level = 2**i
-            end_level = 2**(i+1)-1
-            level_range = range(start_level, end_level+1)
+        x = numpy.asarray(x)
+        return numpy.exp(x * self.frequency * 1j)
 
-            basis_functions.extend(ChebyshevSecondKind(n) for n in level_range)
-            levels.append(list(level_range))
-            for p in basis_functions[end_level].points:
-                if not numpy.isclose(points, p).any():
-                    points.append(p)
-        return NestedBasisFunctionSet(points,basis_functions,levels)
+    def _derivative(self, x):
+        r"""Evaluate the derivetive of the trigonometric polynomials.
+
+        Parameters
+        ----------
+        x : float
+            One-dimensional point on :math:`[0, 2\pi]`.
+
+        Returns
+        -------
+        float
+            Value of the derivative of Trigonometric polynomial.
+
+        Raises
+        ------
+        ValueError
+            If input is outside the domain `[0, 2\pi]`
+        """
+        x = numpy.asarray(x)
+        return self.frequency * 1j * numpy.exp(x * self.frequency * 1j)
 
 
-class BasisFunctionSet():
+class BasisFunctionSet:
     """Set of basis functions and sample points.
 
     Parameters
@@ -409,60 +420,12 @@ class BasisFunctionSet():
     basis_functions : list
         Basis functions in set.
 
-    points : list
-        Sample point corresponding to each basis function.
-
     """
 
-    def __init__(self,points,basis_functions):
+    def __init__(self, basis_functions):
         self._basis_functions = basis_functions
-        self._points = points
-        if len(basis_functions) != len(points):
-            raise IndexError("basis_functions and points must have the "
-                    "same number of elements.")
-
-    @property
-    def points(self):
-        """list: Sampling points."""
-        return self._points
 
     @property
     def basis_functions(self):
         """list: Basis functions."""
         return self._basis_functions
-
-
-class NestedBasisFunctionSet(BasisFunctionSet):
-    """Nested set of basis functions and points.
-
-    Nested points/basis function grow in levels, such that an approximation
-    of a given level uses not only its sampling points but also all the points
-    at lower levels. Nested sets (similarly to ogres) are like onions.
-
-    Parameters
-    ---------
-    levels : list of lists
-       Assignment of points/basis functions to each level.
-    """
-
-    def __init__(self,points,basis_functions,levels):
-        super().__init__(points,basis_functions)
-        self._levels = levels
-
-    @property
-    def levels(self):
-        """list: List of lists of indexes for points/functions at each level.
-        Raises
-        ------
-        IndexError
-            max index must be less than total number of points.
-        """
-        return self._levels
-
-    @levels.setter
-    def levels(self,levels):
-        if numpy.any(numpy.concatenate(levels) > len(self.points)):
-            raise IndexError("max level index must be less than total "
-                    "number of points.")
-        self._levels = levels
-
