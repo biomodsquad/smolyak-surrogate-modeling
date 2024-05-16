@@ -475,9 +475,9 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         self._num_per_level[1:] = [
             rule(i) - rule((i - 1)) for i in range(1, self.max_level + 1)
         ]
-
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
+
         # points, level 0 is a special case only 0 as a point
         points = numpy.zeros(numpy.sum(self._num_per_level))
         degree = 0
