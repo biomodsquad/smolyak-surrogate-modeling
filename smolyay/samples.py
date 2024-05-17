@@ -337,7 +337,7 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
                 continue
             # find indexes of extrema not already found. Fraction index/degree
             # cannot be further simplified
-            degree = int(2**(numpy.ceil(numpy.log2(i)) + 1))
+            degree = int(2 ** (numpy.ceil(numpy.log2(i)) + 1))
             if i == 1:
                 # special case for level == 1
                 indexes = numpy.arange(0, degree + 1, 2, dtype=int)
@@ -362,7 +362,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     The points are then scaled from the domain :math:`[0, 2\pi]`
     to the domain specified by the parameter `domain`.
-    
+
     Parameters
     ----------
     domain: list
@@ -433,7 +433,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
     The points are then scaled from the domain :math:`[0, 2\pi]`
     to the domain specified by the :attr:`domain`.
-    
+
     Parameters
     ----------
     domain: list

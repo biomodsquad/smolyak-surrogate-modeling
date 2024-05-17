@@ -395,7 +395,7 @@ def test_nested_levels(nested_samples, num_per_level, start_level, end_level, po
     assert numpy.array_equal(nested_samples.start_level, start_level)
     assert numpy.array_equal(nested_samples.end_level, end_level)
 
-    # check points for individual levels to test if start_level and end_level 
+    # check points for individual levels to test if start_level and end_level
     # correctly correspond to the expected points for specific levels
     check_level = nested_samples.max_level
     # avoid always checking the last level
