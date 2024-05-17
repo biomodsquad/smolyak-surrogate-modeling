@@ -263,7 +263,7 @@ def test_generate_points(samples, points):
 
 
 @pytest.mark.parametrize(
-    "nested_samples,num_per_level,start_level,end_level,points",
+    "nested_samples,num_per_level,start_level,end_level",
     [
         (
             smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 0),
