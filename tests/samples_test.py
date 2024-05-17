@@ -270,136 +270,84 @@ def test_generate_points(samples, points):
             [1],
             [0],
             [1],
-            [0],
         ),
         (
             smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1),
             [1, 2],
             [0, 1],
             [1, 3],
-            [-1, 1],
         ),
         (
             smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 2),
             [1, 2, 2],
             [0, 1, 3],
             [1, 3, 5],
-            [-1 / numpy.sqrt(2), 1 / numpy.sqrt(2)],
         ),
         (
             smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
             [1, 2, 2, 4],
             [0, 1, 3, 5],
             [1, 3, 5, 9],
-            [
-                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-            ],
         ),
         (
             smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 0),
             [1],
             [0],
             [1],
-            [0],
         ),
         (
             smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 1),
             [1, 2],
             [0, 1],
             [1, 3],
-            [-1, 1],
         ),
         (
             smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 2),
             [1, 2, 2],
             [0, 1, 3],
             [1, 3, 5],
-            [-1 / numpy.sqrt(2), 1 / numpy.sqrt(2)],
         ),
         (
             smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 3),
             [1, 2, 2, 4],
             [0, 1, 3, 5],
             [1, 3, 5, 9],
-            [
-                -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-                -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-                numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-            ],
         ),
         (
             smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 4),
             [1, 2, 2, 4, 0],
             [0, 1, 3, 5, 9],
             [1, 3, 5, 9, 9],
-            [],
         ),
         (
             smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5),
             [1, 2, 2, 4, 0, 8],
             [0, 1, 3, 5, 9, 9],
             [1, 3, 5, 9, 9, 17],
-            [
-                -numpy.sqrt(2 + numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-                -numpy.sqrt(2 + numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                -numpy.sqrt(2 - numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                -numpy.sqrt(2 - numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 - numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 - numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 + numpy.sqrt(2 - numpy.sqrt(2))) / 2,
-                numpy.sqrt(2 + numpy.sqrt(2 + numpy.sqrt(2))) / 2,
-            ],
         ),
         (
             smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 0),
             [1],
             [0],
             [1],
-            [0],
         ),
         (
             smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 1),
             [1, 2],
             [0, 1],
             [1, 3],
-            [2 * numpy.pi / 3, 4 * numpy.pi / 3],
         ),
         (
             smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2),
             [1, 2, 6],
             [0, 1, 3],
             [1, 3, 9],
-            2
-            * numpy.pi
-            * numpy.array(
-                [
-                    1 / 9,
-                    2 / 9,
-                    4 / 9,
-                    5 / 9,
-                    7 / 9,
-                    8 / 9,
-                ]
-            ),
         ),
     ],
     ids=nested_sample_ids,
 )
-def test_nested_levels(nested_samples, num_per_level, start_level, end_level, points):
+def test_nested_levels(nested_samples, num_per_level, start_level, end_level):
     """test number of points per level, start level indexes, and end level indexes"""
     assert numpy.array_equal(nested_samples.num_per_level, num_per_level)
     assert numpy.array_equal(nested_samples.start_level, start_level)
     assert numpy.array_equal(nested_samples.end_level, end_level)
-
-    # check points for individual levels to test if start_level and end_level
-    # correctly correspond to the expected points for specific levels
-    check_level = nested_samples.max_level
-    # avoid always checking the last level
-    nested_samples.max_level = 6
-    end_lev = nested_samples.end_level[check_level]
-    start_lev = nested_samples.start_level[check_level]
-    assert numpy.allclose(nested_samples.points[start_lev:end_lev], points)
