@@ -235,24 +235,13 @@ def test_domain_error(samples):
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
 def test_generate_points(samples, points):
     """test the points of initialized UnidimensionalPointSet"""
+    assert len(samples) == len(points)
     assert numpy.allclose(samples.points, points, atol=1e-10)
-
-
-@pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
-def test_generate_points_set_domain(samples, points):
-    """test point correctness after setting a new domain"""
     new_points = numpy.array(points) * 5 + 10
     new_domain = samples.domain * 5 + 10
     samples.domain = new_domain
     assert numpy.array_equal(samples.domain, new_domain)
     assert numpy.allclose(samples.points, new_points, atol=1e-10)
-
-
-@pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
-def test_len(samples, points):
-    """test the len method of UnidimensionalPointSet objects"""
-    assert len(samples) == len(points)
-
 
 @pytest.mark.parametrize(
     "nested_samples,num_per_level",
