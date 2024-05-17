@@ -182,13 +182,21 @@ def test_clenshaw_initial():
     f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 7)
     assert numpy.array_equal(f.domain, [-2, 1])
     assert f.degree == 7
+    assert isinstance(f.degree, int)
+    f.degree = float(5)
+    assert f.degree == 5
+    assert isinstance(f.degree, int)
 
-
+    
 def test_trig_initial():
     """test default properties"""
     f = smolyay.samples.TrigonometricPointSet([0, 4 * numpy.pi], 7)
     assert numpy.array_equal(f.domain, [0, 4 * numpy.pi])
     assert f.frequency == 7
+    assert isinstance(f.frequency, int)
+    f.frequency = float(5)
+    assert f.frequency == 5
+    assert isinstance(f.frequency, int)
 
 
 @pytest.mark.parametrize(
@@ -198,13 +206,21 @@ def test_trig_initial():
         smolyay.samples.SlowNestedClenshawCurtisPointSet,
         smolyay.samples.NestedTrigonometricPointSet,
     ],
-    ids=["NestedClenshawCurtis", "SlowNestedClenshawCurtis", "NestedTrigonometric"],
+    ids=[
+        "NestedClenshawCurtis",
+        "SlowNestedClenshawCurtis",
+        "NestedTrigonometric",
+    ],
 )
 def test_nested_initial(nested_samples):
     """test default properties"""
     f = nested_samples([-10, 10], 7)
     assert numpy.array_equal(f.domain, [-10, 10])
     assert f.max_level == 7
+    assert isinstance(f.max_level, int)
+    f.max_level = float(5)
+    assert f.max_level == 5
+    assert isinstance(f.max_level, int)
 
 
 @pytest.mark.parametrize(
@@ -242,6 +258,7 @@ def test_generate_points(samples, points):
     samples.domain = new_domain
     assert numpy.array_equal(samples.domain, new_domain)
     assert numpy.allclose(samples.points, new_points, atol=1e-10)
+
 
 @pytest.mark.parametrize(
     "nested_samples,num_per_level,start_level,end_level",
@@ -332,6 +349,10 @@ def test_nested_levels(nested_samples, num_per_level, start_level, end_level):
     assert numpy.array_equal(nested_samples.num_per_level, num_per_level)
     assert numpy.array_equal(nested_samples.start_level, start_level)
     assert numpy.array_equal(nested_samples.end_level, end_level)
+    check_level = nested_samples.max_level
+    nested_samples.max_level = 6
+    assert check_level != 6
+    
 
 
 @pytest.mark.parametrize(
