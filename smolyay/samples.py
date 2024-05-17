@@ -353,8 +353,8 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
 class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
 
-    The :attr:`points` for this interpolation scheme are nested
-    trigonometric points
+    The :attr:`points` for this interpolation scheme are the
+    trigonometric interpolation points for m points
 
     .. math::
 
@@ -419,7 +419,8 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
     To determine the number of points per level, an order(L) is
     used to describe the number of points at each level L. For
-    the Trigonometric points, this order equation is
+    these Trigonometric points, ensuring the total number of
+    points is an odd number, this order equation is
 
     .. math::
 
