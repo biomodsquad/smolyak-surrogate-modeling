@@ -241,7 +241,7 @@ def test_nested_initial(nested_samples):
     ],
 )
 def test_domain_error(samples):
-    """test default properties"""
+    """test error given invalid domain"""
     with pytest.raises(TypeError):
         samples([-10, 10, 20], 7)
     with pytest.raises(TypeError):
@@ -253,6 +253,8 @@ def test_generate_points(samples, points):
     """test the points of initialized UnidimensionalPointSet"""
     assert len(samples) == len(points)
     assert numpy.allclose(samples.points, points, atol=1e-10)
+
+    # test for different domain and that points update after changing domain
     new_points = numpy.array(points) * 5 + 10
     new_domain = samples.domain * 5 + 10
     samples.domain = new_domain
@@ -388,12 +390,13 @@ def test_generate_points(samples, points):
     ids=nested_sample_ids,
 )
 def test_nested_levels(nested_samples, num_per_level, start_level, end_level, points):
-    """test number of points per level and start and end indexes"""
+    """test number of points per level, start level indexes, and end level indexes"""
     assert numpy.array_equal(nested_samples.num_per_level, num_per_level)
     assert numpy.array_equal(nested_samples.start_level, start_level)
     assert numpy.array_equal(nested_samples.end_level, end_level)
 
-    # check points for individual levels
+    # check points for individual levels to test if start_level and end_level 
+    # correctly correspond to the expected points for specific levels
     check_level = nested_samples.max_level
     # avoid always checking the last level
     nested_samples.max_level = 6
