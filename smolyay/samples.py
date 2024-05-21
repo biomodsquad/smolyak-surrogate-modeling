@@ -1,8 +1,9 @@
+import collections.abc
 import abc
 import numpy
 
 
-class UnidimensionalPointSet(abc.ABC):
+class UnidimensionalPointSet(collections.abc.Sequence):
     """Set of unidimensional points
 
     A set of unique unidimensional points within a domain.
@@ -44,6 +45,9 @@ class UnidimensionalPointSet(abc.ABC):
 
     def __len__(self):
         return len(self.points)
+    
+    def __getitem__(self, key):
+        return self.points[key]
 
     @abc.abstractmethod
     def _create(self):
