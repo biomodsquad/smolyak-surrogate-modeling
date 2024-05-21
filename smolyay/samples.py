@@ -119,7 +119,10 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
             self._create()
             self._valid_cache = True
         return self._end_level
-
+    
+    def level(self, index):
+        """return all the points in a level"""
+        return self[self.start_level[index] : self.end_level[index]]
 
 class ClenshawCurtisPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Clenshaw Curtis sampling
