@@ -188,7 +188,7 @@ def test_initialize_clenshaw():
     assert isinstance(f.degree, int)
 
 
-def test_trig_initial():
+def test_initialize_trig():
     """test default properties"""
     f = smolyay.samples.TrigonometricPointSet([0, 4 * numpy.pi], 7)
     assert numpy.array_equal(f.domain, [0, 4 * numpy.pi])
