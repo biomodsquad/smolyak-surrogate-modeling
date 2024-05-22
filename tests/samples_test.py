@@ -354,6 +354,5 @@ def test_nested_levels(nested_samples, num_per_level, start_level, end_level):
     assert numpy.array_equal(nested_samples.num_per_level, num_per_level)
     assert numpy.array_equal(nested_samples.start_level, start_level)
     assert numpy.array_equal(nested_samples.end_level, end_level)
-    for i in range(len(start_level)):
-        points = nested_samples[start_level[i] : end_level[i]]
-        assert numpy.allclose(nested_samples.level(i), points)
+    for level, (start, end) in enumerate(zip(nested_samples.start_level, nested_samples.end_level)):
+        assert numpy.allclose(nested_samples.level(level), nested_samples[start:end])
