@@ -260,9 +260,9 @@ def test_generate_points(samples, points):
     samples.domain = new_domain
     assert numpy.array_equal(samples.domain, new_domain)
     assert numpy.allclose(samples.points, new_points, atol=1e-10)
+    assert samples[0] == pytest.approx(new_points[0])
     assert numpy.allclose(samples[:], new_points, atol=1e-10)
-    for p, a in zip(samples, new_points):
-        assert p == pytest.approx(a)
+    assert numpy.allclose(list(samples), new_points, atol=1e-10)
 
 
 @pytest.mark.parametrize(
