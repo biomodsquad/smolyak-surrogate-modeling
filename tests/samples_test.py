@@ -224,13 +224,13 @@ def test_initialize_nested(nested_samples):
 
 
 @pytest.mark.parametrize(
-    "samples",
+    "samples,set_args",
     [
-        smolyay.samples.ClenshawCurtisPointSet,
-        smolyay.samples.TrigonometricPointSet,
-        smolyay.samples.NestedClenshawCurtisPointSet,
-        smolyay.samples.SlowNestedClenshawCurtisPointSet,
-        smolyay.samples.NestedTrigonometricPointSet,
+        (smolyay.samples.ClenshawCurtisPointSet, {"degree": 7}),
+        (smolyay.samples.TrigonometricPointSet, {"frequency": 7}),
+        (smolyay.samples.NestedClenshawCurtisPointSet, {"max_level": 7}),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, {"max_level": 7}),
+        (smolyay.samples.NestedTrigonometricPointSet, {"max_level": 7}),
     ],
     ids=[
         "ClenshawCurtis",
@@ -240,12 +240,18 @@ def test_initialize_nested(nested_samples):
         "NestedTrigonometric",
     ],
 )
-def test_domain_error(samples):
+def test_domain_error(samples, set_args):
     """test error given invalid domain"""
     with pytest.raises(TypeError):
-        samples([-10, 10, 20], 7)
+        samples([-10, 10, 20], **set_args)
     with pytest.raises(TypeError):
-        samples([[-10, 10], [-10, 10]], 7)
+        samples([[-10, 10], [-10, 10]], **set_args)
+    with pytest.raises(TypeError):
+        f = samples([-10, 10], **set_args)
+        f.domain = [[-10, 10], [-10, 10]]
+    with pytest.raises(TypeError):
+        f = samples([-10, 10], **set_args)
+        f.domain = [-10, 10, 20]
 
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
@@ -354,5 +360,7 @@ def test_nested_levels(nested_samples, num_per_level, start_level, end_level):
     assert numpy.array_equal(nested_samples.num_per_level, num_per_level)
     assert numpy.array_equal(nested_samples.start_level, start_level)
     assert numpy.array_equal(nested_samples.end_level, end_level)
-    for level, (start, end) in enumerate(zip(nested_samples.start_level, nested_samples.end_level)):
+    for level, (start, end) in enumerate(
+        zip(nested_samples.start_level, nested_samples.end_level)
+    ):
         assert numpy.allclose(nested_samples.level(level), nested_samples[start:end])
