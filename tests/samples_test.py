@@ -177,7 +177,7 @@ nested_sample_ids = [
 ]
 
 
-def test_clenshaw_initial():
+def test_initialize_clenshaw():
     """test default properties"""
     f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 7)
     assert numpy.array_equal(f.domain, [-2, 1])
