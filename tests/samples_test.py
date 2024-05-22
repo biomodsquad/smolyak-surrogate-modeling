@@ -212,7 +212,7 @@ def test_initialize_trig():
         "NestedTrigonometric",
     ],
 )
-def test_nested_initial(nested_samples):
+def test_initialize_nested(nested_samples):
     """test default properties"""
     f = nested_samples([-10, 10], 7)
     assert numpy.array_equal(f.domain, [-10, 10])
