@@ -339,7 +339,8 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         self._start_level = self._end_level - self._num_per_level
 
         # points, level 0 is a special case only 0 as a point
-        points = numpy.zeros(numpy.sum(self._num_per_level))
+        num_points = self._end_level[-1]
+        points = numpy.zeros(num_points, dtype=float)
         for i in range(1, self.max_level + 1):
             if self._num_per_level[i] == 0:
                 continue
