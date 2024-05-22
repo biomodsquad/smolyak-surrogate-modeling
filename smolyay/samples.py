@@ -121,7 +121,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
         return self._end_level
 
     def level(self, index):
-        """return all the points in a level"""
+        """numpy.ndarray: Points in a level"""
         return self[self.start_level[index] : self.end_level[index]]
 
 
