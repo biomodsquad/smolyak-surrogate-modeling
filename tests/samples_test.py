@@ -33,34 +33,14 @@ sample_points_answers = [
         smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 9),
         2 * numpy.pi * numpy.linspace(0, 8 / 9, 9),
     ),
-    (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 0), [0]),
-    (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1), [0, -1, 1]),
-    (
-        smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 2),
-        [0, -1.0, 1.0, -1 / numpy.sqrt(2), 1 / numpy.sqrt(2)],
-    ),
+    (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1), [0]),
+    (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 2), [0, -1, 1]),
     (
         smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
-        [
-            0,
-            -1.0,
-            1.0,
-            -1 / numpy.sqrt(2),
-            1 / numpy.sqrt(2),
-            -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-            -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-            numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
-            numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
-        ],
-    ),
-    (smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 0), [0]),
-    (smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 1), [0, -1, 1]),
-    (
-        smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 2),
         [0, -1.0, 1.0, -1 / numpy.sqrt(2), 1 / numpy.sqrt(2)],
     ),
     (
-        smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 3),
+        smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 4),
         [
             0,
             -1.0,
@@ -72,6 +52,12 @@ sample_points_answers = [
             numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
             numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
         ],
+    ),
+    (smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 1), [0]),
+    (smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 2), [0, -1, 1]),
+    (
+        smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 3),
+        [0, -1.0, 1.0, -1 / numpy.sqrt(2), 1 / numpy.sqrt(2)],
     ),
     (
         smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 4),
@@ -99,6 +85,20 @@ sample_points_answers = [
             -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
             numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
             numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+        ],
+    ),
+    (
+        smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 6),
+        [
+            0,
+            -1.0,
+            1.0,
+            -1 / numpy.sqrt(2),
+            1 / numpy.sqrt(2),
+            -numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
+            -numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+            numpy.sqrt(numpy.sqrt(2) - 1) / (2**0.75),
+            numpy.sqrt(numpy.sqrt(2) + 1) / (2**0.75),
             -numpy.sqrt(2 + numpy.sqrt(2 + numpy.sqrt(2))) / 2,
             -numpy.sqrt(2 + numpy.sqrt(2 - numpy.sqrt(2))) / 2,
             -numpy.sqrt(2 - numpy.sqrt(2 - numpy.sqrt(2))) / 2,
@@ -109,13 +109,13 @@ sample_points_answers = [
             numpy.sqrt(2 + numpy.sqrt(2 + numpy.sqrt(2))) / 2,
         ],
     ),
-    (smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 0), [0]),
+    (smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 1), [0]),
     (
-        smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 1),
+        smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2),
         [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
     ),
     (
-        smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2),
+        smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 3),
         2
         * numpy.pi
         * numpy.array(
@@ -216,11 +216,11 @@ def test_initialize_nested(nested_samples):
     """test default properties"""
     f = nested_samples([-10, 10], 7)
     assert numpy.array_equal(f.domain, [-10, 10])
-    assert f.max_level == 7
-    assert isinstance(f.max_level, int)
-    f.max_level = float(5)
-    assert f.max_level == 5
-    assert isinstance(f.max_level, int)
+    assert f.num_level == 7
+    assert isinstance(f.num_level, int)
+    f.num_level = float(5)
+    assert f.num_level == 5
+    assert isinstance(f.num_level, int)
 
 
 @pytest.mark.parametrize(
@@ -228,9 +228,9 @@ def test_initialize_nested(nested_samples):
     [
         (smolyay.samples.ClenshawCurtisPointSet, {"degree": 7}),
         (smolyay.samples.TrigonometricPointSet, {"frequency": 7}),
-        (smolyay.samples.NestedClenshawCurtisPointSet, {"max_level": 7}),
-        (smolyay.samples.SlowNestedClenshawCurtisPointSet, {"max_level": 7}),
-        (smolyay.samples.NestedTrigonometricPointSet, {"max_level": 7}),
+        (smolyay.samples.NestedClenshawCurtisPointSet, {"num_level": 7}),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, {"num_level": 7}),
+        (smolyay.samples.NestedTrigonometricPointSet, {"num_level": 7}),
     ],
     ids=[
         "ClenshawCurtis",
@@ -253,6 +253,27 @@ def test_domain_error(samples, set_args):
         f = samples([-10, 10], **set_args)
         f.domain = [-10, 10, 20]
 
+@pytest.mark.parametrize(
+    "nested_samples",
+    [
+        smolyay.samples.NestedClenshawCurtisPointSet,
+        smolyay.samples.SlowNestedClenshawCurtisPointSet,
+        smolyay.samples.NestedTrigonometricPointSet,
+    ],
+    ids=[
+        "NestedClenshawCurtis",
+        "SlowNestedClenshawCurtis",
+        "NestedTrigonometric",
+    ],
+)
+def test_num_level_error(nested_samples):
+    """test error given invalid num_level"""
+    with pytest.raises(ValueError):
+        f = nested_samples([-10, 10], 0)
+        f.domain = [[-10, 10], [-10, 10]]
+    with pytest.raises(ValueError):
+        f = nested_samples([-10, 10], 2)
+        f.num_level = 0
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
 def test_generate_points(samples, points):
@@ -275,79 +296,79 @@ def test_generate_points(samples, points):
     "nested_samples,num_per_level,start_level,end_level",
     [
         (
-            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 0),
+            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1),
             [1],
             [0],
             [1],
-        ),
-        (
-            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1),
-            [1, 2],
-            [0, 1],
-            [1, 3],
         ),
         (
             smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 2),
-            [1, 2, 2],
-            [0, 1, 3],
-            [1, 3, 5],
-        ),
-        (
-            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
-            [1, 2, 2, 4],
-            [0, 1, 3, 5],
-            [1, 3, 5, 9],
-        ),
-        (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 0),
-            [1],
-            [0],
-            [1],
-        ),
-        (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 1),
             [1, 2],
             [0, 1],
             [1, 3],
         ),
         (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 2),
+            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
             [1, 2, 2],
             [0, 1, 3],
             [1, 3, 5],
         ),
         (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 3),
+            smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 4),
             [1, 2, 2, 4],
             [0, 1, 3, 5],
             [1, 3, 5, 9],
         ),
         (
+            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 1),
+            [1],
+            [0],
+            [1],
+        ),
+        (
+            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 2),
+            [1, 2],
+            [0, 1],
+            [1, 3],
+        ),
+        (
+            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 3),
+            [1, 2, 2],
+            [0, 1, 3],
+            [1, 3, 5],
+        ),
+        (
             smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 4),
+            [1, 2, 2, 4],
+            [0, 1, 3, 5],
+            [1, 3, 5, 9],
+        ),
+        (
+            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5),
             [1, 2, 2, 4, 0],
             [0, 1, 3, 5, 9],
             [1, 3, 5, 9, 9],
         ),
         (
-            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 5),
+            smolyay.samples.SlowNestedClenshawCurtisPointSet([-1, 1], 6),
             [1, 2, 2, 4, 0, 8],
             [0, 1, 3, 5, 9, 9],
             [1, 3, 5, 9, 9, 17],
         ),
         (
-            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 0),
+            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 1),
             [1],
             [0],
             [1],
         ),
         (
-            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 1),
+            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2),
             [1, 2],
             [0, 1],
             [1, 3],
         ),
         (
-            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 2),
+            smolyay.samples.NestedTrigonometricPointSet([0, 2 * numpy.pi], 3),
             [1, 2, 6],
             [0, 1, 3],
             [1, 3, 9],
