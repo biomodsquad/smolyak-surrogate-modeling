@@ -375,10 +375,13 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         x^f_j = \frac{2\pi j}{m(f)},  1 \leq j \leq m(l), f \geq 0
 
-    where m is the number of points and f is the frequency. The
-    relationship between the frequency and the number of points
-    is set at :math:`m = 2*\left | f \right | + 1` to ensure
-    that m is an odd number at every frequency.
+    where f is the frequency. The relationship between the frequency
+    and the number of points is set at 
+    
+    .. math::
+        `m = 2*\left | f \right | + 1` 
+    
+    to ensure that m is an odd number at every frequency.
 
     The points are then scaled from the domain :math:`[0, 2\pi]`
     to the domain specified by the parameter `domain`.
