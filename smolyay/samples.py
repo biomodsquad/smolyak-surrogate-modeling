@@ -371,7 +371,12 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     .. math::
 
-        x^l_j = \frac{j-1}{m(l)},  1 \leq j \leq m(l), l \geq 0
+        x^f_j = \frac{2\pi j}{m(f)},  1 \leq j \leq m(l), f \geq 0
+
+    where m is the number of points and f is the frequency. The
+    relationship between the frequency and the number of points
+    is set at :math:`m = 2*\left | f \right | + 1` to ensure
+    that m is an odd number at every frequency.
 
     The points are then scaled from the domain :math:`[0, 2\pi]`
     to the domain specified by the parameter `domain`.
@@ -408,12 +413,8 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         Generating trigonometic points at a given frequency.
         """
-        if self.frequency > 0:
-            idx = numpy.arange(1, self.frequency + 1, 1, dtype=int)
-            points = (idx - 1) * 2 * numpy.pi / self.frequency
-        else:
-            # special case where frequency == 0
-            points = numpy.zeros(1)
+        idx = numpy.arange(0, 2 * numpy.abs(self.frequency) + 1, 1, dtype=int)
+        points = (idx) * 2 * numpy.pi / (2 * numpy.abs(self.frequency) + 1)
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
 
 

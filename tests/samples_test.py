@@ -23,14 +23,20 @@ sample_points_answers = [
         ],
     ),
     (smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 0), [0]),
-    (smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 1), [0]),
-    (smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 2), [0, numpy.pi]),
     (
-        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 3),
+        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 1),
         [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
     ),
     (
-        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 9),
+        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], -1),
+        [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
+    ),
+    (
+        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 4),
+        2 * numpy.pi * numpy.linspace(0, 8 / 9, 9),
+    ),
+    (
+        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], -4),
         2 * numpy.pi * numpy.linspace(0, 8 / 9, 9),
     ),
     (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1), [0]),
@@ -194,8 +200,8 @@ def test_initialize_trig():
     assert numpy.array_equal(f.domain, [0, 4 * numpy.pi])
     assert f.frequency == 7
     assert isinstance(f.frequency, int)
-    f.frequency = float(5)
-    assert f.frequency == 5
+    f.frequency = float(-5)
+    assert f.frequency == -5
     assert isinstance(f.frequency, int)
 
 
