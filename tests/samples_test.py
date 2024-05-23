@@ -194,6 +194,15 @@ def test_initialize_clenshaw():
     assert isinstance(f.degree, int)
 
 
+def test_degree_error():
+    """test degree error given invalid degree"""
+    with pytest.raises(ValueError):
+        smolyay.samples.ClenshawCurtisPointSet([-2, 1], -7)
+    with pytest.raises(ValueError):
+        f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 7)
+        f.degree = -5
+
+
 def test_initialize_trig():
     """test default properties"""
     f = smolyay.samples.TrigonometricPointSet([0, 4 * numpy.pi], 7)
@@ -271,6 +280,7 @@ def test_domain_error(samples, set_args):
         f = samples([-10, 10], **set_args)
         f.domain = [10, 10]
 
+
 @pytest.mark.parametrize(
     "nested_samples",
     [
@@ -292,6 +302,7 @@ def test_num_level_error(nested_samples):
     with pytest.raises(ValueError):
         f = nested_samples([-10, 10], 2)
         f.num_level = 0
+
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)
 def test_generate_points(samples, points):

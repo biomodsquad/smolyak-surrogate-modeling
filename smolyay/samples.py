@@ -167,6 +167,8 @@ class ClenshawCurtisPointSet(UnidimensionalPointSet):
     @degree.setter
     def degree(self, value):
         degree = int(value)
+        if degree < 0:
+            raise ValueError("Degree must be 0 or greater")
         if degree != self._degree:
             self._degree = degree
             self._valid_cache = False
