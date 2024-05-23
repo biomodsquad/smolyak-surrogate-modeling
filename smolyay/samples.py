@@ -479,15 +479,15 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         num_points = self._end_level[-1]
         points = numpy.zeros(num_points, dtype=float)
         for i in range(self.num_level):
-            # find fraction index/degree that cannot be further simplified
-            degree = 3**i
+            # find fraction index/num_points that cannot be further simplified
+            num_points = 3**i
             if i == 0:
                 # special case where level == 0
-                indexes = numpy.arange(0, degree, dtype=int)
+                indexes = numpy.arange(0, num_points, dtype=int)
             else:
-                indexes = numpy.arange(1, degree + 1, 1, dtype=int)
-                indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+                indexes = numpy.arange(1, num_points + 1, 1, dtype=int)
+                indexes = indexes[~(numpy.gcd(indexes, num_points) > 1)]
             points[self._start_level[i] : self._end_level[i]] = (
-                (indexes) * 2 * numpy.pi / degree
+                (indexes) * 2 * numpy.pi / num_points
             )
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
