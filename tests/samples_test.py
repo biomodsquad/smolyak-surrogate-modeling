@@ -241,17 +241,29 @@ def test_initialize_nested(nested_samples):
     ],
 )
 def test_domain_error(samples, set_args):
-    """test error given invalid domain"""
+    """test error given invalid domain and that reversed domains swap"""
+    # reverse domain
+    f = samples([10, -10], **set_args)
+    assert numpy.array_equal(f.domain, [-10, 10])
+    f = samples([-10, 10], **set_args)
+    f.domain = [5, -10]
+    assert numpy.array_equal(f.domain, [-10, 5])
+    # invalid domain
     with pytest.raises(TypeError):
         samples([-10, 10, 20], **set_args)
     with pytest.raises(TypeError):
         samples([[-10, 10], [-10, 10]], **set_args)
+    with pytest.raises(ValueError):
+        samples([10, 10], **set_args)
     with pytest.raises(TypeError):
         f = samples([-10, 10], **set_args)
         f.domain = [[-10, 10], [-10, 10]]
     with pytest.raises(TypeError):
         f = samples([-10, 10], **set_args)
         f.domain = [-10, 10, 20]
+    with pytest.raises(ValueError):
+        f = samples([-10, 10], **set_args)
+        f.domain = [10, 10]
 
 @pytest.mark.parametrize(
     "nested_samples",
