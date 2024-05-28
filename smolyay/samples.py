@@ -339,7 +339,7 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         rule = lambda x: 1 if x == 0 else int(2 ** (numpy.ceil(numpy.log2(x)) + 1) + 1)
         self._num_per_level = numpy.ones(self.num_level, dtype=int)
         self._num_per_level[1:] = [
-            rule(i) - rule((i - 1)) for i in range(1, self.num_level)
+            rule(i) - rule(i - 1) for i in range(1, self.num_level)
         ]
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
