@@ -299,8 +299,8 @@ def test_num_level_error(nested_samples):
     with pytest.raises(ValueError):
         f = nested_samples([-10, 10], 0)
         f.domain = [[-10, 10], [-10, 10]]
+    f = nested_samples([-10, 10], 2)
     with pytest.raises(ValueError):
-        f = nested_samples([-10, 10], 2)
         f.num_level = 0
 
 
