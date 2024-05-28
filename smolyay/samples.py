@@ -31,7 +31,7 @@ class UnidimensionalPointSet(collections.abc.Sequence):
         domain = numpy.sort(numpy.array(value, dtype=float))
         if domain.shape != (2,):
             raise TypeError("Domain must be array with two variables")
-        if domain[0] == domain[1]:
+        if domain[0] >= domain[1]:
             raise ValueError("Lower bound must be less than upper bound")
         if not numpy.array_equal(self._domain, domain):
             self._domain = domain
