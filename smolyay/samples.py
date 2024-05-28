@@ -376,8 +376,8 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         x^f_j = \frac{2\pi j}{m(f)},  1 \leq j \leq m(l), f \geq 0
 
-    where f represents the frequency of the complex trigonometric
-    polynomial of the form 
+    where f represents the positive frequency of the complex 
+    trigonometric polynomial of the form 
     
     .. math::
 
@@ -418,7 +418,9 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     @frequency.setter
     def frequency(self, value):
-        frequency = abs(int(value))
+        frequency = int(value)
+        if frequency < 0:
+            raise ValueError("Frequency must be 0 or greater")
         if frequency != self._frequency:
             self._frequency = frequency
             self._valid_cache = False

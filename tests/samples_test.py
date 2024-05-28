@@ -188,8 +188,8 @@ def test_degree_error():
     """test degree error given invalid degree"""
     with pytest.raises(ValueError):
         smolyay.samples.ClenshawCurtisPointSet([-2, 1], -7)
+    f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 3)
     with pytest.raises(ValueError):
-        f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 3)
         f.degree = -5
 
 
@@ -199,9 +199,15 @@ def test_initialize_trig():
     assert numpy.array_equal(f.domain, [0, 4 * numpy.pi])
     assert f.frequency == 3
     assert isinstance(f.frequency, int)
-    f.frequency = float(-5)
-    assert f.frequency == 5
-    assert isinstance(f.frequency, int)
+
+
+def test_frequency_error():
+    """test frequency error given invalid frequency"""
+    with pytest.raises(ValueError):
+        smolyay.samples.TrigonometricPointSet([-2, 1], -4)
+    f = smolyay.samples.TrigonometricPointSet([-2, 1], 3)
+    with pytest.raises(ValueError):
+        f.frequency = -5
 
 
 @pytest.mark.parametrize(
