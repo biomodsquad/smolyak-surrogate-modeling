@@ -376,14 +376,14 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         x^f_j = \frac{2\pi j}{m(f)},  1 \leq j \leq m(l), f \geq 0
 
-    where f represents the highest frequency of a trigonometric
+    where f represents the frequency of the complex trigonometric
     polynomial of the form 
     
     .. math::
 
-        p(x) = a_{0} + \sum_{k=1}^{f} a_{k}\cos (kx) + \sum_{k=1}^{f} a_{k}\sin (kx)
+        p(x) = \sum_{n=-f}^{f} a_{n}\exp(xi * n)
     
-    where :math:`a_{k}` and :math:`b_{k}` are coefficients. The 
+    where the sequence :math:`a_{n}` are coefficients. The 
     relationship between the frequency and the number of points 
     is set at 
     
