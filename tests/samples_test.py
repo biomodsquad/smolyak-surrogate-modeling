@@ -185,9 +185,9 @@ nested_sample_ids = [
 
 def test_initialize_clenshaw():
     """test default properties"""
-    f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 7)
+    f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 3)
     assert numpy.array_equal(f.domain, [-2, 1])
-    assert f.degree == 7
+    assert f.degree == 3
     assert isinstance(f.degree, int)
     f.degree = float(5)
     assert f.degree == 5
@@ -199,15 +199,15 @@ def test_degree_error():
     with pytest.raises(ValueError):
         smolyay.samples.ClenshawCurtisPointSet([-2, 1], -7)
     with pytest.raises(ValueError):
-        f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 7)
+        f = smolyay.samples.ClenshawCurtisPointSet([-2, 1], 3)
         f.degree = -5
 
 
 def test_initialize_trig():
     """test default properties"""
-    f = smolyay.samples.TrigonometricPointSet([0, 4 * numpy.pi], 7)
+    f = smolyay.samples.TrigonometricPointSet([0, 4 * numpy.pi], 3)
     assert numpy.array_equal(f.domain, [0, 4 * numpy.pi])
-    assert f.frequency == 7
+    assert f.frequency == 3
     assert isinstance(f.frequency, int)
     f.frequency = float(-5)
     assert f.frequency == -5
@@ -229,9 +229,9 @@ def test_initialize_trig():
 )
 def test_initialize_nested(nested_samples):
     """test default properties"""
-    f = nested_samples([-10, 10], 7)
+    f = nested_samples([-10, 10], 4)
     assert numpy.array_equal(f.domain, [-10, 10])
-    assert f.num_level == 7
+    assert f.num_level == 4
     assert isinstance(f.num_level, int)
     f.num_level = float(5)
     assert f.num_level == 5
@@ -241,11 +241,11 @@ def test_initialize_nested(nested_samples):
 @pytest.mark.parametrize(
     "samples,set_args",
     [
-        (smolyay.samples.ClenshawCurtisPointSet, {"degree": 7}),
-        (smolyay.samples.TrigonometricPointSet, {"frequency": 7}),
-        (smolyay.samples.NestedClenshawCurtisPointSet, {"num_level": 7}),
-        (smolyay.samples.SlowNestedClenshawCurtisPointSet, {"num_level": 7}),
-        (smolyay.samples.NestedTrigonometricPointSet, {"num_level": 7}),
+        (smolyay.samples.ClenshawCurtisPointSet, {"degree": 4}),
+        (smolyay.samples.TrigonometricPointSet, {"frequency": 4}),
+        (smolyay.samples.NestedClenshawCurtisPointSet, {"num_level": 4}),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, {"num_level": 4}),
+        (smolyay.samples.NestedTrigonometricPointSet, {"num_level": 4}),
     ],
     ids=[
         "ClenshawCurtis",
