@@ -418,8 +418,9 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         Generating trigonometic points at a given frequency.
         """
-        idx = numpy.arange(0, 2 * abs(self.frequency) + 1, 1, dtype=int)
-        points = (idx) * 2 * numpy.pi / (2 * abs(self.frequency) + 1)
+        num_points = 2 * abs(self.frequency) + 1
+        indexes = numpy.arange(num_points)
+        points = 2 * numpy.pi *  indexes /  num_points
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
 
 
