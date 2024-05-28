@@ -266,7 +266,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
             degree = 2**i
             if i == 1:
                 # special case for level == 1
-                indexes = numpy.arange(0, degree + 1, 2, dtype=int)
+                indexes = numpy.arange(0, degree + 1, 2)
             else:
                 indexes = numpy.arange(1, degree, 2, dtype=int)
                 divisible_indexes = numpy.gcd(indexes, degree) > 1
@@ -355,10 +355,11 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
             degree = int(2 ** (numpy.ceil(numpy.log2(i)) + 1))
             if i == 1:
                 # special case for level == 1
-                indexes = numpy.arange(0, degree + 1, 2, dtype=int)
+                indexes = numpy.arange(0, degree + 1, 2)
             else:
                 indexes = indexes = numpy.arange(1, degree, 2, dtype=int)
-                indexes = indexes[~(numpy.gcd(indexes, degree) > 1)]
+                divisible_indexes = numpy.gcd(indexes, degree) > 1
+                indexes = indexes[~divisible_indexes]
             points[self._start_level[i] : self._end_level[i]] = -numpy.cos(
                 numpy.pi * indexes / degree
             )
@@ -369,19 +370,28 @@ class TrigonometricPointSet(UnidimensionalPointSet):
     r"""Set of unidimensional points for Trigonometric sampling
 
     The :attr:`points` for this interpolation scheme are the
-    trigonometric interpolation points for m points
+    equidistant trigonometric interpolation points for m points
 
     .. math::
 
         x^f_j = \frac{2\pi j}{m(f)},  1 \leq j \leq m(l), f \geq 0
 
-    where f is the frequency. The relationship between the frequency
-    and the number of points is set at 
+    where f represents the highest frequency of a trigonometric
+    polynomial of the form 
+    
+    .. math::
+
+        p(x) = a_{0} + \sum_{k=1}^{f} a_{k}\cos (kx) + \sum_{k=1}^{f} a_{k}\sin (kx)
+    
+    where :math:`a_{k}` and :math:`b_{k}` are coefficients. The 
+    relationship between the frequency and the number of points 
+    is set at 
     
     .. math::
         `m = 2*\left | f \right | + 1` 
     
-    to ensure that m is an odd number at every frequency.
+    to ensure that m is equal to the number of coefficients in
+    the trigonometric polynomial.
 
     The points are then scaled from the domain :math:`[0, 2\pi]`
     to the domain specified by the parameter `domain`.
@@ -490,7 +500,8 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
                 indexes = numpy.arange(0, num_points, dtype=int)
             else:
                 indexes = numpy.arange(1, num_points + 1, 1, dtype=int)
-                indexes = indexes[~(numpy.gcd(indexes, num_points) > 1)]
+                divisible_indexes = numpy.gcd(indexes, num_points) > 1
+                indexes = indexes[~divisible_indexes]
             points[self._start_level[i] : self._end_level[i]] = (
                 2 * numpy.pi * indexes / num_points
             )
