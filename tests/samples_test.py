@@ -231,11 +231,11 @@ def test_initialize_nested(nested_samples):
     """test default properties"""
     f = nested_samples([-10, 10], 4)
     assert numpy.array_equal(f.domain, [-10, 10])
-    assert f.num_level == 4
-    assert isinstance(f.num_level, int)
-    f.num_level = float(5)
-    assert f.num_level == 5
-    assert isinstance(f.num_level, int)
+    assert f.num_levels == 4
+    assert isinstance(f.num_levels, int)
+    f.num_levels = float(5)
+    assert f.num_levels == 5
+    assert isinstance(f.num_levels, int)
 
 
 @pytest.mark.parametrize(
@@ -243,9 +243,9 @@ def test_initialize_nested(nested_samples):
     [
         (smolyay.samples.ClenshawCurtisPointSet, {"degree": 4}),
         (smolyay.samples.TrigonometricPointSet, {"frequency": 4}),
-        (smolyay.samples.NestedClenshawCurtisPointSet, {"num_level": 4}),
-        (smolyay.samples.SlowNestedClenshawCurtisPointSet, {"num_level": 4}),
-        (smolyay.samples.NestedTrigonometricPointSet, {"num_level": 4}),
+        (smolyay.samples.NestedClenshawCurtisPointSet, {"num_levels": 4}),
+        (smolyay.samples.SlowNestedClenshawCurtisPointSet, {"num_levels": 4}),
+        (smolyay.samples.NestedTrigonometricPointSet, {"num_levels": 4}),
     ],
     ids=[
         "ClenshawCurtis",
@@ -294,13 +294,13 @@ def test_domain_error(samples, set_args):
         "NestedTrigonometric",
     ],
 )
-def test_num_level_error(nested_samples):
-    """test error given invalid num_level"""
+def test_num_levels_error(nested_samples):
+    """test error given invalid num_levels"""
     with pytest.raises(ValueError):
         f = nested_samples([-10, 10], 0)
     f = nested_samples([-10, 10], 2)
     with pytest.raises(ValueError):
-        f.num_level = 0
+        f.num_levels = 0
 
 
 @pytest.mark.parametrize("samples,points", sample_points_answers, ids=sample_points_ids)

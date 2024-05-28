@@ -73,31 +73,31 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
     domain: list
         Domain of the sample points.
 
-    num_level: int
+    num_levels: int
        The number of levels.
     """
 
-    def __init__(self, domain, num_level):
+    def __init__(self, domain, num_levels):
         super().__init__(domain)
-        self._num_level = None
+        self._num_levels = None
         self._num_per_level = None
         self._start_level = None
         self._end_level = None
 
-        self.num_level = num_level
+        self.num_levels = num_levels
 
     @property
-    def num_level(self):
+    def num_levels(self):
         """int: number of levels."""
-        return self._num_level
+        return self._num_levels
 
-    @num_level.setter
-    def num_level(self, value):
-        num_level = int(value)
-        if num_level <= 0:
+    @num_levels.setter
+    def num_levels(self, value):
+        num_levels = int(value)
+        if num_levels <= 0:
             raise ValueError("Must have at least one level.")
-        if num_level != self._num_level:
-            self._num_level = num_level
+        if num_levels != self._num_levels:
+            self._num_levels = num_levels
             self._valid_cache = False
 
     @property
@@ -239,7 +239,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     domain: list
         Domain of the sample points.
 
-    num_level: int
+    num_levels: int
         The number of levels.
     """
 
@@ -250,9 +250,9 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         """
         # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 1 if x == 0 else 2**x + 1
-        self._num_per_level = numpy.ones(self.num_level, dtype=int)
+        self._num_per_level = numpy.ones(self.num_levels, dtype=int)
         self._num_per_level[1:] = [
-            rule(i) - rule(i - 1) for i in range(1, self.num_level)
+            rule(i) - rule(i - 1) for i in range(1, self.num_levels)
         ]
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
@@ -260,7 +260,7 @@ class NestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         # points, level 0 is a special case only 0 as a point
         num_points = self._end_level[-1]
         points = numpy.zeros(num_points, dtype=float)
-        for i in range(1, self.num_level):
+        for i in range(1, self.num_levels):
             # find indexes of extrema not already found. Fraction index/degree
             # cannot be further simplified
             degree = 2**i
@@ -326,7 +326,7 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
     domain: list
         Domain of the sample points.
 
-    num_level: int
+    num_levels: int
         The number of levels.
     """
 
@@ -337,9 +337,9 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         """
         # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 1 if x == 0 else int(2 ** (numpy.ceil(numpy.log2(x)) + 1) + 1)
-        self._num_per_level = numpy.ones(self.num_level, dtype=int)
+        self._num_per_level = numpy.ones(self.num_levels, dtype=int)
         self._num_per_level[1:] = [
-            rule(i) - rule(i - 1) for i in range(1, self.num_level)
+            rule(i) - rule(i - 1) for i in range(1, self.num_levels)
         ]
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
@@ -347,7 +347,7 @@ class SlowNestedClenshawCurtisPointSet(NestedUnidimensionalPointSet):
         # points, level 0 is a special case only 0 as a point
         num_points = self._end_level[-1]
         points = numpy.zeros(num_points, dtype=float)
-        for i in range(1, self.num_level):
+        for i in range(1, self.num_levels):
             if self._num_per_level[i] == 0:
                 continue
             # find indexes of extrema not already found. Fraction index/degree
@@ -460,7 +460,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
     domain: list
         Domain of the sample points.
 
-    num_level: int
+    num_levels: int
         The number of levels.
     """
 
@@ -472,9 +472,9 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         """
         # create properties for levels, level 0 is a special case with 1 point
         rule = lambda x: 3**x
-        self._num_per_level = numpy.ones(self.num_level, dtype=int)
+        self._num_per_level = numpy.ones(self.num_levels, dtype=int)
         self._num_per_level[1:] = [
-            rule(i) - rule(i - 1) for i in range(1, self.num_level)
+            rule(i) - rule(i - 1) for i in range(1, self.num_levels)
         ]
         self._end_level = numpy.cumsum(self._num_per_level)
         self._start_level = self._end_level - self._num_per_level
@@ -482,7 +482,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
         # points, level 0 is a special case only 0 as a point
         num_points = self._end_level[-1]
         points = numpy.zeros(num_points, dtype=float)
-        for i in range(self.num_level):
+        for i in range(self.num_levels):
             # find fraction index/num_points that cannot be further simplified
             num_points = 3**i
             if i == 0:
