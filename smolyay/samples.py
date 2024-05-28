@@ -418,7 +418,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
     @frequency.setter
     def frequency(self, value):
-        frequency = int(value)
+        frequency = abs(int(value))
         if frequency != self._frequency:
             self._frequency = frequency
             self._valid_cache = False
@@ -428,7 +428,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         Generating trigonometic points at a given frequency.
         """
-        num_points = 2 * abs(self.frequency) + 1
+        num_points = 2 * self.frequency + 1
         indexes = numpy.arange(num_points)
         points = 2 * numpy.pi *  indexes /  num_points
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])

@@ -28,15 +28,7 @@ sample_points_answers = [
         [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
     ),
     (
-        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], -1),
-        [0, 2 * numpy.pi / 3, 4 * numpy.pi / 3],
-    ),
-    (
         smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], 4),
-        2 * numpy.pi * numpy.linspace(0, 8 / 9, 9),
-    ),
-    (
-        smolyay.samples.TrigonometricPointSet([0, 2 * numpy.pi], -4),
         2 * numpy.pi * numpy.linspace(0, 8 / 9, 9),
     ),
     (smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 1), [0]),
@@ -148,9 +140,7 @@ sample_points_ids = [
     "ClenshawCurtis [8]",
     "Trigonometric [0]",
     "Trigonometric [1]",
-    "Trigonometric [2]",
-    "Trigonometric [3]",
-    "Trigonometric [9]",
+    "Trigonometric [4]",
     "NestedClenshawCurtis [0]",
     "NestedClenshawCurtis [1]",
     "NestedClenshawCurtis [2]",
@@ -210,7 +200,7 @@ def test_initialize_trig():
     assert f.frequency == 3
     assert isinstance(f.frequency, int)
     f.frequency = float(-5)
-    assert f.frequency == -5
+    assert f.frequency == 5
     assert isinstance(f.frequency, int)
 
 
