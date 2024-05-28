@@ -492,6 +492,6 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
                 indexes = numpy.arange(1, num_points + 1, 1, dtype=int)
                 indexes = indexes[~(numpy.gcd(indexes, num_points) > 1)]
             points[self._start_level[i] : self._end_level[i]] = (
-                (indexes) * 2 * numpy.pi / num_points
+                2 * numpy.pi * indexes / num_points
             )
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
