@@ -46,7 +46,7 @@ class UnidimensionalPointSet(collections.abc.Sequence):
         return self._points
 
     def __len__(self):
-        return len(self.points)
+        return self.points.shape[0]
 
     def __getitem__(self, key):
         return self.points[key]
@@ -126,7 +126,7 @@ class NestedUnidimensionalPointSet(UnidimensionalPointSet):
 
     def level(self, index):
         """numpy.ndarray: Points in a level"""
-        return self[self.start_level[index] : self.end_level[index]]
+        return self.points[self.start_level[index] : self.end_level[index]]
 
 
 class ClenshawCurtisPointSet(UnidimensionalPointSet):
