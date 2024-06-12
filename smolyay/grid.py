@@ -184,7 +184,7 @@ class RandomPointSet(MultidimensionalPointSet):
         self._domain = value
 
     @property
-    def number_points(self):
+    def __len__(self):
         """int: random seed for generating points"""
         return self._number_points
 
