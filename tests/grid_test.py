@@ -5,37 +5,6 @@ import scipy.stats.qmc
 import smolyay
 
 
-def test_map_function_1d():
-    """Test if points are transfromed properly."""
-    domain = (-8, 12)
-    new_domain = (0, 1)
-    assert smolyay.grid.MultidimensionalPointSet._scale_to_domain(2, domain, new_domain)
-    assert numpy.allclose(
-        smolyay.grid.MultidimensionalPointSet._scale_to_domain(
-            [-3, 7], domain, new_domain
-        ),
-        [0.25, 0.75],
-    )
-
-
-def test_map_function_2d():
-    """Test if points are transfromed properly."""
-    domain = ((-10, 10), (0, 2))
-    new_domain = ((0, 1), (-1, 1))
-    assert numpy.allclose(
-        smolyay.grid.MultidimensionalPointSet._scale_to_domain(
-            (-10, 0), domain, new_domain
-        ),
-        [0, -1],
-    )
-    assert numpy.allclose(
-        smolyay.grid.MultidimensionalPointSet._scale_to_domain(
-            [(0, 1), (10, 2)], domain, new_domain
-        ),
-        [[0.5, 0], [1, 1]],
-    )
-
-
 @pytest.mark.parametrize(
     "random_point_set",
     [

@@ -44,50 +44,6 @@ class MultidimensionalPointSet(abc.ABC):
     def __len__(self):
         return self.points.shape[0]
 
-    @staticmethod
-    def _scale_to_domain(x, old, new):
-        """Transform the points into new domain.
-
-        Parameters
-        ----------
-        x: list
-            point(s) to be transformed.
-        old: list
-            old domain.
-        new: list
-            new domain.
-
-        Returns
-        -------
-        numpy.ndarray
-            Transformed point(s).
-
-        Raises
-        ------
-        TypeError
-            Old and new domain must have the same shape.
-            Domain should be a dim x 2 array.
-        """
-        old = numpy.array(old, copy=False, ndmin=2)
-        new = numpy.array(new, copy=False, ndmin=2)
-
-        # error checking
-        if old.shape != new.shape:
-            raise TypeError("Old and new domain must have the same shape")
-        if old.ndim != 2 or old.shape[1] != 2:
-            raise TypeError("Domain should be a dim x 2 array")
-
-        new_x = new[:, 0] + (new[:, 1] - new[:, 0]) * (
-            (x - old[:, 0]) / (old[:, 1] - old[:, 0])
-        )
-        # clamp bounds
-        if len(new_x.shape) == 1:
-            numpy.clip(new_x, new[:, 0], new[:, 1], out=new_x)
-        else:
-            for i in range(new.shape[0]):
-                numpy.clip(new_x[..., i], new[i, 0], new[i, 1], out=new_x[..., i])
-        return new_x
-
     @abc.abstractmethod
     def _create(self):
         """Abstract method for generating the mulitdimensional grid set"""
@@ -174,11 +130,11 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @domain.setter
     def domain(self, value):
-        domain = numpy.sort(numpy.array(value, ndmin=2),axis=1)
+        domain = numpy.sort(numpy.array(value, ndmin=2), axis=1)
         if domain.ndim != 2 or domain.shape[1] != 2:
             raise TypeError("Domain must have size (num_dimensions, 2)")
-        if any(domain[:,0] >= domain[:,1]):
-             raise ValueError("Lower bound must be less than upper bound")
+        if any(domain[:, 0] >= domain[:, 1]):
+            raise ValueError("Lower bound must be less than upper bound")
         if not numpy.array_equal(self._domain, domain):
             self._domain = domain
             self._valid_cache = False
@@ -202,7 +158,7 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @seed.setter
     def seed(self, value):
-        if not isinstance(value,numpy.random.Generator):
+        if not isinstance(value, numpy.random.Generator):
             value = int(value)
         if self._seed != value:
             self._seed = value
@@ -247,6 +203,7 @@ class RandomPointSet(MultidimensionalPointSet):
             number of points for Sobol sequences must be a power of 2
         """
         pass
+
 
 class UniformRandomPointSet(RandomPointSet):
     """Generates a grid using a uniform distribution"""
