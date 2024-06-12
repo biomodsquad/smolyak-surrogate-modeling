@@ -36,7 +36,7 @@ def test_random_initalize_without_optional():
     """Test that the random point set initializes correctly"""
     f = smolyay.grid.RandomPointSet([[-10, 10], [0, 2]], 70, "latin", 1234)
     assert numpy.array_equal(f.domain, [[-10, 10], [0, 2]])
-    assert f.dimension == 2
+    assert f.num_dimensions == 2
     assert f.number_points == 70
     assert f.method == "latin"
     assert f.seed == 1234
@@ -47,7 +47,7 @@ def test_random_initalize_with_optional():
     """Test that the random point set initializes correctly"""
     f2 = smolyay.grid.RandomPointSet([[-10, 20]], 49, "latin", 5678, options={"strength": 2})
     assert numpy.array_equal(f2.domain, [[-10, 20]])
-    assert f2.dimension == 1
+    assert f2.num_dimensions == 1
     assert f2.number_points == 49
     assert f2.method == "latin"
     assert f2.seed == 5678
@@ -134,7 +134,7 @@ def test_random_set_domain():
     f = smolyay.grid.RandomPointSet([[-3, 5], [6, 9]], 5, "halton", 4)
     f.set_params(domain=[[-10, 10], [0, 2], [0, 9]])
     assert numpy.array_equal(f.domain, [[-10, 10], [0, 2], [0, 9]])
-    assert f.dimension == 3
+    assert f.num_dimensions == 3
     assert numpy.array_equal(f.points, points)
 
 
@@ -190,7 +190,7 @@ def test_random_set_params():
         domain=[[-10, 10], [0, 2], [0, 9]], method="latin", seed=1234, number_points=70
     )
     assert numpy.array_equal(f.domain, [[-10, 10], [0, 2], [0, 9]])
-    assert f.dimension == 3
+    assert f.num_dimensions == 3
     assert f.seed == 1234
     assert f.number_points == 70
     assert f.method == "latin"

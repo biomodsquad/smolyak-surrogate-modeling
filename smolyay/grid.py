@@ -22,7 +22,7 @@ class MultidimensionalPointSet(abc.ABC):
         self._points = None
 
     @property
-    def dimension(self):
+    def num_dimensions(self):
         """int: number of independent variables."""
         return numpy.shape(self.domain)[0]
 
@@ -133,7 +133,7 @@ class RandomPointSet(MultidimensionalPointSet):
     strength : {1, 2}
         Default 1. Exclusive to Latin Hypercube. If 2, produces latin hypercube
         points based on an orthogonal array. number_points is constrained to
-        squares of prime number whose square root is one greater than dimension.
+        squares of prime number whose square root is one greater than num_dimensions.
     bits : int
         Default 30. Exclusive to Sobol. Is the number of bits used by the
         generator.
@@ -185,7 +185,7 @@ class RandomPointSet(MultidimensionalPointSet):
     def domain(self, value):
         value = numpy.array(value, ndmin=2)
         if value.ndim != 2 or value.shape[1] != 2:
-            raise IndexError("Domain must have size (dimension, 2)")
+            raise IndexError("Domain must have size (num_dimensions, 2)")
         self._domain = value
 
     @property
@@ -280,27 +280,27 @@ class RandomPointSet(MultidimensionalPointSet):
 
         lower_bounds = [bound[0] for bound in domain]
         upper_bounds = [bound[1] for bound in domain]
-        dimension = len(lower_bounds)
+        num_dimensions = len(lower_bounds)
         if isinstance(options, dict):
             args = {"seed": seed, **options}
         else:
             args = {"seed": seed}
         if method.casefold() == "uniform":
             p_gen = numpy.random.default_rng(seed=seed).uniform(
-                size=(number_points, dimension)
+                size=(number_points, num_dimensions )
             )
         elif method.casefold() == "latin":
-            p_gen = scipy.stats.qmc.LatinHypercube(dimension, **args).random(
+            p_gen = scipy.stats.qmc.LatinHypercube(num_dimensions , **args).random(
                 n=number_points
             )
         elif method.casefold() == "halton":
-            p_gen = scipy.stats.qmc.Halton(dimension, **args).random(n=number_points)
+            p_gen = scipy.stats.qmc.Halton(num_dimensions, **args).random(n=number_points)
         elif method.casefold() == "sobol":
             if numpy.ceil(numpy.log2(number_points)) != numpy.floor(
                 numpy.log2(number_points)
             ):
                 raise ValueError("Number of points must be power of 2")
-            p_gen = scipy.stats.qmc.Sobol(dimension, **args).random(n=number_points)
+            p_gen = scipy.stats.qmc.Sobol(num_dimensions, **args).random(n=number_points)
         else:
             raise ValueError("Invalid method")
 
@@ -390,9 +390,9 @@ class SmolyakPointSet(PointSetProduct):
         max_num_levels = [ob.num_levels for ob in self._point_sets]
         # get the combinations of levels
         index_composition = []
-        for sum_of_levels in range(self.dimension, self.dimension + max_num_level):
+        for sum_of_levels in range(self.num_dimensions, self.num_dimensions + max_num_level):
             index_composition.extend(
-                list(generate_compositions(sum_of_levels, self.dimension, include_zero=False))
+                list(generate_compositions(sum_of_levels, self.num_dimensions, include_zero=False))
             )
         index_composition = numpy.array(index_composition) - 1
         if min(max_num_levels) != max_num_level:
@@ -407,7 +407,7 @@ class SmolyakPointSet(PointSetProduct):
             ]
             grid_points_ = numpy.array(
                 numpy.meshgrid(*level_composition_index)
-            ).T.reshape(-1, self.dimension)
+            ).T.reshape(-1, self.num_dimensions)
             if grid_points is None:
                 grid_points = grid_points_
             else:
