@@ -36,7 +36,7 @@ class MultidimensionalPointSet(abc.ABC):
     def points(self):
         """numpy.ndarray: Points to be sampled."""
         if self._points is None:
-            self._generate_points()
+            self._create()
         return self._points
 
     @staticmethod
@@ -86,11 +86,11 @@ class MultidimensionalPointSet(abc.ABC):
     def set_params(self, **parameters):
         for parameter, value in parameters.items():
             setattr(self, parameter, value)
-        self._generate_points()
+        self._create()
         return self
 
     @abc.abstractmethod
-    def _generate_points(self):
+    def _create(self):
         """Abstract method for generating the mulitdimensional grid set"""
 
 
@@ -231,7 +231,7 @@ class RandomPointSet(MultidimensionalPointSet):
     def options(self, value):
         self._options = value
 
-    def _generate_points(self):
+    def _create(self):
         """Generating the Monte Carlo mulitdimensional grid set
 
         Using the parameters of the class, generate a grid set using
@@ -339,7 +339,7 @@ class PointSetProduct(MultidimensionalPointSet):
     def indexes(self):
         """list: Grid points' indexes."""
         if self._indexes is None:
-            self._generate_points()
+            self._create()
         return self._indexes
 
 
@@ -356,7 +356,7 @@ class TensorPointSet(PointSetProduct):
         unique set of 1D points
     """
 
-    def _generate_points(self):
+    def _create(self):
         """Generating the tensor grid
 
         Using the parameters of the class, generate a grid set using all
@@ -379,7 +379,7 @@ class SmolyakPointSet(PointSetProduct):
         unique set of 1D points
     """
 
-    def _generate_points(self):
+    def _create(self):
         """Generating the tensor grid
 
         Using the parameters of the class, generate a grid set using all
