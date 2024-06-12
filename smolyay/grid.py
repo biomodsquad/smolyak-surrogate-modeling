@@ -354,7 +354,7 @@ class HaltonRandomPointSet(QMCRandomPointSet):
 
     bits : int
         Default 30. Sets the max number of points that can be generated,
-        which is 2**bits. 
+        which is 2**bits.
     """
 
     def _get_random_points(self):
@@ -391,13 +391,21 @@ class SobolRandomPointSet(QMCRandomPointSet):
         Default None. If "random-cd" the coordinates of points are adjusted to
         lower the centered discrepancy. If "lloyd", adjust points using a
         Lloyd-Max algorithm to encourage even spacing.
+
+    Raises
+    ------
+    ValueError
+        number of points must be a power of two
+    ValueError 
+        number of points must be less than 2**bits
     """
 
-    def __init__(self, domain, number_points, seed, scramble=True, optimization=None, bits=30):
-        self._bits = 64 # max value of bits
+    def __init__(
+        self, domain, number_points, seed, scramble=True, optimization=None, bits=30
+    ):
+        self._bits = 64  # max value of bits
         super().__init__(domain, number_points, seed, scramble, optimization)
         self.bits = bits
-
 
     @property
     def bits(self):
