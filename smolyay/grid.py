@@ -338,7 +338,7 @@ class PointSetProduct(MultidimensionalPointSet):
         return self._indexes
 
 
-class TensorPointSet(PointSetProduct):
+class TensorProductPointSet(PointSetProduct):
     """Generate a grid using all combinations of unidimensional point sets
 
     Depending on the dimensionality, points and provided by
