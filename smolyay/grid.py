@@ -22,10 +22,9 @@ class MultidimensionalPointSet(abc.ABC):
         self._points = None
 
     @property
-    @abc.abstractmethod
     def dimension(self):
         """int: number of independent variables."""
-        pass
+        return numpy.shape(self.domain)[0]
 
     @property
     @abc.abstractmethod
@@ -160,6 +159,12 @@ class RandomPointSet(MultidimensionalPointSet):
 
     def __init__(self, domain, number_points, method, seed, options=None):
         super().__init__()
+        self._domain = None
+        self._number_points = None
+        self._method = None
+        self._seed = None
+        self._options = None
+
         self.domain = domain
         self.number_points = number_points
         self.method = method
@@ -174,10 +179,7 @@ class RandomPointSet(MultidimensionalPointSet):
     @property
     def domain(self):
         """numpy.ndarray: domain of the point set."""
-        if self.dimension > 1:
-            return numpy.array(self._domain)
-        else:
-            return numpy.array(self._domain[0])
+        return self._domain
 
     @domain.setter
     def domain(self, value):
@@ -185,11 +187,6 @@ class RandomPointSet(MultidimensionalPointSet):
         if value.ndim != 2 or value.shape[1] != 2:
             raise IndexError("Domain must have size (dimension, 2)")
         self._domain = value
-
-    @property
-    def dimension(self):
-        """int: Number of independent variables."""
-        return numpy.shape(self._domain)[0]
 
     @property
     def number_points(self):
@@ -330,11 +327,6 @@ class PointSetProduct(MultidimensionalPointSet):
         return numpy.array([up.domain for up in self.point_sets])
 
     @property
-    def dimension(self):
-        """int: number of independent variables."""
-        return len(self.point_sets)
-
-    @property
     def point_sets(self):
         """:class:UnidimensionalPointSet: set of unique points"""
         return self._point_sets
@@ -394,19 +386,19 @@ class SmolyakPointSet(PointSetProduct):
         combinations of unidimensional points
         """
         grid_points = None
-        max_level = max([ob.max_level for ob in self._point_sets])
-        max_levels = [ob.max_level for ob in self._point_sets]
+        max_num_level = max([ob.num_levels for ob in self._point_sets]) 
+        max_num_levels = [ob.num_levels for ob in self._point_sets]
         # get the combinations of levels
         index_composition = []
-        for sum_of_levels in range(self.dimension, self.dimension + max_level):
+        for sum_of_levels in range(self.dimension, self.dimension + max_num_level):
             index_composition.extend(
                 list(generate_compositions(sum_of_levels, self.dimension, include_zero=False))
             )
         index_composition = numpy.array(index_composition) - 1
-        if min(max_levels) != max_level:
+        if min(max_num_levels) != max_num_level:
             # only check if point sets have different number of levels
             valid_comb = numpy.all(
-                numpy.greater_equal(max_levels, index_composition), axis=1
+                numpy.greater_equal(max_num_levels, index_composition), axis=1
             )
             index_composition = index_composition[valid_comb, :]
         for index_comp in index_composition:

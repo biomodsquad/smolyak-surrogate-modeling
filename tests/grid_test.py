@@ -46,7 +46,7 @@ def test_random_initalize_without_optional():
 def test_random_initalize_with_optional():
     """Test that the random point set initializes correctly"""
     f2 = smolyay.grid.RandomPointSet([[-10, 20]], 49, "latin", 5678, options={"strength": 2})
-    assert numpy.array_equal(f2.domain, [-10, 20])
+    assert numpy.array_equal(f2.domain, [[-10, 20]])
     assert f2.dimension == 1
     assert f2.number_points == 49
     assert f2.method == "latin"
