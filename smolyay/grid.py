@@ -177,30 +177,12 @@ class RandomPointSet(MultidimensionalPointSet):
         """Generate a set of random points
 
         Generates a set of random points with a given Monte Carlo/Quasi Monte
-        Carlo method. Available methods are latinhypercube, Halton sequences,
-        and Sobol sequences. If no method is selected, random points will be
-        generated using numpy.random's rand function.
-
-        Parameters
-        ----------
-        domain: list
-            domain of the random points
-
-        number_points: int
-            number of points to generate
-
-        seed: {int, numpy.random.Generator}
-            seed for generating the random points
+        Carlo method depending on the class.
 
         Returns
         -------
         numpy.ndarray
             generated random points
-
-        Raises
-        ------
-        ValueError
-            number of points for Sobol sequences must be a power of 2
         """
         pass
 
@@ -219,7 +201,35 @@ class UniformRandomPointSet(RandomPointSet):
 
 
 class QMCRandomPointSet(RandomPointSet):
-    """Generates a point set using a QMCEngine"""
+    """Point set that generates points using a QMCEngine
+    
+    This random point set relies on the QMCEngine objects in 
+    the scipy.stats.qmc module to generate points.
+
+    In addition to the domain, number of points, and the seed
+    to generate the points, all QMCEngines have 2 additional
+    optional parameters, ``scramble`` and ``optimization``.
+
+    Parameters
+    ----------
+    domain: list
+        domain of the random points
+
+    number_points: int
+        number of points to generate
+
+    seed: {int, numpy.random.Generator}
+        seed for generating the random points
+
+    scramble : bool
+        Default True. Applies centering to Latin Hypercube points, Owen
+        scrambling to Halton points, and LMS+shift scrambling to Sobol points.
+
+    optimization : {None, "random-cd", "lloyd"}
+        Default None. If "random-cd" the coordinates of points are adjusted to
+        lower the centered discrepancy. If "lloyd", adjust points using a
+        Lloyd-Max algorithm to encourage even spacing.
+    """
 
     def __init__(self, domain, number_points, seed, scramble=True, optimization=None):
         super().__init__(domain, number_points, seed)
@@ -257,7 +267,32 @@ class QMCRandomPointSet(RandomPointSet):
 
 
 class LatinHypercubeRandomPointSet(QMCRandomPointSet):
-    """Generates a grid using a uniform distribution"""
+    """Generates a grid using a LatinHypercube
+    
+    
+    Parameters
+    ----------
+    domain: list
+        domain of the random points
+
+    number_points: int
+        number of points to generate
+
+    seed: {int, numpy.random.Generator}
+        seed for generating the random points
+
+    scramble : bool
+        Default True. Applies centering to Latin Hypercube points.
+
+    optimization : {None, "random-cd", "lloyd"}
+        Default None. If "random-cd" the coordinates of points are adjusted to
+        lower the centered discrepancy. If "lloyd", adjust points using a
+        Lloyd-Max algorithm to encourage even spacing.
+    
+    strength : {1, 2}, optional
+        Default 1. If 1, produces a normal LHS. If 2, produces an orthogonal
+        array based LHS.
+    """
 
     def __init__(
         self, domain, number_points, seed, scramble=True, optimization=None, strength=1
@@ -295,7 +330,28 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
 
 
 class HaltonRandomPointSet(QMCRandomPointSet):
-    """Generates a grid using a uniform distribution"""
+    """Generates a grid using Halton Sequences    
+    
+    Parameters
+    ----------
+    domain: list
+        domain of the random points
+
+    number_points: int
+        number of points to generate
+
+    seed: {int, numpy.random.Generator}
+        seed for generating the random points
+
+    scramble : bool
+        Default True. Applies centering to Latin Hypercube points, Owen
+        scrambling to Halton points, and LMS+shift scrambling to Sobol points.
+
+    optimization : {None, "random-cd", "lloyd"}
+        Default None. If "random-cd" the coordinates of points are adjusted to
+        lower the centered discrepancy. If "lloyd", adjust points using a
+        Lloyd-Max algorithm to encourage even spacing.
+    """
 
     def _get_random_points(self):
         lower_bounds = [bound[0] for bound in self.domain]
@@ -310,7 +366,28 @@ class HaltonRandomPointSet(QMCRandomPointSet):
 
 
 class SobolRandomPointSet(QMCRandomPointSet):
-    """Generates a grid using a uniform distribution"""
+    """Generates a grid using Sobol Sequence
+    
+    Parameters
+    ----------
+    domain: list
+        domain of the random points
+
+    number_points: int
+        number of points to generate. Must be a power of 2.
+
+    seed: {int, numpy.random.Generator}
+        seed for generating the random points
+
+    scramble : bool
+        Default True. Applies centering to Latin Hypercube points, Owen
+        scrambling to Halton points, and LMS+shift scrambling to Sobol points.
+
+    optimization : {None, "random-cd", "lloyd"}
+        Default None. If "random-cd" the coordinates of points are adjusted to
+        lower the centered discrepancy. If "lloyd", adjust points using a
+        Lloyd-Max algorithm to encourage even spacing.
+    """
 
     def __init__(
         self, domain, number_points, seed, scramble=True, optimization=None, bits=30
@@ -335,6 +412,10 @@ class SobolRandomPointSet(QMCRandomPointSet):
             self._valid_cache = False
 
     def _get_random_points(self):
+        """Generate a set of random points
+        
+        Generates a set of quasi-monte carlo Sobol Sequence points. 
+        """
         lower_bounds = [bound[0] for bound in self.domain]
         upper_bounds = [bound[1] for bound in self.domain]
         if numpy.ceil(numpy.log2(self.number_points)) != numpy.floor(
