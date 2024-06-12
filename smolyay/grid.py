@@ -20,6 +20,7 @@ class MultidimensionalPointSet(abc.ABC):
 
     def __init__(self):
         self._points = None
+        self._valid_cache = False
 
     @property
     def num_dimensions(self):
@@ -35,9 +36,13 @@ class MultidimensionalPointSet(abc.ABC):
     @property
     def points(self):
         """numpy.ndarray: Points to be sampled."""
-        if self._points is None:
+        if not self._valid_cache:
             self._create()
+            self._valid_cache = True
         return self._points
+    
+    def __len__(self):
+        return self.points.shape[0]
 
     @staticmethod
     def _scale_to_domain(x, old, new):
@@ -87,7 +92,7 @@ class MultidimensionalPointSet(abc.ABC):
     @abc.abstractmethod
     def _create(self):
         """Abstract method for generating the mulitdimensional grid set"""
-
+        pass
 
 class RandomPointSet(MultidimensionalPointSet):
     """Point Set that uses randomly generated points
@@ -178,13 +183,15 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @domain.setter
     def domain(self, value):
-        value = numpy.array(value, ndmin=2)
-        if value.ndim != 2 or value.shape[1] != 2:
+        domain = numpy.array(value, ndmin=2)
+        if domain.ndim != 2 or domain.shape[1] != 2:
             raise IndexError("Domain must have size (num_dimensions, 2)")
-        self._domain = value
+        if not numpy.array_equal(self._domain, domain):
+            self._domain = domain
+            self._valid_cache = False
 
     @property
-    def __len__(self):
+    def number_points(self):
         """int: random seed for generating points"""
         return self._number_points
 
@@ -192,7 +199,9 @@ class RandomPointSet(MultidimensionalPointSet):
     def number_points(self, value):
         if not isinstance(value, (int, numpy.random.Generator)):
             raise TypeError("number_points must be an integer or Generator.")
-        self._number_points = value
+        if self._number_points != value:
+            self._number_points = value
+            self._valid_cache = False
 
     @property
     def method(self):
@@ -201,10 +210,12 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @method.setter
     def method(self, value):
-        if value.casefold() in self.valid_methods:
-            self._method = value.casefold()
-        else:
+        method = value.casefold()
+        if not method in self.valid_methods:
             raise ValueError("Method can only be latin, halton, sobol, or uniform.")
+        if self._method != method:
+            self._method = method
+            self._valid_cache = False
 
     @property
     def seed(self):
@@ -215,7 +226,9 @@ class RandomPointSet(MultidimensionalPointSet):
     def seed(self, value):
         if not isinstance(value, int):
             raise TypeError("seed must be an integer.")
-        self._seed = value
+        if self._seed != value:
+            self._seed = value
+            self._valid_cache = False
 
     @property
     def options(self):
@@ -224,7 +237,10 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @options.setter
     def options(self, value):
-        self._options = value
+        if self._options != value:
+            self._options = value
+            self._valid_cache = False
+        
 
     def _create(self):
         """Generating the Monte Carlo mulitdimensional grid set
@@ -326,15 +342,12 @@ class PointSetProduct(MultidimensionalPointSet):
         """:class:UnidimensionalPointSet: set of unique points"""
         return self._point_sets
 
-    @point_sets.setter
-    def point_sets(self, value):
-        self._point_sets = value
-
     @property
     def indexes(self):
         """list: Grid points' indexes."""
-        if self._indexes is None:
+        if not self._valid_cache:
             self._create()
+            self._valid_cache = True
         return self._indexes
 
 

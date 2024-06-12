@@ -128,74 +128,54 @@ def test_random_sobol_error():
 
 
 def test_random_set_domain():
-    """Test that set_params sets the parameters"""
+    """Test that domain is set"""
     p_gen = scipy.stats.qmc.Halton(3, seed=4).random(n=5)
     points = scipy.stats.qmc.scale(p_gen, [-10, 0, 0], [10, 2, 9])
     f = smolyay.grid.RandomPointSet([[-3, 5], [6, 9]], 5, "halton", 4)
-    f.set_params(domain=[[-10, 10], [0, 2], [0, 9]])
+    f.domain= [[-10, 10], [0, 2], [0, 9]]
     assert numpy.array_equal(f.domain, [[-10, 10], [0, 2], [0, 9]])
     assert f.num_dimensions == 3
     assert numpy.array_equal(f.points, points)
 
 
 def test_random_set_number_points():
-    """Test that set_params sets the parameters"""
+    """Test that number of points is set"""
     p_gen = scipy.stats.qmc.Halton(2, seed=4).random(n=70)
     points = scipy.stats.qmc.scale(p_gen, [-3, 6], [5, 9])
     f = smolyay.grid.RandomPointSet([[-3, 5], [6, 9]], 5, "halton", 4)
-    f.set_params(number_points=70)
+    f.number_points=70
     assert f.number_points == 70
     assert numpy.array_equal(f.points, points)
 
 
 def test_random_set_method():
-    """Test that set_params sets the parameters"""
+    """Test that method is set"""
     p_gen = scipy.stats.qmc.LatinHypercube(2, seed=4).random(n=5)
     points = scipy.stats.qmc.scale(p_gen, [-3, 6], [5, 9])
     f = smolyay.grid.RandomPointSet([[-3, 5], [6, 9]], 5, "halton", 4)
-    f.set_params(method="latin")
+    f.method="latin"
     assert f.method == "latin"
     assert numpy.array_equal(f.points, points)
 
 
 def test_random_set_seed():
-    """Test that set_params sets the parameters"""
+    """Test that seed is set"""
     p_gen = scipy.stats.qmc.Halton(2, seed=1234).random(n=5)
     points = scipy.stats.qmc.scale(p_gen, [-3, 6], [5, 9])
     f = smolyay.grid.RandomPointSet([[-3, 5], [6, 9]], 5, "halton", 4)
-    f.set_params(seed=1234)
+    f.seed=1234
     assert f.seed == 1234
     assert numpy.array_equal(f.points, points)
 
 
 def test_random_set_options():
-    """Test that set_params sets the parameters"""
+    """Test that options is set"""
     p_gen = scipy.stats.qmc.Halton(2, seed=4, scramble=False).random(n=5)
     points = scipy.stats.qmc.scale(p_gen, [-3, 6], [5, 9])
     f = smolyay.grid.RandomPointSet([[-3, 5], [6, 9]], 5, "halton", 4)
-    f.set_params(options={"scramble": False})
+    f.options={"scramble": False}
     assert f.options == {"scramble": False}
     assert numpy.array_equal(f.points, points)
-
-
-def test_random_set_params():
-    """Test that set_params sets the parameters"""
-    p_gen1 = scipy.stats.qmc.Halton(2, seed=4).random(n=5)
-    new_points1 = scipy.stats.qmc.scale(p_gen1, [-3, 6], [5, 9])
-    p_gen2 = scipy.stats.qmc.LatinHypercube(3, seed=1234).random(n=70)
-    new_points2 = scipy.stats.qmc.scale(p_gen2, [-10, 0, 0], [10, 2, 9])
-    f = smolyay.grid.RandomPointSet([[-3, 5], [6, 9]], 5, "halton", 4)
-    assert numpy.array_equal(f.points, new_points1)
-    f.set_params(
-        domain=[[-10, 10], [0, 2], [0, 9]], method="latin", seed=1234, number_points=70
-    )
-    assert numpy.array_equal(f.domain, [[-10, 10], [0, 2], [0, 9]])
-    assert f.num_dimensions == 3
-    assert f.seed == 1234
-    assert f.number_points == 70
-    assert f.method == "latin"
-    assert f.options == None
-    assert numpy.array_equal(f.points, new_points2)
 
 
 @pytest.mark.parametrize(
@@ -351,7 +331,7 @@ def test_generate_tensor_points():
     """Test the generate_tensor_combinations for a series with multiple sets."""
     point_sets = [numpy.array([9, 8, 7]), numpy.array([1, 2])]
     answer = [[9, 1], [9, 2], [8, 1], [8, 2], [7, 1], [7, 2]]
-    f = smolyay.grid.TensorPointSet(point_sets)
+    f = smolyay.grid.TensorProductPointSet(point_sets)
     assert numpy.array_equal(f.points, answer)
 
 
@@ -376,7 +356,7 @@ def test_generate_smolyak_points():
         [0.0, -1.41421356],
         [0.0, 1.41421356],
     ]
-    f = smolyay.grid.SmolyakPointSet(point_sets)
+    f = smolyay.grid.SmolyakSparseProductPointSet(point_sets)
     assert numpy.allclose(f.points, answer)
 
 
