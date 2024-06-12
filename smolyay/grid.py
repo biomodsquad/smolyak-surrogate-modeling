@@ -40,7 +40,7 @@ class MultidimensionalPointSet(abc.ABC):
             self._create()
             self._valid_cache = True
         return self._points
-    
+
     def __len__(self):
         return self.points.shape[0]
 
@@ -88,11 +88,11 @@ class MultidimensionalPointSet(abc.ABC):
                 numpy.clip(new_x[..., i], new[i, 0], new[i, 1], out=new_x[..., i])
         return new_x
 
-
     @abc.abstractmethod
     def _create(self):
         """Abstract method for generating the mulitdimensional grid set"""
         pass
+
 
 class RandomPointSet(MultidimensionalPointSet):
     """Point Set that uses randomly generated points
@@ -157,24 +157,15 @@ class RandomPointSet(MultidimensionalPointSet):
         if method != None, additional parameters passed to the QMCEngine
     """
 
-    def __init__(self, domain, number_points, method, seed, options=None):
+    def __init__(self, domain, number_points, seed):
         super().__init__()
         self._domain = None
         self._number_points = None
-        self._method = None
         self._seed = None
-        self._options = None
 
         self.domain = domain
         self.number_points = number_points
-        self.method = method
         self.seed = seed
-        self.options = options
-
-    @property
-    def valid_methods(self):
-        """list: the allowed methods for generating random numbers"""
-        return ["latin", "halton", "sobol", "uniform"]
 
     @property
     def domain(self):
@@ -183,9 +174,11 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @domain.setter
     def domain(self, value):
-        domain = numpy.array(value, ndmin=2)
+        domain = numpy.sort(numpy.array(value, ndmin=2),axis=1)
         if domain.ndim != 2 or domain.shape[1] != 2:
-            raise IndexError("Domain must have size (num_dimensions, 2)")
+            raise TypeError("Domain must have size (num_dimensions, 2)")
+        if any(domain[:,0] >= domain[:,1]):
+             raise ValueError("Lower bound must be less than upper bound")
         if not numpy.array_equal(self._domain, domain):
             self._domain = domain
             self._valid_cache = False
@@ -197,24 +190,9 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @number_points.setter
     def number_points(self, value):
-        if not isinstance(value, (int, numpy.random.Generator)):
-            raise TypeError("number_points must be an integer or Generator.")
-        if self._number_points != value:
-            self._number_points = value
-            self._valid_cache = False
-
-    @property
-    def method(self):
-        """str: method of sampling"""
-        return self._method
-
-    @method.setter
-    def method(self, value):
-        method = value.casefold()
-        if not method in self.valid_methods:
-            raise ValueError("Method can only be latin, halton, sobol, or uniform.")
-        if self._method != method:
-            self._method = method
+        number_points = int(value)
+        if self._number_points != number_points:
+            self._number_points = number_points
             self._valid_cache = False
 
     @property
@@ -224,23 +202,11 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @seed.setter
     def seed(self, value):
-        if not isinstance(value, int):
-            raise TypeError("seed must be an integer.")
+        if not isinstance(value,numpy.random.Generator):
+            value = int(value)
         if self._seed != value:
             self._seed = value
             self._valid_cache = False
-
-    @property
-    def options(self):
-        """None or dict: additional parameters passed to QMCEngine"""
-        return self._options
-
-    @options.setter
-    def options(self, value):
-        if self._options != value:
-            self._options = value
-            self._valid_cache = False
-        
 
     def _create(self):
         """Generating the Monte Carlo mulitdimensional grid set
@@ -248,12 +214,10 @@ class RandomPointSet(MultidimensionalPointSet):
         Using the parameters of the class, generate a grid set using
         the a Monte Carlo/Quasi Monte Carlo method.
         """
-        self._points = self.get_random_points(
-            self.domain, self.number_points, self.method, self.seed, self.options
-        )
+        self._points = self._get_random_points()
 
-    @staticmethod
-    def get_random_points(domain, number_points, method, seed, options=None):
+    @abc.abstractmethod
+    def _get_random_points(self):
         """Generate a set of random points
 
         Generates a set of random points with a given Monte Carlo/Quasi Monte
@@ -269,14 +233,8 @@ class RandomPointSet(MultidimensionalPointSet):
         number_points: int
             number of points to generate
 
-        method: {"uniform", "halton", "sobol", "latin"}
-            the method of generating random points
-
         seed: {int, numpy.random.Generator}
             seed for generating the random points
-
-        options: {None, dict}, optional
-            if method != "uniform", additional parameters passed to the QMCEngine
 
         Returns
         -------
@@ -288,33 +246,151 @@ class RandomPointSet(MultidimensionalPointSet):
         ValueError
             number of points for Sobol sequences must be a power of 2
         """
+        pass
 
-        lower_bounds = [bound[0] for bound in domain]
-        upper_bounds = [bound[1] for bound in domain]
+class UniformRandomPointSet(RandomPointSet):
+    """Generates a grid using a uniform distribution"""
+
+    def _get_random_points(self):
+        lower_bounds = [bound[0] for bound in self.domain]
+        upper_bounds = [bound[1] for bound in self.domain]
         num_dimensions = len(lower_bounds)
-        if isinstance(options, dict):
-            args = {"seed": seed, **options}
-        else:
-            args = {"seed": seed}
-        if method.casefold() == "uniform":
-            p_gen = numpy.random.default_rng(seed=seed).uniform(
-                size=(number_points, num_dimensions )
-            )
-        elif method.casefold() == "latin":
-            p_gen = scipy.stats.qmc.LatinHypercube(num_dimensions , **args).random(
-                n=number_points
-            )
-        elif method.casefold() == "halton":
-            p_gen = scipy.stats.qmc.Halton(num_dimensions, **args).random(n=number_points)
-        elif method.casefold() == "sobol":
-            if numpy.ceil(numpy.log2(number_points)) != numpy.floor(
-                numpy.log2(number_points)
-            ):
-                raise ValueError("Number of points must be power of 2")
-            p_gen = scipy.stats.qmc.Sobol(num_dimensions, **args).random(n=number_points)
-        else:
-            raise ValueError("Invalid method")
+        p_gen = numpy.random.default_rng(seed=self.seed).uniform(
+            size=(self.number_points, num_dimensions)
+        )
+        return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
+
+class QMCRandomPointSet(RandomPointSet):
+    """Generates a point set using a QMCEngine"""
+
+    def __init__(self, domain, number_points, seed, scramble=True, optimization=None):
+        super().__init__(domain, number_points, seed)
+        self._scramble = True
+        self._optimization = None
+
+        self.scramble = scramble
+        self.optimization = optimization
+
+    @property
+    def scramble(self):
+        """bool: If True, applies centering to Latin Hypercube points, Owen
+        scrambling to Halton points, and LMS+shift scrambling to Sobol points."""
+        return self._scramble
+
+    @scramble.setter
+    def scramble(self, value):
+        scramble = bool(value)
+        if self._scramble != scramble:
+            self._scramble = scramble
+            self._scramble = False
+
+    @property
+    def optimization(self):
+        """{None, “random-cd”, “lloyd”}: perform post-processing on points"""
+        return self._optimization
+
+    @optimization.setter
+    def optimization(self, value):
+        if not value in [None, "random-cd", "lloyd"]:
+            raise TypeError("optimization must be None, random-cd, or lloyd.")
+        if self._optimization != value:
+            self._optimization = value
+            self._valid_cache = False
+
+
+class LatinHypercubeRandomPointSet(QMCRandomPointSet):
+    """Generates a grid using a uniform distribution"""
+
+    def __init__(
+        self, domain, number_points, seed, scramble=True, optimization=None, strength=1
+    ):
+        super().__init__(domain, number_points, seed, scramble, optimization)
+        self._strength = 1
+
+        self.strength = strength
+
+    @property
+    def strength(self):
+        """{1, 2}: Whether to create an orthogonal array of points"""
+        return self._strength
+
+    @strength.setter
+    def strength(self, value):
+        strength = int(value)
+        if not strength in [1, 2]:
+            raise TypeError("Strength must be 1 or 2.")
+        if self._strength != strength:
+            self._strength = strength
+            self._valid_cache = False
+
+    def _get_random_points(self):
+        lower_bounds = [bound[0] for bound in self.domain]
+        upper_bounds = [bound[1] for bound in self.domain]
+        p_gen = scipy.stats.qmc.LatinHypercube(
+            self.num_dimensions,
+            scramble=self.scramble,
+            strength=self.strength,
+            optimization=self.optimization,
+            seed=self.seed,
+        ).random(n=self.number_points)
+        return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
+
+
+class HaltonRandomPointSet(QMCRandomPointSet):
+    """Generates a grid using a uniform distribution"""
+
+    def _get_random_points(self):
+        lower_bounds = [bound[0] for bound in self.domain]
+        upper_bounds = [bound[1] for bound in self.domain]
+        p_gen = scipy.stats.qmc.Halton(
+            self.num_dimensions,
+            scramble=self.scramble,
+            optimization=self.optimization,
+            seed=self.seed,
+        ).random(n=self.number_points)
+        return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
+
+
+class SobolRandomPointSet(QMCRandomPointSet):
+    """Generates a grid using a uniform distribution"""
+
+    def __init__(
+        self, domain, number_points, seed, scramble=True, optimization=None, bits=30
+    ):
+        super().__init__(domain, number_points, seed, scramble, optimization)
+        self._bits = 30
+
+        self.bits = bits
+
+    @property
+    def bits(self):
+        """{1, 2}: Whether to create an orthogonal array of points"""
+        return self._bits
+
+    @bits.setter
+    def bits(self, value):
+        bits = int(value)
+        if bits > 64:
+            raise TypeError("bits cannot exceed 64.")
+        if self._bits != bits:
+            self._bits = bits
+            self._valid_cache = False
+
+    def _get_random_points(self):
+        lower_bounds = [bound[0] for bound in self.domain]
+        upper_bounds = [bound[1] for bound in self.domain]
+        if numpy.ceil(numpy.log2(self.number_points)) != numpy.floor(
+            numpy.log2(self.number_points)
+        ):
+            raise ValueError("Number of points must be power of 2")
+        p_gen = scipy.stats.qmc.Sobol(
+            self.num_dimensions,
+            scramble=self.scramble,
+            bits=self.bits,
+            optimization=self.optimization,
+            seed=self.seed,
+        ).random(n=self.number_points)
         return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
@@ -371,7 +447,6 @@ class TensorProductPointSet(PointSetProduct):
         combinations of unidimensional points
         """
         self._points = numpy.array(list(itertools.product(*self._point_sets)))
-        
 
 
 class SmolyakSparseProductPointSet(PointSetProduct):
@@ -394,13 +469,19 @@ class SmolyakSparseProductPointSet(PointSetProduct):
         combinations of unidimensional points
         """
         grid_points = None
-        max_num_level = max([ob.num_levels for ob in self._point_sets]) 
+        max_num_level = max([ob.num_levels for ob in self._point_sets])
         max_num_levels = [ob.num_levels for ob in self._point_sets]
         # get the combinations of levels
         index_composition = []
-        for sum_of_levels in range(self.num_dimensions, self.num_dimensions + max_num_level):
+        for sum_of_levels in range(
+            self.num_dimensions, self.num_dimensions + max_num_level
+        ):
             index_composition.extend(
-                list(generate_compositions(sum_of_levels, self.num_dimensions, include_zero=False))
+                list(
+                    generate_compositions(
+                        sum_of_levels, self.num_dimensions, include_zero=False
+                    )
+                )
             )
         index_composition = numpy.array(index_composition) - 1
         if min(max_num_levels) != max_num_level:
@@ -419,9 +500,7 @@ class SmolyakSparseProductPointSet(PointSetProduct):
             if grid_points is None:
                 grid_points = grid_points_
             else:
-                grid_points = numpy.concatenate(
-                    (grid_points,
-                        grid_points_), axis=0)
+                grid_points = numpy.concatenate((grid_points, grid_points_), axis=0)
 
         # turn level combinations into points
         self._points = grid_points
