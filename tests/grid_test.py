@@ -17,17 +17,17 @@ import smolyay
 )
 def test_random_initalize(random_point_set):
     """Test that the random point set initializes correctly"""
-    f = random_point_set([[-10, 10], [0, 2]], 70, 1234)
+    f = random_point_set([[-10, 10], [0, 2]], 64, 1234)
     assert numpy.array_equal(f.domain, [[-10, 10], [0, 2]])
     assert f.num_dimensions == 2
-    assert f.number_points == 70
+    assert f.number_points == 64
     assert isinstance(f.number_points, int)
     assert f.seed == 1234
     assert isinstance(f.seed, int)
     f.domain = [-10, 10]
     assert numpy.array_equal(f.domain, [[-10, 10]])
-    f.number_points = 50.0
-    assert f.number_points == 50
+    f.number_points = 128.0
+    assert f.number_points == 128
     assert isinstance(f.number_points, int)
     f.seed = 40.0
     assert f.seed == 40
@@ -49,10 +49,10 @@ def test_random_initalize(random_point_set):
 )
 def test_random_qmc_initalize(qmc_point_set):
     """Test that the random point set initializes correctly"""
-    f = qmc_point_set([[-10, 20]], 49, 5678, True, "random-cd")
+    f = qmc_point_set([[-10, 20]], 64, 5678, True, "random-cd")
     assert numpy.array_equal(f.domain, [[-10, 20]])
     assert f.num_dimensions == 1
-    assert f.number_points == 49
+    assert f.number_points == 64
     assert f.seed == 5678
     assert isinstance(f.scramble, bool)
     assert f.scramble == True
@@ -79,33 +79,36 @@ def test_random_qmc_initalize(qmc_point_set):
 def test_random_domain_error(random_point_set):
     """Test that an exception is given if the domain is invalid"""
     # reverse domain
-    f = random_point_set([[10, -10]], 70, 1234)
+    f = random_point_set([[10, -10]], 64, 1234)
     assert numpy.array_equal(f.domain, [[-10, 10]])
-    f = random_point_set([[-10, 10]], 70, 1234)
+    f = random_point_set([[-10, 10]], 64, 1234)
     f.domain = [[5, -10], [9, -9]]
     assert numpy.array_equal(f.domain, [[-10, 5], [-9, 9]])
     # invalid domain
     with pytest.raises(TypeError):
-        random_point_set([[-10, 10, 11], [0, 2, 11]], 70, 1234)
+        random_point_set([[-10, 10, 11], [0, 2, 11]], 64, 1234)
     with pytest.raises(TypeError):
-        random_point_set([[[-10, 10]]], 70, 1234)
+        random_point_set([[[-10, 10]]], 64, 1234)
     with pytest.raises(ValueError):
-        random_point_set([[10, 10], [5, 10], [9, 12]], 70, 1234)
+        random_point_set([[10, 10], [5, 10], [9, 12]], 64, 1234)
     with pytest.raises(TypeError):
-        f = random_point_set([[-10, 10], [-10, 10]], 70, 1234)
+        f = random_point_set([[-10, 10], [-10, 10]], 64, 1234)
         f.domain = [[-10, 10, 11], [0, 2, 11]]
     with pytest.raises(TypeError):
-        f = random_point_set([[-10, 10], [-10, 10]], 70, 1234)
+        f = random_point_set([[-10, 10], [-10, 10]], 64, 1234)
         f.domain = [[[-10, 10]]]
     with pytest.raises(ValueError):
-        f = random_point_set([[-10, 10], [-10, 10]], 70, 1234)
+        f = random_point_set([[-10, 10], [-10, 10]], 64, 1234)
         f.domain = [[10, 10], [5, 10], [9, 12]]
 
 
 def test_random_sobol_error():
     """Test classmethod error using sobol if number of points not a power of 2"""
     with pytest.raises(ValueError):
-        smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234).points
+        smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234)
+    with pytest.raises(ValueError):
+        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 64, 1234)
+        f.number_points = 70
 
 
 @pytest.mark.parametrize(

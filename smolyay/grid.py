@@ -202,8 +202,8 @@ class UniformRandomPointSet(RandomPointSet):
 
 class QMCRandomPointSet(RandomPointSet):
     """Point set that generates points using a QMCEngine
-    
-    This random point set relies on the QMCEngine objects in 
+
+    This random point set relies on the QMCEngine objects in
     the scipy.stats.qmc module to generate points.
 
     In addition to the domain, number of points, and the seed
@@ -268,8 +268,8 @@ class QMCRandomPointSet(RandomPointSet):
 
 class LatinHypercubeRandomPointSet(QMCRandomPointSet):
     """Generates a grid using a LatinHypercube
-    
-    
+
+
     Parameters
     ----------
     domain: list
@@ -288,7 +288,7 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
         Default None. If "random-cd" the coordinates of points are adjusted to
         lower the centered discrepancy. If "lloyd", adjust points using a
         Lloyd-Max algorithm to encourage even spacing.
-    
+
     strength : {1, 2}, optional
         Default 1. If 1, produces a normal LHS. If 2, produces an orthogonal
         array based LHS.
@@ -330,8 +330,8 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
 
 
 class HaltonRandomPointSet(QMCRandomPointSet):
-    """Generates a grid using Halton Sequences    
-    
+    """Generates a grid using Halton Sequences
+
     Parameters
     ----------
     domain: list
@@ -367,7 +367,7 @@ class HaltonRandomPointSet(QMCRandomPointSet):
 
 class SobolRandomPointSet(QMCRandomPointSet):
     """Generates a grid using Sobol Sequence
-    
+
     Parameters
     ----------
     domain: list
@@ -389,13 +389,9 @@ class SobolRandomPointSet(QMCRandomPointSet):
         Lloyd-Max algorithm to encourage even spacing.
     """
 
-    def __init__(
-        self, domain, number_points, seed, scramble=True, optimization=None, bits=30
-    ):
+    def __init__(self, domain, number_points, seed, scramble=True, optimization=None):
         super().__init__(domain, number_points, seed, scramble, optimization)
         self._bits = 30
-
-        self.bits = bits
 
     @property
     def bits(self):
@@ -411,17 +407,29 @@ class SobolRandomPointSet(QMCRandomPointSet):
             self._bits = bits
             self._valid_cache = False
 
+    @property
+    def number_points(self):
+        """int: random seed for generating points"""
+        return self._number_points
+
+    @number_points.setter
+    def number_points(self, value):
+        number_points = int(value)
+        if numpy.ceil(numpy.log2(number_points)) != numpy.floor(
+            numpy.log2(number_points)
+        ):
+            raise ValueError("Number of points must be power of 2")
+        if self._number_points != number_points:
+            self._number_points = number_points
+            self._valid_cache = False
+
     def _get_random_points(self):
         """Generate a set of random points
-        
-        Generates a set of quasi-monte carlo Sobol Sequence points. 
+
+        Generates a set of quasi-monte carlo Sobol Sequence points.
         """
         lower_bounds = [bound[0] for bound in self.domain]
         upper_bounds = [bound[1] for bound in self.domain]
-        if numpy.ceil(numpy.log2(self.number_points)) != numpy.floor(
-            numpy.log2(self.number_points)
-        ):
-            raise ValueError("Number of points must be power of 2")
         p_gen = scipy.stats.qmc.Sobol(
             self.num_dimensions,
             scramble=self.scramble,
