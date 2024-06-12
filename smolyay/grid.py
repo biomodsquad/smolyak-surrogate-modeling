@@ -361,7 +361,7 @@ class TensorPointSet(PointSetProduct):
         
 
 
-class SmolyakPointSet(PointSetProduct):
+class SmolyakSparseProductPointSet(PointSetProduct):
     """Generate a grid using sparse combinations of unidimensional point sets
 
     Depending on the dimensionality, points and provided by
