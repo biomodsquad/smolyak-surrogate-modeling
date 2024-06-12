@@ -65,6 +65,37 @@ def test_random_qmc_initalize(qmc_point_set):
     f.optimization = None
     assert f.optimization is None
 
+def test_random_latin_initialize():
+    """That the LatinHypercubeRandomPointSet initializes correctly"""
+    f = smolyay.grid.LatinHypercubeRandomPointSet([[-10, 20]], 64, 5678, True, "random-cd", 1)
+    assert numpy.array_equal(f.domain, [[-10, 20]])
+    assert f.num_dimensions == 1
+    assert f.number_points == 64
+    assert f.seed == 5678
+    assert isinstance(f.scramble, bool)
+    assert f.scramble == True
+    assert f.optimization == "random-cd"
+    assert f.strength == 1
+    assert isinstance(f.strength, int)
+    f.strength = 2
+    assert f.strength == 2
+    assert isinstance(f.strength, int)
+
+def test_random_sobol_initialize():
+    """That the SobolRandomPointSet initializes correctly"""
+    f = smolyay.grid.SobolRandomPointSet([[-10, 20]], 64, 5678, True, "random-cd", 30)
+    assert numpy.array_equal(f.domain, [[-10, 20]])
+    assert f.num_dimensions == 1
+    assert f.number_points == 64
+    assert f.seed == 5678
+    assert isinstance(f.scramble, bool)
+    assert f.scramble == True
+    assert f.optimization == "random-cd"
+    assert f.bits == 30
+    assert isinstance(f.bits, int)
+    f.bits = 42
+    assert f.bits == 42
+    assert isinstance(f.bits, int)
 
 @pytest.mark.parametrize(
     "random_point_set",
@@ -104,12 +135,27 @@ def test_random_domain_error(random_point_set):
 
 def test_random_sobol_error():
     """Test classmethod error using sobol if number of points not a power of 2"""
+    # power of 2 error
     with pytest.raises(ValueError):
         smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234)
     with pytest.raises(ValueError):
         f = smolyay.grid.SobolRandomPointSet([[0, 2]], 64, 1234)
         f.number_points = 70
-
+    # max bits error
+    with pytest.raises(ValueError):
+        smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234, bits= 72)
+    with pytest.raises(ValueError):
+        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 64, 1234)
+        f.bits = 72
+    # 2**bits < number_points
+    with pytest.raises(ValueError):
+        smolyay.grid.SobolRandomPointSet([[0, 2]], 2048, 1234, bits = 5)
+    with pytest.raises(ValueError):
+        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits = 5)
+        f.number_points = 2048
+    with pytest.raises(ValueError):
+        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits = 5)
+        f.bits = 2
 
 @pytest.mark.parametrize(
     "random_point_set,domain,num_points,seed,answer",
