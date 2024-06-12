@@ -83,11 +83,6 @@ class MultidimensionalPointSet(abc.ABC):
                 numpy.clip(new_x[..., i], new[i, 0], new[i, 1], out=new_x[..., i])
         return new_x
 
-    def set_params(self, **parameters):
-        for parameter, value in parameters.items():
-            setattr(self, parameter, value)
-        self._create()
-        return self
 
     @abc.abstractmethod
     def _create(self):
