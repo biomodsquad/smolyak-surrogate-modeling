@@ -8,10 +8,10 @@ import smolyay
 @pytest.mark.parametrize(
     "random_point_set",
     [
-        smolyay.grid.UniformRandomPointSet,
-        smolyay.grid.LatinHypercubeRandomPointSet,
-        smolyay.grid.HaltonRandomPointSet,
-        smolyay.grid.SobolRandomPointSet,
+        smolyay.samples.UniformRandomPointSet,
+        smolyay.samples.LatinHypercubeRandomPointSet,
+        smolyay.samples.HaltonRandomPointSet,
+        smolyay.samples.SobolRandomPointSet,
     ],
     ids=["Uniform", "Latin", "Halton", "Sobol"],
 )
@@ -41,9 +41,9 @@ def test_random_initalize(random_point_set):
 @pytest.mark.parametrize(
     "qmc_point_set",
     [
-        smolyay.grid.LatinHypercubeRandomPointSet,
-        smolyay.grid.HaltonRandomPointSet,
-        smolyay.grid.SobolRandomPointSet,
+        smolyay.samples.LatinHypercubeRandomPointSet,
+        smolyay.samples.HaltonRandomPointSet,
+        smolyay.samples.SobolRandomPointSet,
     ],
     ids=["Latin", "Halton", "Sobol"],
 )
@@ -68,7 +68,7 @@ def test_random_qmc_initalize(qmc_point_set):
 
 def test_random_latin_initialize():
     """That the LatinHypercubeRandomPointSet initializes correctly"""
-    f = smolyay.grid.LatinHypercubeRandomPointSet(
+    f = smolyay.samples.LatinHypercubeRandomPointSet(
         [[-10, 20]], 64, 5678, True, "random-cd", 1
     )
     assert numpy.array_equal(f.domain, [[-10, 20]])
@@ -87,7 +87,7 @@ def test_random_latin_initialize():
 
 def test_random_sobol_initialize():
     """That the SobolRandomPointSet initializes correctly"""
-    f = smolyay.grid.SobolRandomPointSet([[-10, 20]], 64, 5678, True, "random-cd", 30)
+    f = smolyay.samples.SobolRandomPointSet([[-10, 20]], 64, 5678, True, "random-cd", 30)
     assert numpy.array_equal(f.domain, [[-10, 20]])
     assert f.num_dimensions == 1
     assert f.number_points == 64
@@ -105,8 +105,8 @@ def test_random_sobol_initialize():
 @pytest.mark.parametrize(
     "product_point_set",
     [
-        smolyay.grid.TensorProductPointSet,
-        smolyay.grid.SmolyakSparseProductPointSet,
+        smolyay.samples.TensorProductPointSet,
+        smolyay.samples.SmolyakSparseProductPointSet,
     ],
     ids=["Tensor", "Smolyak"],
 )
@@ -128,10 +128,10 @@ def test_product_initialize(product_point_set):
 @pytest.mark.parametrize(
     "random_point_set",
     [
-        smolyay.grid.UniformRandomPointSet,
-        smolyay.grid.LatinHypercubeRandomPointSet,
-        smolyay.grid.HaltonRandomPointSet,
-        smolyay.grid.SobolRandomPointSet,
+        smolyay.samples.UniformRandomPointSet,
+        smolyay.samples.LatinHypercubeRandomPointSet,
+        smolyay.samples.HaltonRandomPointSet,
+        smolyay.samples.SobolRandomPointSet,
     ],
     ids=["Uniform", "Latin", "Halton", "Sobol"],
 )
@@ -165,32 +165,32 @@ def test_random_sobol_error():
     """Test classmethod error using sobol if number of points not a power of 2"""
     # power of 2 error
     with pytest.raises(ValueError):
-        smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234)
+        smolyay.samples.SobolRandomPointSet([[0, 2]], 70, 1234)
     with pytest.raises(ValueError):
-        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 64, 1234)
+        f = smolyay.samples.SobolRandomPointSet([[0, 2]], 64, 1234)
         f.number_points = 70
     # max bits error
     with pytest.raises(ValueError):
-        smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234, bits=72)
+        smolyay.samples.SobolRandomPointSet([[0, 2]], 70, 1234, bits=72)
     with pytest.raises(ValueError):
-        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 64, 1234)
+        f = smolyay.samples.SobolRandomPointSet([[0, 2]], 64, 1234)
         f.bits = 72
     # 2**bits < number_points
     with pytest.raises(ValueError):
-        smolyay.grid.SobolRandomPointSet([[0, 2]], 2048, 1234, bits=5)
+        smolyay.samples.SobolRandomPointSet([[0, 2]], 2048, 1234, bits=5)
     with pytest.raises(ValueError):
-        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
+        f = smolyay.samples.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
         f.number_points = 2048
     with pytest.raises(ValueError):
-        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
+        f = smolyay.samples.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
         f.bits = 2
 
 
 @pytest.mark.parametrize(
     "product_point_set",
     [
-        smolyay.grid.TensorProductPointSet,
-        smolyay.grid.SmolyakSparseProductPointSet,
+        smolyay.samples.TensorProductPointSet,
+        smolyay.samples.SmolyakSparseProductPointSet,
     ],
     ids=["Tensor", "Smolyak"],
 )
@@ -216,7 +216,7 @@ def test_product_domain_error(product_point_set):
     "random_point_set,domain,num_points,seed,answer",
     [
         (
-            smolyay.grid.HaltonRandomPointSet,
+            smolyay.samples.HaltonRandomPointSet,
             [[-3, 5], [6, 9]],
             5,
             4,
@@ -225,7 +225,7 @@ def test_product_domain_error(product_point_set):
             ),
         ),
         (
-            smolyay.grid.LatinHypercubeRandomPointSet,
+            smolyay.samples.LatinHypercubeRandomPointSet,
             [[-10, 10], [0, 2], [0, 9]],
             70,
             1234,
@@ -236,7 +236,7 @@ def test_product_domain_error(product_point_set):
             ),
         ),
         (
-            smolyay.grid.SobolRandomPointSet,
+            smolyay.samples.SobolRandomPointSet,
             [[-10, 10], [0, 9]],
             32,
             1234,
@@ -245,7 +245,7 @@ def test_product_domain_error(product_point_set):
             ),
         ),
         (
-            smolyay.grid.UniformRandomPointSet,
+            smolyay.samples.UniformRandomPointSet,
             [[-10, 10], [0, 9], [0, 1], [0, 1]],
             100,
             1234,
@@ -268,7 +268,7 @@ def test_generate_tensor_points():
     """Test the generate_tensor_combinations for a series with multiple sets."""
     point_sets = [numpy.array([9, 8, 7]), numpy.array([1, 2])]
     answer = [[9, 1], [9, 2], [8, 1], [8, 2], [7, 1], [7, 2]]
-    f = smolyay.grid.TensorProductPointSet(point_sets)
+    f = smolyay.samples.TensorProductPointSet(point_sets)
     assert numpy.array_equal(f.points, answer)
 
 
@@ -293,7 +293,7 @@ def test_generate_smolyak_points():
         [0.0, -1.41421356],
         [0.0, 1.41421356],
     ]
-    f = smolyay.grid.SmolyakSparseProductPointSet(point_sets)
+    f = smolyay.samples.SmolyakSparseProductPointSet(point_sets)
     assert numpy.allclose(f.points, answer)
 
 
@@ -302,7 +302,7 @@ def test_generate_compositions_include_zero_true():
     composition_expected = [[6, 0], [5, 1], [4, 2], [3, 3], [2, 4], [1, 5], [0, 6]]
     composition_obtained = []
     composition_obtained = list(
-        smolyay.grid.generate_compositions(6, 2, include_zero=True)
+        smolyay.samples.generate_compositions(6, 2, include_zero=True)
     )
     assert composition_obtained == composition_expected
 
@@ -311,7 +311,7 @@ def test_generate_compositions_include_zero_false():
     """Test the generate compositions function if include_zero is false."""
     composition_expected = [[5, 1], [4, 2], [3, 3], [2, 4], [1, 5]]
     composition_obtained = list(
-        smolyay.grid.generate_compositions(6, 2, include_zero=False)
+        smolyay.samples.generate_compositions(6, 2, include_zero=False)
     )
     assert composition_obtained == composition_expected
 
@@ -319,4 +319,4 @@ def test_generate_compositions_include_zero_false():
 def test_generate_compositions_zero_false_error():
     """Test that generate compositions raises an error for invalid input."""
     with pytest.raises(ValueError):
-        list(smolyay.grid.generate_compositions(6, 7, include_zero=False))
+        list(smolyay.samples.generate_compositions(6, 7, include_zero=False))
