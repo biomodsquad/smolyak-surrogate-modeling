@@ -54,46 +54,7 @@ class RandomPointSet(MultidimensionalPointSet):
     """Point Set that uses randomly generated points
 
     A Multidimensional point set that creates a grid using a Monte Carlo
-    or Quasi Monte Carlo method for generating points. This generation
-    relies on the QMCEngine objects in the scipy.stats.qmc module.
-
-    In addition to the domain of the grid, this class has 3 required and
-    1 optional parameter to initailize and use the QMCEngines.
-    `number_points` is the number of points to be generated. Certain methods
-    of generating random number
-    `method` is the Monte Carlo method of generated points. There are 4
-    valid options for the method:
-        "latin" - short for Latin Hypercube, generates points with
-        scipy.stats.qmc.LatinHypercube object.
-        "halton" - short for Halton Sequences, generated points with
-        scipy.stats.qmc.Halton object.
-        "sobol" - short for Sobol Sequences, generated points with
-        scipy.stats.qmc.Sobol object. number_points must be a power of 2.
-        "uniform" - use numpy.random.default_rng().uniform function
-    The valid possible values of `method` are controlled by the property
-    `valid_methods`.
-    `seed` is the int or numpy.random.Generator instance is used to control the
-    creation of pseudorandom numbers. This parameter is required to ensure
-    an instance of random grid points can be recreated.
-    `options` is an optional parameter for any parameters to pass to the
-    QMCEngine that are not listed, and only affect the "latin", "halton", and
-    "sobol" methods. These possible parameters are:
-
-    scramble : bool
-        Default True. Applies centering to Latin Hypercube points, Owen
-        scrambling to Halton points, and LMS+shift scrambling to Sobol points.
-    optimization : {None, "random-cd", "lloyd"}
-        Default None. If "random-cd" the coordinates of points are adjusted to
-        lower the centered discrepancy. If "lloyd", adjust points using a
-        Lloyd-Max algorithm to encourage even spacing.
-    strength : {1, 2}
-        Default 1. Exclusive to Latin Hypercube. If 2, produces latin hypercube
-        points based on an orthogonal array. number_points is constrained to
-        squares of prime number whose square root is one greater than num_dimensions.
-    bits : int
-        Default 30. Exclusive to Sobol. Is the number of bits used by the
-        generator.
-
+    or Quasi Monte Carlo method for generating points.
 
     Parameters
     ----------
