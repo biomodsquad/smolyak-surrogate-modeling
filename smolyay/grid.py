@@ -19,6 +19,7 @@ class MultidimensionalPointSet(abc.ABC):
     """
 
     def __init__(self):
+        self._domain = None
         self._points = None
         self._valid_cache = False
 
@@ -28,10 +29,9 @@ class MultidimensionalPointSet(abc.ABC):
         return numpy.shape(self.domain)[0]
 
     @property
-    @abc.abstractmethod
     def domain(self):
         """numpy.ndarray: domain of the point set."""
-        pass
+        return self._domain
 
     @property
     def points(self):
@@ -477,6 +477,21 @@ class PointSetProduct(MultidimensionalPointSet):
     def domain(self):
         """numpy.ndarray: domain of the point set."""
         return numpy.array([up.domain for up in self.point_sets])
+
+    @domain.setter
+    def domain(self, value):
+        domain = numpy.sort(numpy.array(value, ndmin=2), axis=1)
+        if domain.ndim != 2 or domain.shape[1] != 2:
+            raise TypeError("Domain must have size (num_dimensions, 2)")
+        if any(domain[:, 0] >= domain[:, 1]):
+            raise ValueError("Lower bound must be less than upper bound")
+        if len(self.point_sets) != domain.shape[0]:
+            raise IndexError("Domain does not match number of point sets")
+        if not numpy.array_equal(self._domain, domain):
+            self._domain = domain
+            for ps,d in zip(self.point_sets,domain):
+                ps.domain = d
+            self._valid_cache = False
 
     @property
     def point_sets(self):

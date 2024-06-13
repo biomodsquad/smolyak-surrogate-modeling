@@ -65,9 +65,12 @@ def test_random_qmc_initalize(qmc_point_set):
     f.optimization = None
     assert f.optimization is None
 
+
 def test_random_latin_initialize():
     """That the LatinHypercubeRandomPointSet initializes correctly"""
-    f = smolyay.grid.LatinHypercubeRandomPointSet([[-10, 20]], 64, 5678, True, "random-cd", 1)
+    f = smolyay.grid.LatinHypercubeRandomPointSet(
+        [[-10, 20]], 64, 5678, True, "random-cd", 1
+    )
     assert numpy.array_equal(f.domain, [[-10, 20]])
     assert f.num_dimensions == 1
     assert f.number_points == 64
@@ -80,6 +83,7 @@ def test_random_latin_initialize():
     f.strength = 2
     assert f.strength == 2
     assert isinstance(f.strength, int)
+
 
 def test_random_sobol_initialize():
     """That the SobolRandomPointSet initializes correctly"""
@@ -96,6 +100,30 @@ def test_random_sobol_initialize():
     f.bits = 42
     assert f.bits == 42
     assert isinstance(f.bits, int)
+
+
+@pytest.mark.parametrize(
+    "product_point_set",
+    [
+        smolyay.grid.TensorProductPointSet,
+        smolyay.grid.SmolyakSparseProductPointSet,
+    ],
+    ids=["Tensor", "Smolyak"],
+)
+def test_product_initialize(product_point_set):
+    point_sets = [
+        smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
+        smolyay.samples.NestedClenshawCurtisPointSet([-2, 2], 3),
+    ]
+    f = product_point_set(point_sets)
+    assert f.point_sets == point_sets
+    assert numpy.array_equal(f.domain, [[-1, 1], [-2, 2]])
+    f.domain = [[-10, 10], [-5, 3]]
+    assert numpy.array_equal(f.domain, [[-10, 10], [-5, 3]])
+    assert numpy.array_equal(f.point_sets[0].domain,[-10, 10])
+    assert numpy.array_equal(f.point_sets[1].domain,[-5, 3])
+
+
 
 @pytest.mark.parametrize(
     "random_point_set",
@@ -143,19 +171,46 @@ def test_random_sobol_error():
         f.number_points = 70
     # max bits error
     with pytest.raises(ValueError):
-        smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234, bits= 72)
+        smolyay.grid.SobolRandomPointSet([[0, 2]], 70, 1234, bits=72)
     with pytest.raises(ValueError):
         f = smolyay.grid.SobolRandomPointSet([[0, 2]], 64, 1234)
         f.bits = 72
     # 2**bits < number_points
     with pytest.raises(ValueError):
-        smolyay.grid.SobolRandomPointSet([[0, 2]], 2048, 1234, bits = 5)
+        smolyay.grid.SobolRandomPointSet([[0, 2]], 2048, 1234, bits=5)
     with pytest.raises(ValueError):
-        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits = 5)
+        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
         f.number_points = 2048
     with pytest.raises(ValueError):
-        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits = 5)
+        f = smolyay.grid.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
         f.bits = 2
+
+
+@pytest.mark.parametrize(
+    "product_point_set",
+    [
+        smolyay.grid.TensorProductPointSet,
+        smolyay.grid.SmolyakSparseProductPointSet,
+    ],
+    ids=["Tensor", "Smolyak"],
+)
+def test_product_domain_error(product_point_set):
+    point_sets = [
+        smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
+        smolyay.samples.NestedClenshawCurtisPointSet([-2, 2], 3),
+    ]
+    f = product_point_set(point_sets)
+    with pytest.raises(TypeError):
+        f.domain = [[-10, 10, 11], [0, 2, 11]]
+    with pytest.raises(TypeError):
+        f.domain = [[[-10, 10],[-10, 10]]]
+    with pytest.raises(ValueError):
+        f.domain = [[10, 10], [5, 10]]
+    with pytest.raises(IndexError):
+        f.domain = [[-10, 10]]
+    with pytest.raises(IndexError):
+        f.domain = [[-10, 10],[-10, 10],[-10, 10]]
+
 
 @pytest.mark.parametrize(
     "random_point_set,domain,num_points,seed,answer",
