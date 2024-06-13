@@ -9,6 +9,15 @@ class brownden(BenchmarkFunction):
                 [3.2036300512, 20.88326704608],
                 [-10.4034394882, 8.63690446062],
                 [-9.7632212255, 9.21310089705]]
+    
+    @property
+    def global_minimum(self):
+        return 85822.201626356
+    
+    @property
+    def global_minimum_location(self):
+        return [ -11.5944399048, 13.2036300512, -0.4034394882, 0.2367787745 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 0.2 * x[...,1]

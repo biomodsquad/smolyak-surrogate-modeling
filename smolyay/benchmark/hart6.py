@@ -6,7 +6,15 @@ class hart6(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]
-        
+
+    @property
+    def global_minimum(self):
+        return -3.3228868916
+    
+    @property
+    def global_minimum_location(self):
+        return [0.2016625606, 0.1476768506, 0.4768667693, 0.2753176613, 0.3116642775, 0.6572686392]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -0.1312 + x[...,0]

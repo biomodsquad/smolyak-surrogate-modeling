@@ -7,6 +7,14 @@ class sineval(BenchmarkFunction):
     def domain(self):
         return [[-10.0000000002, 8.99999999982], [-10.0000000002, 8.99999999982]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = numpy.sin(x[...,0])

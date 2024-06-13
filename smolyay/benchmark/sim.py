@@ -7,6 +7,14 @@ class sim2bqp(BenchmarkFunction):
     def domain(self):
         return [[-10, 9], [0, 0.45]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = -x[...,0]
@@ -22,6 +30,14 @@ class simbqp(BenchmarkFunction):
     @property
     def domain(self):
         return [[-10, 9], [0, 0.45]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])

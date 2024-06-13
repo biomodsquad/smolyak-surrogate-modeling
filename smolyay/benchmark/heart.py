@@ -12,6 +12,14 @@ class heart6ls(BenchmarkFunction):
                 [-30.2417255436, -9.21755298924],
                 [-9.2029016565, 9.71738850915]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.0030998595, -0.0002239415, 2.6815198284, 2.2502162603, -20.2417255436, 0.7970983435]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [6])
         v[...,0] = x[...,2] * x[...,0]

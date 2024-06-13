@@ -7,6 +7,14 @@ class loghairy(BenchmarkFunction):
     def domain(self):
         return [[-9.9999999999, 9.00000000009], [-9.9999999974, 9.00000000234]]
 
+    @property
+    def global_minimum(self):
+        return 0.1823215568
+    
+    @property
+    def global_minimum_location(self):
+        return [1e-10, 2.6e-09]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 7. * x[...,0]

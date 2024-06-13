@@ -6,7 +6,15 @@ class allinit(BenchmarkFunction):
     @property
     def domain(self):
         return [[-11.1426691153, 8.8573308847], [1, 11.2456257795],[-1e10, 1]]
-        
+    
+    @property
+    def global_minimum(self):
+        return 16.7059684329
+    
+    @property
+    def global_minimum_location(self):
+        return [ -1.1426691153, 1.2456257795, -1.3520878443 ]
+    
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = x[...,0] * x[...,0]
@@ -51,6 +59,14 @@ class allinitu(BenchmarkFunction):
         return [[-8.5401384356, 10.31387540796], [-10.0, 9.0],
                 [-9.9191099435, 9.07280105085],
                 [-10.8111130846, 8.26999822386]]
+
+    @property
+    def global_minimum(self):
+        return 5.7443849103
+    
+    @property
+    def global_minimum_location(self):
+        return [ 1.4598615644, 0, 0.0808900565, -0.8111130846 ]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])

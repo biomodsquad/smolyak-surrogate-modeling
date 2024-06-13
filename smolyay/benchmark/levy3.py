@@ -7,6 +7,14 @@ class levy3(BenchmarkFunction):
     def domain(self):
         return [[-10.0, 10.0], [-10.0, 10.0]]
 
+    @property
+    def global_minimum(self):
+        return -165.6596934956
+    
+    @property
+    def global_minimum_location(self):
+        return [4.8580568789, 4.8580568789]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2. * x[...,0]

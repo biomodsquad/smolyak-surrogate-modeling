@@ -7,6 +7,14 @@ class jensmp(BenchmarkFunction):
     def domain(self):
         return [[0.1, 0.9], [0.1, 0.9]]
 
+    @property
+    def global_minimum(self):
+        return 124.3621823556
+    
+    @property
+    def global_minimum_location(self):
+        return [0.2578252137, 0.2578252137]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = numpy.exp(x[...,0])

@@ -7,6 +7,14 @@ class sisser(BenchmarkFunction):
     def domain(self):
         return [[-9.9978640372, 9.00192236652], [-9.9983980285, 9.00144177435]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = pow(x[...,0], 4)

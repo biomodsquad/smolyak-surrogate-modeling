@@ -7,6 +7,14 @@ class mexhat(BenchmarkFunction):
     def domain(self):
         return [[-9.1417744688, 9.77240297808], [-9.2634512042, 9.66289391622]]
 
+    @property
+    def global_minimum(self):
+        return -0.0401
+    
+    @property
+    def global_minimum_location(self):
+        return [0.8582255312, 0.7365487958]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -1. + x[...,0]

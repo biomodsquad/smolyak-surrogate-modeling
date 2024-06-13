@@ -7,6 +7,14 @@ class gold(BenchmarkFunction):
     def domain(self):
         return [[-2.0, 2.0], [-2.0, 2.0]]
 
+    @property
+    def global_minimum(self):
+        return 3
+    
+    @property
+    def global_minimum_location(self):
+        return [ 2e-10, -0.9999999999 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [5])
         v[...,0] = 1. + x[...,0]

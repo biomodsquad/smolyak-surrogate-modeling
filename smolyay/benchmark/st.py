@@ -6,7 +6,15 @@ class st_cqpjk2(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 0.9], [0, 0.9], [0, 0.9]]
-        
+
+    @property
+    def global_minimum(self):
+        return -12.5
+    
+    @property
+    def global_minimum_location(self):
+        return [0.8333333333, 0.6666666667, 0.5]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 9. * x[...,0]
@@ -26,6 +34,14 @@ class st_bsj3(BenchmarkFunction):
     @property
     def domain(self):
         return [[0, 99], [0, 99], [0, 99], [0, 99], [0, 99], [0, 99]]
+
+    @property
+    def global_minimum(self):
+        return -86768.55
+    
+    @property
+    def global_minimum_location(self):
+        return [99, 99, 99, 99, 99, 99]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])

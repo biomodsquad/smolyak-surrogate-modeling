@@ -22,8 +22,23 @@ class _powell(BenchmarkFunction):
         v[...,0] += v[...,1]
         return v[...,0]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [2.9999999992, 0.4999999998]
 
 class powell(_powell):
     @property
     def domain(self):
         return [[-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0], [-4.0, 5.0]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0, 0, 0]

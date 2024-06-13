@@ -9,6 +9,14 @@ class biggs3(BenchmarkFunction):
                 [-1.96500000271271e-07, 17.99999982315],
                 [-5.0000001349, 13.49999987859]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0.9999999832, 9.9999998035, 4.9999998651]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = -0.1 * x[...,0]
@@ -150,6 +158,14 @@ class biggs5(BenchmarkFunction):
                 [-8.999999498, 9.9000004518],
                 [-4.999999779, 13.5000001989],
                 [-5.999999158, 12.6000007578]]
+
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1.0000003537, 9.9999990899, 1.000000502, 5.000000221, 4.000000842]
 
     def _function(self,x):
         # based on biggs6 replacing 6th variable with constant 3
@@ -345,6 +361,14 @@ class biggs6(BenchmarkFunction):
                 [-3.05828543, 15.247543113], [-4.8134383873, 13.66790545143],
                 [-8.2885839966, 10.54027440306],
                 [-14.6154272503, 4.84611547473]]
+
+    @property
+    def global_minimum(self):
+        return 0.0056556499
+    
+    @property
+    def global_minimum_location(self):
+        return [1.7114160002, 17.6831983277, 6.94171457, 5.1865616127, 1.7114160034, -4.6154272503]
 
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])

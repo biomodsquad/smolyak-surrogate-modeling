@@ -7,6 +7,14 @@ class expfit(BenchmarkFunction):
     def domain(self):
         return [[-9.5210154534, 9.43108609194], [-9.3116998055, 9.61947017505]]
 
+    @property
+    def global_minimum(self):
+        return 0.240510594
+    
+    @property
+    def global_minimum_location(self):
+        return [ 0.4789845466, 0.6883001945 ]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = 0.25 * x[...,1]

@@ -28,7 +28,23 @@ class camel1(_camel):
     def domain(self):
         return [[-5, 5], [-5, 5]]
 
+    @property
+    def global_minimum(self):
+        return -1.0316284535
+    
+    @property
+    def global_minimum_location(self):
+        return [-0.0898420147, 0.7126564056]
+
 class camel6(_camel):
     @property
     def domain(self):
         return [[-3, 3], [-1.5, 1.5]]
+
+    @property
+    def global_minimum(self):
+        return -1.0316284535
+    
+    @property
+    def global_minimum_location(self):
+        return [0.0898420147, -0.7126564056]

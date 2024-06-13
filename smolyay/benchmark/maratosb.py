@@ -7,6 +7,14 @@ class maratosb(BenchmarkFunction):
     def domain(self):
         return [[-11.000000125, 8.0999998875], [-10.0, 9.0]]
 
+    @property
+    def global_minimum(self):
+        return -1.0000000625
+    
+    @property
+    def global_minimum_location(self):
+        return [-1.000000125, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = x[...,0] * x[...,0]

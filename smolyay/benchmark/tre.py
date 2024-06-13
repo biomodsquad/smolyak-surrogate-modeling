@@ -7,6 +7,14 @@ class tre(BenchmarkFunction):
     def domain(self):
         return [[-5.0, 5.0], [-5.0, 5.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [-2, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [3])
         v[...,0] = pow(x[...,0], 4)

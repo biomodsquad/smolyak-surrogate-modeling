@@ -19,6 +19,14 @@ class rosenbr(BenchmarkFunction):
     def domain(self):
         return [[-10.0, 5.0], [-10.0, 10.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [1, 1]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [7])
         v[...,0] = x[...,0] * x[...,0]

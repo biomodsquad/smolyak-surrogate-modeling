@@ -7,6 +7,14 @@ class kowalik(BenchmarkFunction):
     def domain(self):
         return [[0, 0.378], [0, 0.378], [0, 0.378], [0, 0.378]]
 
+    @property
+    def global_minimum(self):
+        return 0.000307486
+    
+    @property
+    def global_minimum_location(self):
+        return [0.1928334549, 0.1908362413, 0.1231173143, 0.1357659902]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 4. * x[...,1]
@@ -235,3 +243,11 @@ class kowosb(_kow):
     def domain(self):
         return [[-9.8071930634, 9.17352624294], [-9.8087176971, 9.17215407261],
                 [-9.8769435657, 9.11075079087], [-9.8639376421, 9.12245612211]]
+    
+    @property
+    def global_minimum(self):
+        return 0.0003075056
+    
+    @property
+    def global_minimum_location(self):
+        return [0.1928069366, 0.1912823029, 0.1230564343, 0.1360623579]

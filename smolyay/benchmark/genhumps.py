@@ -7,6 +7,14 @@ class genhumps(BenchmarkFunction):
     def domain(self):
         return [[-9.999999999, 9.0000000009], [-10.0000000017, 8.99999999847], [-10.0000000095, 8.99999999145], [-9.9999999989, 9.00000000099], [-10.0000000027, 8.99999999757]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0, 0, 0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = 2. * x[...,0]

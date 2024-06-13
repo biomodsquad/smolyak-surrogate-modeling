@@ -7,6 +7,14 @@ class engval2(BenchmarkFunction):
     def domain(self):
         return [[-10.0, 9.0], [-10.0, 9.0], [-9.0, 9.9]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0, 1]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]

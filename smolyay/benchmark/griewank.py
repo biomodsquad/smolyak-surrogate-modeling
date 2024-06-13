@@ -7,6 +7,14 @@ class griewank(BenchmarkFunction):
     def domain(self):
         return [[-100.0, 90.0], [-100.0, 90.0]]
 
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [0, 0]
+
     def _function(self,x):
         v = numpy.zeros(list(x.shape[:-1]) + [4])
         v[...,0] = x[...,0] * x[...,0]

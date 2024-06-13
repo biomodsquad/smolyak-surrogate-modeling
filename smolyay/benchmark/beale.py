@@ -30,3 +30,11 @@ class beale(_beale):
     def domain(self):
         return ([[-7.0000000008, 11.69999999928],
                           [-9.5000000002,9.44999999982]])
+    
+    @property
+    def global_minimum(self):
+        return 0
+    
+    @property
+    def global_minimum_location(self):
+        return [3, 0.5]
