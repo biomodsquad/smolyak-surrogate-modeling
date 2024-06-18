@@ -583,12 +583,7 @@ class RandomPointSet(MultidimensionalPointSet):
         self.num_points = num_points
         self.seed = seed
 
-    @property
-    def domain(self):
-        """numpy.ndarray: domain of the point set."""
-        return self._domain
-
-    @domain.setter
+    @MultidimensionalPointSet.domain.setter
     def domain(self, value):
         domain = numpy.sort(numpy.array(value, ndmin=2), axis=1)
         if domain.ndim != 2 or domain.shape[1] != 2:
