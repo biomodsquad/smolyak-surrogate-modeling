@@ -918,11 +918,6 @@ class PointSetProduct(MultidimensionalPointSet):
         self._indexes = []
 
     @property
-    def num_dimensions(self):
-        """int: number of independent variables."""
-        return len(self.point_sets)
-    
-    @property
     def domain(self):
         """numpy.ndarray: domain of the point set."""
         return numpy.array([up.domain for up in self.point_sets])

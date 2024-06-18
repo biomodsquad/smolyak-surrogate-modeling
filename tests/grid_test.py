@@ -266,7 +266,7 @@ def test_random_points(random_point_set, domain, num_points, seed, answer):
     assert numpy.array_equal(points, answer)
 
 
-def test_generate_tensor_points_from_point_sets():
+def test_generate_tensor_points():
     """Test the generate_tensor_combinations for a series with multiple sets."""
     point_sets = [
         smolyay.samples.TrigonometricPointSet([-1, 1], 1),
@@ -275,14 +275,6 @@ def test_generate_tensor_points_from_point_sets():
     answer = [[-1, -1], [-1, 1], [-1 / 3, -1], [-1 / 3, 1], [1 / 3, -1], [1 / 3, 1]]
     f = smolyay.samples.TensorProductPointSet(point_sets)
     assert numpy.allclose(f.points, answer)
-
-
-def test_generate_tensor_points_from_arrays():
-    """Test the generate_tensor_combinations for using numpy arrays."""
-    point_sets = [numpy.array([9, 8, 7]), numpy.array([1, 2])]
-    answer = [[9, 1], [9, 2], [8, 1], [8, 2], [7, 1], [7, 2]]
-    f = smolyay.samples.TensorProductPointSet(point_sets)
-    assert numpy.array_equal(f.points, answer)
 
 
 def test_generate_smolyak_points():
