@@ -1022,8 +1022,8 @@ class SmolyakSparseProductPointSet(PointSetProduct):
         combinations of unidimensional points
         """
         grid_points = None
-        max_num_level = max([ob.num_levels for ob in self._point_sets])
         max_num_levels = [ob.num_levels for ob in self._point_sets]
+        max_num_level = max(max_num_levels)
         # get the combinations of levels
         index_composition = []
         for sum_of_levels in range(
