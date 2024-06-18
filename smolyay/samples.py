@@ -557,10 +557,10 @@ class MultidimensionalPointSet(abc.ABC):
 
 
 class RandomPointSet(MultidimensionalPointSet):
-    """Point Set that uses randomly generated points
+    """Point Set for random points
 
-    A Multidimensional point set that creates a grid using a Monte Carlo
-    or Quasi Monte Carlo method for generating points.
+    Abstract class for multidimensional point sets that generate
+    random points using a seed.
 
     Parameters
     ----------
@@ -569,15 +569,9 @@ class RandomPointSet(MultidimensionalPointSet):
 
     number_points: int
         number of points to generate
-
-    method: {"uniform", "halton", "sobol", "latin"}
-        the method of generating random points
-
+        
     seed: {int, numpy.random.Generator}
         seed for generating the random points
-
-    options: {None, dict}, optional
-        if method != None, additional parameters passed to the QMCEngine
     """
 
     def __init__(self, domain, number_points, seed):
