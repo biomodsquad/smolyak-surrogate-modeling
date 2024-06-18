@@ -618,40 +618,22 @@ class RandomPointSet(MultidimensionalPointSet):
             self._seed = value
             self._valid_cache = False
 
-    def _create(self):
-        """Generating the Monte Carlo mulitdimensional grid set
-
-        Using the parameters of the class, generate a grid set using
-        the a Monte Carlo/Quasi Monte Carlo method.
-        """
-        self._points = self._get_random_points()
-
-    @abc.abstractmethod
-    def _get_random_points(self):
-        """Generate a set of random points
-
-        Generates a set of random points with a given Monte Carlo/Quasi Monte
-        Carlo method depending on the class.
-
-        Returns
-        -------
-        numpy.ndarray
-            generated random points
-        """
-        pass
-
 
 class UniformRandomPointSet(RandomPointSet):
     """Generates a grid using a uniform distribution"""
 
-    def _get_random_points(self):
+    def _create(self):
+        """Generate a set of random points
+
+        Generates uniformly distributed random points
+        """
         lower_bounds = [bound[0] for bound in self.domain]
         upper_bounds = [bound[1] for bound in self.domain]
         num_dimensions = len(lower_bounds)
         p_gen = numpy.random.default_rng(seed=self.seed).uniform(
             size=(self.num_points, num_dimensions)
         )
-        return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
+        self._points = scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
 class QMCRandomPointSet(RandomPointSet):
@@ -770,7 +752,11 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
             self._strength = strength
             self._valid_cache = False
 
-    def _get_random_points(self):
+    def _create(self):
+        """Generate a set of random points
+
+        Generates a set of monte carlo LatinHypercube points.
+        """
         lower_bounds = [bound[0] for bound in self.domain]
         upper_bounds = [bound[1] for bound in self.domain]
         p_gen = scipy.stats.qmc.LatinHypercube(
@@ -780,7 +766,7 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
             optimization=self.optimization,
             seed=self.seed,
         ).random(n=self.num_points)
-        return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
+        self._points = scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
 class HaltonRandomPointSet(QMCRandomPointSet):
@@ -811,7 +797,11 @@ class HaltonRandomPointSet(QMCRandomPointSet):
         which is 2**bits.
     """
 
-    def _get_random_points(self):
+    def _create(self):
+        """Generate a set of random points
+
+        Generates a set of quasi-monte carlo Halton Sequence points.
+        """
         lower_bounds = [bound[0] for bound in self.domain]
         upper_bounds = [bound[1] for bound in self.domain]
         p_gen = scipy.stats.qmc.Halton(
@@ -820,7 +810,7 @@ class HaltonRandomPointSet(QMCRandomPointSet):
             optimization=self.optimization,
             seed=self.seed,
         ).random(n=self.num_points)
-        return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
+        self._points = scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
 class SobolRandomPointSet(QMCRandomPointSet):
@@ -896,7 +886,7 @@ class SobolRandomPointSet(QMCRandomPointSet):
 
             self._valid_cache = False
 
-    def _get_random_points(self):
+    def _create(self):
         """Generate a set of random points
 
         Generates a set of quasi-monte carlo Sobol Sequence points.
@@ -910,7 +900,7 @@ class SobolRandomPointSet(QMCRandomPointSet):
             optimization=self.optimization,
             seed=self.seed,
         ).random(n=self.num_points)
-        return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
+        self._points = scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
 class PointSetProduct(MultidimensionalPointSet):
