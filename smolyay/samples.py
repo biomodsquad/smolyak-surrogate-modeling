@@ -875,9 +875,7 @@ class SobolRandomPointSet(QMCRandomPointSet):
     @num_points.setter
     def num_points(self, value):
         num_points = int(value)
-        if numpy.ceil(numpy.log2(num_points)) != numpy.floor(
-            numpy.log2(num_points)
-        ):
+        if numpy.ceil(numpy.log2(num_points)) != numpy.floor(numpy.log2(num_points)):
             raise ValueError("Number of points must be power of 2")
         if num_points > 2**self.bits:
             raise ValueError("Number of points must be less than 2**bits")
@@ -992,17 +990,15 @@ class SmolyakSparseProductPointSet(PointSetProduct):
         max_num_level = max(max_num_levels)
         # get the combinations of levels
         index_composition = []
-        for sum_of_levels in range(
-            self.num_dimensions, self.num_dimensions + max_num_level
-        ):
+        for sum_of_levels in range(max_num_level):
             index_composition.extend(
                 list(
                     generate_compositions(
-                        sum_of_levels, self.num_dimensions, include_zero=False
+                        sum_of_levels, self.num_dimensions, include_zero=True
                     )
                 )
             )
-        index_composition = numpy.array(index_composition) - 1
+        index_composition = numpy.array(index_composition)
         if min(max_num_levels) != max_num_level:
             # only check if point sets have different number of levels
             valid_comb = numpy.all(
