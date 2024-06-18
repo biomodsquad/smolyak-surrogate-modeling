@@ -636,7 +636,7 @@ class UniformRandomPointSet(RandomPointSet):
         self._points = scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
-class QMCRandomPointSet(RandomPointSet):
+class _QMCRandomPointSet(RandomPointSet):
     """Point set that generates points using a QMCEngine
 
     This random point set relies on the QMCEngine objects in
