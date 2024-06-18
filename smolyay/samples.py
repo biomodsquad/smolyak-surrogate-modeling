@@ -586,7 +586,6 @@ class RandomPointSet(MultidimensionalPointSet):
 
     def __init__(self, domain, number_points, seed):
         super().__init__()
-        self._domain = None
         self._number_points = None
         self._seed = None
 
