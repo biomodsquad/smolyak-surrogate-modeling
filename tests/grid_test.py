@@ -20,15 +20,15 @@ def test_random_initalize(random_point_set):
     f = random_point_set([[-10, 10], [0, 2]], 64, 1234)
     assert numpy.array_equal(f.domain, [[-10, 10], [0, 2]])
     assert f.num_dimensions == 2
-    assert f.number_points == 64
-    assert isinstance(f.number_points, int)
+    assert f.num_points == 64
+    assert isinstance(f.num_points, int)
     assert f.seed == 1234
     assert isinstance(f.seed, int)
     f.domain = [-10, 10]
     assert numpy.array_equal(f.domain, [[-10, 10]])
-    f.number_points = 128.0
-    assert f.number_points == 128
-    assert isinstance(f.number_points, int)
+    f.num_points = 128.0
+    assert f.num_points == 128
+    assert isinstance(f.num_points, int)
     f.seed = 40.0
     assert f.seed == 40
     assert isinstance(f.seed, int)
@@ -52,7 +52,7 @@ def test_random_qmc_initalize(qmc_point_set):
     f = qmc_point_set([[-10, 20]], 64, 5678, True, "random-cd")
     assert numpy.array_equal(f.domain, [[-10, 20]])
     assert f.num_dimensions == 1
-    assert f.number_points == 64
+    assert f.num_points == 64
     assert f.seed == 5678
     assert isinstance(f.scramble, bool)
     assert f.scramble == True
@@ -73,7 +73,7 @@ def test_random_latin_initialize():
     )
     assert numpy.array_equal(f.domain, [[-10, 20]])
     assert f.num_dimensions == 1
-    assert f.number_points == 64
+    assert f.num_points == 64
     assert f.seed == 5678
     assert isinstance(f.scramble, bool)
     assert f.scramble == True
@@ -92,7 +92,7 @@ def test_random_sobol_initialize():
     )
     assert numpy.array_equal(f.domain, [[-10, 20]])
     assert f.num_dimensions == 1
-    assert f.number_points == 64
+    assert f.num_points == 64
     assert f.seed == 5678
     assert isinstance(f.scramble, bool)
     assert f.scramble == True
@@ -169,19 +169,19 @@ def test_random_sobol_error():
         smolyay.samples.SobolRandomPointSet([[0, 2]], 70, 1234)
     with pytest.raises(ValueError):
         f = smolyay.samples.SobolRandomPointSet([[0, 2]], 64, 1234)
-        f.number_points = 70
+        f.num_points = 70
     # max bits error
     with pytest.raises(ValueError):
         smolyay.samples.SobolRandomPointSet([[0, 2]], 70, 1234, bits=72)
     with pytest.raises(ValueError):
         f = smolyay.samples.SobolRandomPointSet([[0, 2]], 64, 1234)
         f.bits = 72
-    # 2**bits < number_points
+    # 2**bits < num_points
     with pytest.raises(ValueError):
         smolyay.samples.SobolRandomPointSet([[0, 2]], 2048, 1234, bits=5)
     with pytest.raises(ValueError):
         f = smolyay.samples.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
-        f.number_points = 2048
+        f.num_points = 2048
     with pytest.raises(ValueError):
         f = smolyay.samples.SobolRandomPointSet([[0, 2]], 16, 1234, bits=5)
         f.bits = 2

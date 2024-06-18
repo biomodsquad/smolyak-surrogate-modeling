@@ -567,20 +567,20 @@ class RandomPointSet(MultidimensionalPointSet):
     domain: list
         domain of the random points
 
-    number_points: int
+    num_points: int
         number of points to generate
-        
+
     seed: {int, numpy.random.Generator}
         seed for generating the random points
     """
 
-    def __init__(self, domain, number_points, seed):
+    def __init__(self, domain, num_points, seed):
         super().__init__()
-        self._number_points = None
+        self._num_points = None
         self._seed = None
 
         self.domain = domain
-        self.number_points = number_points
+        self.num_points = num_points
         self.seed = seed
 
     @property
@@ -602,13 +602,13 @@ class RandomPointSet(MultidimensionalPointSet):
     @property
     def num_points(self):
         """int: random seed for generating points"""
-        return self._number_points
+        return self._num_points
 
-    @number_points.setter
-    def number_points(self, value):
-        number_points = int(value)
-        if self._number_points != number_points:
-            self._number_points = number_points
+    @num_points.setter
+    def num_points(self, value):
+        num_points = int(value)
+        if self._num_points != num_points:
+            self._num_points = num_points
             self._valid_cache = False
 
     @property
@@ -655,7 +655,7 @@ class UniformRandomPointSet(RandomPointSet):
         upper_bounds = [bound[1] for bound in self.domain]
         num_dimensions = len(lower_bounds)
         p_gen = numpy.random.default_rng(seed=self.seed).uniform(
-            size=(self.number_points, num_dimensions)
+            size=(self.num_points, num_dimensions)
         )
         return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
@@ -675,7 +675,7 @@ class QMCRandomPointSet(RandomPointSet):
     domain: list
         domain of the random points
 
-    number_points: int
+    num_points: int
         number of points to generate
 
     seed: {int, numpy.random.Generator}
@@ -691,8 +691,8 @@ class QMCRandomPointSet(RandomPointSet):
         Lloyd-Max algorithm to encourage even spacing.
     """
 
-    def __init__(self, domain, number_points, seed, scramble=True, optimization=None):
-        super().__init__(domain, number_points, seed)
+    def __init__(self, domain, num_points, seed, scramble=True, optimization=None):
+        super().__init__(domain, num_points, seed)
         self._scramble = True
         self._optimization = None
 
@@ -735,7 +735,7 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
     domain: list
         domain of the random points
 
-    number_points: int
+    num_points: int
         number of points to generate
 
     seed: {int, numpy.random.Generator}
@@ -755,9 +755,9 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
     """
 
     def __init__(
-        self, domain, number_points, seed, scramble=True, optimization=None, strength=1
+        self, domain, num_points, seed, scramble=True, optimization=None, strength=1
     ):
-        super().__init__(domain, number_points, seed, scramble, optimization)
+        super().__init__(domain, num_points, seed, scramble, optimization)
         self._strength = 1
 
         self.strength = strength
@@ -785,7 +785,7 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
             strength=self.strength,
             optimization=self.optimization,
             seed=self.seed,
-        ).random(n=self.number_points)
+        ).random(n=self.num_points)
         return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
@@ -797,7 +797,7 @@ class HaltonRandomPointSet(QMCRandomPointSet):
     domain: list
         domain of the random points
 
-    number_points: int
+    num_points: int
         number of points to generate
 
     seed: {int, numpy.random.Generator}
@@ -825,7 +825,7 @@ class HaltonRandomPointSet(QMCRandomPointSet):
             scramble=self.scramble,
             optimization=self.optimization,
             seed=self.seed,
-        ).random(n=self.number_points)
+        ).random(n=self.num_points)
         return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
@@ -837,7 +837,7 @@ class SobolRandomPointSet(QMCRandomPointSet):
     domain: list
         domain of the random points
 
-    number_points: int
+    num_points: int
         number of points to generate. Must be a power of 2.
 
     seed: {int, numpy.random.Generator}
@@ -861,10 +861,10 @@ class SobolRandomPointSet(QMCRandomPointSet):
     """
 
     def __init__(
-        self, domain, number_points, seed, scramble=True, optimization=None, bits=30
+        self, domain, num_points, seed, scramble=True, optimization=None, bits=30
     ):
         self._bits = 64  # max value of bits
-        super().__init__(domain, number_points, seed, scramble, optimization)
+        super().__init__(domain, num_points, seed, scramble, optimization)
         self.bits = bits
 
     @property
@@ -877,28 +877,28 @@ class SobolRandomPointSet(QMCRandomPointSet):
         bits = int(value)
         if bits > 64:
             raise ValueError("bits max value is 64.")
-        if 2**bits < self.number_points:
+        if 2**bits < self.num_points:
             raise ValueError("2**bits must be greater than number of points.")
         if self._bits != bits:
             self._bits = bits
             self._valid_cache = False
 
     @property
-    def number_points(self):
+    def num_points(self):
         """int: random seed for generating points"""
-        return self._number_points
+        return self._num_points
 
-    @number_points.setter
-    def number_points(self, value):
-        number_points = int(value)
-        if numpy.ceil(numpy.log2(number_points)) != numpy.floor(
-            numpy.log2(number_points)
+    @num_points.setter
+    def num_points(self, value):
+        num_points = int(value)
+        if numpy.ceil(numpy.log2(num_points)) != numpy.floor(
+            numpy.log2(num_points)
         ):
             raise ValueError("Number of points must be power of 2")
-        if number_points > 2**self.bits:
+        if num_points > 2**self.bits:
             raise ValueError("Number of points must be less than 2**bits")
-        if self._number_points != number_points:
-            self._number_points = number_points
+        if self._num_points != num_points:
+            self._num_points = num_points
 
             self._valid_cache = False
 
@@ -915,7 +915,7 @@ class SobolRandomPointSet(QMCRandomPointSet):
             bits=self.bits,
             optimization=self.optimization,
             seed=self.seed,
-        ).random(n=self.number_points)
+        ).random(n=self.num_points)
         return scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
