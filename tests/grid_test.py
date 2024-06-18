@@ -87,7 +87,9 @@ def test_random_latin_initialize():
 
 def test_random_sobol_initialize():
     """That the SobolRandomPointSet initializes correctly"""
-    f = smolyay.samples.SobolRandomPointSet([[-10, 20]], 64, 5678, True, "random-cd", 30)
+    f = smolyay.samples.SobolRandomPointSet(
+        [[-10, 20]], 64, 5678, True, "random-cd", 30
+    )
     assert numpy.array_equal(f.domain, [[-10, 20]])
     assert f.num_dimensions == 1
     assert f.number_points == 64
@@ -120,9 +122,8 @@ def test_product_initialize(product_point_set):
     assert numpy.array_equal(f.domain, [[-1, 1], [-2, 2]])
     f.domain = [[-10, 10], [-5, 3]]
     assert numpy.array_equal(f.domain, [[-10, 10], [-5, 3]])
-    assert numpy.array_equal(f.point_sets[0].domain,[-10, 10])
-    assert numpy.array_equal(f.point_sets[1].domain,[-5, 3])
-
+    assert numpy.array_equal(f.point_sets[0].domain, [-10, 10])
+    assert numpy.array_equal(f.point_sets[1].domain, [-5, 3])
 
 
 @pytest.mark.parametrize(
@@ -203,13 +204,13 @@ def test_product_domain_error(product_point_set):
     with pytest.raises(TypeError):
         f.domain = [[-10, 10, 11], [0, 2, 11]]
     with pytest.raises(TypeError):
-        f.domain = [[[-10, 10],[-10, 10]]]
+        f.domain = [[[-10, 10], [-10, 10]]]
     with pytest.raises(ValueError):
         f.domain = [[10, 10], [5, 10]]
     with pytest.raises(IndexError):
         f.domain = [[-10, 10]]
     with pytest.raises(IndexError):
-        f.domain = [[-10, 10],[-10, 10],[-10, 10]]
+        f.domain = [[-10, 10], [-10, 10], [-10, 10]]
 
 
 @pytest.mark.parametrize(
@@ -266,10 +267,13 @@ def test_random_points(random_point_set, domain, num_points, seed, answer):
 
 def test_generate_tensor_points():
     """Test the generate_tensor_combinations for a series with multiple sets."""
-    point_sets = [numpy.array([9, 8, 7]), numpy.array([1, 2])]
-    answer = [[9, 1], [9, 2], [8, 1], [8, 2], [7, 1], [7, 2]]
+    point_sets = [
+        smolyay.samples.TrigonometricPointSet([-1, 1], 1),
+        smolyay.samples.ClenshawCurtisPointSet([-1, 1], 1),
+    ]
+    answer = [[-1, -1], [-1, 1], [-1 / 3, -1], [-1 / 3, 1], [1 / 3, -1], [1 / 3, 1]]
     f = smolyay.samples.TensorProductPointSet(point_sets)
-    assert numpy.array_equal(f.points, answer)
+    assert numpy.allclose(f.points, answer)
 
 
 def test_generate_smolyak_points():

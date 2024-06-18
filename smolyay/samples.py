@@ -1,6 +1,9 @@
-import collections.abc
 import abc
+import collections.abc
+import itertools
+
 import numpy
+import scipy.stats.qmc
 
 
 class UnidimensionalPointSet(collections.abc.Sequence):
@@ -376,20 +379,20 @@ class TrigonometricPointSet(UnidimensionalPointSet):
 
         x^f_j = \frac{2\pi j}{m(f)},  1 \leq j \leq m(l), f \geq 0
 
-    where f represents the positive frequency of the complex 
-    trigonometric polynomial of the form 
-    
+    where f represents the positive frequency of the complex
+    trigonometric polynomial of the form
+
     .. math::
 
         p(x) = \sum_{n=-f}^{f} a_{n}\exp(xi * n)
-    
-    where the sequence :math:`a_{n}` are coefficients. The 
-    relationship between the frequency and the number of points 
-    is set at 
-    
+
+    where the sequence :math:`a_{n}` are coefficients. The
+    relationship between the frequency and the number of points
+    is set at
+
     .. math::
-        `m = 2*\left | f \right | + 1` 
-    
+        `m = 2*\left | f \right | + 1`
+
     to ensure that m is equal to the number of coefficients in
     the trigonometric polynomial.
 
@@ -432,7 +435,7 @@ class TrigonometricPointSet(UnidimensionalPointSet):
         """
         num_points = 2 * self.frequency + 1
         indexes = numpy.arange(num_points)
-        points = 2 * numpy.pi *  indexes /  num_points
+        points = 2 * numpy.pi * indexes / num_points
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
 
 
@@ -508,13 +511,6 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
                 2 * numpy.pi * indexes / num_points
             )
         self._points = self._scale_to_domain(points, [0, 2 * numpy.pi])
-
-
-import abc
-import itertools
-
-import numpy
-import scipy.stats.qmc
 
 
 class MultidimensionalPointSet(abc.ABC):
@@ -866,7 +862,7 @@ class SobolRandomPointSet(QMCRandomPointSet):
     ------
     ValueError
         number of points must be a power of two
-    ValueError 
+    ValueError
         number of points must be less than 2**bits
     """
 
@@ -959,7 +955,7 @@ class PointSetProduct(MultidimensionalPointSet):
             raise IndexError("Domain does not match number of point sets")
         if not numpy.array_equal(self._domain, domain):
             self._domain = domain
-            for ps,d in zip(self.point_sets,domain):
+            for ps, d in zip(self.point_sets, domain):
                 ps.domain = d
             self._valid_cache = False
 
@@ -997,9 +993,9 @@ class TensorProductPointSet(PointSetProduct):
         combinations of unidimensional points
         """
         num_points = numpy.prod([len(p) for p in self._point_sets])
-        self._points = numpy.array((num_points, self.num_dimensions), dtype=float)
+        self._points = numpy.zeros((num_points, self.num_dimensions), dtype=float)
         for i, point in enumerate(itertools.product(*self._point_sets)):
-            self._points[i] = point
+            self._points[i] = numpy.array(point)
 
 
 class SmolyakSparseProductPointSet(PointSetProduct):
