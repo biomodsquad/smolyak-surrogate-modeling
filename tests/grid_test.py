@@ -166,12 +166,17 @@ def test_random_sobol_error():
     with pytest.raises(ValueError):
         f = smolyay.samples.SobolRandomPointSet([[0, 2]], 64, 1234)
         f.num_points = 70
-    # max bits error
+    # bits limits error
     with pytest.raises(ValueError):
         smolyay.samples.SobolRandomPointSet([[0, 2]], 70, 1234, bits=72)
     with pytest.raises(ValueError):
         f = smolyay.samples.SobolRandomPointSet([[0, 2]], 64, 1234)
         f.bits = 72
+    with pytest.raises(ValueError):
+        smolyay.samples.SobolRandomPointSet([[0, 2]], 70, 1234, bits=-4)
+    with pytest.raises(ValueError):
+        f = smolyay.samples.SobolRandomPointSet([[0, 2]], 64, 1234)
+        f.bits = -4
     # 2**bits < num_points
     with pytest.raises(ValueError):
         smolyay.samples.SobolRandomPointSet([[0, 2]], 2048, 1234, bits=5)

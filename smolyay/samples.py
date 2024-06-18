@@ -861,6 +861,8 @@ class SobolRandomPointSet(QMCRandomPointSet):
         bits = int(value)
         if bits > 64:
             raise ValueError("bits max value is 64.")
+        elif bits < 1:
+            raise ValueError("bits must be at least 1")
         if 2**bits < self.num_points:
             raise ValueError("2**bits must be greater than number of points.")
         if self._bits != bits:
