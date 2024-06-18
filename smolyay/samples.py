@@ -536,7 +536,7 @@ class MultidimensionalPointSet(abc.ABC):
     @property
     def num_dimensions(self):
         """int: number of independent variables."""
-        return numpy.shape(self.domain)[0]
+        return self.domain.shape[0]
 
     @property
     def domain(self):
