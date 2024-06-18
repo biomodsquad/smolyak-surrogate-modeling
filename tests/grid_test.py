@@ -274,7 +274,16 @@ def test_generate_tensor_points():
     ]
     answer = [[-1, -1], [-1, 1], [-1 / 3, -1], [-1 / 3, 1], [1 / 3, -1], [1 / 3, 1]]
     f = smolyay.samples.TensorProductPointSet(point_sets)
-    assert numpy.allclose(f.points, answer)
+    points = f.points
+    assert numpy.allclose(points[numpy.lexsort(points.T[::-1])], answer)
+
+
+def test_generate_tensor_points_from_arrays():
+    """Test the generate_tensor_combinations for using numpy arrays."""
+    point_sets = [numpy.array([9, 8, 7]), numpy.array([1, 2])]
+    answer = [[9, 1], [9, 2], [8, 1], [8, 2], [7, 1], [7, 2]]
+    f = smolyay.samples.TensorProductPointSet(point_sets)
+    assert numpy.array_equal(f.points, answer)
 
 
 def test_generate_smolyak_points():

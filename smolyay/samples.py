@@ -962,10 +962,13 @@ class TensorProductPointSet(PointSetProduct):
         Using the parameters of the class, generate a grid set using all
         combinations of unidimensional points
         """
-        self._points = numpy.array(numpy.meshgrid(*self._point_sets)).T.reshape(
-            -1, self.num_dimensions
+        self._points = numpy.stack(numpy.meshgrid(*self._point_sets), -1).reshape(
+            -1, len(self._point_sets)
         )
-
+        #num_points = numpy.prod([len(p) for p in self._point_sets])
+        #self._points = numpy.zeros((num_points, len(self._point_sets)), dtype=float)
+        #for i, point in enumerate(itertools.product(*self._point_sets)):
+        #    self._points[i] = point
 
 class SmolyakSparseProductPointSet(PointSetProduct):
     """Generate a grid using sparse combinations of unidimensional point sets
