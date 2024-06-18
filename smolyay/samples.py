@@ -996,7 +996,10 @@ class TensorProductPointSet(PointSetProduct):
         Using the parameters of the class, generate a grid set using all
         combinations of unidimensional points
         """
-        self._points = numpy.array(list(itertools.product(*self._point_sets)))
+        num_points = numpy.prod([len(p) for p in self._point_sets])
+        self._points = numpy.array((num_points, self.num_dimensions), dtype=float)
+        for i, point in enumerate(itertools.product(*self._point_sets)):
+            self._points[i] = point
 
 
 class SmolyakSparseProductPointSet(PointSetProduct):
