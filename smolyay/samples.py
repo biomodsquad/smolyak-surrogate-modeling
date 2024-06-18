@@ -600,7 +600,7 @@ class RandomPointSet(MultidimensionalPointSet):
             self._valid_cache = False
 
     @property
-    def number_points(self):
+    def num_points(self):
         """int: random seed for generating points"""
         return self._number_points
 
