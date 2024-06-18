@@ -696,7 +696,7 @@ class _QMCRandomPointSet(RandomPointSet):
     @optimization.setter
     def optimization(self, value):
         if not value in [None, "random-cd", "lloyd"]:
-            raise TypeError("optimization must be None, random-cd, or lloyd.")
+            raise TypeError("optimization must be None, random-cd, or lloyd")
         if self._optimization != value:
             self._optimization = value
             self._valid_cache = False
@@ -747,7 +747,7 @@ class LatinHypercubeRandomPointSet(_QMCRandomPointSet):
     def strength(self, value):
         strength = int(value)
         if not strength in [1, 2]:
-            raise TypeError("Strength must be 1 or 2.")
+            raise TypeError("Strength must be 1 or 2")
         if self._strength != strength:
             self._strength = strength
             self._valid_cache = False
@@ -860,11 +860,11 @@ class SobolRandomPointSet(_QMCRandomPointSet):
     def bits(self, value):
         bits = int(value)
         if bits > 64:
-            raise ValueError("bits max value is 64.")
+            raise ValueError("bits max value is 64")
         elif bits < 1:
             raise ValueError("bits must be at least 1")
         if 2**bits < self.num_points:
-            raise ValueError("2**bits must be greater than number of points.")
+            raise ValueError("2**bits must be greater than number of points")
         if self._bits != bits:
             self._bits = bits
             self._valid_cache = False
@@ -877,7 +877,7 @@ class SobolRandomPointSet(_QMCRandomPointSet):
     @num_points.setter
     def num_points(self, value):
         num_points = int(value)
-        if num_points & (num_points-1) != 0:
+        if num_points & (num_points - 1) != 0:
             raise ValueError("Number of points must be power of 2")
         if num_points > 2**self.bits:
             raise ValueError("Number of points must be less than 2**bits")
@@ -1015,9 +1015,9 @@ class SmolyakSparseProductPointSet(PointSetProduct):
             level_point_combinations = [
                 self._point_sets[d].level(level) for d, level in enumerate(level_comb)
             ]
-            points_ = numpy.array(
-                numpy.meshgrid(*level_point_combinations)
-            ).T.reshape(-1, self.num_dimensions)
+            points_ = numpy.array(numpy.meshgrid(*level_point_combinations)).T.reshape(
+                -1, self.num_dimensions
+            )
             if self._points is None:
                 self._points = points_
             else:
