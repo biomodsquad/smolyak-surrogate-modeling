@@ -32,10 +32,6 @@ def test_random_initalize(random_point_set):
     f.seed = 40.0
     assert f.seed == 40
     assert isinstance(f.seed, int)
-    a = numpy.random.Generator(numpy.random.Philox())
-    f.seed = a
-    assert f.seed == a
-    assert isinstance(f.seed, numpy.random.Generator)
 
 
 @pytest.mark.parametrize(

@@ -570,7 +570,7 @@ class RandomPointSet(MultidimensionalPointSet):
     num_points: int
         number of points to generate
 
-    seed: {int, numpy.random.Generator}
+    seed: int
         seed for generating the random points
     """
 
@@ -613,8 +613,7 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @seed.setter
     def seed(self, value):
-        if not isinstance(value, numpy.random.Generator):
-            value = int(value)
+        value = int(value)
         if self._seed != value:
             self._seed = value
             self._valid_cache = False
@@ -673,7 +672,7 @@ class QMCRandomPointSet(RandomPointSet):
     num_points: int
         number of points to generate
 
-    seed: {int, numpy.random.Generator}
+    seed: int
         seed for generating the random points
 
     scramble : bool
@@ -733,7 +732,7 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
     num_points: int
         number of points to generate
 
-    seed: {int, numpy.random.Generator}
+    seed: int
         seed for generating the random points
 
     scramble : bool
@@ -795,7 +794,7 @@ class HaltonRandomPointSet(QMCRandomPointSet):
     num_points: int
         number of points to generate
 
-    seed: {int, numpy.random.Generator}
+    seed: int
         seed for generating the random points
 
     scramble : bool
@@ -835,7 +834,7 @@ class SobolRandomPointSet(QMCRandomPointSet):
     num_points: int
         number of points to generate. Must be a power of 2.
 
-    seed: {int, numpy.random.Generator}
+    seed: int
         seed for generating the random points
 
     scramble : bool
