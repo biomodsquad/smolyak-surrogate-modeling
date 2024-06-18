@@ -987,40 +987,41 @@ class SmolyakSparseProductPointSet(PointSetProduct):
         Using the parameters of the class, generate a grid set using all
         combinations of unidimensional points
         """
-        grid_points = None
-        max_num_levels = [ob.num_levels for ob in self._point_sets]
-        max_num_level = max(max_num_levels)
-        # get the combinations of levels
-        index_composition = []
-        for sum_of_levels in range(max_num_level):
-            index_composition.extend(
+        # reset points
+        self._points = None
+        # find number of levels per dimension
+        num_levels_per_dim = [ob.num_levels for ob in self._point_sets]
+        max_num_levels = max(num_levels_per_dim)
+        # get the combinations of levels based on maximum possible number of levels
+        level_combinations = []
+        for sum_of_levels in range(max_num_levels):
+            level_combinations.extend(
                 list(
                     generate_compositions(
                         sum_of_levels, self.num_dimensions, include_zero=True
                     )
                 )
             )
-        index_composition = numpy.array(index_composition)
-        if min(max_num_levels) != max_num_level:
-            # only check if point sets have different number of levels
+        level_combinations = numpy.array(level_combinations)
+        # remove combinations where a dimension exceeds its number of levels
+        # only check if point sets have different number of levels
+        if min(num_levels_per_dim) != max_num_levels:
             valid_comb = numpy.all(
-                numpy.greater_equal(max_num_levels, index_composition), axis=1
+                numpy.greater_equal(num_levels_per_dim, level_combinations), axis=1
             )
-            index_composition = index_composition[valid_comb, :]
-        for index_comp in index_composition:
-            level_composition_index = [
-                self._point_sets[d].level(index) for d, index in enumerate(index_comp)
+            level_combinations = level_combinations[valid_comb, :]
+        # generate sets of points based on combinations of levels
+        for level_comb in level_combinations:
+            level_point_combinations = [
+                self._point_sets[d].level(level) for d, level in enumerate(level_comb)
             ]
-            grid_points_ = numpy.array(
-                numpy.meshgrid(*level_composition_index)
+            points_ = numpy.array(
+                numpy.meshgrid(*level_point_combinations)
             ).T.reshape(-1, self.num_dimensions)
-            if grid_points is None:
-                grid_points = grid_points_
+            if self._points is None:
+                self._points = points_
             else:
-                grid_points = numpy.concatenate((grid_points, grid_points_), axis=0)
-
-        # turn level combinations into points
-        self._points = grid_points
+                self._points = numpy.concatenate((self._points, points_), axis=0)
 
 
 def generate_compositions(value, num_parts, include_zero):
