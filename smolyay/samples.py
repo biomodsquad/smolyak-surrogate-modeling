@@ -702,7 +702,7 @@ class _QMCRandomPointSet(RandomPointSet):
             self._valid_cache = False
 
 
-class LatinHypercubeRandomPointSet(QMCRandomPointSet):
+class LatinHypercubeRandomPointSet(_QMCRandomPointSet):
     """Generates a grid using a LatinHypercube
 
 
@@ -769,7 +769,7 @@ class LatinHypercubeRandomPointSet(QMCRandomPointSet):
         self._points = scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
-class HaltonRandomPointSet(QMCRandomPointSet):
+class HaltonRandomPointSet(_QMCRandomPointSet):
     """Generates a grid using Halton Sequences
 
     Parameters
@@ -813,7 +813,7 @@ class HaltonRandomPointSet(QMCRandomPointSet):
         self._points = scipy.stats.qmc.scale(p_gen, lower_bounds, upper_bounds)
 
 
-class SobolRandomPointSet(QMCRandomPointSet):
+class SobolRandomPointSet(_QMCRandomPointSet):
     """Generates a grid using Sobol Sequence
 
     Parameters
