@@ -942,14 +942,6 @@ class PointSetProduct(MultidimensionalPointSet):
         """:class:UnidimensionalPointSet: set of unique points"""
         return self._point_sets
 
-    @property
-    def indexes(self):
-        """list: Grid points' indexes."""
-        if not self._valid_cache:
-            self._create()
-            self._valid_cache = True
-        return self._indexes
-
 
 class TensorProductPointSet(PointSetProduct):
     """Generate a grid using all combinations of unidimensional point sets
