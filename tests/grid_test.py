@@ -274,8 +274,7 @@ def test_generate_tensor_points():
     ]
     answer = [[-1, -1], [-1, 1], [-1 / 3, -1], [-1 / 3, 1], [1 / 3, -1], [1 / 3, 1]]
     f = smolyay.samples.TensorProductPointSet(point_sets)
-    points = f.points
-    assert numpy.allclose(points[numpy.lexsort(points.T[::-1])], answer)
+    assert numpy.allclose(f.points, answer)
 
 
 def test_generate_tensor_points_from_arrays():
