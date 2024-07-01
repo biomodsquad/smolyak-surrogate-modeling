@@ -999,7 +999,7 @@ class SmolyakSparseProductPointSet(PointSetProduct):
             valid_comb = numpy.all(
                 numpy.greater(num_levels_per_dim, level_combinations), axis=1
             )
-            level_combinations = level_combinations[valid_comb, :]
+            level_combinations = level_combinations[valid_comb]
         # generate sets of points based on combinations of levels
         for level_comb in level_combinations:
             level_point_combinations = [
