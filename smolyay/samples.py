@@ -580,7 +580,7 @@ class RandomPointSet(MultidimensionalPointSet):
         domain = numpy.sort(numpy.array(value, ndmin=2), axis=1)
         if domain.ndim != 2 or domain.shape[1] != 2:
             raise TypeError("Domain must have size (num_dimensions, 2)")
-        if any(domain[:, 0] >= domain[:, 1]):
+        if numpy.any(domain[:, 0] >= domain[:, 1]):
             raise ValueError("Lower bound must be less than upper bound")
         if not numpy.array_equal(self._domain, domain):
             self._domain = domain
