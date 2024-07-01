@@ -934,7 +934,7 @@ class PointSetProduct(MultidimensionalPointSet):
 
 
 class TensorProductPointSet(PointSetProduct):
-    """Generate a grid using all combinations of unidimensional point sets
+    """Points generated using all combinations of unidimensional points.
 
     Depending on the dimensionality, points and provided by
     :class:`UnidimensionalPointSet`, make full tensor grids.
