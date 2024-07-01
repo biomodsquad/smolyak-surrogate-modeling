@@ -337,7 +337,7 @@ def test_generate_compositions_include_zero_true():
     composition_expected = [[6, 0], [5, 1], [4, 2], [3, 3], [2, 4], [1, 5], [0, 6]]
     composition_obtained = []
     composition_obtained = list(
-        smolyay.samples.generate_compositions(6, 2, include_zero=True)
+        smolyay.samples._generate_compositions(6, 2, include_zero=True)
     )
     assert composition_obtained == composition_expected
 
@@ -346,7 +346,7 @@ def test_generate_compositions_include_zero_false():
     """Test the generate compositions function if include_zero is false."""
     composition_expected = [[5, 1], [4, 2], [3, 3], [2, 4], [1, 5]]
     composition_obtained = list(
-        smolyay.samples.generate_compositions(6, 2, include_zero=False)
+        smolyay.samples._generate_compositions(6, 2, include_zero=False)
     )
     assert composition_obtained == composition_expected
 
@@ -354,4 +354,4 @@ def test_generate_compositions_include_zero_false():
 def test_generate_compositions_zero_false_error():
     """Test that generate compositions raises an error for invalid input."""
     with pytest.raises(ValueError):
-        list(smolyay.samples.generate_compositions(6, 7, include_zero=False))
+        list(smolyay.samples._generate_compositions(6, 7, include_zero=False))

@@ -987,7 +987,7 @@ class SmolyakSparseProductPointSet(PointSetProduct):
         for sum_of_levels in range(max_num_levels):
             level_combinations.extend(
                 list(
-                    generate_compositions(
+                    _generate_compositions(
                         sum_of_levels, self.num_dimensions, include_zero=True
                     )
                 )
