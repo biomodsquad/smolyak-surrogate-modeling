@@ -695,7 +695,7 @@ class _QMCRandomPointSet(RandomPointSet):
 
 
 class LatinHypercubeRandomPointSet(_QMCRandomPointSet):
-    """Generates a grid using a LatinHypercube
+    """Points drawn randomly using a Latin hypercube.
 
 
     Parameters
