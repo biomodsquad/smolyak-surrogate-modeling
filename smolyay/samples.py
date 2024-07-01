@@ -514,15 +514,7 @@ class NestedTrigonometricPointSet(NestedUnidimensionalPointSet):
 
 
 class MultidimensionalPointSet(abc.ABC):
-    """Multidimensional set of points
-
-    Creates a set of grid points within the specified domain
-
-    Parameters
-    ----------
-    domain: list
-         the domain of the grid
-    """
+    """Multidimensional set of points."""
 
     def __init__(self):
         self._domain = None
