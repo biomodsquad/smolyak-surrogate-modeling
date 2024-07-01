@@ -726,7 +726,7 @@ class LatinHypercubeRandomPointSet(_QMCRandomPointSet):
         self, domain, num_points, seed, scramble=True, optimization=None, strength=1
     ):
         super().__init__(domain, num_points, seed, scramble, optimization)
-        self._strength = 1
+        self._strength = None
 
         self.strength = strength
 
