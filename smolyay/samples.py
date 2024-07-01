@@ -588,7 +588,7 @@ class RandomPointSet(MultidimensionalPointSet):
 
     @property
     def num_points(self):
-        """int: random seed for generating points"""
+        """int: Number of points"""
         return self._num_points
 
     @num_points.setter
