@@ -978,6 +978,7 @@ class SmolyakSparseProductPointSet(PointSetProduct):
         """
         # reset points
         self._points = None
+
         # find number of levels per dimension
         num_levels_per_dim = [ob.num_levels for ob in self._point_sets]
         max_num_levels = max(num_levels_per_dim)
