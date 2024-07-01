@@ -803,7 +803,7 @@ class HaltonRandomPointSet(_QMCRandomPointSet):
 
 
 class SobolRandomPointSet(_QMCRandomPointSet):
-    """Generates a grid using Sobol Sequence
+    """Points drawn randomly using a Sobol sequence.
 
     Parameters
     ----------
