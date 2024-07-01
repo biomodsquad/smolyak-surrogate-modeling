@@ -958,7 +958,7 @@ class TensorProductPointSet(PointSetProduct):
             self._points[i] = point
 
 class SmolyakSparseProductPointSet(PointSetProduct):
-    """Generate a grid using sparse combinations of unidimensional point sets
+    """Points generated from sparse combinations of unidimensional points.
 
     Depending on the dimensionality, points and provided by
     :class:`UnidimensionalPointSet`, make full tensor grids.
