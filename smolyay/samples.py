@@ -749,8 +749,8 @@ class LatinHypercubeRandomPointSet(_QMCRandomPointSet):
 
         Generates a set of monte carlo LatinHypercube points.
         """
-        lower_bounds = [bound[0] for bound in self.domain]
-        upper_bounds = [bound[1] for bound in self.domain]
+        lower_bounds = self.domain[:, 0]
+        upper_bounds = self.domain[:, 1]
         p_gen = scipy.stats.qmc.LatinHypercube(
             self.num_dimensions,
             scramble=self.scramble,
@@ -791,8 +791,8 @@ class HaltonRandomPointSet(_QMCRandomPointSet):
 
         Generates a set of quasi-monte carlo Halton Sequence points.
         """
-        lower_bounds = [bound[0] for bound in self.domain]
-        upper_bounds = [bound[1] for bound in self.domain]
+        lower_bounds = self.domain[:, 0]
+        upper_bounds = self.domain[:, 1]
         p_gen = scipy.stats.qmc.Halton(
             self.num_dimensions,
             scramble=self.scramble,
@@ -881,8 +881,8 @@ class SobolRandomPointSet(_QMCRandomPointSet):
 
         Generates a set of quasi-monte carlo Sobol Sequence points.
         """
-        lower_bounds = [bound[0] for bound in self.domain]
-        upper_bounds = [bound[1] for bound in self.domain]
+        lower_bounds = self.domain[:, 0]
+        upper_bounds = self.domain[:, 1]
         p_gen = scipy.stats.qmc.Sobol(
             self.num_dimensions,
             scramble=self.scramble,
