@@ -762,7 +762,7 @@ class LatinHypercubeRandomPointSet(_QMCRandomPointSet):
 
 
 class HaltonRandomPointSet(_QMCRandomPointSet):
-    """Generates a grid using Halton Sequences
+    """Points drawn randomly using a Halton sequence.
 
     Parameters
     ----------
