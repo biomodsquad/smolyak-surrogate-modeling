@@ -894,7 +894,7 @@ class SobolRandomPointSet(_QMCRandomPointSet):
 
 
 class PointSetProduct(MultidimensionalPointSet):
-    """Generate a grid using combinations of a unidimensional point set
+    """Points generated from combinations of unidimensional points.
 
     Parameters
     ----------
