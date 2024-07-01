@@ -54,13 +54,14 @@ class Surrogate_Test(Surrogate):
     def predict(self, x):
         return 1
     def fit(self, x, y):
-        c = x + y
+        self._point_set = x
 
 def test_initialization_1d():
     """Test if class is properly intiallized."""
     grid_generator = smolyay.samples.LatinHypercubeRandomPointSet((-1, 1),50,1234)
     domain = (-1, 1)
-    surrogate = Surrogate_Test(grid_generator)
+    surrogate = Surrogate_Test()
+    surrogate.fit(grid_generator,None)
     assert numpy.allclose(surrogate.domain, domain)
     assert isinstance(surrogate.point_set, smolyay.samples.MultidimensionalPointSet)
     assert surrogate.num_dimensions == 1

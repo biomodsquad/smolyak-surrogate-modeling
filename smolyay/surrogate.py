@@ -28,12 +28,10 @@ class Surrogate(abc.ABC):
         a point set of samples
     """
 
-    def __init__(self, point_set):
+    def __init__(self):
         self._data = None
         self._point_set = None
         self._valid_cache = False
-        
-        self.point_set = point_set
 
         
     @property
