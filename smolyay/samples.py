@@ -619,8 +619,8 @@ class UniformRandomPointSet(RandomPointSet):
 
         Generates uniformly distributed random points
         """
-        lower_bounds = [bound[0] for bound in self.domain]
-        upper_bounds = [bound[1] for bound in self.domain]
+        lower_bounds = self.domain[:, 0]
+        upper_bounds = self.domain[:, 1]
         num_dimensions = len(lower_bounds)
         p_gen = numpy.random.default_rng(seed=self.seed).uniform(
             size=(self.num_points, num_dimensions)
