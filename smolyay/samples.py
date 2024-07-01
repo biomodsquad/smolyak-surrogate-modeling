@@ -629,7 +629,7 @@ class UniformRandomPointSet(RandomPointSet):
 
 
 class _QMCRandomPointSet(RandomPointSet):
-    """Point set that generates points using a QMCEngine
+    """Points drawn randomly using a QMCEngine
 
     This random point set relies on the QMCEngine objects in
     the scipy.stats.qmc module to generate points.
@@ -776,8 +776,7 @@ class HaltonRandomPointSet(_QMCRandomPointSet):
         seed for generating the random points
 
     scramble : bool
-        Default True. Applies centering to Latin Hypercube points, Owen
-        scrambling to Halton points, and LMS+shift scrambling to Sobol points.
+        Default True. Applies Owen scrambling to Halton points.
 
     optimization : {None, "random-cd", "lloyd"}
         Default None. If "random-cd" the coordinates of points are adjusted to
@@ -817,13 +816,16 @@ class SobolRandomPointSet(_QMCRandomPointSet):
         seed for generating the random points
 
     scramble : bool
-        Default True. Applies centering to Latin Hypercube points, Owen
-        scrambling to Halton points, and LMS+shift scrambling to Sobol points.
+        Default True. Applies LMS+shift scrambling to Sobol points.
 
     optimization : {None, "random-cd", "lloyd"}
         Default None. If "random-cd" the coordinates of points are adjusted to
         lower the centered discrepancy. If "lloyd", adjust points using a
         Lloyd-Max algorithm to encourage even spacing.
+
+    bits : int
+        Default 30. Sets the max number of points that can be generated,
+        which is 2**bits.
 
     Raises
     ------
@@ -842,7 +844,7 @@ class SobolRandomPointSet(_QMCRandomPointSet):
 
     @property
     def bits(self):
-        """{1, 2}: Whether to create an orthogonal array of points"""
+        """int: Sets max number of points to generate at 2**bits."""
         return self._bits
 
     @bits.setter
@@ -957,12 +959,12 @@ class TensorProductPointSet(PointSetProduct):
         for i, point in enumerate(itertools.product(*self._point_sets)):
             self._points[i] = point
 
+
 class SmolyakSparseProductPointSet(PointSetProduct):
     """Points generated from sparse combinations of unidimensional points.
 
-    Depending on the dimensionality, points and provided by
-    :class:`UnidimensionalPointSet`, make full tensor grids.
-    :meth:`generates_points` generates a full tensor grid
+    Depending on the dimensionality, and levels in each point set in
+    param:`point_sets`, makes sparse smolyak grids.
 
     Parameters
     ----------
@@ -971,10 +973,10 @@ class SmolyakSparseProductPointSet(PointSetProduct):
     """
 
     def _create(self):
-        """Generating the tensor grid
+        """Generating the sparse smolyak grid
 
         Using the parameters of the class, generate a grid set using all
-        combinations of unidimensional points
+        valid smolyak combinations of unidimensional points
         """
         # reset points
         self._points = None
