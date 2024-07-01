@@ -998,18 +998,17 @@ class SmolyakSparseProductPointSet(PointSetProduct):
         # remove combinations where a dimension exceeds its number of levels
         # only check if point sets have different numbers of levels
         if min(num_levels_per_dim) != max_num_levels:
-            valid_comb = numpy.all(
-                numpy.greater(num_levels_per_dim, level_combinations), axis=1
-            )
+            valid_comb = numpy.all(numpy.less(level_combinations, num_levels_per_dim), axis=1)
             level_combinations = level_combinations[valid_comb]
         # generate sets of points based on combinations of levels
         for level_comb in level_combinations:
             level_point_combinations = [
                 self._point_sets[d].level(level) for d, level in enumerate(level_comb)
             ]
-            points_ = numpy.array(numpy.meshgrid(*level_point_combinations)).T.reshape(
-                -1, self.num_dimensions
-            )
+            num_points = numpy.prod([len(p) for p in level_point_combinations])
+            points_ = numpy.zeros((num_points, len(level_point_combinations)), dtype=float)
+            for i, point in enumerate(itertools.product(*level_point_combinations)):
+                points_[i] = point
             if self._points is None:
                 self._points = points_
             else:
