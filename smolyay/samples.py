@@ -612,7 +612,7 @@ class RandomPointSet(MultidimensionalPointSet):
 
 
 class UniformRandomPointSet(RandomPointSet):
-    """Generates a grid using a uniform distribution"""
+    """Points drawn from a uniform random distribution."""
 
     def _create(self):
         """Generate a set of random points
