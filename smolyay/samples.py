@@ -784,9 +784,6 @@ class HaltonRandomPointSet(_QMCRandomPointSet):
         lower the centered discrepancy. If "lloyd", adjust points using a
         Lloyd-Max algorithm to encourage even spacing.
 
-    bits : int
-        Default 30. Sets the max number of points that can be generated,
-        which is 2**bits.
     """
 
     def _create(self):
