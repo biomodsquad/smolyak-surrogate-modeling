@@ -869,11 +869,11 @@ class SobolRandomPointSet(_QMCRandomPointSet):
         num_points = int(value)
         if num_points & (num_points - 1) != 0:
             raise ValueError("Number of points must be power of 2")
-        if num_points > 2**self.bits:
+        elif num_points > 2**self.bits:
             raise ValueError("Number of points must be less than 2**bits")
+
         if self._num_points != num_points:
             self._num_points = num_points
-
             self._valid_cache = False
 
     def _create(self):
