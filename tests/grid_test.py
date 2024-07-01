@@ -310,6 +310,28 @@ def test_generate_smolyak_points():
     assert numpy.allclose(f.points, answer)
 
 
+def test_generate_smolyak_points_different_levels():
+    """Test the generate_tensor_combinations for a series with one set."""
+    point_sets = [
+        smolyay.samples.NestedClenshawCurtisPointSet([-1, 1], 3),
+        smolyay.samples.NestedClenshawCurtisPointSet([-2, 2], 2),
+    ]
+    answer = [
+        [0.0, 0.0],
+        [-1.0, 0.0],
+        [1.0, 0.0],
+        [0.0, -2.0],
+        [0.0, 2.0],
+        [-0.70710678, 0.0],
+        [0.70710678, 0.0],
+        [-1.0, -2.0],
+        [-1.0, 2.0],
+        [1.0, -2.0],
+        [1.0, 2.0],
+    ]
+    f = smolyay.samples.SmolyakSparseProductPointSet(point_sets)
+    assert numpy.allclose(f.points, answer)
+
 def test_generate_compositions_include_zero_true():
     """Test the generate compositions function if include_zero is true."""
     composition_expected = [[6, 0], [5, 1], [4, 2], [3, 3], [2, 4], [1, 5], [0, 6]]
