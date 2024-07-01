@@ -1014,7 +1014,7 @@ class SmolyakSparseProductPointSet(PointSetProduct):
                 self._points = numpy.concatenate((self._points, points_), axis=0)
 
 
-def generate_compositions(value, num_parts, include_zero):
+def _generate_compositions(value, num_parts, include_zero):
     """Generate compositions of a value into num_parts parts.
 
     The algorithm that is being used is NEXCOM and can be found in
