@@ -838,7 +838,7 @@ class SobolRandomPointSet(_QMCRandomPointSet):
     def __init__(
         self, domain, num_points, seed, scramble=True, optimization=None, bits=30
     ):
-        self._bits = 64  # max value of bits
+        self._bits = 64  # bits must have a value before num_points can be set
         super().__init__(domain, num_points, seed, scramble, optimization)
         self.bits = bits
 
